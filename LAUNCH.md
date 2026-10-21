@@ -33,14 +33,14 @@ How to use this file:
 - [x] core/cache (Redis + Postgres fallback), core/graph (recursive SQL + networkx), core/embeddings (fastembed + fake), core/llm (mockable)
 
 ## Stage 2 — Auth and security (Session A)
-- [ ] Ninja auth class: Supabase JWT via JWKS (signature, expiry, audience, pinned alg); Member lookup by auth_user_id; first-login member creation
-- [ ] DEMO_AUTH persona tokens in dev/demo; startup refusal in staging/production (tested)
-- [ ] Permission helpers: require_role, require_level, organisation scoping
-- [ ] Organisations: create (super admin), join by code or verified email domain, leave, remove
-- [ ] RLS deny-by-default on every table (migration); app DB role documented
-- [ ] Rate limits on extraction, intros, applications, reports, claims
-- [ ] CORS exact origins + staging preview regex; security headers; Django SECURE_* settings
-- [ ] Tests: expired/forged tokens, every role on every endpoint, IDOR on every ID, org scoping, no PII in logs
+- [x] Ninja auth class: Supabase JWT via JWKS (signature, expiry, audience, pinned alg); Member lookup by auth_user_id; first-login member creation
+- [x] DEMO_AUTH persona tokens in dev/demo; startup refusal in staging/production (tested)
+- [x] Permission helpers: require_role, require_level, organisation scoping
+- [x] Organisations: create (super admin), join by code or verified email domain, leave, remove
+- [x] RLS deny-by-default on every table (migration); app DB role documented
+- [ ] Rate limits on extraction, intros, applications, reports, claims (helper `core.ratelimit.check_rate` + limits are built and wired on org join; the other endpoints do not exist yet, so Stage 3 adds one call to each)
+- [x] CORS exact origins + staging preview regex; security headers; Django SECURE_* settings
+- [x] Tests: expired/forged tokens, every role on every endpoint, IDOR on every ID, org scoping, no PII in logs
 
 ## Stage 3 — Core features API (Session A)
 - [ ] Members, startups, needs, offers; smart onboarding endpoint with LLM + manual fallback (F1)

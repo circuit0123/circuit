@@ -49,6 +49,11 @@ class Cache:
 
         return self._safe("incr", run)
 
+    def ttl(self, key: str) -> int | None:
+        """Seconds until `key` expires, or None if unknown (missing key or Redis down)."""
+        seconds = self._safe("ttl", lambda: self.client.ttl(key))
+        return seconds if isinstance(seconds, int) and seconds > 0 else None
+
     def flush_prefix(self, prefix: str) -> None:
         def run():
             for k in self.client.scan_iter(f"{prefix}*"):

@@ -22,6 +22,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.gis",
     "django.contrib.postgres",
+    "corsheaders",
+    "ninja",
     "core",
     "django_otp",
     "django_otp.plugins.otp_totp",
@@ -41,6 +43,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "core.logging.RequestLogMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    # Security headers sit outside everything that can answer early (CORS preflight, redirects, errors).
+    "core.security.SecurityHeadersMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -96,6 +102,7 @@ DEMO_AUTH = cfg.demo_auth
 DEMO_PUBLIC = cfg.demo_public
 SUPABASE_URL = cfg.supabase_url
 SUPABASE_JWT_AUDIENCE = cfg.supabase_jwt_audience
+SUPABASE_JWT_ALG = cfg.supabase_jwt_alg
 LLM_PROVIDER = cfg.llm_provider
 GEMINI_API_KEY = cfg.gemini_api_key
 GROQ_API_KEY = cfg.groq_api_key
@@ -104,9 +111,45 @@ EMBEDDING_PROVIDER = cfg.embedding_provider
 EMAIL_FROM = cfg.email_from
 SUPPORT_EMAIL = cfg.support_email
 SEED_CITY = {"name": cfg.seed_city_name, "lat": cfg.seed_city_lat, "lng": cfg.seed_city_lng}
-CORS_ALLOWED_ORIGINS = cfg.csv(cfg.cors_allowed_origins)
-CORS_PREVIEW_REGEX = cfg.cors_preview_regex
 CSRF_TRUSTED_ORIGINS = cfg.csv(cfg.csrf_trusted_origins)
+
+# CORS: exact origins (+ the staging preview regex). Bearer tokens, so no cookies cross origins.
+CORS_ALLOWED_ORIGINS = cfg.csv(cfg.cors_allowed_origins)
+CORS_ALLOWED_ORIGIN_REGEXES = [cfg.cors_preview_regex] if cfg.cors_preview_regex else []
+CORS_URLS_REGEX = r"^/api/"
+CORS_ALLOW_CREDENTIALS = False
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+CORS_ALLOW_HEADERS = ["authorization", "content-type", "x-request-id"]
+CORS_EXPOSE_HEADERS = ["x-request-id"]
+CORS_PREFLIGHT_MAX_AGE = 600
+
+# Security headers and request limits (PRODUCTION.md §3)
+X_FRAME_OPTIONS = "DENY"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1_000_000
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 8 * 3600
+if ENV != "dev":  # demo is on the public internet too
+    SECURE_SSL_REDIRECT = True
+    SECURE_REDIRECT_EXEMPT = [r"^api/health"]  # Cloud Run health checks arrive over plain HTTP
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # Cloud Run terminates TLS
+    SECURE_HSTS_SECONDS = 31_536_000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# Rate limits: (max requests, window in seconds) per member per action (core/ratelimit.py)
+RATE_LIMITS = {
+    "extraction": (10, 3600),
+    "intro": (10, 86400),
+    "application": (30, 86400),
+    "report": (10, 86400),
+    "claim": (5, 86400),
+    "org_join": (10, 3600),
+}
 
 EMAIL_BACKEND = {
     "console": "django.core.mail.backends.console.EmailBackend",

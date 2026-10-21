@@ -1,7 +1,7 @@
 import structlog
 from django.conf import settings
 from django.db import connection
-from ninja import Router, Schema
+from ninja import Router, Schema, Status
 
 log = structlog.get_logger("health")
 router = Router()
@@ -50,4 +50,4 @@ def deps(request):
     if overall == "ok" and redis_state == "down":
         overall = "degraded"
     body = {"status": overall, "postgres": pg, "redis": redis_state, "jwks": jwks}
-    return (503 if overall == "fail" else 200), body
+    return Status(503 if overall == "fail" else 200, body)

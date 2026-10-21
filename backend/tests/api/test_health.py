@@ -11,9 +11,22 @@ def test_health_ok():
     assert r.status_code == 200 and r.json() == {"status": "ok"}
 
 
-def test_health_deps_ok_skips_jwks():
+def test_health_deps_ok_skips_jwks(settings):
+    settings.SUPABASE_URL = ""
     body = Client().get("/api/health/deps").json()
     assert body["postgres"] == "ok" and body["redis"] == "ok" and body["jwks"] == "skipped"
+
+
+def test_health_deps_checks_jwks_when_supabase_configured():
+    assert Client().get("/api/health/deps").json()["jwks"] == "ok"  # conftest points auth at a fake JWKS
+
+
+def test_health_deps_fails_when_jwks_unreachable(supabase, monkeypatch):
+    from core import auth
+
+    monkeypatch.setattr(auth, "_fetch_jwks", lambda **kw: (_ for _ in ()).throw(ConnectionError("down")))
+    r = Client().get("/api/health/deps")
+    assert r.status_code == 503 and r.json()["jwks"] == "down"
 
 
 def test_unknown_route_uses_error_format():

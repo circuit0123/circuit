@@ -1,6 +1,7 @@
 """One logging setup: structlog JSON, one line per request, no PII."""
 
 import logging
+import re
 import sys
 import time
 import uuid
@@ -34,6 +35,10 @@ def configure_logging(level: str = "INFO") -> None:
     )
 
 
+# A client-supplied id is kept only if it is short and plain; anything else could forge log lines or bloat them.
+_SAFE_REQUEST_ID = re.compile(r"[A-Za-z0-9._-]{1,64}")
+
+
 class RequestLogMiddleware:
     """Assigns a request_id and writes exactly one JSON line per request."""
 
@@ -42,7 +47,8 @@ class RequestLogMiddleware:
         self.log = structlog.get_logger("request")
 
     def __call__(self, request):
-        request_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex
+        supplied = request.headers.get("X-Request-ID", "")
+        request_id = supplied if _SAFE_REQUEST_ID.fullmatch(supplied) else uuid.uuid4().hex
         request.request_id = request_id
         structlog.contextvars.clear_contextvars()
         structlog.contextvars.bind_contextvars(request_id=request_id)

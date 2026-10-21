@@ -1,5 +1,6 @@
 """One error format for every endpoint: {"error": {"code", "message", "details"}}."""
 
+from django.core.exceptions import RequestDataTooBig
 from django.http import Http404
 from ninja import NinjaAPI
 from ninja.errors import AuthenticationError, HttpError, ValidationError
@@ -40,8 +41,19 @@ class Conflict(ApiError):
 
 
 class RateLimited(ApiError):
-    def __init__(self, message: str = "Too many requests, try again later"):
-        super().__init__(429, "rate_limited", message)
+    def __init__(self, message: str = "Too many requests, try again later", retry_after: int | None = None):
+        super().__init__(429, "rate_limited", message, {"retry_after": retry_after} if retry_after else None)
+        self.retry_after = retry_after
+
+
+class Unauthenticated(ApiError):
+    def __init__(self, message: str = "Authentication required"):
+        super().__init__(401, "unauthenticated", message)
+
+
+class ServiceUnavailable(ApiError):
+    def __init__(self, message: str, code: str = "service_unavailable"):
+        super().__init__(503, code, message)
 
 
 def _respond(api: NinjaAPI, request, status: int, code: str, message: str, details=None):
@@ -64,6 +76,10 @@ def install_handlers(api: NinjaAPI) -> None:
     @api.exception_handler(NinjaAuthorizationError)
     def _forbidden(request, exc):
         return _respond(api, request, 403, "forbidden", "You do not have permission to do this")
+
+    @api.exception_handler(RequestDataTooBig)
+    def _too_big(request, exc):
+        return _respond(api, request, 413, "payload_too_large", "Request body is too large")
 
     @api.exception_handler(Http404)
     def _404(request, exc):

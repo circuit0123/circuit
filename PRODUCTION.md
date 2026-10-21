@@ -101,10 +101,33 @@ Switching to the real domain (config only, ~1 hour plus DNS wait):
 - Django admin: staff only, TOTP 2FA required, non-obvious path, disabled in demo,
   all actions audit-logged. Django's security settings on (SECURE_*, HSTS, secure cookies).
 - Rate limits (Redis): onboarding extraction, intros, applications, reports, claims.
+- Rate limits: `core.ratelimit.check_rate(member_id, action)` with limits in `settings.RATE_LIMITS`
+  (extraction, intro, application, report, claim, org_join). Redis first; Postgres fallback if Redis is down.
 - CORS: exact origins only. Headers: CSP, HSTS, nosniff, Referrer-Policy, frame-ancestors.
 - Input validation (Ninja schemas), request size limits, upload type/size checks.
 - No personal data in logs or analytics (tested).
 - Dependabot + secret scanning; 2FA on GitHub, GCP, Supabase, Vercel, Upstash.
+
+### 3a. Database roles and RLS
+- Django connects as the **table owner** (the pooler URL's user). Owners bypass RLS, so the app is the only
+  writer. Never `FORCE ROW LEVEL SECURITY`, or the app would lock itself out.
+- Every table in `public` has RLS enabled with **no policies** (`core/rls.py`, run by migration `core.0002`
+  and again after every `migrate`). Supabase's `anon` and `authenticated` roles (PostgREST, Realtime) therefore
+  read nothing. When Stage 6 adds Realtime, add narrow per-table SELECT policies for `authenticated`; never a blanket one.
+- The Supabase service-role key exists only in the backend's Secret Manager; never in Vercel or the repo.
+- Supabase Auth must use **asymmetric JWT signing keys** (ES256 default, or RS256 via `SUPABASE_JWT_ALG`). The
+  API pins that algorithm and rejects HS256 tokens, so projects still on the legacy shared secret will not work.
+- Supabase Auth settings that auto-join relies on: only Google + email OTP enabled, password sign-up off,
+  "Confirm email" on. The API trusts the `email` claim only for those providers and ignores `user_metadata`.
+- `/api/docs` and `/api/openapi.json` are not served when `ENV=production`.
+- Defence in depth behind RLS: migration `core.0003` revokes all table/sequence privileges from `anon` and
+  `authenticated` (and from future tables). Stage 6 Realtime must `GRANT SELECT` per table, plus a policy, on purpose.
+- Outside `dev`, `migrate` fails if any `public` table still lacks RLS (e.g. owned by a different role).
+- Demo is internet-facing, so it gets the same settings as staging/production: HTTPS redirect, HSTS, secure
+  cookies, DEBUG off, a random 32+ character `SECRET_KEY` (demo tokens are signed with a key derived from it).
+- `SUPABASE_URL` must be `https://` outside dev (the signing keys are downloaded from it). Signing keys are cached
+  10 minutes and, if Supabase is unreachable, trusted for at most 6 hours.
+- Known limit: Supabase access tokens stay valid until they expire (about 1 hour) even after sign-out or a ban.
 
 ## 4. Roles and data access
 

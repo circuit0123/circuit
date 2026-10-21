@@ -5,7 +5,7 @@ from circuit.config import Config
 
 BASE = dict(
     env="dev",
-    secret_key="x" * 20,
+    secret_key="aB3dE5fG7hJ9kL1mN3pQ5rS7tU9vW1xY3zA5",
     database_url="postgres://u:p@h/d",
     redis_url="redis://h",
     allowed_hosts="h",
