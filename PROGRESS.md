@@ -1,10 +1,10 @@
 # Circuit — Progress
 
-Branch: `backend-core` (LAUNCH.md Stages 1–3, backend only)
+Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 gets its own branch. Backend only for now.
 
 ## Status
-- Stage 1 — Backend foundation: **done**
-- Stage 2 — Auth and security: **done, awaiting OK** (make check green: ruff, mypy, all tests; finecomb audit done, findings fixed)
+- Stage 1 — Backend foundation: **done and merged**
+- Stage 2 — Auth and security: **done and merged** (make check green: ruff, mypy, 321 tests; finecomb audit done, findings fixed)
   - One box stays open on purpose: rate limits on extraction/intros/applications/reports/claims. The helper and limits exist and org join uses them; those endpoints arrive in Stage 3, and each adds one `check_rate(member.pk, "<action>")` line.
 - Stage 3 — Core features API: not started
 
