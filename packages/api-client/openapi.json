@@ -1,0 +1,112 @@
+{
+  "components": {
+    "schemas": {
+      "DepStatus": {
+        "properties": {
+          "jwks": {
+            "title": "Jwks",
+            "type": "string"
+          },
+          "postgres": {
+            "title": "Postgres",
+            "type": "string"
+          },
+          "redis": {
+            "title": "Redis",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "postgres",
+          "redis",
+          "jwks"
+        ],
+        "title": "DepStatus",
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "Health",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Circuit backend. Errors always use {error: {code, message, details}}; lists use {items, count, next_offset}.",
+    "title": "Circuit API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/health": {
+      "get": {
+        "description": "Process is up. Touches no dependencies.",
+        "operationId": "core_health_health",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Liveness",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/health/deps": {
+      "get": {
+        "description": "Checks Postgres, Redis and the Supabase JWKS (skipped when SUPABASE_URL is unset). Redis down is degraded, not failed, because Postgres is the source of truth.",
+        "operationId": "core_health_deps",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepStatus"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepStatus"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Dependency health",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  },
+  "servers": []
+}

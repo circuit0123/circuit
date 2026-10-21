@@ -1,0 +1,18 @@
+services:
+  db:
+    build: docker/postgres
+    environment:
+      POSTGRES_USER: circuit
+      POSTGRES_PASSWORD: circuit
+      POSTGRES_DB: circuit
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U circuit"]
+      interval: 5s
+      retries: 10
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+volumes:
+  pgdata:
