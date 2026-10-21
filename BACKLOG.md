@@ -1,0 +1,68 @@
+# Circuit — Backlog
+
+Work AFTER LAUNCH.md. Everything needed before the pilot lives in LAUNCH.md, not here.
+Pull an item into a new numbered stage before building it; tick it when merged.
+
+Priority: P1 = during pilot · P2 = after pilot · Later = only when data says so.
+
+---
+
+## P1 — during the pilot
+
+### Networking redesign
+- [ ] Home opportunities feed (matches, nearby jobs, circuits, intros, profile views, skills in demand). No likes, no posts
+- [ ] Profiles: headline, verification badge, capability chips, proof of work first, profile strength meter
+- [ ] Connections (request with note, accept/decline, mutuals) feeding warm paths
+- [ ] Follow startups
+- [ ] Notifications centre (grouped, read/unread)
+- [ ] Global search (people, startups, jobs, skills); Cmd/Ctrl+K on desktop
+- [ ] Inbox via Supabase Realtime (connected members only; students can't message strangers)
+- [ ] Animation pass (page transitions, staggered lists, bottom sheets, swipe with button alternatives, circuit loop animation); reduced-motion respected
+
+### Students and proof of work
+- [ ] Searchable student profiles (opt-in) so founders can find students
+- [ ] Students post offers (skills) and join circuits
+- [ ] GitHub proof of work via OAuth: original repos, merged PRs, languages → capabilities; capped score weight; disconnect deletes data
+- [ ] Non-code proof: portfolio, Behance/Dribbble, case studies
+- [ ] "Project" job type for short paid gigs
+
+### Data
+- [ ] Production crawler as a Cloud Run Job: PageFetcher interface (own fetcher + optional Firecrawl), robots.txt, LLM extraction, dedupe, geocode, confidence score
+- [ ] Review queue in Django admin; "Unclaimed · from public sources" label
+- [ ] Public "Remove my startup" form + takedown queue
+- [ ] Pilot city: ~150 verified startups; re-crawl every 2–4 weeks
+- [ ] Startup claim outreach: 30–50 claimed with a real role
+
+### SEO
+- [ ] Public startup and job pages (statically generated on the landing site from public API endpoints), sitemap
+
+### Matching
+- [ ] v1.x tuning from real acceptance data (weights, bridge share, thresholds)
+- [ ] Grow eval set to a few hundred labelled pairs from real outcomes
+- [ ] Gap map export for partners (PDF/CSV)
+
+## P2 — after the pilot
+- [ ] Matching v2: learned weights (logistic regression) after a few hundred rated outcomes
+- [ ] Mentor chains; peer circles; reputation score (PageRank over "helped" edges)
+- [ ] Need decomposition (goal → sub-needs)
+- [ ] Level 4 community vouching
+- [ ] Regional language support
+- [ ] Partner self-serve onboarding
+- [ ] Investor tier; corporate innovation needs; services marketplace and perks
+
+## Later — only when measurements justify it
+- [ ] Matching v3: learning-to-rank (LightGBM) after thousands of outcomes
+- [ ] Bandit-learned bridge share per user; circuit scoring with predicted acceptance
+- [ ] Neo4j behind core/graph. Trigger: warm-path or circuit queries > ~500ms p95, circuit round > 10 minutes, or multi-hop features SQL can't express cleanly
+- [ ] Rust (PyO3) or Go for one hot path, only if profiling shows Python is the bottleneck
+- [ ] Portable signed badges (W3C Verifiable Credentials); ecosystem reports
+- [ ] Graph neural networks (tens of thousands of active users)
+
+## Decided against (don't reopen without new evidence)
+- Social feed with likes, follower counts and public posts
+- Scraping LinkedIn or any site that forbids it; proxy rotation / anti-bot evasion
+- Storing user passwords (only Django staff admins, with 2FA)
+- Success fees on fundraising; paying for placement in rankings
+- Microservices / Kubernetes at pilot scale
+- Neo4j for the pilot
+- Another backend rewrite before the pilot
