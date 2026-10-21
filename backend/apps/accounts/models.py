@@ -34,6 +34,7 @@ class Member(models.Model):
     is_minor = models.BooleanField(default=False)
     profile_visibility = models.CharField(max_length=10, choices=Visibility.choices, default=Visibility.MEMBERS)
     visible_to_org = models.BooleanField(default=False)
+    suspended_at = models.DateTimeField(null=True, blank=True)  # set = locked out of the API (moderation, takedowns)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

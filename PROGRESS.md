@@ -4,7 +4,7 @@ Branch: `backend-core` (LAUNCH.md Stages 1–3, backend only)
 
 ## Status
 - Stage 1 — Backend foundation: **done**
-- Stage 2 — Auth and security: **done, awaiting OK** (make check green: ruff, mypy, 286 tests; finecomb audit done, findings fixed)
+- Stage 2 — Auth and security: **done, awaiting OK** (make check green: ruff, mypy, all tests; finecomb audit done, findings fixed)
   - One box stays open on purpose: rate limits on extraction/intros/applications/reports/claims. The helper and limits exist and org join uses them; those endpoints arrive in Stage 3, and each adds one `check_rate(member.pk, "<action>")` line.
 - Stage 3 — Core features API: not started
 
@@ -44,7 +44,7 @@ Also found and fixed while writing tests: `remove_member` would have matched eve
 Checked, nothing found: algorithm confusion (alg none, HS256 with the public key), forged/expired/not-yet-valid tokens, wrong audience/issuer, malformed claim types and hostile tokens (always 401, never 500), IDOR on member ids, role bypass on every route, PII in logs.
 
 ## Decisions for you / not changed
-1. **No way to suspend a member.** A deleted Member is re-created as a fresh student on their next request (their token stays valid ~1 h), and there is no ban switch. Needed for moderation/takedowns (Stage 6/F13). It needs one new column (e.g. `Member.suspended_at`), which is not in the CLAUDE.md data model. Say yes and I add it with Stage 3.
+1. ~~No way to suspend a member~~ **Done (you approved it).** `Member.suspended_at` (migration `accounts.0003`, also added to the CLAUDE.md data model). A suspended member gets `403 account_suspended` on every authenticated route, checked against the database on each request, so it bites immediately even though their token lives ~1 h. Super admins suspend/reinstate from the Member list in Django admin (audit-logged; suspending also clears "visible to my organisation"). Suspended members are hidden from partner admins' lists. To remove someone, **suspend, don't delete**: a deleted Member is re-created as a fresh student by their next valid token.
 2. **Under-18 members** who tick "visible to my organisation" show up in the partner admin's list. CLAUDE.md does not say whether to exclude them. I did not change it.
 3. **Django admin login has no password-attempt limit** (TOTP is throttled by django-otp; the password step is not). Low risk with 2–3 staff and a hidden path, but a proper fix needs a trusted client-IP rule or `django-axes` (not approved). Suggest Stage 8.
 4. **Assumptions about Supabase** (can't be tested offline): only Google + email OTP enabled, password sign-up off, "Confirm email" on, asymmetric JWT signing keys on. The API trusts the `email` claim only for those providers. Tokens can't be revoked before they expire (~1 h).

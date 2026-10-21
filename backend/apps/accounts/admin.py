@@ -1,14 +1,15 @@
 from django import forms
 from django.contrib import admin
+from django.utils import timezone
 
 from apps.accounts.models import Connection, Consent, Member
-from core.adminbase import AuditedAdmin, ReadOnlyAdmin
+from core.adminbase import AuditedAdmin, ReadOnlyAdmin, audit
 
 
 class MemberForm(forms.ModelForm):
     class Meta:
         model = Member
-        fields = ["role", "verification_level", "organisation"]
+        fields = ["role", "verification_level", "organisation", "suspended_at"]
 
     def clean(self):
         data = super().clean()
@@ -23,8 +24,8 @@ class MemberAdmin(AuditedAdmin):
 
     form = MemberForm
 
-    list_display = ("id", "display_name", "role", "verification_level", "organisation", "city")
-    list_filter = ("role", "verification_level", "organisation")
+    list_display = ("id", "display_name", "role", "verification_level", "organisation", "city", "suspended_at")
+    list_filter = ("role", "verification_level", "organisation", "suspended_at")
     search_fields = ("display_name",)
     readonly_fields = [
         "auth_user_id",
@@ -41,6 +42,29 @@ class MemberAdmin(AuditedAdmin):
         "created_at",
         "updated_at",
     ]
+
+    actions = ["suspend_members", "reinstate_members"]
+
+    @admin.action(description="Suspend selected members (locked out of the API at once)")
+    def suspend_members(self, request, queryset):
+        n = 0
+        for m in queryset.filter(suspended_at__isnull=True):
+            m.suspended_at = timezone.now()
+            m.visible_to_org = False
+            m.save(update_fields=["suspended_at", "visible_to_org", "updated_at"])
+            audit(request, "suspend", m)
+            n += 1
+        self.message_user(request, f"Suspended {n} member(s)")
+
+    @admin.action(description="Reinstate selected members")
+    def reinstate_members(self, request, queryset):
+        n = 0
+        for m in queryset.filter(suspended_at__isnull=False):
+            m.suspended_at = None
+            m.save(update_fields=["suspended_at", "updated_at"])
+            audit(request, "reinstate", m)
+            n += 1
+        self.message_user(request, f"Reinstated {n} member(s)")
 
     def has_add_permission(self, request):
         return False

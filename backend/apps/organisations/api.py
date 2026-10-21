@@ -87,7 +87,7 @@ def leave(request):
 )
 def members(request, params: PageParams = Query(...)):
     org_id = require_org_admin(current_member(request))
-    qs = Member.objects.filter(organisation_id=org_id, visible_to_org=True).order_by("id")
+    qs = Member.objects.filter(organisation_id=org_id, visible_to_org=True, suspended_at__isnull=True).order_by("id")
     return paginate(qs, params)
 
 

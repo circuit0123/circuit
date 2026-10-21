@@ -35,6 +35,11 @@ class Forbidden(ApiError):
         super().__init__(403, "forbidden", message)
 
 
+class AccountSuspended(ApiError):
+    def __init__(self):
+        super().__init__(403, "account_suspended", "This account is suspended")
+
+
 class Conflict(ApiError):
     def __init__(self, message: str, code: str = "conflict"):
         super().__init__(409, code, message)

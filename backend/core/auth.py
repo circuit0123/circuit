@@ -27,7 +27,7 @@ from django.db import IntegrityError, transaction
 from django.http import HttpRequest
 from ninja.security import HttpBearer
 
-from core.errors import ServiceUnavailable
+from core.errors import AccountSuspended, ServiceUnavailable
 
 log = structlog.get_logger("auth")
 
@@ -294,6 +294,9 @@ class SupabaseAuth(HttpBearer):
             member = _member_for_supabase(auth_user_id, email)
         if member is None:
             return None
+        if member.suspended_at is not None:
+            # Checked on every request against the database, so a suspension bites at once, not when the token expires.
+            raise AccountSuspended()
         request.member_id = member.pk  # type: ignore[attr-defined]  # picked up by the request log line
         return AuthContext(member=member, verified_email=email, kind=kind)  # type: ignore[arg-type]
 
