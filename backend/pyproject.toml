@@ -1,0 +1,57 @@
+[project]
+name = "circuit-backend"
+version = "0.1.0"
+description = "Circuit backend (Django + Ninja)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "anthropic>=2.1.0",
+    "django>=5.2,<6",
+    "django-cors-headers>=4.9.0",
+    "django-ninja>=1.7.1",
+    "django-otp>=1.7.5",
+    "fakeredis>=2.40.0",
+    "fastembed>=0.9.0",
+    "google-genai>=2.32.0",
+    "groq>=1.7.0",
+    "httpx>=0.28.1",
+    "networkx>=3.7",
+    "ortools>=9.15.6755",
+    "pgvector>=0.5.1",
+    "psycopg[binary]>=3.3.6",
+    "pydantic-settings>=2.16.1",
+    "pyjwt[crypto]>=2.15.1",
+    "redis>=8.1.0",
+    "resend>=2.50.0",
+    "sentry-sdk>=2.72.0",
+    "structlog>=26.1.0",
+]
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "django-stubs>=6.1.2",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "pytest-django>=4.14.0",
+    "ruff>=0.17.1",
+]
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008", "B905", "UP046", "UP047"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+ignore_missing_imports = true
+exclude = ["migrations/", "tests/"]
+
+[tool.django-stubs]
+django_settings_module = "circuit.settings"

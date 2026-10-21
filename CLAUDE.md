@@ -135,7 +135,7 @@ behind core/graph. Neo4j is NOT in scope (trigger in BACKLOG.md).
 ## Data model (Postgres)
 - members: id, auth_user_id (unique), role, display_name, bio, location (point), city,
   college, organisation_id (nullable), verification_level, open_intro_slots,
-  circuits_opt_in, is_minor, profile_visibility, visible_to_org, created_at, updated_at
+  circuits_opt_in, is_minor, profile_visibility, visible_to_org, suspended_at, created_at, updated_at
 - organisations: id, name, kind (college | incubator | program), city, email_domains,
   join_code, created_by. A member belongs to at most one organisation. Super admins
   create organisations and appoint the first partner_admin. Members join via invite
