@@ -80,3 +80,18 @@ class Consent(models.Model):
     policy_version = models.CharField(max_length=20)
     accepted_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class WorkEmailVerification(models.Model):
+    """A pending proof that a member controls a work email. Only the domain and a code hash are stored, never the address."""
+
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="work_email_checks")
+    email_domain = models.CharField(max_length=253)
+    code_hash = models.CharField(max_length=64)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["member"]), models.Index(fields=["expires_at"])]

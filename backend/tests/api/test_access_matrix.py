@@ -27,13 +27,54 @@ MATRIX = {
     ("POST", "/api/organisations/leave"): by_role(204, partner_admin=403),
     ("GET", "/api/organisations/mine/members"): by_role(403, partner_admin=200),
     ("DELETE", "/api/organisations/mine/members/{member_id}"): by_role(403, partner_admin=404),
+    # Stage 3, part 1
+    ("PATCH", "/api/me"): by_role(200),
+    ("GET", "/api/capabilities"): by_role(200),
+    ("GET", "/api/traits"): by_role(200),
+    ("GET", "/api/me/needs"): by_role(200),
+    ("PUT", "/api/me/needs"): by_role(200),
+    ("GET", "/api/me/offers"): by_role(200),
+    ("PUT", "/api/me/offers"): by_role(200),
+    ("GET", "/api/me/skills"): by_role(200),
+    ("PUT", "/api/me/skills"): by_role(200),
+    ("GET", "/api/me/traits"): by_role(200),
+    ("PUT", "/api/me/traits"): by_role(200),
+    ("GET", "/api/members/{member_id}"): by_role(404),
+    ("POST", "/api/onboarding/extract"): by_role(200),
+    ("POST", "/api/me/verify/work-email"): by_role(200),
+    ("POST", "/api/me/verify/work-email/confirm"): by_role(400),
+    ("GET", "/api/startups/nearby"): by_role(200),
+    ("GET", "/api/startups/map"): by_role(200),
+    ("GET", "/api/startups/{startup_id}"): by_role(404),
+    ("PATCH", "/api/startups/{startup_id}"): by_role(404),
+    ("POST", "/api/startups/{startup_id}/interest"): by_role(403, student=404),
+    ("DELETE", "/api/startups/{startup_id}/interest"): by_role(403, student=404),
+    ("POST", "/api/startups/{startup_id}/claim"): by_role(403, founder=404),
+    ("POST", "/api/startups/{startup_id}/claim/verify"): by_role(403, founder=404),
 }
+
+# Request bodies and query strings for routes that need them (default POST body is {"code": "X"}).
+BODIES = {
+    ("PATCH", "/api/me"): "{}",
+    ("PUT", "/api/me/needs"): "[]",
+    ("PUT", "/api/me/offers"): "[]",
+    ("PUT", "/api/me/skills"): "[]",
+    ("PUT", "/api/me/traits"): "[]",
+    ("PATCH", "/api/startups/{startup_id}"): "{}",
+    ("POST", "/api/onboarding/extract"): '{"bio": "I build things and need help with sales."}',
+    ("POST", "/api/me/verify/work-email"): '{"email": "someone@acme.io"}',
+    ("POST", "/api/me/verify/work-email/confirm"): '{"code": "ABCDEFGH"}',
+    ("POST", "/api/startups/{startup_id}/claim"): '{"email": "me@acme.io"}',
+    ("POST", "/api/startups/{startup_id}/claim/verify"): '{"code": "ABCDEFGH"}',
+}
+QUERIES = {("GET", "/api/startups/map"): "?min_lng=80&min_lat=13&max_lng=80.5&max_lat=13.5"}
 
 
 def call(client, method, path):
-    path = path.replace("{member_id}", "999999")
-    body = '{"code": "X"}' if method == "POST" else None
-    return client.generic(method, path, body, content_type="application/json") if body else client.generic(method, path)
+    key = (method, path)
+    url = path.replace("{member_id}", "999999").replace("{startup_id}", "999999") + QUERIES.get(key, "")
+    body = BODIES.get(key, '{"code": "X"}' if method == "POST" else None)
+    return client.generic(method, url, body, content_type="application/json") if body else client.generic(method, url)
 
 
 def operations():

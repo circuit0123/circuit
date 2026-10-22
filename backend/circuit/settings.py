@@ -149,6 +149,7 @@ RATE_LIMITS = {
     "report": (10, 86400),
     "claim": (5, 86400),
     "org_join": (10, 3600),
+    "verify": (5, 86400),
 }
 
 EMAIL_BACKEND = {
