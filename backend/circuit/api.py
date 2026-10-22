@@ -3,6 +3,7 @@ from ninja import NinjaAPI
 
 from apps.accounts.api import router as accounts_router
 from apps.organisations.api import router as organisations_router
+from apps.startups.api import router as startups_router
 from core.auth import SupabaseAuth
 from core.demo import router as demo_router
 from core.errors import install_handlers
@@ -21,3 +22,4 @@ api.add_router("/health", health_router, tags=["health"])
 api.add_router("/demo", demo_router, tags=["demo"])
 api.add_router("", accounts_router, tags=["accounts"])
 api.add_router("/organisations", organisations_router, tags=["organisations"])
+api.add_router("/startups", startups_router, tags=["startups"])

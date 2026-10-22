@@ -1,6 +1,132 @@
 {
   "components": {
     "schemas": {
+      "BboxParams": {
+        "properties": {
+          "capability": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capability"
+          },
+          "hiring": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hiring"
+          },
+          "max_lat": {
+            "maximum": 90,
+            "minimum": -90,
+            "title": "Max Lat",
+            "type": "number"
+          },
+          "max_lng": {
+            "maximum": 180,
+            "minimum": -180,
+            "title": "Max Lng",
+            "type": "number"
+          },
+          "min_lat": {
+            "maximum": 90,
+            "minimum": -90,
+            "title": "Min Lat",
+            "type": "number"
+          },
+          "min_lng": {
+            "maximum": 180,
+            "minimum": -180,
+            "title": "Min Lng",
+            "type": "number"
+          }
+        },
+        "required": [
+          "min_lng",
+          "min_lat",
+          "max_lng",
+          "max_lat"
+        ],
+        "title": "BboxParams",
+        "type": "object"
+      },
+      "CapabilityOut": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "category"
+        ],
+        "title": "CapabilityOut",
+        "type": "object"
+      },
+      "ClaimConfirmIn": {
+        "properties": {
+          "code": {
+            "maxLength": 16,
+            "minLength": 4,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "ClaimConfirmIn",
+        "type": "object"
+      },
+      "ClaimIn": {
+        "properties": {
+          "email": {
+            "maxLength": 254,
+            "title": "Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "ClaimIn",
+        "type": "object"
+      },
+      "CodeIn": {
+        "properties": {
+          "code": {
+            "maxLength": 16,
+            "minLength": 4,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "CodeIn",
+        "type": "object"
+      },
       "DemoToken": {
         "properties": {
           "access_token": {
@@ -47,6 +173,42 @@
         "title": "DepStatus",
         "type": "object"
       },
+      "ExtractIn": {
+        "properties": {
+          "bio": {
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Bio",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bio"
+        ],
+        "title": "ExtractIn",
+        "type": "object"
+      },
+      "ExtractOut": {
+        "properties": {
+          "source": {
+            "enum": [
+              "llm",
+              "manual"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "suggestions": {
+            "$ref": "#/components/schemas/Suggestions"
+          }
+        },
+        "required": [
+          "source",
+          "suggestions"
+        ],
+        "title": "ExtractOut",
+        "type": "object"
+      },
       "Health": {
         "properties": {
           "status": {
@@ -75,6 +237,22 @@
       },
       "MeOut": {
         "properties": {
+          "bio": {
+            "title": "Bio",
+            "type": "string"
+          },
+          "circuits_opt_in": {
+            "title": "Circuits Opt In",
+            "type": "boolean"
+          },
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "college": {
+            "title": "College",
+            "type": "string"
+          },
           "display_name": {
             "title": "Display Name",
             "type": "string"
@@ -87,6 +265,32 @@
             "title": "Is Minor",
             "type": "boolean"
           },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lng": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lng"
+          },
+          "open_intro_slots": {
+            "title": "Open Intro Slots",
+            "type": "integer"
+          },
           "organisation_id": {
             "anyOf": [
               {
@@ -98,6 +302,10 @@
             ],
             "title": "Organisation Id"
           },
+          "profile_visibility": {
+            "title": "Profile Visibility",
+            "type": "string"
+          },
           "role": {
             "title": "Role",
             "type": "string"
@@ -105,17 +313,332 @@
           "verification_level": {
             "title": "Verification Level",
             "type": "integer"
+          },
+          "visible_to_org": {
+            "title": "Visible To Org",
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "role",
           "display_name",
+          "bio",
+          "city",
+          "college",
+          "lat",
+          "lng",
           "verification_level",
           "organisation_id",
-          "is_minor"
+          "is_minor",
+          "profile_visibility",
+          "visible_to_org",
+          "circuits_opt_in",
+          "open_intro_slots"
         ],
         "title": "MeOut",
+        "type": "object"
+      },
+      "MePatch": {
+        "properties": {
+          "bio": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "circuits_opt_in": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Circuits Opt In"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "college": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "College"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "maximum": 90,
+                "minimum": -90,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lng": {
+            "anyOf": [
+              {
+                "maximum": 180,
+                "minimum": -180,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lng"
+          },
+          "open_intro_slots": {
+            "anyOf": [
+              {
+                "maximum": 10,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Intro Slots"
+          },
+          "profile_visibility": {
+            "anyOf": [
+              {
+                "enum": [
+                  "public",
+                  "members",
+                  "hidden"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Visibility"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "enum": [
+                  "student",
+                  "founder",
+                  "mentor",
+                  "investor"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "visible_to_org": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visible To Org"
+          }
+        },
+        "title": "MePatch",
+        "type": "object"
+      },
+      "NearbyParams": {
+        "properties": {
+          "capability": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capability"
+          },
+          "hiring": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hiring"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "maximum": 90,
+                "minimum": -90,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "limit": {
+            "default": 50,
+            "maximum": 200,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "lng": {
+            "anyOf": [
+              {
+                "maximum": 180,
+                "minimum": -180,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lng"
+          },
+          "radius_km": {
+            "default": 10,
+            "exclusiveMinimum": 0,
+            "maximum": 100,
+            "title": "Radius Km",
+            "type": "number"
+          }
+        },
+        "title": "NearbyParams",
+        "type": "object"
+      },
+      "NeedOfferIn": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Description",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capability"
+        ],
+        "title": "NeedOfferIn",
+        "type": "object"
+      },
+      "NeedOfferOut": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capability",
+          "description"
+        ],
+        "title": "NeedOfferOut",
+        "type": "object"
+      },
+      "OpenJobOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "stipend_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stipend Max"
+          },
+          "stipend_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stipend Min"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "stipend_min",
+          "stipend_max"
+        ],
+        "title": "OpenJobOut",
         "type": "object"
       },
       "OrgMemberOut": {
@@ -276,6 +799,518 @@
         ],
         "title": "PersonaChoice",
         "type": "object"
+      },
+      "PinOut": {
+        "properties": {
+          "claimed": {
+            "title": "Claimed",
+            "type": "boolean"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "hiring": {
+            "title": "Hiring",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lng": {
+            "title": "Lng",
+            "type": "number"
+          },
+          "match_pct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Pct"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "open_roles": {
+            "title": "Open Roles",
+            "type": "integer"
+          },
+          "sector": {
+            "title": "Sector",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "lat",
+          "lng",
+          "hiring",
+          "sector",
+          "claimed",
+          "open_roles"
+        ],
+        "title": "PinOut",
+        "type": "object"
+      },
+      "ProfileOut": {
+        "properties": {
+          "bio": {
+            "title": "Bio",
+            "type": "string"
+          },
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "college": {
+            "title": "College",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "needs": {
+            "items": {
+              "$ref": "#/components/schemas/NeedOfferOut"
+            },
+            "title": "Needs",
+            "type": "array"
+          },
+          "offers": {
+            "items": {
+              "$ref": "#/components/schemas/NeedOfferOut"
+            },
+            "title": "Offers",
+            "type": "array"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillOut"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "traits": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Traits",
+            "type": "array"
+          },
+          "verification_level": {
+            "title": "Verification Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "display_name",
+          "bio",
+          "city",
+          "college",
+          "verification_level",
+          "needs",
+          "offers",
+          "skills",
+          "traits"
+        ],
+        "title": "ProfileOut",
+        "type": "object"
+      },
+      "SkillIn": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "level": {
+            "default": 1,
+            "maximum": 3,
+            "minimum": 1,
+            "title": "Level",
+            "type": "integer"
+          },
+          "proof_url": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Proof Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capability"
+        ],
+        "title": "SkillIn",
+        "type": "object"
+      },
+      "SkillOut": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "proof_url": {
+            "title": "Proof Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capability",
+          "level",
+          "proof_url"
+        ],
+        "title": "SkillOut",
+        "type": "object"
+      },
+      "StartupOut": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "claimed": {
+            "title": "Claimed",
+            "type": "boolean"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "hiring": {
+            "title": "Hiring",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "interest_count": {
+            "title": "Interest Count",
+            "type": "integer"
+          },
+          "interested": {
+            "title": "Interested",
+            "type": "boolean"
+          },
+          "is_team": {
+            "title": "Is Team",
+            "type": "boolean"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lng": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lng"
+          },
+          "match_pct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Pct"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "open_jobs": {
+            "items": {
+              "$ref": "#/components/schemas/OpenJobOut"
+            },
+            "title": "Open Jobs",
+            "type": "array"
+          },
+          "sector": {
+            "title": "Sector",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          },
+          "tech_stack": {
+            "items": {},
+            "title": "Tech Stack",
+            "type": "array"
+          },
+          "view_count": {
+            "title": "View Count",
+            "type": "integer"
+          },
+          "website_domain": {
+            "title": "Website Domain",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "website_domain",
+          "description",
+          "sector",
+          "stage",
+          "address",
+          "lat",
+          "lng",
+          "hiring",
+          "tech_stack",
+          "claimed",
+          "source",
+          "view_count",
+          "interest_count",
+          "interested",
+          "is_team",
+          "match_pct",
+          "open_jobs"
+        ],
+        "title": "StartupOut",
+        "type": "object"
+      },
+      "StartupPatch": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 3000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "hiring": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hiring"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "maximum": 90,
+                "minimum": -90,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lng": {
+            "anyOf": [
+              {
+                "maximum": 180,
+                "minimum": -180,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lng"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "tech_stack": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tech Stack"
+          }
+        },
+        "title": "StartupPatch",
+        "type": "object"
+      },
+      "Suggestions": {
+        "properties": {
+          "needs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Needs",
+            "type": "array"
+          },
+          "offers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Offers",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "traits": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Traits",
+            "type": "array"
+          }
+        },
+        "required": [
+          "needs",
+          "offers",
+          "skills",
+          "traits"
+        ],
+        "title": "Suggestions",
+        "type": "object"
+      },
+      "TraitOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ],
+        "title": "TraitOut",
+        "type": "object"
+      },
+      "WorkEmailIn": {
+        "properties": {
+          "email": {
+            "maxLength": 254,
+            "title": "Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "WorkEmailIn",
+        "type": "object"
+      },
+      "WorkEmailOut": {
+        "properties": {
+          "dev_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dev Code"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "sent"
+        ],
+        "title": "WorkEmailOut",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -292,6 +1327,38 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/capabilities": {
+      "get": {
+        "description": "The fixed list of capabilities used for needs, offers and skills.",
+        "operationId": "apps_accounts_api_capabilities",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CapabilityOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Capability list",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
     "/api/demo/personas": {
       "get": {
         "description": "Dev and demo only.",
@@ -410,7 +1477,7 @@
     },
     "/api/me": {
       "get": {
-        "description": "The signed-in member's own basics.",
+        "description": "The signed-in member's own profile and settings.",
         "operationId": "apps_accounts_api_me",
         "parameters": [],
         "responses": {
@@ -431,6 +1498,498 @@
           }
         ],
         "summary": "Current member",
+        "tags": [
+          "accounts"
+        ]
+      },
+      "patch": {
+        "description": "Send only the fields to change. Role may be student, founder, mentor or investor (admin roles are set by Circuit). Joining circuits needs verification level 2. Under-18 members stay students and are never public.",
+        "operationId": "apps_accounts_api_update_me",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Update my profile",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/me/needs": {
+      "get": {
+        "description": "What I am looking for help with.",
+        "operationId": "apps_accounts_api_get_needs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NeedOfferOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My needs",
+        "tags": [
+          "accounts"
+        ]
+      },
+      "put": {
+        "description": "Replaces my needs with this list (max 8, capability slugs from /capabilities). Safe to repeat.",
+        "operationId": "apps_accounts_api_put_needs",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/NeedOfferIn"
+                },
+                "title": "Body",
+                "type": "array"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NeedOfferOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Set my needs",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/me/offers": {
+      "get": {
+        "description": "What I can help others with.",
+        "operationId": "apps_accounts_api_get_offers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NeedOfferOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My offers",
+        "tags": [
+          "accounts"
+        ]
+      },
+      "put": {
+        "description": "Replaces my offers with this list (max 8, capability slugs from /capabilities). Safe to repeat.",
+        "operationId": "apps_accounts_api_put_offers",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/NeedOfferIn"
+                },
+                "title": "Body",
+                "type": "array"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NeedOfferOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Set my offers",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/me/skills": {
+      "get": {
+        "description": "Skills with level 1-3 and optional proof link.",
+        "operationId": "apps_accounts_api_get_skills",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SkillOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My skills",
+        "tags": [
+          "accounts"
+        ]
+      },
+      "put": {
+        "description": "Replaces my skills (max 8). Level 1-3; proof_url is optional proof of work. Safe to repeat.",
+        "operationId": "apps_accounts_api_put_skills",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/SkillIn"
+                },
+                "title": "Body",
+                "type": "array"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SkillOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Set my skills",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/me/traits": {
+      "get": {
+        "description": "Trait slugs I picked.",
+        "operationId": "apps_accounts_api_get_traits",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My traits",
+        "tags": [
+          "accounts"
+        ]
+      },
+      "put": {
+        "description": "Replaces my traits (max 10, slugs from /traits). Safe to repeat.",
+        "operationId": "apps_accounts_api_put_traits",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Body",
+                "type": "array"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Set my traits",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/me/verify/work-email": {
+      "post": {
+        "description": "Sends a code to a work email (not a personal mailbox). Confirm it to reach verification level 2. Rate limited.",
+        "operationId": "apps_accounts_api_verify_work_email",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkEmailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkEmailOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Start work-email verification",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/me/verify/work-email/confirm": {
+      "post": {
+        "description": "Enter the code from the email. On success you reach verification level 2.",
+        "operationId": "apps_accounts_api_verify_work_email_confirm",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Confirm work-email code",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/members/{member_id}": {
+      "get": {
+        "description": "Another member's profile. Hidden, under-18, suspended, blocked and admin accounts are a 404.",
+        "operationId": "apps_accounts_api_member_profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "title": "Member Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "A member's profile",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/onboarding/extract": {
+      "post": {
+        "description": "Reads a pasted bio and suggests items from our fixed lists. Nothing is saved: confirm with the PUT endpoints. If the AI is unavailable, source is 'manual' with empty suggestions and the app shows the pickers. Rate limited.",
+        "operationId": "apps_accounts_api_extract",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtractIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Suggest needs and offers from a bio",
         "tags": [
           "accounts"
         ]
@@ -631,6 +2190,514 @@
         "summary": "Remove a member",
         "tags": [
           "organisations"
+        ]
+      }
+    },
+    "/api/startups/map": {
+      "get": {
+        "description": "Pins inside a bounding box (max about 2 degrees wide, max 500 pins). Hiring startups come first.",
+        "operationId": "apps_startups_api_map_pins",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "min_lng",
+            "required": true,
+            "schema": {
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Min Lng",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_lat",
+            "required": true,
+            "schema": {
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Min Lat",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_lng",
+            "required": true,
+            "schema": {
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Max Lng",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_lat",
+            "required": true,
+            "schema": {
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Max Lat",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hiring",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hiring"
+            }
+          },
+          {
+            "in": "query",
+            "name": "capability",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capability"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PinOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Startups in a map box",
+        "tags": [
+          "startups"
+        ]
+      }
+    },
+    "/api/startups/nearby": {
+      "get": {
+        "description": "Nearest first. Defaults to my saved location, else the city centre. Filters: hiring, capability of an open role, radius.",
+        "operationId": "apps_startups_api_nearby",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lat"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lng"
+            }
+          },
+          {
+            "in": "query",
+            "name": "radius_km",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "exclusiveMinimum": 0,
+              "maximum": 100,
+              "title": "Radius Km",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hiring",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hiring"
+            }
+          },
+          {
+            "in": "query",
+            "name": "capability",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capability"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PinOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Startups near a point",
+        "tags": [
+          "startups"
+        ]
+      }
+    },
+    "/api/startups/{startup_id}": {
+      "get": {
+        "description": "Profile, open roles, and how many people viewed it or showed interest (a reason to claim it). Counts one view per member per day.",
+        "operationId": "apps_startups_api_startup_detail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Startup profile",
+        "tags": [
+          "startups"
+        ]
+      },
+      "patch": {
+        "description": "Only the team of a claimed startup. Claimed data is never overwritten by anything else.",
+        "operationId": "apps_startups_api_update_startup",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartupPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Edit my startup",
+        "tags": [
+          "startups"
+        ]
+      }
+    },
+    "/api/startups/{startup_id}/claim": {
+      "post": {
+        "description": "Founders only. Sends a code to an email at the startup's own website domain. Rate limited. In dev and demo the code is returned.",
+        "operationId": "apps_startups_api_start_claim",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkEmailOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Start claiming a startup",
+        "tags": [
+          "startups"
+        ]
+      }
+    },
+    "/api/startups/{startup_id}/claim/verify": {
+      "post": {
+        "description": "Founders only. Enter the emailed code to become the startup's owner (also raises you to verification level 2). Rate limited.",
+        "operationId": "apps_startups_api_verify_claim",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Finish claiming a startup",
+        "tags": [
+          "startups"
+        ]
+      }
+    },
+    "/api/startups/{startup_id}/interest": {
+      "delete": {
+        "description": "Students only. Safe to repeat.",
+        "operationId": "apps_startups_api_remove_interest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Withdraw interest",
+        "tags": [
+          "startups"
+        ]
+      },
+      "post": {
+        "description": "Students only. Tells the startup I'm interested. Safe to repeat.",
+        "operationId": "apps_startups_api_add_interest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "I'm interested",
+        "tags": [
+          "startups"
+        ]
+      }
+    },
+    "/api/traits": {
+      "get": {
+        "description": "The fixed list of traits.",
+        "operationId": "apps_accounts_api_traits",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TraitOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Trait list",
+        "tags": [
+          "accounts"
         ]
       }
     }

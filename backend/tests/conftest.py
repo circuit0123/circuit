@@ -134,3 +134,26 @@ def client_for(token_for):
             return super().patch(path, data, content_type=content_type, **extra)
 
     return AuthedClient
+
+
+@pytest.fixture
+def lists(db):
+    """The fixed capability and trait lists (seed tests load them too)."""
+    from apps.matching.lists import sync_lists
+    from apps.matching.models import Capability, Trait
+
+    sync_lists(Capability, Trait)
+
+
+@pytest.fixture
+def make_startup(db):
+    from django.contrib.gis.geos import Point
+
+    from apps.startups.models import Startup
+
+    def _make(name="Acme", domain="acme.io", lat=13.08, lng=80.27, hiring=False, claimed_by=None, **kw):
+        return Startup.objects.create(
+            name=name, website_domain=domain, location=Point(lng, lat, srid=4326), hiring=hiring, claimed_by=claimed_by, **kw
+        )
+
+    return _make
