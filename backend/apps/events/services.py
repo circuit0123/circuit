@@ -20,6 +20,9 @@ EVENT_TYPES = frozenset(
         "startup.claimed",
         # jobs
         "job.created", "job.updated", "application.created", "application.withdrawn", "application.status_changed",
+        # circuits
+        "circuit.round_run", "circuit.proposed", "circuit.accepted", "circuit.declined", "circuit.activated",
+        "circuit.leg_done", "circuit.rated", "circuit.completed", "circuit.expired",
         # intros
         "intro.requested", "intro.broker_responded", "intro.responded", "intro.rated", "intro.expired",
         # matching

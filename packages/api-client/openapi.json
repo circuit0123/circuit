@@ -215,6 +215,59 @@
         "title": "CapabilityOut",
         "type": "object"
       },
+      "CircuitOut": {
+        "properties": {
+          "consent_deadline": {
+            "format": "date-time",
+            "title": "Consent Deadline",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "legs": {
+            "items": {
+              "$ref": "#/components/schemas/LegOut"
+            },
+            "title": "Legs",
+            "type": "array"
+          },
+          "my_consent": {
+            "title": "My Consent",
+            "type": "string"
+          },
+          "score_percent": {
+            "title": "Score Percent",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "week": {
+            "title": "Week",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "score_percent",
+          "week",
+          "consent_deadline",
+          "created_at",
+          "my_consent",
+          "legs"
+        ],
+        "title": "CircuitOut",
+        "type": "object"
+      },
       "ClaimConfirmIn": {
         "properties": {
           "code": {
@@ -988,6 +1041,64 @@
         "title": "JoinIn",
         "type": "object"
       },
+      "LegOut": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "consent": {
+            "title": "Consent",
+            "type": "string"
+          },
+          "fulfilled": {
+            "title": "Fulfilled",
+            "type": "boolean"
+          },
+          "giver": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "i_give": {
+            "title": "I Give",
+            "type": "boolean"
+          },
+          "i_receive": {
+            "title": "I Receive",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/PersonOut"
+          }
+        },
+        "required": [
+          "id",
+          "giver",
+          "receiver",
+          "capability",
+          "consent",
+          "fulfilled",
+          "rating",
+          "i_give",
+          "i_receive"
+        ],
+        "title": "LegOut",
+        "type": "object"
+      },
       "MatchOut": {
         "properties": {
           "candidate_id": {
@@ -1696,6 +1807,38 @@
           "count"
         ],
         "title": "Page[ApplicationOut]",
+        "type": "object"
+      },
+      "Page_CircuitOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CircuitOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[CircuitOut]",
         "type": "object"
       },
       "Page_IntroOut_": {
@@ -2620,6 +2763,248 @@
         "summary": "Capability list",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/circuits": {
+      "get": {
+        "description": "Exchange circuits I am part of, newest first, with live status: who gives what to whom, who has said yes, what has been handed over. A proposal nobody finished answering in 72 hours reads as expired.",
+        "operationId": "apps_circuits_api_list_circuits",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CircuitOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My circuits",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/circuits/{circuit_id}": {
+      "get": {
+        "description": "A circuit I am part of. Anyone else's circuit is a 404.",
+        "operationId": "apps_circuits_api_get_circuit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "circuit_id",
+            "required": true,
+            "schema": {
+              "title": "Circuit Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "One circuit",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/circuits/{circuit_id}/legs/{leg_id}/done": {
+      "post": {
+        "description": "The person giving says they have done their part. When all three are done the circuit is completed. Only the giver can do this, and only while the circuit is active. Safe to repeat.",
+        "operationId": "apps_circuits_api_mark_done",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "circuit_id",
+            "required": true,
+            "schema": {
+              "title": "Circuit Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "leg_id",
+            "required": true,
+            "schema": {
+              "title": "Leg Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Mark my handover done",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/circuits/{circuit_id}/legs/{leg_id}/rating": {
+      "post": {
+        "description": "The person receiving rates the handover from 1 to 5, once it is marked done. The first rating stands.",
+        "operationId": "apps_circuits_api_rate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "circuit_id",
+            "required": true,
+            "schema": {
+              "title": "Circuit Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "leg_id",
+            "required": true,
+            "schema": {
+              "title": "Leg Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RatingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Rate what I received",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/circuits/{circuit_id}/respond": {
+      "post": {
+        "description": "Each of the three people answers within 72 hours. When all three say yes the circuit becomes active; one no ends it for everyone. Answering the same way again is safe; changing your answer is a 409; an expired proposal is a 409.",
+        "operationId": "apps_circuits_api_respond",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "circuit_id",
+            "required": true,
+            "schema": {
+              "title": "Circuit Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Say yes or no to a circuit",
+        "tags": [
+          "circuits"
         ]
       }
     },

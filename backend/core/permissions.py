@@ -10,6 +10,9 @@ from django.db.models import QuerySet
 
 from core.errors import Forbidden
 
+# The roles that take part in the network (matches, intros, circuits). Admins run things; they are not matched.
+NETWORK_ROLES = ("student", "founder", "mentor", "investor")
+
 
 def require_role(member, *roles: str) -> None:
     if member.role not in roles:

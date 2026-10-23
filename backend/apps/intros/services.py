@@ -11,7 +11,7 @@ from django.db import transaction
 from django.db.models import Q, QuerySet
 from django.utils import timezone
 
-from apps.accounts.models import Member, Role
+from apps.accounts.models import Member
 from apps.accounts.services import visible_member
 from apps.events.services import record
 from apps.intros.models import IntroRequest
@@ -19,9 +19,9 @@ from apps.moderation.models import Block
 from apps.notifications.services import notify
 from core.errors import ApiError, Conflict, Forbidden, NotFound
 from core.graph import neighbours
+from core.permissions import NETWORK_ROLES
 from core.ratelimit import check_rate
 
-INTRO_ROLES = (Role.STUDENT, Role.FOUNDER, Role.MENTOR, Role.INVESTOR)
 WEEK = timedelta(days=7)
 S, G = IntroRequest.Status, IntroRequest.Stage
 
@@ -43,7 +43,7 @@ def _blocked(a: int, b: int) -> bool:
 
 def warm_path(member: Member, target_id: int) -> tuple[Member, Member | None]:
     """(target, broker) for the best path of one or two hops. The broker is None when we are already connected."""
-    if member.role not in INTRO_ROLES:
+    if member.role not in NETWORK_ROLES:
         raise Forbidden()
     target = visible_member(member, target_id)  # hidden, blocked, minor, admin and unknown people are a 404
     if target.pk == member.pk:
@@ -109,7 +109,7 @@ def expire_due() -> int:
 
 def respond(member: Member, intro_id: int, accept: bool) -> IntroRequest:
     """The broker (first) or the target (second) answers. Anyone not in the request gets a 404."""
-    if member.role not in INTRO_ROLES:
+    if member.role not in NETWORK_ROLES:
         raise Forbidden()
     with transaction.atomic():  # the write that marks it expired must be committed before we refuse
         intro, expired = _respond(member, intro_id, accept)

@@ -9,15 +9,10 @@ from apps.intros.models import IntroRequest
 from core.auth import current_member
 from core.errors import Forbidden
 from core.pagination import Page, PageParams, paginate
+from core.permissions import NETWORK_ROLES
+from core.schemas import PersonOut, person
 
 router = Router()
-
-
-class PersonOut(Schema):
-    id: int
-    display_name: str
-    role: str
-    verification_level: int
 
 
 class PathOut(Schema):
@@ -57,15 +52,11 @@ class IntroParams(PageParams):
     box: Literal["sent", "received", "brokered"] = "sent"
 
 
-def _person(m: Member) -> dict:
-    return {"id": m.pk, "display_name": m.display_name, "role": m.role, "verification_level": m.verification_level}
-
-
 def _out(i: IntroRequest, me: Member) -> dict:
     return {
         "id": i.pk, "my_role": "requester" if i.requester_id == me.pk else "broker" if i.via_id == me.pk else "target",
         "status": services.effective_status(i), "stage": i.stage, "can_respond": services.can_respond(i, me),
-        "requester": _person(i.requester), "target": _person(i.target), "via": _person(i.via) if i.via else None,
+        "requester": person(i.requester), "target": person(i.target), "via": person(i.via) if i.via else None,
         "message": i.message, "outcome_rating": i.outcome_rating, "created_at": i.created_at, "expires_at": i.expires_at,
     }  # fmt: skip
 
@@ -75,7 +66,7 @@ def _fresh(i: IntroRequest) -> IntroRequest:
 
 
 def _check_role(member: Member) -> None:
-    if member.role not in services.INTRO_ROLES:
+    if member.role not in NETWORK_ROLES:
         raise Forbidden()
 
 
@@ -88,7 +79,7 @@ def _check_role(member: Member) -> None:
 )
 def preview_path(request, target_id: int):
     target, broker = services.warm_path(current_member(request), target_id)
-    return {"target": _person(target), "via": _person(broker) if broker else None}
+    return {"target": person(target), "via": person(broker) if broker else None}
 
 
 @router.post(

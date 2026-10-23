@@ -171,6 +171,9 @@ MATCH_CACHE_TTL = 6 * 3600
 
 INTRO_WEEKLY_LIMIT = 3  # warm intros one member may send per rolling 7 days (a target's own cap is open_intro_slots)
 INTRO_EXPIRY_DAYS = 7
+
+CIRCUIT_CONSENT_HOURS = 72
+CIRCUIT_MIN_LEG_SCORE = 0.2  # a loop is only proposed if even its weakest handover is at least this good a match
 STUDENT_MAX_DISTANCE_KM = 25
 
 from core.logging import configure_logging  # noqa: E402
