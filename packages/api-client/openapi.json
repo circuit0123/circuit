@@ -1,6 +1,50 @@
 {
   "components": {
     "schemas": {
+      "AcceptanceGroup": {
+        "properties": {
+          "accepted": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "rate_percent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate Percent"
+          },
+          "requested": {
+            "$ref": "#/components/schemas/CountOut"
+          }
+        },
+        "required": [
+          "requested",
+          "accepted",
+          "rate_percent"
+        ],
+        "title": "AcceptanceGroup",
+        "type": "object"
+      },
+      "AcceptanceOut": {
+        "properties": {
+          "bridge": {
+            "$ref": "#/components/schemas/AcceptanceGroup"
+          },
+          "local": {
+            "$ref": "#/components/schemas/AcceptanceGroup"
+          }
+        },
+        "required": [
+          "local",
+          "bridge"
+        ],
+        "title": "AcceptanceOut",
+        "type": "object"
+      },
       "AnswerIn": {
         "properties": {
           "accept": {
@@ -215,6 +259,29 @@
         "title": "CapabilityOut",
         "type": "object"
       },
+      "CellOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lng": {
+            "title": "Lng",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat",
+          "lng",
+          "count"
+        ],
+        "title": "CellOut",
+        "type": "object"
+      },
       "CircuitOut": {
         "properties": {
           "consent_deadline": {
@@ -314,13 +381,25 @@
       },
       "CountOut": {
         "properties": {
-          "count": {
-            "title": "Count",
-            "type": "integer"
+          "hidden": {
+            "title": "Hidden",
+            "type": "boolean"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
           }
         },
         "required": [
-          "count"
+          "value",
+          "hidden"
         ],
         "title": "CountOut",
         "type": "object"
@@ -407,6 +486,46 @@
         "title": "ExtractOut",
         "type": "object"
       },
+      "GapOut": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "is_gap": {
+            "title": "Is Gap",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needed_by": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "offered_by": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "offered_outside": {
+            "$ref": "#/components/schemas/CountOut"
+          }
+        },
+        "required": [
+          "capability",
+          "name",
+          "category",
+          "needed_by",
+          "offered_by",
+          "offered_outside",
+          "is_gap"
+        ],
+        "title": "GapOut",
+        "type": "object"
+      },
       "Health": {
         "properties": {
           "status": {
@@ -418,6 +537,39 @@
           "status"
         ],
         "title": "Health",
+        "type": "object"
+      },
+      "HeatmapOut": {
+        "properties": {
+          "capability": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capability"
+          },
+          "cell_degrees": {
+            "title": "Cell Degrees",
+            "type": "number"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/CellOut"
+            },
+            "title": "Cells",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cell_degrees",
+          "capability",
+          "cells"
+        ],
+        "title": "HeatmapOut",
         "type": "object"
       },
       "IntroIn": {
@@ -1546,6 +1698,42 @@
           "description"
         ],
         "title": "NeedOfferOut",
+        "type": "object"
+      },
+      "NetworkOut": {
+        "properties": {
+          "applications": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "circuits_completed": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "intros_accepted": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "intros_requested": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "members": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "members_with_matches": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "new_members_30d": {
+            "$ref": "#/components/schemas/CountOut"
+          }
+        },
+        "required": [
+          "members",
+          "new_members_30d",
+          "members_with_matches",
+          "intros_requested",
+          "intros_accepted",
+          "circuits_completed",
+          "applications"
+        ],
+        "title": "NetworkOut",
         "type": "object"
       },
       "NotificationOut": {
@@ -3005,6 +3193,139 @@
         "summary": "Say yes or no to a circuit",
         "tags": [
           "circuits"
+        ]
+      }
+    },
+    "/api/dashboard/acceptance": {
+      "get": {
+        "description": "Introductions my members asked for, split into local and Bridge matches, with how many were accepted. The rate appears only when both counts are at least 5.",
+        "operationId": "apps_dashboard_api_acceptance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptanceOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Local vs Bridge introductions",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/gaps": {
+      "get": {
+        "description": "What my organisation's members need against what they offer, biggest gaps first. Partner admins only, and only for their own organisation. Counts below 5 are hidden.",
+        "operationId": "apps_dashboard_api_gaps",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GapOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Gap chart",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/heatmap": {
+      "get": {
+        "description": "Members on a grid of roughly 2 km cells; cells with fewer than 5 members are left out. Add capability=<slug> to show only members who need that capability.",
+        "operationId": "apps_dashboard_api_heatmap",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "capability",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capability"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HeatmapOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Where my members are",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/network": {
+      "get": {
+        "description": "Members, new members, matches, introductions, completed circuits and applications for my organisation. Counts below 5 are hidden.",
+        "operationId": "apps_dashboard_api_network",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Network statistics",
+        "tags": [
+          "dashboard"
         ]
       }
     },

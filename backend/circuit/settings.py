@@ -173,6 +173,9 @@ INTRO_WEEKLY_LIMIT = 3  # warm intros one member may send per rolling 7 days (a 
 INTRO_EXPIRY_DAYS = 7
 
 CIRCUIT_CONSENT_HOURS = 72
+DASHBOARD_MIN_COUNT = 5  # partner dashboards never show a count below this (CLAUDE.md privacy rules)
+DASHBOARD_CACHE_SECONDS = 300
+HEATMAP_CELL_DEGREES = 0.02  # about 2 km
 CIRCUIT_MIN_LEG_SCORE = 0.2  # a loop is only proposed if even its weakest handover is at least this good a match
 STUDENT_MAX_DISTANCE_KM = 25
 
