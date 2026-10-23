@@ -157,3 +157,41 @@ def make_startup(db):
         )
 
     return _make
+
+
+# -- demo stories: `make check` prints PASS/FAIL per story ------------------------------------------------------------
+STORY_NAMES = {
+    1: "Biotech needs marketing, matched to a deep-tech marketer (Bridge match)",
+    2: "Exchange circuit: Asha, Priya and Arjun",
+    3: "Tier-3 student applies and is the founder's top applicant",
+    4: "Warm intro through a respected mentor",
+    5: "Regulatory-help gap on the partner dashboard",
+}
+_story_outcomes: dict[int, str] = {}
+
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "story(n): this test belongs to demo story n (see STORY_NAMES in tests/conftest.py)")
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    report = (yield).get_result()
+    marker = item.get_closest_marker("story")
+    if marker is None:
+        return
+    n = marker.args[0]
+    if report.failed:
+        _story_outcomes[n] = "FAIL"
+    elif report.when == "call" and report.passed:
+        _story_outcomes.setdefault(n, "PASS")
+
+
+def pytest_terminal_summary(terminalreporter):
+    """One line per story, so a failing story is obvious without reading the test names."""
+    if not _story_outcomes:
+        return  # a partial run that did not touch the stories
+    terminalreporter.section("demo stories")
+    for n, name in STORY_NAMES.items():
+        result = _story_outcomes.get(n, "NOT RUN")
+        terminalreporter.write_line(f"Story {n}: {result}  {name}", red=result != "PASS", green=result == "PASS")

@@ -1,24 +1,10 @@
 """Demo story 1: a biotech startup needing marketing is matched with a deep-tech marketer as a Bridge match."""
 
 import pytest
-from django.conf import settings
 
-from apps.accounts.models import Member
-from apps.matching import services
-from seed.build import run
-from seed.personas import auth_uuid
+from tests.demo.conftest import person
 
-pytestmark = pytest.mark.django_db(transaction=True)
-
-
-@pytest.fixture
-def seeded():
-    run(settings.SEED_CITY)
-    services.compute_all()
-
-
-def person(key):
-    return Member.objects.get(auth_user_id=auth_uuid(key))
+pytestmark = [pytest.mark.django_db(transaction=True), pytest.mark.story(1)]
 
 
 def test_story_1_biotech_founder_gets_the_deeptech_marketer_as_a_bridge_match(seeded, client_for):
