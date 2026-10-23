@@ -12,6 +12,12 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 contin
   - Part 3: matching (F4). `manage.py compute_matches` (1.3 s for the 300-member seed), `GET /api/matches`, `manage.py eval_matching` with 14 hand-labelled pairs, demo story 1 test.
   - Part 4: warm intros (F5), exchange circuits (F6), partner dashboard (F8), verification badge tests (F7), demo stories 2–5, and `make check` printing `Story n: PASS/FAIL` (marker `@pytest.mark.story(n)` plus a summary hook in `tests/conftest.py`).
 
+## Stage 4 — Frontends (branch `frontend`): part 1 of 4 done, waiting for your OK
+- Part 1: `DESIGN.md` (contrast ratios measured), `packages/ui` (Button, Card, Badge, Chip, Avatar, Modal, BottomSheet, Tabs, Toast, Skeleton, EmptyState, CircuitLine), `packages/api-client` (types generated from `openapi.json` + `openapi-fetch`; one `ApiError`; `pnpm api:generate`, also run by `make openapi`), and throwaway hero/Home scaffolds in `apps/landing` and `apps/app` for screenshots. axe: no violations on either page at 375px and 1280px.
+- Approved by you: `openapi-fetch` (added to CLAUDE.md) and a small `POST /api/me/consent` endpoint (Part 3).
+- Note: `apps/landing` is a static export, so `pnpm --filter @circuit/landing start` serves `out/` with Python's http.server.
+- Parts 2–4 not started. Stage 4 boxes for landing, shell, onboarding, screens and Playwright stay open.
+
 ## What exists (Stage 2)
 - `core/auth.py`: `SupabaseAuth` is the API-wide default (an endpoint is protected unless it says `auth=None`). Checks signature (ES256 pinned), expiry, audience, issuer, `role=authenticated`, no anonymous users. Keys come from Supabase's JWKS (cached, throttled, served stale only up to 6 h). First login creates a `student` Member.
 - `core/demo.py`: persona tokens, only when `DEMO_AUTH` (dev, or demo with `DEMO_PUBLIC`); the public demo never issues the `admin` persona. The app refuses to start with `DEMO_AUTH` in staging/production (config check + a second guard in `core/apps.py`, both tested).

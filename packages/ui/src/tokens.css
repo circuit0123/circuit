@@ -1,0 +1,44 @@
+/* Design tokens from DESIGN.md. Import once per app, after `@import "tailwindcss"`. */
+@theme {
+  --color-paper: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-ink: #0e1a3a;
+  --color-ink-soft: #4a5573;
+  --color-rule: #d5dbe6;
+  --color-line: #1f4bd8;
+  --color-line-wash: #e6ecfc;
+  --color-signal: #f2a100;
+  --color-bridge: #9b2c75;
+  --color-verified: #16795a;
+  --color-alert: #b3261e;
+
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-text), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-sheet: 20px;
+
+  --shadow-sheet: 0 12px 32px rgba(14, 26, 58, 0.16);
+  --ease-circuit: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@layer base {
+  html { background: var(--color-paper); color: var(--color-ink); }
+  body { font-family: var(--font-sans); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
+  :focus-visible { outline: 2px solid var(--color-line); outline-offset: 2px; }
+  dialog { color: inherit; }
+}
+
+/* The hero line draws itself once; reduced motion shows it complete. */
+@keyframes circuit-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.circuit-draw { stroke-dasharray: 1; animation: circuit-draw 900ms var(--ease-circuit) 1 both; }
+@keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet-in { animation: sheet-in 200ms var(--ease-circuit) both; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.fade-in { animation: fade-in 120ms var(--ease-circuit) both; }
+@media (prefers-reduced-motion: reduce) {
+  .circuit-draw, .sheet-in, .fade-in { animation: none; }
+  .circuit-draw { stroke-dasharray: none; }
+}
