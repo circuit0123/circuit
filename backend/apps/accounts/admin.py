@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.utils import timezone
 
-from apps.accounts.models import Connection, Consent, Member
+from apps.accounts.models import Connection, ConnectionRequest, Consent, Member
 from core.adminbase import AuditedAdmin, ReadOnlyAdmin, audit
 
 
@@ -75,4 +75,4 @@ class MemberAdmin(AuditedAdmin):
         super().save_model(request, obj, form, change)
 
 
-admin.site.register([Connection, Consent], ReadOnlyAdmin)
+admin.site.register([Connection, ConnectionRequest, Consent], ReadOnlyAdmin)

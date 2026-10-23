@@ -8,7 +8,7 @@ import pytest
 from cryptography.hazmat.primitives.asymmetric import ec
 from django.test import Client
 
-from core import auth, cache, embeddings, llm
+from core import auth, cache, embeddings, llm, storage
 
 SUPABASE_URL = "https://test.supabase.co"
 ISSUER = f"{SUPABASE_URL}/auth/v1"
@@ -22,7 +22,13 @@ def fakes():
     embeddings.set_embedder(embeddings.FakeEmbeddingProvider())
     fake = llm.FakeLLM()
     llm.set_llm(fake)
+    storage.set_storage(storage.MemoryStorage())
+    from apps.messaging import realtime
+
+    realtime.set_sender(lambda topic, event, payload: None)
     yield fake
+    storage.set_storage(None)
+    realtime.set_sender(None)
     cache.set_cache(None)
     embeddings.set_embedder(None)
     llm.set_llm(None)
@@ -157,6 +163,56 @@ def make_startup(db):
         )
 
     return _make
+
+
+@pytest.fixture
+def connect(db):
+    from apps.accounts.models import Connection
+
+    def _connect(a, b):
+        x, y = sorted((a.pk, b.pk))
+        return Connection.objects.create(member_a_id=x, member_b_id=y, strength=0.5)
+
+    return _connect
+
+
+@pytest.fixture
+def block(db):
+    from apps.moderation.models import Block
+
+    return lambda blocker, blocked: Block.objects.create(blocker=blocker, blocked=blocked)
+
+
+@pytest.fixture
+def make_post(db):
+    from apps.social.models import Post
+
+    def _post(author, visibility="everyone", body="Shipped the login screen", **kw):
+        return Post.objects.create(author=author, body=body, visibility=visibility, **kw)
+
+    return _post
+
+
+@pytest.fixture
+def make_image():
+    """Real PNG/JPEG bytes (optionally with EXIF GPS) for upload tests."""
+    import io
+
+    from PIL import Image
+
+    def _image(fmt="PNG", size=(64, 48), exif=False) -> bytes:
+        img = Image.new("RGB", size, (200, 80, 40))
+        buf = io.BytesIO()
+        kw = {}
+        if exif:
+            e = Image.Exif()
+            e[0x010F] = "TestCam"  # Make
+            e[0x8825] = {1: "N", 2: (13.0, 5.0, 0.0)}  # GPS block
+            kw["exif"] = e
+        img.save(buf, fmt, **kw)
+        return buf.getvalue()
+
+    return _image
 
 
 # -- demo stories: `make check` prints PASS/FAIL per story ------------------------------------------------------------

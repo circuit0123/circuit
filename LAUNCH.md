@@ -38,7 +38,7 @@ How to use this file:
 - [x] Permission helpers: require_role, require_level, organisation scoping
 - [x] Organisations: create (super admin), join by code or verified email domain, leave, remove
 - [x] RLS deny-by-default on every table (migration); app DB role documented
-- [ ] Rate limits on extraction, intros, applications, reports, claims (helper `core.ratelimit.check_rate` + limits are built and wired on org join, extraction, verify, claim and applications; intros added in Stage 3; reports arrive with report/block in Stage 6)
+- [x] Rate limits on extraction, intros, applications, reports, claims (helper `core.ratelimit.check_rate` + limits are built and wired on org join, extraction, verify, claim and applications; intros added in Stage 3; reports arrived with Stage 3b)
 - [x] CORS exact origins + staging preview regex; security headers; Django SECURE_* settings
 - [x] Tests: expired/forged tokens, every role on every endpoint, IDOR on every ID, org scoping, no PII in logs
 
@@ -55,14 +55,31 @@ How to use this file:
 - [x] Demo story tests 1–5 pass; `make check` prints PASS/FAIL per story
 - [x] OpenAPI spec clean; every endpoint described
 
-## Stage 4 — Frontends (Session B, in parallel with Stages 1–3)
-- [x] DESIGN.md first: palette (hex), type scale, spacing, motion rules, circuit line motif, voice; banned list (gradients, glassmorphism, emoji icons, buzzword copy, lorem ipsum, fake stats)
-- [x] packages/ui components: Button, Card, Badge (verification, Bridge, Hiring), Chip, Avatar, BottomSheet, Modal, Tabs, Toast, Skeleton, EmptyState
-- [x] packages/api-client generated from the backend OpenAPI spec (script; mock spec until Stage 3 lands)
+## Stage 3b — Social API (Session A)
+- [x] social app: posts, post_media (Supabase Storage uploads, size/type checks, server-side resize variants), reactions, replies, follows, story_views
+- [x] Pulse endpoint: chronological last 7 days, visibility rules, mixes build logs + nearby matching roles + system activity, cursor pagination, "caught up" marker
+- [x] Daily Drop: `manage.py build_daily_drops` (08:00 IST job) using match_results; 3 per member; swipe outcomes logged as events
+- [x] Today strip endpoint (authors with posts or roles in the last 24h among connections, follows, organisation)
+- [x] messaging app: conversations (request | active | blocked), messages, Realtime channel per conversation with RLS; under-18 rules enforced server-side
+- [x] Reports on posts, replies, messages and profiles; hide/remove from Django admin; audit-logged
+- [x] Rate limits on posting, replies, messages and connection requests
+- [x] Seed data: build logs for the demo personas using screenshot-style images of their (fictional) projects rendered from simple SVG/HTML mockups — no stock photos, no AI-generated people; plus follows and conversations
+- [x] Tests: visibility (everyone / connections / org), minors rules, IDOR on posts/messages, no public counts in API responses to non-authors
+
+## Stage 4 — Frontends (Session B; follow DESIGN.md exactly)
+- [ ] DESIGN.md is final (lifestyle redesign); do not change it without my OK
+- [ ] packages/ui components listed in DESIGN.md §6, with dark and light themes
+- [ ] packages/api-client generated from the backend OpenAPI spec (script; mock spec until Stage 3 lands)
 - [ ] apps/landing: hero, students / founders / circuits sections, partner CTA, footer (privacy, terms, contact), SEO + OG metadata, links to APP_URL
-- [ ] apps/app shell: Supabase sign-in (Google + OTP), auth callback, role-based tabs (mobile bottom bar, desktop sidebar), environment banner, persona switcher (dev/demo)
-- [ ] Onboarding: role → paste bio → confirm chips → location → consent (under-18 hidden)
-- [ ] Screens: map, jobs list + job page + apply, my applications, founder applicants, matches with reasons + Bridge badge, warm intro request, circuits loop card (accept/decline, live status), partner dashboard
+- [ ] apps/app shell: Supabase sign-in (Google + OTP), auth callback, navigation per DESIGN.md §3 (Home · Discover · Circuits · Inbox · Profile; create in top bar), environment banner, persona switcher (dev/demo)
+- [ ] Onboarding: role → photo → paste bio → confirm chips → location → consent (under-18 private)
+- [ ] Home: Today strip + story viewer, Daily Drop stack, Pulse feed with build logs and "caught up" end
+- [ ] Build log composer and post view (media pager, reactions, replies, report)
+- [ ] Discover: People, Startups, Jobs (+ job page, apply), Map
+- [ ] Circuits: ring cards, live status, signature closing animation
+- [ ] Inbox: Chats + Requests, realtime messages, report/block
+- [ ] Profile: header, needs/offers, highlights, build log grid, circuits, about; connect/follow/message/intro via mutual
+- [ ] Founder applicants view, my applications, partner dashboard
 - [ ] Every screen: loading, empty, error states; works at 375px and 1280px
 - [ ] Playwright tests for the five demo stories at both widths; axe checks
 

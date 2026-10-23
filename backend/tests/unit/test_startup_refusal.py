@@ -11,6 +11,8 @@ from django.core.exceptions import ImproperlyConfigured
 BACKEND = Path(__file__).resolve().parents[2]
 VALID = {
     "SUPABASE_URL": "https://x.supabase.co",
+    "STORAGE_PROVIDER": "supabase",
+    "SUPABASE_SERVICE_ROLE_KEY": "k",
     "DEBUG": "false",
     "SECRET_KEY": secrets.token_urlsafe(50),
     "CORS_PREVIEW_REGEX": "",

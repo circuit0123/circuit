@@ -13,11 +13,11 @@ infrastructure, this file wins.
 | App | Next.js (apps/app) on Vercel | PWA, Supabase sign-in, calls the API |
 | API | Django 5 + Django Ninja on Cloud Run, asia-south1 | Stateless, autoscaling, min instances ≥ 1 in prod |
 | Admin | Django admin on the same service | Staff login + TOTP 2FA; super admins only; not in demo |
-| Background jobs | Django management commands as Cloud Run Jobs + Cloud Scheduler | compute_matches, run_circuit_round, expire_items (every 15 min), cleanup |
+| Background jobs | Django management commands as Cloud Run Jobs + Cloud Scheduler | compute_matches (daily), build_daily_drops (08:00 IST), run_circuit_round (weekly), expire_items (every 15 min), cleanup |
 | Database | Supabase Postgres + PostGIS + pgvector | Source of truth; connect via the pooler |
 | Auth | Supabase Auth | Google + email OTP; JWT verified in Django via JWKS |
-| Files | Supabase Storage | `avatars` (public), `private` (reports, exports) |
-| Realtime | Supabase Realtime | Notifications, circuit status; RLS-scoped |
+| Files | Supabase Storage | `avatars` (public), `private` (reports, exports), `posts` and `messages` (private, 5 MB limit, image types only; the API hands out short-lived signed URLs, so no public read and no storage RLS policy) |
+| Realtime | Supabase Realtime | Chat: private Broadcast channel `conversation:<id>`; notifications, circuit status; RLS-scoped |
 | Cache + rate limits | Redis (Upstash) | Disposable; Postgres fallback |
 | Graph | Recursive SQL + networkx (core/graph) | Neo4j only if a BACKLOG.md trigger is hit |
 | Secrets | Google Secret Manager | Never in repo or frontend |
@@ -100,7 +100,6 @@ Switching to the real domain (config only, ~1 hour plus DNS wait):
 - RLS on every table (deny by default); service role key only in the backend.
 - Django admin: staff only, TOTP 2FA required, non-obvious path, disabled in demo,
   all actions audit-logged. Django's security settings on (SECURE_*, HSTS, secure cookies).
-- Rate limits (Redis): onboarding extraction, intros, applications, reports, claims.
 - Rate limits: `core.ratelimit.check_rate(member_id, action)` with limits in `settings.RATE_LIMITS`
   (extraction, intro, application, report, claim, org_join). Redis first; Postgres fallback if Redis is down.
 - CORS: exact origins only. Headers: CSP, HSTS, nosniff, Referrer-Policy, frame-ancestors.
@@ -113,7 +112,7 @@ Switching to the real domain (config only, ~1 hour plus DNS wait):
   writer. Never `FORCE ROW LEVEL SECURITY`, or the app would lock itself out.
 - Every table in `public` has RLS enabled with **no policies** (`core/rls.py`, run by migration `core.0002`
   and again after every `migrate`). Supabase's `anon` and `authenticated` roles (PostgREST, Realtime) therefore
-  read nothing. When Stage 6 adds Realtime, add narrow per-table SELECT policies for `authenticated`; never a blanket one.
+  read nothing. Chat Realtime does not need table access (see below). If a later stage adds Postgres Changes, add narrow per-table SELECT policies for `authenticated`; never a blanket one.
 - The Supabase service-role key exists only in the backend's Secret Manager; never in Vercel or the repo.
 - Supabase Auth must use **asymmetric JWT signing keys** (ES256 default, or RS256 via `SUPABASE_JWT_ALG`). The
   API pins that algorithm and rejects HS256 tokens, so projects still on the legacy shared secret will not work.
@@ -121,13 +120,24 @@ Switching to the real domain (config only, ~1 hour plus DNS wait):
   "Confirm email" on. The API trusts the `email` claim only for those providers and ignores `user_metadata`.
 - `/api/docs` and `/api/openapi.json` are not served when `ENV=production`.
 - Defence in depth behind RLS: migration `core.0003` revokes all table/sequence privileges from `anon` and
-  `authenticated` (and from future tables). Stage 6 Realtime must `GRANT SELECT` per table, plus a policy, on purpose.
+  `authenticated` (and from future tables). Any future Realtime-on-tables feature must `GRANT SELECT` per table, plus a policy, on purpose.
 - Outside `dev`, `migrate` fails if any `public` table still lacks RLS (e.g. owned by a different role).
 - Demo is internet-facing, so it gets the same settings as staging/production: HTTPS redirect, HSTS, secure
   cookies, DEBUG off, a random 32+ character `SECRET_KEY` (demo tokens are signed with a key derived from it).
 - `SUPABASE_URL` must be `https://` outside dev (the signing keys are downloaded from it). Signing keys are cached
   10 minutes and, if Supabase is unreachable, trusted for at most 6 hours.
 - Known limit: Supabase access tokens stay valid until they expire (about 1 hour) even after sign-out or a ban.
+- Chat Realtime (Stage 3b): messages never travel through Realtime tables. The backend saves a message, then calls
+  Supabase's Broadcast API (service-role key) on the private topic `conversation:<id>` with ids only
+  (`{message_id, conversation_id}`); the app then fetches the message from our API, which checks membership. Migration
+  `messaging.0003` creates `public.is_conversation_member(conv_id, uid)` (SECURITY DEFINER, EXECUTE for `authenticated`
+  only) and, when the `realtime` schema exists, a SELECT policy on `realtime.messages` so a client can join the topic only
+  if that function says it is one of the two people (and the conversation is not blocked). Check "Allow public access" is
+  OFF in Realtime settings, so channels are private-only. A failed broadcast is logged and ignored: the message is saved.
+- Storage (Stage 3b): `posts` and `messages` buckets are private with a 5 MB file limit and image MIME types only. The
+  browser uploads to a signed URL from `POST /api/media/uploads`; `complete` re-encodes to WebP at 1440 and 480 px
+  (EXIF/GPS removed) and deletes the original. `STORAGE_PROVIDER=supabase` and `SUPABASE_SERVICE_ROLE_KEY` are required in
+  staging/production (the app refuses to start without them); dev uses local files and cannot take browser uploads.
 
 ## 4. Roles and data access
 

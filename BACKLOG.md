@@ -9,15 +9,12 @@ Priority: P1 = during pilot · P2 = after pilot · Later = only when data says s
 
 ## P1 — during the pilot
 
-### Networking redesign
-- [ ] Home opportunities feed (matches, nearby jobs, circuits, intros, profile views, skills in demand). No likes, no posts
-- [ ] Profiles: headline, verification badge, capability chips, proof of work first, profile strength meter
-- [ ] Connections (request with note, accept/decline, mutuals) feeding warm paths
-- [ ] Follow startups
-- [ ] Notifications centre (grouped, read/unread)
-- [ ] Global search (people, startups, jobs, skills); Cmd/Ctrl+K on desktop
-- [ ] Inbox via Supabase Realtime (connected members only; students can't message strangers)
-- [ ] Animation pass (page transitions, staggered lists, bottom sheets, swipe with button alternatives, circuit loop animation); reduced-motion respected
+### Lifestyle features (after F15–F17 ship)
+- [ ] Short video in build logs (≤30s, server transcoding, moderation)
+- [ ] Global search shortcut (Cmd/Ctrl+K) on desktop
+- [ ] Group chats for circuits (the three members)
+- [ ] Events: meetups and demo days with RSVPs in Pulse
+- [ ] "Tune my Pulse": choose capabilities and topics that shape the feed
 
 ### Students and proof of work
 - [ ] Searchable student profiles (opt-in) so founders can find students
@@ -59,7 +56,7 @@ Priority: P1 = during pilot · P2 = after pilot · Later = only when data says s
 - [ ] Graph neural networks (tens of thousands of active users)
 
 ## Decided against (don't reopen without new evidence)
-- Social feed with likes, follower counts and public posts
+- Public like, follower and view counts; infinite feeds without an end; streaks (posts and Pulse ARE in scope, see F15)
 - Scraping LinkedIn or any site that forbids it; proxy rotation / anti-bot evasion
 - Storing user passwords (only Django staff admins, with 2FA)
 - Success fees on fundraising; paying for placement in rankings

@@ -42,3 +42,14 @@ def test_missing_required_variable_refuses_to_start():
     bad = {k: v for k, v in BASE.items() if k != "database_url"}
     with pytest.raises(ValidationError):
         Config(_env_file=None, **bad)
+
+
+@pytest.mark.parametrize("env", ["staging", "production"])
+def test_local_file_storage_refused_when_deployed(env):
+    with pytest.raises(ValidationError, match="STORAGE_PROVIDER"):
+        make(env=env, supabase_url="https://x.supabase.co")
+
+
+def test_supabase_storage_needs_the_service_role_key_outside_dev():
+    with pytest.raises(ValidationError, match="SERVICE_ROLE_KEY"):
+        make(env="demo", supabase_url="https://x.supabase.co", storage_provider="supabase")
