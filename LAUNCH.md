@@ -56,9 +56,9 @@ How to use this file:
 - [x] OpenAPI spec clean; every endpoint described
 
 ## Stage 4 — Frontends (Session B, in parallel with Stages 1–3)
-- [ ] DESIGN.md first: palette (hex), type scale, spacing, motion rules, circuit line motif, voice; banned list (gradients, glassmorphism, emoji icons, buzzword copy, lorem ipsum, fake stats)
-- [ ] packages/ui components: Button, Card, Badge (verification, Bridge, Hiring), Chip, Avatar, BottomSheet, Modal, Tabs, Toast, Skeleton, EmptyState
-- [ ] packages/api-client generated from the backend OpenAPI spec (script; mock spec until Stage 3 lands)
+- [x] DESIGN.md first: palette (hex), type scale, spacing, motion rules, circuit line motif, voice; banned list (gradients, glassmorphism, emoji icons, buzzword copy, lorem ipsum, fake stats)
+- [x] packages/ui components: Button, Card, Badge (verification, Bridge, Hiring), Chip, Avatar, BottomSheet, Modal, Tabs, Toast, Skeleton, EmptyState
+- [x] packages/api-client generated from the backend OpenAPI spec (script; mock spec until Stage 3 lands)
 - [ ] apps/landing: hero, students / founders / circuits sections, partner CTA, footer (privacy, terms, contact), SEO + OG metadata, links to APP_URL
 - [ ] apps/app shell: Supabase sign-in (Google + OTP), auth callback, role-based tabs (mobile bottom bar, desktop sidebar), environment banner, persona switcher (dev/demo)
 - [ ] Onboarding: role → paste bio → confirm chips → location → consent (under-18 hidden)

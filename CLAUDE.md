@@ -93,7 +93,7 @@ Approved supporting libraries (no need to ask):
 - Backend: google-genai (Gemini), groq, anthropic (one active via LLM_PROVIDER),
   PyJWT[crypto] (JWKS), django-otp (admin 2FA), redis, fakeredis (tests),
   httpx, sentry-sdk, resend, django-environ or pydantic-settings (pick one), ruff, mypy
-- Frontend: @supabase/supabase-js, @tanstack/react-query, openapi-typescript,
+- Frontend: @supabase/supabase-js, @tanstack/react-query, openapi-typescript, openapi-fetch,
   maplibre-gl, recharts, serwist (PWA, Stage 10), @playwright/test, @axe-core/playwright,
   @sentry/nextjs, eslint, prettier
 
