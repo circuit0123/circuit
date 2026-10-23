@@ -22,38 +22,38 @@ How to use this file:
 - [ ] All values in the password manager and local .env (never pasted into chat)
 
 ## Stage 1 — Backend foundation (Session A)
-- [ ] Monorepo layout per CLAUDE.md; uv project; pnpm workspace root
-- [ ] docker compose: Postgres 16 + PostGIS + pgvector (multi-arch Dockerfile), Redis
-- [ ] Django settings per ENV, validated at startup; .env.example complete
-- [ ] structlog JSON request logging with request_id; one error format; one pagination style
-- [ ] All models + migrations per CLAUDE.md data model; GIST, HNSW and FK indexes
-- [ ] Capability and trait lists; seed generator with the five demo stories; `manage.py reset_demo` (idempotent)
-- [ ] Django admin registered for all models (read-only where appropriate); TOTP 2FA required; disabled in demo
-- [ ] `/api/health` and `/api/health/deps`
-- [ ] core/cache (Redis + Postgres fallback), core/graph (recursive SQL + networkx), core/embeddings (fastembed + fake), core/llm (mockable)
+- [x] Monorepo layout per CLAUDE.md; uv project; pnpm workspace root
+- [x] docker compose: Postgres 16 + PostGIS + pgvector (multi-arch Dockerfile), Redis
+- [x] Django settings per ENV, validated at startup; .env.example complete
+- [x] structlog JSON request logging with request_id; one error format; one pagination style
+- [x] All models + migrations per CLAUDE.md data model; GIST, HNSW and FK indexes
+- [x] Capability and trait lists; seed generator with the five demo stories; `manage.py reset_demo` (idempotent)
+- [x] Django admin registered for all models (read-only where appropriate); TOTP 2FA required; disabled in demo
+- [x] `/api/health` and `/api/health/deps`
+- [x] core/cache (Redis + Postgres fallback), core/graph (recursive SQL + networkx), core/embeddings (fastembed + fake), core/llm (mockable)
 
 ## Stage 2 — Auth and security (Session A)
-- [ ] Ninja auth class: Supabase JWT via JWKS (signature, expiry, audience, pinned alg); Member lookup by auth_user_id; first-login member creation
-- [ ] DEMO_AUTH persona tokens in dev/demo; startup refusal in staging/production (tested)
-- [ ] Permission helpers: require_role, require_level, organisation scoping
-- [ ] Organisations: create (super admin), join by code or verified email domain, leave, remove
-- [ ] RLS deny-by-default on every table (migration); app DB role documented
-- [ ] Rate limits on extraction, intros, applications, reports, claims
-- [ ] CORS exact origins + staging preview regex; security headers; Django SECURE_* settings
-- [ ] Tests: expired/forged tokens, every role on every endpoint, IDOR on every ID, org scoping, no PII in logs
+- [x] Ninja auth class: Supabase JWT via JWKS (signature, expiry, audience, pinned alg); Member lookup by auth_user_id; first-login member creation
+- [x] DEMO_AUTH persona tokens in dev/demo; startup refusal in staging/production (tested)
+- [x] Permission helpers: require_role, require_level, organisation scoping
+- [x] Organisations: create (super admin), join by code or verified email domain, leave, remove
+- [x] RLS deny-by-default on every table (migration); app DB role documented
+- [x] Rate limits on extraction, intros, applications, reports, claims (helper `core.ratelimit.check_rate` + limits are built and wired on org join, extraction, verify, claim and applications; intros added in Stage 3; reports arrived with Stage 3b)
+- [x] CORS exact origins + staging preview regex; security headers; Django SECURE_* settings
+- [x] Tests: expired/forged tokens, every role on every endpoint, IDOR on every ID, org scoping, no PII in logs
 
 ## Stage 3 — Core features API (Session A)
-- [ ] Members, startups, needs, offers; smart onboarding endpoint with LLM + manual fallback (F1)
-- [ ] Geo: nearby + bbox endpoints; student skill-to-startup score; view/interest tracking (F2)
-- [ ] Claim flow via company email domain (simulated in dev/demo) (F3)
-- [ ] Jobs + applications endpoints (F11)
-- [ ] Matching: scoring, candidates, ranking, reasons, bridge flag; `compute_matches`; Redis cache; eval set + `eval_matching` (F4)
-- [ ] Warm intros with capacity limits and outcome rating (F5)
-- [ ] Circuits: edges, cycles, CP-SAT, `run_circuit_round`, consent, expiry, mark done, rating (F6)
-- [ ] Verification levels (F7); partner dashboard endpoints with counts < 5 hidden (F8)
-- [ ] Events written for every product action (F10); notifications model + endpoints
-- [ ] Demo story tests 1–5 pass; `make check` prints PASS/FAIL per story
-- [ ] OpenAPI spec clean; every endpoint described
+- [x] Members, startups, needs, offers; smart onboarding endpoint with LLM + manual fallback (F1)
+- [x] Geo: nearby + bbox endpoints; student skill-to-startup score; view/interest tracking (F2)
+- [x] Claim flow via company email domain (simulated in dev/demo) (F3)
+- [x] Jobs + applications endpoints (F11)
+- [x] Matching: scoring, candidates, ranking, reasons, bridge flag; `compute_matches`; Redis cache; eval set + `eval_matching` (F4)
+- [x] Warm intros with capacity limits and outcome rating (F5)
+- [x] Circuits: edges, cycles, CP-SAT, `run_circuit_round`, consent, expiry, mark done, rating (F6)
+- [x] Verification levels (F7); partner dashboard endpoints with counts < 5 hidden (F8)
+- [x] Events written for every product action (F10); notifications model + endpoints
+- [x] Demo story tests 1–5 pass; `make check` prints PASS/FAIL per story
+- [x] OpenAPI spec clean; every endpoint described
 
 ## Stage 3b — Social API (Session A)
 - [x] social app: posts, post_media (Supabase Storage uploads, size/type checks, server-side resize variants), reactions, replies, follows, story_views

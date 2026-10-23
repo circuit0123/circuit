@@ -1,5 +1,11 @@
 {
   "name": "circuit",
   "private": true,
-  "packageManager": "pnpm@9"
+  "packageManager": "pnpm@11.3.0",
+  "scripts": {
+    "api:generate": "pnpm --filter @circuit/api-client generate",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "build": "pnpm -r build"
+  }
 }

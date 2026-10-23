@@ -18,6 +18,7 @@ reset-demo:
 
 openapi:
 	$(BACKEND) python manage.py export_openapi ../packages/api-client/openapi.json
+	pnpm api:generate
 
 lint:
 	$(BACKEND) ruff check . && $(BACKEND) ruff format --check . && $(BACKEND) mypy .
