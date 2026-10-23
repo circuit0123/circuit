@@ -35,6 +35,7 @@ class Member(models.Model):
     profile_visibility = models.CharField(max_length=10, choices=Visibility.choices, default=Visibility.MEMBERS)
     visible_to_org = models.BooleanField(default=False)
     suspended_at = models.DateTimeField(null=True, blank=True)  # set = locked out of the API (moderation, takedowns)
+    pulse_seen_at = models.DateTimeField(null=True, blank=True)  # Pulse shows what is newer than this, then "You're caught up"
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -73,6 +74,31 @@ class Connection(models.Model):
             models.CheckConstraint(condition=Q(strength__gte=0, strength__lte=1), name="connection_strength_0_1"),
         ]
         indexes = [models.Index(fields=["member_b"])]
+
+
+class ConnectionRequest(models.Model):
+    """Ask to connect, with a note. Accepting creates the Connection row; declining keeps this row so the sender cannot spam."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending"
+        ACCEPTED = "accepted"
+        DECLINED = "declined"
+
+    sender = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="connection_requests_sent")
+    recipient = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="connection_requests_received")
+    note = models.CharField(max_length=300, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    responded_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["sender", "recipient"], condition=Q(status="pending"), name="connectionrequest_one_pending"
+            ),
+            models.CheckConstraint(condition=~Q(sender=F("recipient")), name="connectionrequest_not_self"),
+        ]
+        indexes = [models.Index(fields=["recipient", "status"]), models.Index(fields=["sender", "status"])]
 
 
 class Consent(models.Model):

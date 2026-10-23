@@ -7,14 +7,17 @@ from django.contrib.gis.geos import Point
 from django.db import connection, transaction
 from django.utils import timezone
 
-from apps.accounts.models import Connection, Consent, Member
+from apps.accounts.models import Connection, ConnectionRequest, Consent, Member
 from apps.jobs.models import Application, Job, JobCapability
 from apps.matching.lists import sync_lists
 from apps.matching.models import Capability, MemberSkill, MemberTrait, Need, Offer, Trait
+from apps.messaging.models import Conversation, Message
 from apps.organisations.models import Organisation
+from apps.social.models import Follow, MediaUpload, Post, PostMedia, Reaction, Reply
 from apps.startups.models import Startup, StartupMember, StartupTrait
 from core.embeddings import get_embedder
-from seed import data
+from core.storage import get_storage
+from seed import data, mockups
 from seed.personas import PERSONAS, auth_uuid
 
 SEED = 42
@@ -30,6 +33,8 @@ APP_LABELS = [
     "accounts",
     "organisations",
     "events",
+    "social",
+    "messaging",
 ]
 KEEP_TABLES = {"matching_capability", "matching_trait"}  # fixed lists survive a reset
 
@@ -130,6 +135,7 @@ class Seeder:
         self.save_needs_offers()
         self.build_connections()
         self.build_consents()
+        self.build_social()
         return {"members": Member.objects.count(), "startups": Startup.objects.count(), "jobs": Job.objects.count()}
 
     def build_org(self) -> None:
@@ -386,6 +392,212 @@ class Seeder:
     def build_consents(self) -> None:
         now = timezone.now()
         Consent.objects.bulk_create([Consent(member=m, policy_version="2026-01", accepted_at=now) for m in Member.objects.all()])
+
+    # -- social (F15-F17): build logs with drawn project screenshots, replies, follows, requests, chats -------------
+    def _image(self, owner: Member, n: int, title: str, subtitle: str) -> MediaUpload:
+        """A drawn 'screenshot' stored through the storage provider (same two sizes the upload flow produces)."""
+        from seed.mockups import KINDS
+
+        path = f"post/{owner.pk}/seed{n}"
+        png = mockups.render(KINDS[n % len(KINDS)], title, subtitle, owner.pk + n)
+        from apps.social import media
+
+        variants, (w, h) = media._process(png)
+        store = get_storage()
+        for width, blob in variants.items():
+            store.put("posts", f"{path}/{media.VARIANTS[width]}", blob, "image/webp")
+        return MediaUpload.objects.create(owner=owner, purpose="post", path=path, status="ready", width=w, height=h)
+
+    def _post(self, author: Member, body: str, visibility: str, hours_ago: float, images=(), tags=(), link: str = "") -> Post:
+        post = Post.objects.create(author=author, body=body, visibility=visibility, link=link)
+        Post.objects.filter(pk=post.pk).update(created_at=timezone.now() - timedelta(hours=hours_ago))
+        post.capabilities.set([self.cap[t] for t in tags])
+        for i, (title, subtitle, alt) in enumerate(images):
+            up = self._image(author, self.image_n, title, subtitle)
+            self.image_n += 1
+            PostMedia.objects.create(post=post, upload=up, alt_text=alt, order=i)
+        return post
+
+    def build_social(self) -> None:
+        m, rnd = self.members, self.rnd
+        self.image_n = 0
+        feature = [
+            (
+                "asha",
+                "Week 6 of the diagnostics dashboard: sample turnaround per lab, now with a late-sample flag. Looking for a marketer who has sold to labs.",
+                "everyone",
+                3,
+                [
+                    (
+                        "Turnaround tracker",
+                        "Asha's lab · week 6",
+                        "Dashboard with sample counts and a bar chart of daily turnaround",
+                    )
+                ],
+                ["brand-marketing"],
+            ),
+            (
+                "priya",
+                "Rebuilt our investor update as a single page. Three numbers, one ask. Fundraising is mostly editing.",
+                "connections",
+                7,
+                [("Investor update", "Priya · Q3", "Line chart of monthly revenue with one highlighted point")],
+                ["fundraising"],
+            ),
+            (
+                "arjun",
+                "Our hiring board after switching to two-day trial projects. Fewer interviews, better hires.",
+                "everyone",
+                21,
+                [("Hiring board", "Arjun · trial projects", "Kanban board with three columns: to do, doing, done")],
+                ["recruiting"],
+            ),
+            (
+                "kavya",
+                "Assay run 14: signal-to-noise finally above 10. Posting the plate reader chart before I lose the settings.",
+                "everyone",
+                30,
+                [("Assay run 14", "Kavya · plate reader", "Line chart of signal over nine time points")],
+                ["clinical-research"],
+            ),
+            (
+                "divya",
+                "We are hiring a frontend intern at Pixelwave. React, a designer next to you, real users by week three.",
+                "everyone",
+                5,
+                [("Pixelwave onboarding", "Divya · intern project", "Mobile screen with a list of onboarding steps")],
+                ["frontend-dev", "ui-design"],
+            ),
+            (
+                "ravi",
+                "Built a React Native attendance app for our department. First version works offline. Code is on GitHub, feedback welcome.",
+                "everyone",
+                2,
+                [
+                    ("Attendance app", "Ravi · v0.3", "App screen listing four classes with attendance status"),
+                    ("Attendance app", "Ravi · code", "Code editor showing the sync function"),
+                ],
+                ["frontend-dev"],
+            ),
+            (
+                "lakshmi",
+                "Office hours this Thursday at the incubator. Bring one question about your first customer, not your whole deck.",
+                "everyone",
+                26,
+                [],
+                ["mentoring"],
+            ),
+            (
+                "rohan",
+                "Deep-tech sales cycles are 9 months. Writing down what moved a deal forward each month.",
+                "everyone",
+                40,
+                [("Deal log", "Rohan · 9 months", "Board of deals by stage")],
+                ["b2b-marketing"],
+            ),
+            (
+                "sneha",
+                "Investor intros are warmer when a mentor says one specific thing about you. Grateful for Dr. Lakshmi's.",
+                "connections",
+                12,
+                [],
+                ["investor-intros"],
+            ),
+        ]
+        # Roles were all created at seed time; spread them over the week so Pulse shows a believable mix.
+        jobs = list(Job.objects.order_by("pk"))
+        for job in jobs:
+            Job.objects.filter(pk=job.pk).update(created_at=timezone.now() - timedelta(hours=rnd.randint(1, 160)))
+        posts: dict[str, Post] = {}
+        for key, body, vis, hrs, imgs, tags in feature:
+            posts[key] = self._post(m[key], body, vis, hrs, [(t, s_, a) for t, s_, a in imgs], tags)
+        # Everyday posts from partner-college students (organisation-only for under-18s) and other builders.
+        topics = [
+            ("Finished the sensor wiring for our Arduino soil-moisture project.", "app", ["embedded-systems"]),
+            ("Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.", "app", ["frontend-dev"]),
+            ("Tried Figma for the first time. The auto layout clicked on day two.", "board", ["ui-design"]),
+            ("Learning SQL by cleaning our college library's CSV. 400 duplicate rows so far.", "code", ["data-analysis"]),
+            ("Wrote my first cold email to a startup. Got a reply in an hour.", "chart", ["b2b-marketing"]),
+        ]
+        org_students = [s for s in self.bulk_students if s.organisation_id and s.pk != m["ravi"].pk]
+        others = [s for s in self.bulk_students if not s.organisation_id] + self.bulk_founders
+        authors = rnd.sample(org_students, 14) + rnd.sample(others, 12)
+        for i, who in enumerate(authors):
+            text, kind, tags = topics[i % len(topics)]
+            vis = (
+                "organisation"
+                if who.is_minor or (who.organisation_id and i % 3 == 0)
+                else rnd.choice(["everyone", "connections"])
+            )
+            if who.is_minor or (vis == "organisation" and not who.organisation_id):
+                vis = "organisation" if who.organisation_id else "connections"
+            imgs = (
+                [(f"{who.display_name.split()[0]}'s project", "work in progress", "Screenshot of a work-in-progress project")]
+                if i % 2 == 0
+                else []
+            )
+            tags = [t for t in tags if t in self.cap][:3]
+            self._post(who, text, vis, rnd.choice([1, 4, 9, 20, 30, 50, 90, 120]), imgs, tags)
+        # A thread, a few reactions and follows.
+        everyone = list(Member.objects.exclude(role__in=["super_admin", "partner_admin"]).filter(is_minor=False).order_by("pk"))
+        for key in ("asha", "ravi", "divya"):
+            p = posts[key]
+            top = Reply.objects.create(
+                post=p,
+                author=rnd.choice([x for x in everyone if x.pk != p.author_id]),
+                body=rnd.choice(
+                    [
+                        "How did you handle offline sync?",
+                        "This is useful. What did you use for the chart?",
+                        "Would love to try this.",
+                    ]
+                ),
+            )
+            Reply.objects.create(post=p, author=p.author, body="Thanks! Happy to share how, message me.", parent=top)
+        reactions = []
+        for p in Post.objects.filter(visibility="everyone"):
+            for who in rnd.sample(everyone, 3):
+                if who.pk != p.author_id:
+                    reactions.append(
+                        Reaction(post=p, member=who, kind=rnd.choice(["helpful", "helpful", "intro_me", "lets_talk"]))
+                    )
+        Reaction.objects.bulk_create(reactions, ignore_conflicts=True)
+        hiring = list(Startup.objects.filter(hiring=True).order_by("pk")[:6])
+        follows = [Follow(member=m["ravi"], startup=s) for s in [self.startups["pixelwave"], *hiring[:3]]]
+        follows += [Follow(member=s, startup=rnd.choice(hiring)) for s in rnd.sample(org_students, 10)]
+        Follow.objects.bulk_create(follows, ignore_conflicts=True)
+        # Connection requests and chats.
+        ConnectionRequest.objects.create(
+            sender=m["ravi"], recipient=m["lakshmi"], note="I built an attendance app and need a mentor for my first internship."
+        )
+        ConnectionRequest.objects.create(
+            sender=rnd.choice(org_students), recipient=m["ravi"], note="Same department, loved your attendance app."
+        )
+        self._chat(
+            m["asha"],
+            m["arjun"],
+            ["Saw your hiring board. How long is a trial project?", "Two days, paid. I will send the template."],
+            active=True,
+        )
+        self._chat(
+            m["sneha"],
+            m["lakshmi"],
+            ["Thank you for the intro note.", "Anytime. Send me your one-pager before Thursday."],
+            active=True,
+        )
+        self._chat(
+            m["ravi"], m["divya"], ["Hi, I am applying to the frontend internship. Happy to share my portfolio."], active=False
+        )
+
+    def _chat(self, a: Member, b: Member, lines: list[str], active: bool) -> None:
+        x, y = sorted((a.pk, b.pk))
+        conv = Conversation.objects.create(member_a_id=x, member_b_id=y, started_by=a, status="active" if active else "request")
+        now = timezone.now()
+        for i, line in enumerate(lines):
+            msg = Message.objects.create(conversation=conv, sender=a if i % 2 == 0 else b, body=line)
+            Message.objects.filter(pk=msg.pk).update(created_at=now - timedelta(minutes=30 * (len(lines) - i)))
+        conv.last_message_at = now - timedelta(minutes=30)
+        conv.save(update_fields=["last_message_at"])
 
 
 def run(city: dict) -> dict:

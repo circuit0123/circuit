@@ -54,6 +54,8 @@ class Config(BaseSettings):
     supabase_url: str = ""
     supabase_jwt_audience: str = "authenticated"
     supabase_jwt_alg: Literal["ES256", "RS256"] = "ES256"
+    supabase_service_role_key: str = ""  # backend only: storage uploads/signing and Realtime broadcasts
+    storage_provider: Literal["local", "supabase"] = "local"
     llm_provider: Literal["gemini", "groq", "anthropic", "fake"] = "groq"
     gemini_api_key: str = ""
     groq_api_key: str = ""
@@ -83,6 +85,10 @@ class Config(BaseSettings):
         if self.supabase_url and public and not re.fullmatch(r"https://[^/\s]+", self.supabase_url.rstrip("/")):
             # The JWKS (the keys that decide who is signed in) is downloaded from here: it must be TLS.
             raise ValueError("SUPABASE_URL must be an https:// origin outside dev")
+        if public and self.storage_provider == "supabase" and not (self.supabase_url and self.supabase_service_role_key):
+            raise ValueError("STORAGE_PROVIDER=supabase needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY")
+        if deployed and self.storage_provider != "supabase":
+            raise ValueError("STORAGE_PROVIDER must be supabase in staging and production (local files are for dev)")
         if deployed and self.llm_provider == "fake":
             raise ValueError("LLM_PROVIDER=fake is only for tests")
         if public and _weak_secret(self.secret_key):

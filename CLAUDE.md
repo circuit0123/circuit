@@ -151,7 +151,7 @@ behind core/graph. Neo4j is NOT in scope (trigger in BACKLOG.md).
 ## Data model (Postgres)
 - members: id, auth_user_id (unique), role, display_name, bio, location (point), city,
   college, organisation_id (nullable), verification_level, open_intro_slots,
-  circuits_opt_in, is_minor, profile_visibility, visible_to_org, suspended_at, created_at, updated_at
+  circuits_opt_in, is_minor, profile_visibility, visible_to_org, suspended_at, pulse_seen_at, created_at, updated_at
 - organisations: id, name, kind (college | incubator | program), city, email_domains,
   join_code, created_by. A member belongs to at most one organisation. Super admins
   create organisations and appoint the first partner_admin. Members join via invite
@@ -168,13 +168,16 @@ behind core/graph. Neo4j is NOT in scope (trigger in BACKLOG.md).
 - circuits; circuit_legs (giver, receiver, capability, consent, fulfilled, rating)
 - notifications; reports; blocks; audit_log; consents (policy_version, accepted_at)
 - posts (author, body, link, visibility, capability tags, status: visible | hidden |
-  removed), post_media (storage path, width, height, alt_text, order),
+  removed), media_uploads (owner, purpose post | message, path, status pending | ready,
+  width, height: an image can only be attached by its owner, once), post_media (post,
+  upload, alt_text, order),
   reactions (post, member, kind; unique per member+post+kind), replies (post, author,
   body, parent nullable one level)
-- follows (member → startup); connections (above) for people; daily_drops (member,
-  date, candidate list); story_views (viewer, author, date)
+- follows (member → startup); connections (above) for people; connection_requests
+  (sender, recipient, note, status pending | accepted | declined); daily_drops (member,
+  date, candidate list); story_views (viewer, author or startup, date, viewed_at)
 - conversations (two members, status: request | active | blocked), messages
-  (conversation, sender, body, image, created_at, read_at)
+  (conversation, sender, body, image, created_at, read_at, removed_at)
 - events (append-only: actor, type, target_type, target_id, payload, created_at)
 GIST indexes on locations, HNSW on embeddings, indexes on every foreign key.
 

@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "apps.moderation",
     "apps.events",
     "apps.dashboard",
+    "apps.social",
+    "apps.messaging",
 ]
 
 MIDDLEWARE = [
@@ -103,6 +105,13 @@ DEMO_PUBLIC = cfg.demo_public
 SUPABASE_URL = cfg.supabase_url
 SUPABASE_JWT_AUDIENCE = cfg.supabase_jwt_audience
 SUPABASE_JWT_ALG = cfg.supabase_jwt_alg
+SUPABASE_SERVICE_ROLE_KEY = cfg.supabase_service_role_key
+STORAGE_PROVIDER = cfg.storage_provider
+MEDIA_ROOT = BASE_DIR / ".media"  # STORAGE_PROVIDER=local only (dev)
+STORAGE_BUCKETS = {"post": "posts", "message": "messages"}  # private buckets; reads use short-lived signed URLs
+MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+MEDIA_VARIANT_WIDTHS = (1440, 480)
+MEDIA_MAX_PIXELS = 40_000_000  # decompression-bomb guard
 LLM_PROVIDER = cfg.llm_provider
 GEMINI_API_KEY = cfg.gemini_api_key
 GROQ_API_KEY = cfg.groq_api_key
@@ -150,7 +159,22 @@ RATE_LIMITS = {
     "claim": (5, 86400),
     "org_join": (10, 3600),
     "verify": (5, 86400),
+    "post": (10, 86400),
+    "reply": (60, 86400),
+    "reaction": (300, 3600),
+    "upload": (40, 86400),
+    "message": (300, 86400),
+    "conversation_start": (10, 86400),
+    "connection_request": (20, 86400),
 }
+
+# Social (F15-F17)
+PULSE_WINDOW_DAYS = 7
+PULSE_PAGE_SIZE = 20
+TODAY_WINDOW_HOURS = 24
+DROP_SIZE = 3
+DROP_REPEAT_DAYS = 14  # nobody is dropped to the same member twice within this many days
+DROP_TZ = "Asia/Kolkata"  # drops are built for the IST calendar day, ready at 08:00
 
 EMAIL_BACKEND = {
     "console": "django.core.mail.backends.console.EmailBackend",

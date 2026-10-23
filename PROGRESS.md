@@ -1,11 +1,12 @@
 # Circuit — Progress
 
-Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Backend only for now.
+Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
 - Stage 1 — Backend foundation: **done and merged**
 - Stage 2 — Auth and security: **done and merged** (make check green: ruff, mypy, 321 tests; finecomb audit done, findings fixed)
-  - One box stays open on purpose: rate limits on extraction/intros/applications/reports/claims. Extraction, intros, applications, claims and org join now use `check_rate`; only reports remain, and that endpoint arrives in Stage 6.
+  - One box stays open on purpose: rate limits on extraction/intros/applications/reports/claims. Extraction, intros, applications, claims and org join now use `check_rate`. Reports now exist too (Stage 3b, `POST /api/reports`, limited to 10 a day), so that box can be ticked.
+- Stage 3b — Social API (F15–F17): **done, waiting for your OK** (make check green: ruff, mypy, 1657 tests, Story 1–5 PASS; details in "Social API" below)
 - Stage 3 — Core features API: **done, waiting for your OK** (make check green: ruff, mypy, 1109 tests, Story 1–5 all PASS)
   - Part 1 (committed): members/profile, onboarding extraction, work-email verification, startups nearby/map/views/interest, claim flow.
   - Part 2: jobs and applications (F11), in-app notifications, strict list of event types (`EVENT_TYPES`; an unknown type raises).
@@ -67,7 +68,38 @@ Checked, nothing found: algorithm confusion (alg none, HS256 with the public key
 - `.env` got new dev defaults; `.env.example` documents all.
 
 ## Next
-Stage 4 (frontends) and Stage 5 (deploy staging and demo), after your OK. The backend API for every Stage 3 feature exists and `packages/api-client/openapi.json` is current. Stage 6 will add report/block, which also finishes the Stage 2 rate-limit box.
+Stage 4 (frontends) and Stage 5 (deploy staging and demo), after your OK. The backend API for every Stage 3 and 3b feature exists and `packages/api-client/openapi.json` is current. Stage 6 still owns "block a person from their profile" (blocking from a chat already works) and settings/export/delete.
+
+## Social API (Stage 3b): what exists
+- **Two new apps:** `social` (build logs, reactions, replies, follows, Pulse, Today, Daily Drop, connections, image uploads) and `messaging` (conversations, messages, Realtime nudges). `moderation` gained `POST /api/reports`. New tables: `social_*`, `messaging_*`, `accounts_connectionrequest`, plus `members.pulse_seen_at`. Migrations are additive.
+- **One rule file:** `apps/social/relations.py` decides connected / blocked / same organisation, who can see a post (`can_see_post` and the list version `visible_posts`, tested against each other) and who may message or ask to connect (`may_message`, `may_request_connection`). Anything not allowed is a **404**, so a stranger cannot tell a minor from a missing member.
+- **Visibility:** Everyone = any member; Connections = the author's connections; My organisation = the same organisation. Blocked (either way), suspended, hidden and removed posts are invisible. A hidden-profile author's "Everyone" posts reach only their connections.
+- **Under 18:** can post to their organisation only (and only if they have one). Messages only with connections or staff of their own organisation, checked on **every send**. Connection requests to or from a minor stay inside one organisation. No Daily Drop, never dropped to others.
+- **No public counts:** the API returns reaction totals and reply count only on your own posts (`private_stats`). Nothing returns follower, connection or view counts. A test scans the responses.
+- **Images:** `POST /api/media/uploads` returns a signed upload URL (one JPEG/PNG/WebP, 5 MB); `.../complete` checks the real file type and size, strips EXIF/GPS by re-encoding, stores 1440 px and 480 px WebP and deletes the original. Alt text is required on every image. An upload belongs to its owner and can be attached once. Private buckets `posts` and `messages`; reads use signed URLs (cached 50 min).
+- **Pulse:** `GET /api/pulse`: build logs from connections, organisation and followed startups' teams; new roles (followed startups, plus student skill matches within 25 km, at most 5); circuits closed by people you know, your intros that worked, startups newly claimed nearby; one "skills in demand" card a day. Newest first, 7 days, cursor paging. It shows what is new since you last called `POST /api/pulse/seen`, then `caught_up: true`; `include_seen=true` shows earlier items.
+- **Today strip, Daily Drop:** `GET /api/today` (+ `POST /api/today/seen`), `GET /api/drop/today`, `POST /api/drop/today/{id}/swipe` (records intro/skip; the app then calls the intros endpoint). The drop "day" starts at 08:00 IST.
+- **Messaging:** connected people chat directly; others send a request (the sender gets one message until answered; replying accepts). Block closes the chat and also blocks the person everywhere. Realtime uses **private Broadcast**: after saving, the backend sends only `{message_id, conversation_id}` to `conversation:<id>`; the app fetches the message from our API. Our tables stay closed to Supabase clients. One unread "new message" notification per conversation. Read receipts are stored but not shown to senders.
+- **Admin:** Post and Reply have Hide / Remove / Restore actions; the Report page shows the reported content and has "Take down" and "Dismiss"; all audit-logged. Messages cannot be browsed in admin: a moderator reads a message only when it is reported.
+- **Rate limits (per member):** posts 10/day, replies 60/day, reactions 300/hour, uploads 40/day, messages 300/day, new conversations 10/day, connection requests 20/day, reports 10/day.
+- **Seed:** `reset_demo` adds about 35 build logs (drawn "screenshots" from simple shapes in `seed/mockups.py`: no photos, no people), replies, reactions, follows, 2 connection requests and 3 chats (one request: Ravi to Divya). Spread over the last week. Still idempotent (tested).
+- **Jobs to schedule in Stage 5:** `build_daily_drops` at 08:00 IST, after `compute_matches`.
+
+### Things for you to decide or know (Stage 3b)
+1. **Pulse is calm on purpose, and may look empty on the second visit.** It shows only what is new since `POST /api/pulse/seen`. Stage 4 must call that when the person reaches the end and offer "See earlier this week" (`include_seen=true`). If you would rather it always show the whole week, say so; it is a small change.
+2. **Cursor paging** (Pulse and messages) instead of limit/offset, because offsets skip items on a live feed. CLAUDE.md says "one pagination style"; lists elsewhere stay offset-based.
+3. **Daily Drop contains people only**, not startups (match results are people). Startups reach Home through Pulse and the Map.
+4. **Minors get no Daily Drop and no intro-style discovery.** My reading of "under-18: no appearance in public Discover until age is verified". Say if you want a drop of people from their organisation.
+5. **Minor ↔ organisation staff:** a partner admin can message a minor of their own organisation (as a request the minor accepts). Partner admins can message members of their own organisation only. An org-mate who is not connected cannot message a minor.
+6. **Alt text is required** (DESIGN §10 says images "require" it). The composer should pre-fill a suggestion.
+7. **Browser uploads need Supabase Storage.** In dev (local files) the API works and the seed fills images, but the signed upload URL step answers 503 `uploads_unavailable`. Frontend work in Stage 4 should use a Supabase dev project's storage, or I can add a dev-only upload route.
+8. **Not tested against real Supabase** (no project here): the Storage endpoints (`upload/sign`, `object/sign`), the Broadcast endpoint and the `realtime.messages` policy. The policy migration is skipped when the `realtime` schema is absent. Stage 5 smoke must send one real image and one real chat message. In Supabase: create private buckets `posts` and `messages` (5 MB, image types only) and turn off public access on Realtime channels.
+9. **Config rules added:** staging/production refuse to start unless `STORAGE_PROVIDER=supabase` and `SUPABASE_SERVICE_ROLE_KEY` are set. `.env.example` updated. Existing config tests were adjusted for this.
+10. **CLAUDE.md and PRODUCTION.md edited** (committed in the first commit): your new CLAUDE/LAUNCH/BACKLOG/DESIGN files; `PRODUCTION (2).md` became `PRODUCTION.md` with the Stage 2 text it had lost (database roles/RLS, rate-limit line) put back; `suspended_at` restored in the data model; `pillow` added to the approved libraries (you approved it); data model lists the tables I added (`media_uploads`, `connection_requests`, `story_views.startup`, `messages.removed_at`, `members.pulse_seen_at`).
+11. **The `apps/` folder at the repo root** (Next.js build output and `node_modules` only) is not committed. Stage 4 creates its real contents.
+12. **Declined connection requests:** the sender cannot ask the same person again for 30 days (they are told "recently declined"). Say if you would rather that stayed silent.
+13. I ran `migrate`, `reset_demo`, `compute_matches` and `build_daily_drops` (twice: 191 drops, then 0) on your dev database. Re-run `make reset-demo` any time.
+14. A real bug caught by my own test run: I had written a call to the chat broadcaster that passed `conversation_id` twice (mypy found it), and Pulse first showed only roles because the seed created every job "now". Both fixed (roles are capped at 5 in Pulse; the seed spreads job dates).
 
 ## Warm intros, circuits, dashboard: how they work and what to know (part 4)
 - **Intros (F5):** a request goes to the best mutual connection (the broker) first. If they agree, it reaches the person; if not, the person never sees it. New field `IntroRequest.stage` (broker / target / done / stopped; additive migration `intros.0002`). Already-connected people skip the broker. Limits: 3 new requests per sender per rolling week, the target's `open_intro_slots` as their weekly capacity, a per-member rate limit, 7-day expiry. Under-18s cannot send intros (my choice: a 2-hop intro means contacting a stranger; say if you want it different). People who are hidden, blocked, suspended, minors or admins cannot be reached (404).

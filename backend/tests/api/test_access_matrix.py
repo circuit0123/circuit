@@ -18,6 +18,16 @@ def by_role(default=403, **over):
     return {**{r: default for r in ROLES}, **over}
 
 
+def social(status):
+    """Network roles get `status`; partner and super admins are not part of the social network (403)."""
+    return by_role(403, **{r: status for r in JOINABLE})
+
+
+def messaging(status):
+    """Messaging also admits partner admins (they may message their own organisation, including under-18s)."""
+    return by_role(403, **{r: status for r in [*JOINABLE, "partner_admin"]})
+
+
 # (method, path) -> expected status per role, for a member who belongs to an organisation.
 MATRIX = {
     ("GET", "/api/me"): by_role(200),
@@ -81,6 +91,42 @@ MATRIX = {
     ("GET", "/api/notifications/unread-count"): by_role(200),
     ("POST", "/api/notifications/read-all"): by_role(200),
     ("POST", "/api/notifications/{notification_id}/read"): by_role(404),
+    # Stage 3b: social (F15-F17)
+    ("POST", "/api/media/uploads"): social(201),
+    ("POST", "/api/media/uploads/{upload_id}/complete"): by_role(404),
+    ("POST", "/api/posts"): social(201),
+    ("GET", "/api/posts/{post_id}"): social(404),
+    ("DELETE", "/api/posts/{post_id}"): by_role(404),
+    ("GET", "/api/members/{member_id}/posts"): social(404),
+    ("PUT", "/api/posts/{post_id}/reactions/{kind}"): social(404),
+    ("DELETE", "/api/posts/{post_id}/reactions/{kind}"): social(404),
+    ("GET", "/api/posts/{post_id}/replies"): social(404),
+    ("POST", "/api/posts/{post_id}/replies"): social(404),
+    ("DELETE", "/api/replies/{reply_id}"): by_role(404),
+    ("GET", "/api/pulse"): social(200),
+    ("POST", "/api/pulse/seen"): social(204),
+    ("GET", "/api/today"): social(200),
+    ("POST", "/api/today/seen"): social(404),
+    ("GET", "/api/drop/today"): social(200),
+    ("POST", "/api/drop/today/{member_id}/swipe"): social(404),
+    ("POST", "/api/startups/{startup_id}/follow"): social(404),
+    ("DELETE", "/api/startups/{startup_id}/follow"): social(204),
+    ("GET", "/api/me/follows"): social(200),
+    ("GET", "/api/connections"): social(200),
+    ("DELETE", "/api/connections/{member_id}"): social(404),
+    ("POST", "/api/connections/requests"): social(404),
+    ("GET", "/api/connections/requests"): social(200),
+    ("POST", "/api/connections/requests/{request_id}/respond"): social(404),
+    ("GET", "/api/conversations"): messaging(200),
+    ("POST", "/api/conversations"): messaging(404),
+    ("GET", "/api/conversations/{conversation_id}"): messaging(404),
+    ("GET", "/api/conversations/{conversation_id}/messages"): messaging(404),
+    ("GET", "/api/conversations/{conversation_id}/messages/{message_id}"): messaging(404),
+    ("POST", "/api/conversations/{conversation_id}/messages"): messaging(404),
+    ("POST", "/api/conversations/{conversation_id}/accept"): messaging(404),
+    ("POST", "/api/conversations/{conversation_id}/block"): messaging(404),
+    ("POST", "/api/conversations/{conversation_id}/read"): messaging(404),
+    ("POST", "/api/reports"): by_role(404, super_admin=403),
 }
 
 # Request bodies and query strings for routes that need them (default POST body is {"code": "X"}).
@@ -104,6 +150,16 @@ BODIES = {
     ("POST", "/api/circuits/{circuit_id}/legs/{leg_id}/rating"): '{"rating": 3}',
     ("PATCH", "/api/jobs/{job_id}"): "{}",
     ("PATCH", "/api/applications/{application_id}"): '{"status": "shortlisted"}',
+    ("POST", "/api/media/uploads"): '{"purpose": "post", "content_type": "image/png", "size": 1000}',
+    ("POST", "/api/posts"): '{"body": "Shipped the first version", "visibility": "organisation"}',
+    ("POST", "/api/posts/{post_id}/replies"): '{"body": "Nice work"}',
+    ("POST", "/api/today/seen"): '{"kind": "member", "id": 999999}',
+    ("POST", "/api/drop/today/{member_id}/swipe"): '{"direction": "skip"}',
+    ("POST", "/api/connections/requests"): '{"member_id": 999999, "note": ""}',
+    ("POST", "/api/connections/requests/{request_id}/respond"): '{"accept": true}',
+    ("POST", "/api/conversations"): '{"member_id": 999999, "body": "Hi"}',
+    ("POST", "/api/conversations/{conversation_id}/messages"): '{"body": "Hi"}',
+    ("POST", "/api/reports"): '{"target_type": "post", "target_id": 999999, "reason": "spam"}',
 }
 QUERIES = {("GET", "/api/startups/map"): "?min_lng=80&min_lat=13&max_lng=80.5&max_lat=13.5"}
 
@@ -121,8 +177,15 @@ def call(client, method, path):
         "intro_id",
         "circuit_id",
         "leg_id",
+        "post_id",
+        "reply_id",
+        "upload_id",
+        "request_id",
+        "conversation_id",
+        "message_id",
     ):
         url = url.replace("{" + name + "}", "999999")
+    url = url.replace("{kind}", "helpful")
     url += QUERIES.get(key, "")
     body = BODIES.get(key, '{"code": "X"}' if method == "POST" else None)
     return client.generic(method, url, body, content_type="application/json") if body else client.generic(method, url)

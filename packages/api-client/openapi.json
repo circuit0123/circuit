@@ -45,6 +45,88 @@
         "title": "AcceptanceOut",
         "type": "object"
       },
+      "ActivityOut": {
+        "properties": {
+          "circuit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Circuit Id"
+          },
+          "intro_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intro Id"
+          },
+          "members": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Members"
+          },
+          "startup_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Startup Id"
+          },
+          "startup_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Startup Name"
+          },
+          "target_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Id"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "ActivityOut",
+        "type": "object"
+      },
       "AnswerIn": {
         "properties": {
           "accept": {
@@ -177,6 +259,44 @@
         "title": "ApplicationOut",
         "type": "object"
       },
+      "AuthorOut": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "verification_level": {
+            "title": "Verification Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "role",
+          "verification_level",
+          "headline",
+          "city"
+        ],
+        "title": "AuthorOut",
+        "type": "object"
+      },
       "BboxParams": {
         "properties": {
           "capability": {
@@ -259,6 +379,24 @@
         "title": "CapabilityOut",
         "type": "object"
       },
+      "CapabilityTagOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ],
+        "title": "CapabilityTagOut",
+        "type": "object"
+      },
       "CellOut": {
         "properties": {
           "count": {
@@ -280,6 +418,71 @@
           "count"
         ],
         "title": "CellOut",
+        "type": "object"
+      },
+      "CircleOut": {
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthorOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "member",
+              "startup"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "latest_at": {
+            "format": "date-time",
+            "title": "Latest At",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "posts": {
+            "items": {
+              "$ref": "#/components/schemas/PostOut"
+            },
+            "title": "Posts",
+            "type": "array"
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/StoryRoleOut"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "seen": {
+            "title": "Seen",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name",
+          "latest_at",
+          "seen",
+          "author",
+          "posts",
+          "roles"
+        ],
+        "title": "CircleOut",
         "type": "object"
       },
       "CircuitOut": {
@@ -379,6 +582,122 @@
         "title": "CodeIn",
         "type": "object"
       },
+      "ConnectionRequestIn": {
+        "properties": {
+          "member_id": {
+            "title": "Member Id",
+            "type": "integer"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 300,
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "member_id"
+        ],
+        "title": "ConnectionRequestIn",
+        "type": "object"
+      },
+      "ConnectionRequestOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/AuthorOut"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/AuthorOut"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sender",
+          "recipient",
+          "note",
+          "status",
+          "created_at"
+        ],
+        "title": "ConnectionRequestOut",
+        "type": "object"
+      },
+      "ConversationOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "last_message": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MessageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_message_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message At"
+          },
+          "other": {
+            "$ref": "#/components/schemas/AuthorOut"
+          },
+          "started_by_me": {
+            "title": "Started By Me",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "request",
+              "active"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unread": {
+            "title": "Unread",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "other",
+          "started_by_me",
+          "last_message_at",
+          "unread",
+          "last_message"
+        ],
+        "title": "ConversationOut",
+        "type": "object"
+      },
       "CountOut": {
         "properties": {
           "hidden": {
@@ -402,6 +721,31 @@
           "hidden"
         ],
         "title": "CountOut",
+        "type": "object"
+      },
+      "CursorParams": {
+        "description": "Live feeds (Pulse, messages) use a cursor, not offsets: new items arriving must not shift the next page.",
+        "properties": {
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cursor"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "CursorParams",
         "type": "object"
       },
       "DemoToken": {
@@ -450,6 +794,77 @@
         "title": "DepStatus",
         "type": "object"
       },
+      "DropCardOut": {
+        "properties": {
+          "is_bridge": {
+            "title": "Is Bridge",
+            "type": "boolean"
+          },
+          "member": {
+            "$ref": "#/components/schemas/AuthorOut"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "enum": [
+                  "intro",
+                  "skip"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "member",
+          "reason",
+          "is_bridge",
+          "outcome"
+        ],
+        "title": "DropCardOut",
+        "type": "object"
+      },
+      "DropOut": {
+        "properties": {
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/DropCardOut"
+            },
+            "title": "Cards",
+            "type": "array"
+          },
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "done": {
+            "title": "Done",
+            "type": "boolean"
+          },
+          "next_drop_at": {
+            "format": "date-time",
+            "title": "Next Drop At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "cards",
+          "done",
+          "next_drop_at"
+        ],
+        "title": "DropOut",
+        "type": "object"
+      },
       "ExtractIn": {
         "properties": {
           "bio": {
@@ -484,6 +899,49 @@
           "suggestions"
         ],
         "title": "ExtractOut",
+        "type": "object"
+      },
+      "FolderParams": {
+        "properties": {
+          "folder": {
+            "default": "chats",
+            "enum": [
+              "chats",
+              "requests"
+            ],
+            "title": "Folder",
+            "type": "string"
+          }
+        },
+        "title": "FolderParams",
+        "type": "object"
+      },
+      "FollowedStartupOut": {
+        "properties": {
+          "hiring": {
+            "title": "Hiring",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sector": {
+            "title": "Sector",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "sector",
+          "hiring"
+        ],
+        "title": "FollowedStartupOut",
         "type": "object"
       },
       "GapOut": {
@@ -1594,6 +2052,107 @@
         "title": "MePatch",
         "type": "object"
       },
+      "MediaIn": {
+        "properties": {
+          "alt_text": {
+            "description": "What the image shows, for people using a screen reader",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Alt Text",
+            "type": "string"
+          },
+          "upload_id": {
+            "title": "Upload Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "upload_id",
+          "alt_text"
+        ],
+        "title": "MediaIn",
+        "type": "object"
+      },
+      "MessageOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "conversation_id": {
+            "title": "Conversation Id",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          },
+          "mine": {
+            "title": "Mine",
+            "type": "boolean"
+          },
+          "removed": {
+            "title": "Removed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "conversation_id",
+          "mine",
+          "body",
+          "image",
+          "removed",
+          "created_at"
+        ],
+        "title": "MessageOut",
+        "type": "object"
+      },
+      "MessagePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MessageOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "MessagePage",
+        "type": "object"
+      },
       "NearbyParams": {
         "properties": {
           "capability": {
@@ -2346,6 +2905,198 @@
         "title": "PinOut",
         "type": "object"
       },
+      "PostIn": {
+        "properties": {
+          "body": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Body",
+            "type": "string"
+          },
+          "capabilities": {
+            "description": "Capability slugs from our list",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 3,
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "link": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Link",
+            "type": "string"
+          },
+          "media": {
+            "items": {
+              "$ref": "#/components/schemas/MediaIn"
+            },
+            "maxItems": 4,
+            "title": "Media",
+            "type": "array"
+          },
+          "visibility": {
+            "enum": [
+              "everyone",
+              "connections",
+              "organisation"
+            ],
+            "title": "Visibility",
+            "type": "string"
+          }
+        },
+        "required": [
+          "visibility"
+        ],
+        "title": "PostIn",
+        "type": "object"
+      },
+      "PostMediaOut": {
+        "properties": {
+          "alt_text": {
+            "title": "Alt Text",
+            "type": "string"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "w1440": {
+            "title": "W1440",
+            "type": "string"
+          },
+          "w480": {
+            "title": "W480",
+            "type": "string"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "alt_text",
+          "w1440",
+          "w480",
+          "width",
+          "height"
+        ],
+        "title": "PostMediaOut",
+        "type": "object"
+      },
+      "PostOut": {
+        "properties": {
+          "author": {
+            "$ref": "#/components/schemas/AuthorOut"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/CapabilityTagOut"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "media": {
+            "items": {
+              "$ref": "#/components/schemas/PostMediaOut"
+            },
+            "title": "Media",
+            "type": "array"
+          },
+          "my_reactions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "My Reactions",
+            "type": "array"
+          },
+          "private_stats": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PrivateStatsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "visibility": {
+            "title": "Visibility",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "author",
+          "body",
+          "link",
+          "visibility",
+          "status",
+          "created_at",
+          "capabilities",
+          "media",
+          "my_reactions"
+        ],
+        "title": "PostOut",
+        "type": "object"
+      },
+      "PrivateStatsOut": {
+        "properties": {
+          "reactions": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Reactions",
+            "type": "object"
+          },
+          "replies": {
+            "title": "Replies",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "reactions",
+          "replies"
+        ],
+        "title": "PrivateStatsOut",
+        "type": "object"
+      },
       "ProfileOut": {
         "properties": {
           "bio": {
@@ -2421,6 +3172,143 @@
         "title": "ProfileOut",
         "type": "object"
       },
+      "PulseItemOut": {
+        "properties": {
+          "activity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActivityOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "post",
+              "role",
+              "activity",
+              "skills_in_demand"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "post": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PostOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "seen": {
+            "title": "Seen",
+            "type": "boolean"
+          },
+          "skills_in_demand": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkillsInDemandOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "key",
+          "created_at",
+          "seen"
+        ],
+        "title": "PulseItemOut",
+        "type": "object"
+      },
+      "PulseOut": {
+        "properties": {
+          "caught_up": {
+            "title": "Caught Up",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PulseItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor",
+          "caught_up"
+        ],
+        "title": "PulseOut",
+        "type": "object"
+      },
+      "PulseParams": {
+        "properties": {
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cursor"
+          },
+          "include_seen": {
+            "default": false,
+            "title": "Include Seen",
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "PulseParams",
+        "type": "object"
+      },
       "RatingIn": {
         "properties": {
           "rating": {
@@ -2434,6 +3322,209 @@
           "rating"
         ],
         "title": "RatingIn",
+        "type": "object"
+      },
+      "ReplyIn": {
+        "properties": {
+          "body": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Body",
+            "type": "string"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Reply to a top-level reply (one level deep only)",
+            "title": "Parent Id"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "ReplyIn",
+        "type": "object"
+      },
+      "ReplyOut": {
+        "properties": {
+          "author": {
+            "$ref": "#/components/schemas/AuthorOut"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "replies": {
+            "items": {
+              "$ref": "#/components/schemas/ReplyOut"
+            },
+            "title": "Replies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "author",
+          "body",
+          "created_at",
+          "replies"
+        ],
+        "title": "ReplyOut",
+        "type": "object"
+      },
+      "ReportIn": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "target_id": {
+            "title": "Target Id",
+            "type": "integer"
+          },
+          "target_type": {
+            "enum": [
+              "post",
+              "reply",
+              "message",
+              "member"
+            ],
+            "title": "Target Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_type",
+          "target_id",
+          "reason"
+        ],
+        "title": "ReportIn",
+        "type": "object"
+      },
+      "ReportOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "target_id": {
+            "title": "Target Id",
+            "type": "integer"
+          },
+          "target_type": {
+            "title": "Target Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "target_type",
+          "target_id",
+          "status",
+          "created_at"
+        ],
+        "title": "ReportOut",
+        "type": "object"
+      },
+      "RequestParams": {
+        "properties": {
+          "box": {
+            "default": "incoming",
+            "enum": [
+              "incoming",
+              "outgoing"
+            ],
+            "title": "Box",
+            "type": "string"
+          }
+        },
+        "title": "RequestParams",
+        "type": "object"
+      },
+      "RespondIn": {
+        "properties": {
+          "accept": {
+            "title": "Accept",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accept"
+        ],
+        "title": "RespondIn",
+        "type": "object"
+      },
+      "SendIn": {
+        "properties": {
+          "body": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Body",
+            "type": "string"
+          },
+          "upload_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A finished upload with purpose=message",
+            "title": "Upload Id"
+          }
+        },
+        "title": "SendIn",
+        "type": "object"
+      },
+      "SkillDemandOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "open_roles": {
+            "title": "Open Roles",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "open_roles"
+        ],
+        "title": "SkillDemandOut",
         "type": "object"
       },
       "SkillIn": {
@@ -2483,6 +3574,68 @@
           "proof_url"
         ],
         "title": "SkillOut",
+        "type": "object"
+      },
+      "SkillsInDemandOut": {
+        "properties": {
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillDemandOut"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "skills"
+        ],
+        "title": "SkillsInDemandOut",
+        "type": "object"
+      },
+      "StartIn": {
+        "properties": {
+          "body": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Body",
+            "type": "string"
+          },
+          "member_id": {
+            "title": "Member Id",
+            "type": "integer"
+          },
+          "upload_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upload Id"
+          }
+        },
+        "required": [
+          "member_id"
+        ],
+        "title": "StartIn",
+        "type": "object"
+      },
+      "StartedOut": {
+        "properties": {
+          "conversation": {
+            "$ref": "#/components/schemas/ConversationOut"
+          },
+          "message": {
+            "$ref": "#/components/schemas/MessageOut"
+          }
+        },
+        "required": [
+          "conversation",
+          "message"
+        ],
+        "title": "StartedOut",
         "type": "object"
       },
       "StartupOut": {
@@ -2725,6 +3878,40 @@
         "title": "StatusIn",
         "type": "object"
       },
+      "StoryRoleOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "startup_id": {
+            "title": "Startup Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "startup_id",
+          "created_at"
+        ],
+        "title": "StoryRoleOut",
+        "type": "object"
+      },
       "Suggestions": {
         "properties": {
           "needs": {
@@ -2765,6 +3952,23 @@
         "title": "Suggestions",
         "type": "object"
       },
+      "SwipeIn": {
+        "properties": {
+          "direction": {
+            "enum": [
+              "intro",
+              "skip"
+            ],
+            "title": "Direction",
+            "type": "string"
+          }
+        },
+        "required": [
+          "direction"
+        ],
+        "title": "SwipeIn",
+        "type": "object"
+      },
       "TraitOut": {
         "properties": {
           "name": {
@@ -2781,6 +3985,139 @@
           "name"
         ],
         "title": "TraitOut",
+        "type": "object"
+      },
+      "UnreadOut": {
+        "properties": {
+          "marked": {
+            "title": "Marked",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "marked"
+        ],
+        "title": "UnreadOut",
+        "type": "object"
+      },
+      "UploadDoneOut": {
+        "properties": {
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "width",
+          "height"
+        ],
+        "title": "UploadDoneOut",
+        "type": "object"
+      },
+      "UploadIn": {
+        "properties": {
+          "content_type": {
+            "enum": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "title": "Content Type",
+            "type": "string"
+          },
+          "purpose": {
+            "enum": [
+              "post",
+              "message"
+            ],
+            "title": "Purpose",
+            "type": "string"
+          },
+          "size": {
+            "exclusiveMinimum": 0,
+            "title": "Size",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "purpose",
+          "content_type",
+          "size"
+        ],
+        "title": "UploadIn",
+        "type": "object"
+      },
+      "UploadOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "upload_url": {
+            "title": "Upload Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "upload_url",
+          "status"
+        ],
+        "title": "UploadOut",
+        "type": "object"
+      },
+      "ViewedIn": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "member",
+              "startup"
+            ],
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "title": "ViewedIn",
         "type": "object"
       },
       "WorkEmailIn": {
@@ -3196,6 +4533,587 @@
         ]
       }
     },
+    "/api/connections": {
+      "get": {
+        "description": "People I am connected to. Only I see this list; there are no public counts.",
+        "operationId": "apps_social_api_list_connections",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuthorOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My connections",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/connections/requests": {
+      "get": {
+        "description": "box=incoming (default) or outgoing. Pending ones only, newest first.",
+        "operationId": "apps_social_api_list_requests",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "box",
+            "required": false,
+            "schema": {
+              "default": "incoming",
+              "enum": [
+                "incoming",
+                "outgoing"
+              ],
+              "title": "Box",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectionRequestOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Pending connection requests",
+        "tags": [
+          "social"
+        ]
+      },
+      "post": {
+        "description": "With an optional note of up to 300 characters. If they already asked me, this accepts it. A request to or from someone under 18 must stay inside one organisation; anyone I may not reach is a 404.",
+        "operationId": "apps_social_api_send_request",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionRequestIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionRequestOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Ask to connect",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/connections/requests/{request_id}/respond": {
+      "post": {
+        "description": "Only the person it was sent to. Accepting makes us connections.",
+        "operationId": "apps_social_api_respond",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RespondIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionRequestOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Accept or decline a connection request",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/connections/{member_id}": {
+      "delete": {
+        "description": "404 if we are not connected.",
+        "operationId": "apps_social_api_remove_connection",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "title": "Member Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Remove a connection",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/conversations": {
+      "get": {
+        "description": "folder=chats (accepted) or requests (first messages from people I am not connected to). Latest first. Members under 18 never get requests from strangers.",
+        "operationId": "apps_messaging_api_list_conversations",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "folder",
+            "required": false,
+            "schema": {
+              "default": "chats",
+              "enum": [
+                "chats",
+                "requests"
+              ],
+              "title": "Folder",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My conversations",
+        "tags": [
+          "messaging"
+        ]
+      },
+      "post": {
+        "description": "Sends the first message. Connected people chat directly; others receive it as a request. Someone I may not message (under-18 rules, blocks, hidden profiles) is a 404.",
+        "operationId": "apps_messaging_api_start",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartedOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Start a conversation",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
+    "/api/conversations/{conversation_id}": {
+      "get": {
+        "description": "404 unless I am one of the two people.",
+        "operationId": "apps_messaging_api_get_conversation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "One conversation",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
+    "/api/conversations/{conversation_id}/accept": {
+      "post": {
+        "description": "Only the person the request was sent to.",
+        "operationId": "apps_messaging_api_accept",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Accept a request",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
+    "/api/conversations/{conversation_id}/block": {
+      "post": {
+        "description": "Closes the conversation and blocks them everywhere (matches, posts, messages, intros).",
+        "operationId": "apps_messaging_api_block",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Block the other person",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
+    "/api/conversations/{conversation_id}/messages": {
+      "get": {
+        "description": "Newest first. Pass next_cursor as cursor to load older ones. Read receipts are not shown to senders.",
+        "operationId": "apps_messaging_api_list_messages",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagePage"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Messages in a conversation",
+        "tags": [
+          "messaging"
+        ]
+      },
+      "post": {
+        "description": "Text up to 2000 characters, an image, or both. In a request the sender gets one message until the other person answers; answering accepts the request.",
+        "operationId": "apps_messaging_api_send",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Send a message",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
+    "/api/conversations/{conversation_id}/messages/{message_id}": {
+      "get": {
+        "description": "What the client fetches after a Realtime nudge. 404 unless I am in the conversation.",
+        "operationId": "apps_messaging_api_get_message",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "message_id",
+            "required": true,
+            "schema": {
+              "title": "Message Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "One message",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
+    "/api/conversations/{conversation_id}/read": {
+      "post": {
+        "description": "Marks what the other person sent as read.",
+        "operationId": "apps_messaging_api_read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Mark messages as read",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
     "/api/dashboard/acceptance": {
       "get": {
         "description": "Introductions my members asked for, split into local and Bridge matches, with how many were accepted. The rate appears only when both counts are at least 5.",
@@ -3386,6 +5304,82 @@
         "summary": "Get a demo token",
         "tags": [
           "demo"
+        ]
+      }
+    },
+    "/api/drop/today": {
+      "get": {
+        "description": "Up to 3 people, ready at 08:00 IST. Empty until the daily job has run. Members under 18 get no drop.",
+        "operationId": "apps_social_api_get_drop",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DropOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Today's Daily Drop",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/drop/today/{member_id}/swipe": {
+      "post": {
+        "description": "intro or skip. This records the choice only; to ask for the intro, call the intros endpoint next. A person who is not in today's drop is a 404.",
+        "operationId": "apps_social_api_swipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "title": "Member Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwipeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DropOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Answer a Daily Drop card",
+        "tags": [
+          "social"
         ]
       }
     },
@@ -4246,6 +6240,38 @@
         ]
       }
     },
+    "/api/me/follows": {
+      "get": {
+        "description": "Newest first. Only I can see this list.",
+        "operationId": "apps_social_api_my_follows",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FollowedStartupOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Startups I follow",
+        "tags": [
+          "social"
+        ]
+      }
+    },
     "/api/me/needs": {
       "get": {
         "description": "What I am looking for help with.",
@@ -4626,6 +6652,82 @@
         ]
       }
     },
+    "/api/media/uploads": {
+      "post": {
+        "description": "Returns a short-lived signed URL for one JPEG, PNG or WebP image of at most 5 MB. Upload the file to it, then call complete. The browser resizes to 1440px first; the server re-encodes and removes metadata.",
+        "operationId": "apps_social_api_start_upload",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Start an image upload",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/media/uploads/{upload_id}/complete": {
+      "post": {
+        "description": "Checks the uploaded file really is an image, strips metadata and stores two sizes. Safe to repeat. Someone else's upload is a 404.",
+        "operationId": "apps_social_api_complete_upload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "upload_id",
+            "required": true,
+            "schema": {
+              "title": "Upload Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadDoneOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Finish an image upload",
+        "tags": [
+          "social"
+        ]
+      }
+    },
     "/api/members/{member_id}": {
       "get": {
         "description": "Another member's profile. Hidden, under-18, suspended, blocked and admin accounts are a 404.",
@@ -4661,6 +6763,48 @@
         "summary": "A member's profile",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/members/{member_id}/posts": {
+      "get": {
+        "description": "Newest first, only the ones I am allowed to see. 404 for members I cannot see.",
+        "operationId": "apps_social_api_member_posts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "title": "Member Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PostOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "A member's build logs",
+        "tags": [
+          "social"
         ]
       }
     },
@@ -5053,6 +7197,444 @@
         "summary": "Remove a member",
         "tags": [
           "organisations"
+        ]
+      }
+    },
+    "/api/posts": {
+      "post": {
+        "description": "Up to 4 images (each with alt text), 500 characters, 3 capability tags and an optional link. Members under 18 can only post to their organisation.",
+        "operationId": "apps_social_api_create_post",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Post a build log",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/posts/{post_id}": {
+      "delete": {
+        "description": "Author only; anyone else gets a 404.",
+        "operationId": "apps_social_api_delete_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "required": true,
+            "schema": {
+              "title": "Post Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Delete my build log",
+        "tags": [
+          "social"
+        ]
+      },
+      "get": {
+        "description": "404 unless the post's visibility lets me see it. Reaction totals appear only on my own posts.",
+        "operationId": "apps_social_api_get_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "required": true,
+            "schema": {
+              "title": "Post Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "One build log",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/posts/{post_id}/reactions/{kind}": {
+      "delete": {
+        "description": "Safe to repeat.",
+        "operationId": "apps_social_api_unreact",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "required": true,
+            "schema": {
+              "title": "Post Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "helpful",
+                "intro_me",
+                "lets_talk"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Remove my reaction",
+        "tags": [
+          "social"
+        ]
+      },
+      "put": {
+        "description": "Helpful, intro_me or lets_talk. Safe to repeat. Nobody but the author sees totals.",
+        "operationId": "apps_social_api_react",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "required": true,
+            "schema": {
+              "title": "Post Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "helpful",
+                "intro_me",
+                "lets_talk"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "React to a build log",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/posts/{post_id}/replies": {
+      "get": {
+        "description": "Oldest first, nested one level. Replies from people I blocked or who blocked me are left out.",
+        "operationId": "apps_social_api_list_replies",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "required": true,
+            "schema": {
+              "title": "Post Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReplyOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Replies to a build log",
+        "tags": [
+          "social"
+        ]
+      },
+      "post": {
+        "description": "Up to 300 characters. The post's author is notified.",
+        "operationId": "apps_social_api_reply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "required": true,
+            "schema": {
+              "title": "Post Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReplyOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Reply to a build log",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/pulse": {
+      "get": {
+        "description": "Chronological, last 7 days, never ranked. Shows what is new since I last marked Pulse as seen; include_seen=true shows earlier items too. Ends with caught_up=true.",
+        "operationId": "apps_social_api_get_pulse",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_seen",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Seen",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PulseOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Pulse feed",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/pulse/seen": {
+      "post": {
+        "description": "Call when the member reaches the end. The next visit shows only newer items.",
+        "operationId": "apps_social_api_pulse_seen",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Mark Pulse as seen",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/replies/{reply_id}": {
+      "delete": {
+        "description": "The reply's author or the post's author. Anyone else gets a 404.",
+        "operationId": "apps_social_api_delete_reply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reply_id",
+            "required": true,
+            "schema": {
+              "title": "Reply Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Delete a reply",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/reports": {
+      "post": {
+        "description": "Goes to the Circuit moderators. You can only report what you can see (anything else is a 404). Reporting the same thing twice returns the open report.",
+        "operationId": "apps_moderation_api_create_report",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Report a post, reply, message or profile",
+        "tags": [
+          "moderation"
         ]
       }
     },
@@ -5472,6 +8054,66 @@
         ]
       }
     },
+    "/api/startups/{startup_id}/follow": {
+      "delete": {
+        "description": "Safe to repeat.",
+        "operationId": "apps_social_api_unfollow",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Unfollow a startup",
+        "tags": [
+          "social"
+        ]
+      },
+      "post": {
+        "description": "Safe to repeat.",
+        "operationId": "apps_social_api_follow",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Follow a startup",
+        "tags": [
+          "social"
+        ]
+      }
+    },
     "/api/startups/{startup_id}/interest": {
       "delete": {
         "description": "Students only. Safe to repeat.",
@@ -5529,6 +8171,69 @@
         "summary": "I'm interested",
         "tags": [
           "startups"
+        ]
+      }
+    },
+    "/api/today": {
+      "get": {
+        "description": "Circles for connections, my organisation and startups I follow who posted or opened a role in the last 24 hours. Unseen first. Items are included, so the story viewer needs no second call.",
+        "operationId": "apps_social_api_get_today",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CircleOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Today strip",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/today/seen": {
+      "post": {
+        "description": "Call when a circle is opened. A circle that is not in my strip is a 404.",
+        "operationId": "apps_social_api_today_seen",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ViewedIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Mark a circle as viewed",
+        "tags": [
+          "social"
         ]
       }
     },
