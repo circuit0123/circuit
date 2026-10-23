@@ -1,44 +1,108 @@
-/* Design tokens from DESIGN.md. Import once per app, after `@import "tailwindcss"`. */
-@theme {
-  --color-paper: #f5f7fa;
-  --color-surface: #ffffff;
-  --color-ink: #0e1a3a;
-  --color-ink-soft: #4a5573;
-  --color-rule: #d5dbe6;
-  --color-line: #1f4bd8;
-  --color-line-wash: #e6ecfc;
-  --color-signal: #f2a100;
-  --color-bridge: #9b2c75;
-  --color-verified: #16795a;
-  --color-alert: #b3261e;
+/* Design tokens from DESIGN.md §5. Import once per app, after `@import "tailwindcss"`.
+   Dark is the default; light follows the system unless data-theme overrides it. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0b0e;
+  --surface: #15151a;
+  --surface-2: #1e1e25;
+  --border: #2a2a33;
+  --text: #f5f4f0;
+  --text-muted: #a3a1a8;
+  --accent: #ff5a36;
+  --on-accent: #0b0b0e;
+  --bridge: #7c5cff;
+  --success: #2ecc8f;
+  --warning: #ffb020;
+  --danger: #ff4d5e;
+  --shadow-lift: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
 
-  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-text), ui-sans-serif, system-ui, sans-serif;
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #fafaf7;
+    --surface: #ffffff;
+    --surface-2: #f1f0ec;
+    --border: #e3e1db;
+    --text: #121215;
+    --text-muted: #5e5c63;
+    --accent: #e8431f;
+    --on-accent: #121215;
+    --bridge: #5b3df0;
+    --success: #14a36b;
+    --warning: #c98200;
+    --danger: #d92d3e;
+    --shadow-lift: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+}
 
-  --radius-control: 10px;
-  --radius-card: 14px;
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #f1f0ec;
+  --border: #e3e1db;
+  --text: #121215;
+  --text-muted: #5e5c63;
+  --accent: #e8431f;
+  --on-accent: #121215;
+  --bridge: #5b3df0;
+  --success: #14a36b;
+  --warning: #c98200;
+  --danger: #d92d3e;
+  --shadow-lift: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-bridge: var(--bridge);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-card: 12px;
   --radius-sheet: 20px;
-
-  --shadow-sheet: 0 12px 32px rgba(14, 26, 58, 0.16);
-  --ease-circuit: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --shadow-lift: var(--shadow-lift);
 }
 
 @layer base {
-  html { background: var(--color-paper); color: var(--color-ink); }
-  body { font-family: var(--font-sans); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
-  h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
-  :focus-visible { outline: 2px solid var(--color-line); outline-offset: 2px; }
-  dialog { color: inherit; }
+  html { background: var(--bg); color: var(--text); }
+  body {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.35;
+    -webkit-font-smoothing: antialiased;
+    text-align: left;
+  }
+  @media (min-width: 1024px) { body { font-size: 16px; } }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button, a, [role="button"] { -webkit-tap-highlight-color: transparent; }
 }
 
-/* The hero line draws itself once; reduced motion shows it complete. */
-@keyframes circuit-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-.circuit-draw { stroke-dasharray: 1; animation: circuit-draw 900ms var(--ease-circuit) 1 both; }
-@keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-.sheet-in { animation: sheet-in 200ms var(--ease-circuit) both; }
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-.fade-in { animation: fade-in 120ms var(--ease-circuit) both; }
-@media (prefers-reduced-motion: reduce) {
-  .circuit-draw, .sheet-in, .fade-in { animation: none; }
-  .circuit-draw { stroke-dasharray: none; }
-}
+/* Type scale (DESIGN.md §5): mobile / desktop. Two weights only: 400 and 600. */
+@utility t-display { font-size: 32px; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; @media (min-width: 1024px) { font-size: 40px; } }
+@utility t-title { font-size: 22px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; @media (min-width: 1024px) { font-size: 24px; } }
+@utility t-headline { font-size: 17px; line-height: 1.25; font-weight: 600; @media (min-width: 1024px) { font-size: 18px; } }
+@utility t-body { font-size: 15px; line-height: 1.35; @media (min-width: 1024px) { font-size: 16px; } }
+@utility t-caption { font-size: 13px; line-height: 1.35; }
+@utility t-micro { font-size: 11px; line-height: 1.3; }
+/* Geist Mono only for numbers that matter. */
+@utility num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* The signature gradient: the circuit ring and its closing animation, the app icon. Nothing else. */
+@utility ring-signature { background: linear-gradient(135deg, #ff5a36, #ff2e93, #7c5cff); }
+
+@keyframes skeleton { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+@utility skeleton { animation: skeleton 1.4s ease-in-out infinite; background: var(--surface-2); @media (prefers-reduced-motion: reduce) { animation: none; } }
+
+@utility no-scrollbar { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }

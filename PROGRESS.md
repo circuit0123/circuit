@@ -13,11 +13,17 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 contin
   - Part 3: matching (F4). `manage.py compute_matches` (1.3 s for the 300-member seed), `GET /api/matches`, `manage.py eval_matching` with 14 hand-labelled pairs, demo story 1 test.
   - Part 4: warm intros (F5), exchange circuits (F6), partner dashboard (F8), verification badge tests (F7), demo stories 2–5, and `make check` printing `Story n: PASS/FAIL` (marker `@pytest.mark.story(n)` plus a summary hook in `tests/conftest.py`).
 
-## Stage 4 — Frontends (branch `frontend`): part 1 of 4 done, waiting for your OK
-- Part 1: `DESIGN.md` (contrast ratios measured), `packages/ui` (Button, Card, Badge, Chip, Avatar, Modal, BottomSheet, Tabs, Toast, Skeleton, EmptyState, CircuitLine), `packages/api-client` (types generated from `openapi.json` + `openapi-fetch`; one `ApiError`; `pnpm api:generate`, also run by `make openapi`), and throwaway hero/Home scaffolds in `apps/landing` and `apps/app` for screenshots. axe: no violations on either page at 375px and 1280px.
-- Approved by you: `openapi-fetch` (added to CLAUDE.md) and a small `POST /api/me/consent` endpoint (Part 3).
-- Note: `apps/landing` is a static export, so `pnpm --filter @circuit/landing start` serves `out/` with Python's http.server.
-- Parts 2–4 not started. Stage 4 boxes for landing, shell, onboarding, screens and Playwright stay open.
+## Stage 4 — Frontends (branch `frontend-v2`): round 2 of Home done, waiting for your OK
+Round 2 redoes Home for the new DESIGN.md (taken from `main`; CLAUDE.md F16 and LAUNCH.md Stage 3b/Home lines updated to match).
+- **Removed:** TodayStrip, StoryViewer, the gradient story rings. `ring-signature` now exists only in tokens (for the circuit ring).
+- **Built in `packages/ui`:** `Avatar` (photo or a circuit pattern from the member id, initial small in a corner; `PatternArt` for large areas), `LiveWire` (trace + 44px nodes, verb labels, accent outline for unseen, current-dot animation once per session) and `UpdateView` (full screen; swipe or buttons; picture, one line, why it matters, one action), `MatchStrength` (words only), reason-first `DropStack` card. Role cards hide "N% match" under 55.
+- **App:** `LiveWireSection` replaces `TodaySection`. Rail shows words, not percentages. Sr-only "Pulse" heading fixes heading order.
+- **Seed images:** `backend/seed/mockups.py` rewritten: 13 specific screens (lab dashboard, investor update with ₹, hiring board, assay chart, phone apps, code, SQL, serial monitor, Figma, email). No grey bars. `build.py` maps each post to a scene and writes real alt text. New `tests/unit/test_mockups.py`. `make reset-demo` run on dev.
+- **Temporary, marked `TODO`:** `lib/livewire.ts` builds Live wire items from `/api/today` (only "shipped" and "hiring" nodes; why-line is headline and city). `useDrop` joins `/api/matches` for the strength label and parses "They offer X, which you need" for the headline. Both go away when the backend items below land.
+- **Backend list (for the backend branch, LAUNCH.md Stage 3b):** (1) `GET /api/livewire` + `POST /api/livewire/seen`, `StoryView` to `UpdateView`; (2) Daily Drop cards: `strength`, `help_with`, `offers_you_need`, `via`, `image`; skip scores under 0.55; (3) `/api/matches`: `strength` instead of `score_percent`; (4) tune the seed so personas get matches of 0.55 or more (today 6 of 191 members have any); (5) regenerate `openapi.json`.
+- Checks: `pnpm typecheck`, `pnpm lint`, both builds pass; backend ruff, mypy, 1,672 tests and Stories 1–5 pass; axe clean at 375 and 1280, dark and light, no horizontal overflow. Screenshots: `screenshots/v2-home-r2/` (`screenshots/shots-v2.mjs`).
+- Known gaps: no Strong/Good chip or "via" line shows yet (no data); seen nodes dim only the picture (text stays full strength for contrast); "Intro me" in the Update view sends the intro straight away; not tested on a real Android phone.
+- Not started: landing, shell/sign-in, onboarding, composer, Discover, Circuits, Inbox, Profile, partner views, Playwright. LAUNCH.md Stage 4 boxes stay unticked.
 
 ## What exists (Stage 2)
 - `core/auth.py`: `SupabaseAuth` is the API-wide default (an endpoint is protected unless it says `auth=None`). Checks signature (ES256 pinned), expiry, audience, issuer, `role=authenticated`, no anonymous users. Keys come from Supabase's JWKS (cached, throttled, served stale only up to 6 h). First login creates a `student` Member.

@@ -1,19 +1,27 @@
-import type { Metadata } from "next";
-import { Bricolage_Grotesque, Hanken_Grotesk } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
+import { Providers } from "@/components/Providers";
 import "./globals.css";
-
-const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", weight: ["600", "700", "800"] });
-const text = Hanken_Grotesk({ subsets: ["latin"], variable: "--font-text" });
 
 export const metadata: Metadata = {
   title: "Circuit",
-  description: "Circuit matches students, founders and mentors on what each needs and can offer, not on job titles or college names.",
+  description: "See who near you is building, who needs help and who is hiring.",
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0B0B0E" },
+    { media: "(prefers-color-scheme: light)", color: "#FAFAF7" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" className={`${display.variable} ${text.variable}`}>
-      <body>{children}</body>
+    <html lang="en-IN" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

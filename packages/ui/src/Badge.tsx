@@ -1,45 +1,53 @@
-import type { ReactNode } from "react";
+import { BadgeCheck, MapPin, Lock, Waypoints } from "lucide-react";
 import { cx } from "./cx";
-import { Icon } from "./icons";
 
-function Pill({ className, children }: { className: string; children: ReactNode }) {
+const LABELS = { 1: "Email verified", 2: "Work verified", 3: "Verified by Circuit" } as const;
+
+/** Verification levels 1–3 (F7). Level 3 is filled; lower levels are outlined. */
+export function VerifiedBadge({ level, className }: { level: number; className?: string }) {
+  if (level < 1) return null;
+  const l = Math.min(level, 3) as 1 | 2 | 3;
   return (
-    <span className={cx("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-semibold", className)}>
-      {children}
+    <span
+      role="img"
+      aria-label={LABELS[l]}
+      title={LABELS[l]}
+      className={cx("inline-flex shrink-0 align-middle", l === 3 ? "text-success" : l === 2 ? "text-text" : "text-text-muted", className)}
+    >
+      <BadgeCheck size={16} strokeWidth={1.75} />
     </span>
   );
 }
 
-const verification: Record<1 | 2 | 3, string> = {
-  1: "Email verified",
-  2: "Work email verified",
-  3: "Verified by Circuit",
-};
+const pill = "inline-flex items-center gap-1 rounded-full px-2 py-0.5 t-micro font-semibold";
 
-export function VerificationBadge({ level }: { level: number }) {
-  if (level < 1) return null;
-  const l = Math.min(3, Math.round(level)) as 1 | 2 | 3;
+export function BridgeBadge({ className }: { className?: string }) {
   return (
-    <Pill className="bg-verified text-white">
-      <Icon name="check" size={14} strokeWidth={2.5} />
-      {verification[l]}
-    </Pill>
+    <span className={cx(pill, "bg-bridge/15 text-bridge", className)}>
+      <Waypoints size={12} strokeWidth={1.75} aria-hidden />
+      Bridge match
+    </span>
   );
 }
 
-export function BridgeBadge() {
-  return <Pill className="bg-bridge text-white">Bridge match</Pill>;
+export function HiringBadge({ className }: { className?: string }) {
+  return <span className={cx(pill, "bg-success/15 text-success", className)}>Hiring</span>;
 }
 
-export function HiringBadge({ roles }: { roles?: number }) {
+export function PrivateBadge({ className }: { className?: string }) {
   return (
-    <Pill className="bg-signal text-ink">
-      {roles ? `Hiring: ${roles} ${roles === 1 ? "role" : "roles"}` : "Hiring"}
-    </Pill>
+    <span className={cx(pill, "bg-surface-2 text-text-muted", className)}>
+      <Lock size={12} strokeWidth={1.75} aria-hidden />
+      Private
+    </span>
   );
 }
 
-export function StatusBadge({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "good" | "bad" }) {
-  const tones = { neutral: "bg-line-wash text-ink", good: "bg-verified text-white", bad: "bg-alert text-white" };
-  return <Pill className={tones[tone]}>{children}</Pill>;
+export function DistanceBadge({ km, className }: { km: number; className?: string }) {
+  return (
+    <span className={cx("inline-flex items-center gap-1 t-caption text-text-muted", className)}>
+      <MapPin size={14} strokeWidth={1.75} aria-hidden />
+      <span className="num">{km < 10 ? km.toFixed(1) : Math.round(km)} km</span>
+    </span>
+  );
 }

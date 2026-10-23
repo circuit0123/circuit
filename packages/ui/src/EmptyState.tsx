@@ -1,25 +1,14 @@
-import type { ReactNode } from "react";
-import { LineDivider } from "./CircuitLine";
+import { cx } from "./cx";
 
-/** Says what will appear here and the one thing to do next. */
-export function EmptyState({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
+/** A plain open ring: the app's shape of "nothing here yet". One sentence, one action. */
+export function EmptyState({ text, action, className }: { text: string; action?: React.ReactNode; className?: string }) {
   return (
-    <div className="rounded-card border border-dashed border-rule bg-surface px-5 py-8">
-      <LineDivider className="mb-4" />
-      <h3 className="text-lg">{title}</h3>
-      {children && <p className="mt-1 max-w-[62ch] text-ink-soft">{children}</p>}
-      {action && <div className="mt-4">{action}</div>}
-    </div>
-  );
-}
-
-/** Error state: what went wrong and how to fix it, with a retry. */
-export function ErrorState({ message, action }: { message: string; action?: ReactNode }) {
-  return (
-    <div role="alert" className="rounded-card border border-alert bg-surface px-5 py-6">
-      <h3 className="text-lg text-alert">Something didn&apos;t load</h3>
-      <p className="mt-1 max-w-[62ch]">{message}</p>
-      {action && <div className="mt-4">{action}</div>}
+    <div className={cx("flex flex-col items-start gap-4 px-4 py-8", className)}>
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden className="text-border">
+        <circle cx="28" cy="28" r="22" stroke="currentColor" strokeWidth="2" strokeDasharray="110 28" strokeLinecap="round" />
+      </svg>
+      <p className="t-body max-w-[32ch] text-text-muted">{text}</p>
+      {action}
     </div>
   );
 }

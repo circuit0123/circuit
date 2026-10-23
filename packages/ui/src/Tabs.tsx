@@ -1,41 +1,39 @@
 "use client";
-import { useId, type KeyboardEvent } from "react";
+
+import { useId } from "react";
 import { cx } from "./cx";
 
-type Tab = { id: string; label: string };
+type Item<T extends string> = { id: T; label: string };
 
-/** Controlled tab list. Arrow keys move between tabs; give the panel `role="tabpanel" id={panelId}`. */
-export function Tabs({ tabs, value, onChange, label, panelId }: { tabs: Tab[]; value: string; onChange: (id: string) => void; label: string; panelId: string }) {
-  const base = useId();
-  const onKey = (e: KeyboardEvent) => {
-    const i = tabs.findIndex((t) => t.id === value);
-    const next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : null;
-    if (next === null) return;
+/** Tab switch is a 150ms crossfade in the panel, never a slide (DESIGN.md §7). */
+export function Tabs<T extends string>({ items, value, onChange, label, className }: { items: Item<T>[]; value: T; onChange: (id: T) => void; label: string; className?: string }) {
+  const uid = useId();
+  const move = (e: React.KeyboardEvent, i: number) => {
+    const n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : null;
+    if (n === null) return;
     e.preventDefault();
-    const t = tabs[(next + tabs.length) % tabs.length];
-    onChange(t.id);
-    document.getElementById(`${base}-${t.id}`)?.focus();
+    onChange(items[(n + items.length) % items.length].id);
   };
   return (
-    <div role="tablist" aria-label={label} onKeyDown={onKey} className="flex gap-1 border-b border-rule">
-      {tabs.map((t) => (
-        <button
-          key={t.id}
-          id={`${base}-${t.id}`}
-          role="tab"
-          type="button"
-          aria-selected={t.id === value}
-          aria-controls={panelId}
-          tabIndex={t.id === value ? 0 : -1}
-          onClick={() => onChange(t.id)}
-          className={cx(
-            "-mb-px min-h-11 border-b-2 px-4 font-semibold",
-            t.id === value ? "border-line text-ink" : "border-transparent text-ink-soft hover:text-ink",
-          )}
-        >
-          {t.label}
-        </button>
-      ))}
+    <div role="tablist" aria-label={label} className={cx("flex border-b border-border", className)}>
+      {items.map((it, i) => {
+        const on = it.id === value;
+        return (
+          <button
+            key={it.id}
+            role="tab"
+            id={`${uid}-${it.id}`}
+            aria-selected={on}
+            tabIndex={on ? 0 : -1}
+            onClick={() => onChange(it.id)}
+            onKeyDown={(e) => move(e, i)}
+            className={cx("relative min-h-11 flex-1 px-3 t-body", on ? "font-semibold text-text" : "text-text-muted")}
+          >
+            {it.label}
+            <span className={cx("absolute inset-x-3 bottom-0 h-0.5 rounded-full transition-opacity duration-150", on ? "bg-text opacity-100" : "opacity-0")} aria-hidden />
+          </button>
+        );
+      })}
     </div>
   );
 }

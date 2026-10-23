@@ -56,16 +56,17 @@ How to use this file:
 - [ ] OpenAPI spec clean; every endpoint described
 
 ## Stage 3b — Social API (Session A)
-- [ ] social app: posts, post_media (Supabase Storage uploads, size/type checks, server-side resize variants), reactions, replies, follows, update_views
-- [ ] Pulse endpoint: chronological last 7 days, visibility rules, mixes build logs + nearby matching roles + system activity, cursor pagination, "caught up" marker
-- [ ] Daily Drop: `manage.py build_daily_drops` (08:00 IST job) using match_results; 3 per member; swipe outcomes logged as events
+- [x] social app: posts, post_media (Supabase Storage uploads, size/type checks, server-side resize variants), reactions, replies, follows, update_views
+- [x] Pulse endpoint: chronological last 7 days, visibility rules, mixes build logs + nearby matching roles + system activity, cursor pagination, "caught up" marker
+- [x] Daily Drop: `manage.py build_daily_drops` (08:00 IST job) using match_results; 3 per member; swipe outcomes logged as events
+- [x] Today strip endpoint (authors with posts or roles in the last 24h among connections, follows, organisation) (to be replaced by the Live wire endpoint below)
 - [ ] Live wire endpoint: up to 12 updates from the last 24h (shipped, hiring, needs, joined, closed a circuit), ranked by relevance to the viewer, each with image, verb, one-line reason and one action
 - [ ] Daily Drop returns match strength as a label (Strong ≥ 0.75, Good ≥ 0.55) and excludes candidates below 0.55; API never exposes raw low scores
-- [ ] messaging app: conversations (request | active | blocked), messages, Realtime channel per conversation with RLS; under-18 rules enforced server-side
-- [ ] Reports on posts, replies, messages and profiles; hide/remove from Django admin; audit-logged
-- [ ] Rate limits on posting, replies, messages and connection requests
-- [ ] Seed data: build logs for the demo personas using screenshot-style images of their (fictional) projects rendered from simple SVG/HTML mockups — no stock photos, no AI-generated people; plus follows and conversations
-- [ ] Tests: visibility (everyone / connections / org), minors rules, IDOR on posts/messages, no public counts in API responses to non-authors
+- [x] messaging app: conversations (request | active | blocked), messages, Realtime channel per conversation with RLS; under-18 rules enforced server-side
+- [x] Reports on posts, replies, messages and profiles; hide/remove from Django admin; audit-logged
+- [x] Rate limits on posting, replies, messages and connection requests
+- [x] Seed data: build logs for the demo personas using screenshot-style images of their (fictional) projects rendered from simple SVG/HTML mockups — no stock photos, no AI-generated people; plus follows and conversations
+- [x] Tests: visibility (everyone / connections / org), minors rules, IDOR on posts/messages, no public counts in API responses to non-authors
 
 ## Stage 4 — Frontends (Session B; follow DESIGN.md exactly)
 - [ ] DESIGN.md is final (lifestyle redesign); do not change it without my OK
