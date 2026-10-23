@@ -13,11 +13,16 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 contin
   - Part 3: matching (F4). `manage.py compute_matches` (1.3 s for the 300-member seed), `GET /api/matches`, `manage.py eval_matching` with 14 hand-labelled pairs, demo story 1 test.
   - Part 4: warm intros (F5), exchange circuits (F6), partner dashboard (F8), verification badge tests (F7), demo stories 2–5, and `make check` printing `Story n: PASS/FAIL` (marker `@pytest.mark.story(n)` plus a summary hook in `tests/conftest.py`).
 
-## Stage 4 — Frontends (branch `frontend`): part 1 of 4 done, waiting for your OK
-- Part 1: `DESIGN.md` (contrast ratios measured), `packages/ui` (Button, Card, Badge, Chip, Avatar, Modal, BottomSheet, Tabs, Toast, Skeleton, EmptyState, CircuitLine), `packages/api-client` (types generated from `openapi.json` + `openapi-fetch`; one `ApiError`; `pnpm api:generate`, also run by `make openapi`), and throwaway hero/Home scaffolds in `apps/landing` and `apps/app` for screenshots. axe: no violations on either page at 375px and 1280px.
-- Approved by you: `openapi-fetch` (added to CLAUDE.md) and a small `POST /api/me/consent` endpoint (Part 3).
-- Note: `apps/landing` is a static export, so `pnpm --filter @circuit/landing start` serves `out/` with Python's http.server.
-- Parts 2–4 not started. Stage 4 boxes for landing, shell, onboarding, screens and Playwright stay open.
+## Stage 4 — Frontends (branch `frontend-v2`): round 1 of the redesign done, waiting for your OK
+The old navy/amber frontend is gone. Built to the lifestyle DESIGN.md: **packages/ui and the Home screen only**.
+- `packages/ui`: dark-first tokens (light via system or `data-theme`), Geist + Geist Mono, §5 type scale, signature gradient only on Today rings. Components: Avatar (ring unseen/seen, initials tones), Badge (verification, Bridge, Hiring, Private, distance), Button, Chip, Card, Tabs, SegmentedControl, SearchField, BottomSheet, Modal, Toast (undo), Skeleton, EmptyState, TodayStrip, StoryViewer, DropStack, MediaPager, ReactionBar, PostCard, RoleCard, ActivityCard, SkillsInDemandCard, CaughtUp. Motion uses the §7 springs and respects reduced motion.
+- Not built yet (they belong to their screens): PostComposer, ReplyThread, CircuitRing.
+- `apps/app` Home: top bar, bottom bar, desktop left rail + 600px column + right rail (Daily Drop and people you may know), Today strip + story viewer, Daily Drop with swipe and buttons, virtualised Pulse ending in "You're caught up." and "See earlier this week", reactions, report. TanStack Query hooks in `src/hooks/home.ts` over `@circuit/api-client` (regenerated: the old types predated Stage 3b). Dev-only bar with persona and theme switchers; Supabase sign-in comes with the shell round.
+- Other destinations (Discover, Circuits, Inbox, Profile) show a "not built yet" page so the bar works.
+- `apps/landing` is a plain placeholder until its own round (it imported the removed components).
+- Checks: `pnpm typecheck`, `pnpm lint`, both production builds pass. axe: no violations at 375 and 1280, dark and light; no horizontal overflow. Screenshots in `screenshots/v2-home/` (`screenshots/shots-v2.mjs` makes them).
+- Known gaps, see the notes in the session summary: first-load JS is 264 KB gzipped (budget 250); activity cards cannot name people (API returns ids); no Block on posts yet (Stage 6); drop cards use initials because members have no photos yet; not tested on a real Android phone.
+- Parts 2+ (landing, shell/sign-in, onboarding, composer, Discover, Circuits, Inbox, Profile, partner views, Playwright) not started. LAUNCH.md Stage 4 boxes stay unticked until those are done.
 
 ## What exists (Stage 2)
 - `core/auth.py`: `SupabaseAuth` is the API-wide default (an endpoint is protected unless it says `auth=None`). Checks signature (ES256 pinned), expiry, audience, issuer, `role=authenticated`, no anonymous users. Keys come from Supabase's JWKS (cached, throttled, served stale only up to 6 h). First login creates a `student` Member.

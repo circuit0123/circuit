@@ -164,6 +164,238 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My connections
+         * @description People I am connected to. Only I see this list; there are no public counts.
+         */
+        get: operations["apps_social_api_list_connections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/connections/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pending connection requests
+         * @description box=incoming (default) or outgoing. Pending ones only, newest first.
+         */
+        get: operations["apps_social_api_list_requests"];
+        put?: never;
+        /**
+         * Ask to connect
+         * @description With an optional note of up to 300 characters. If they already asked me, this accepts it. A request to or from someone under 18 must stay inside one organisation; anyone I may not reach is a 404.
+         */
+        post: operations["apps_social_api_send_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/connections/requests/{request_id}/respond": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept or decline a connection request
+         * @description Only the person it was sent to. Accepting makes us connections.
+         */
+        post: operations["apps_social_api_respond"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/connections/{member_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a connection
+         * @description 404 if we are not connected.
+         */
+        delete: operations["apps_social_api_remove_connection"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My conversations
+         * @description folder=chats (accepted) or requests (first messages from people I am not connected to). Latest first. Members under 18 never get requests from strangers.
+         */
+        get: operations["apps_messaging_api_list_conversations"];
+        put?: never;
+        /**
+         * Start a conversation
+         * @description Sends the first message. Connected people chat directly; others receive it as a request. Someone I may not message (under-18 rules, blocks, hidden profiles) is a 404.
+         */
+        post: operations["apps_messaging_api_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conversations/{conversation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One conversation
+         * @description 404 unless I am one of the two people.
+         */
+        get: operations["apps_messaging_api_get_conversation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conversations/{conversation_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept a request
+         * @description Only the person the request was sent to.
+         */
+        post: operations["apps_messaging_api_accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conversations/{conversation_id}/block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Block the other person
+         * @description Closes the conversation and blocks them everywhere (matches, posts, messages, intros).
+         */
+        post: operations["apps_messaging_api_block"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conversations/{conversation_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Messages in a conversation
+         * @description Newest first. Pass next_cursor as cursor to load older ones. Read receipts are not shown to senders.
+         */
+        get: operations["apps_messaging_api_list_messages"];
+        put?: never;
+        /**
+         * Send a message
+         * @description Text up to 2000 characters, an image, or both. In a request the sender gets one message until the other person answers; answering accepts the request.
+         */
+        post: operations["apps_messaging_api_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conversations/{conversation_id}/messages/{message_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One message
+         * @description What the client fetches after a Realtime nudge. 404 unless I am in the conversation.
+         */
+        get: operations["apps_messaging_api_get_message"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conversations/{conversation_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark messages as read
+         * @description Marks what the other person sent as read.
+         */
+        post: operations["apps_messaging_api_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/dashboard/acceptance": {
         parameters: {
             query?: never;
@@ -278,6 +510,46 @@ export interface paths {
          * @description Dev and demo only.
          */
         post: operations["core_demo_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/drop/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Today's Daily Drop
+         * @description Up to 3 people, ready at 08:00 IST. Empty until the daily job has run. Members under 18 get no drop.
+         */
+        get: operations["apps_social_api_get_drop"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/drop/today/{member_id}/swipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Answer a Daily Drop card
+         * @description intro or skip. This records the choice only; to ask for the intro, call the intros endpoint next. A person who is not in today's drop is a 404.
+         */
+        post: operations["apps_social_api_swipe"];
         delete?: never;
         options?: never;
         head?: never;
@@ -560,6 +832,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/follows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Startups I follow
+         * @description Newest first. Only I can see this list.
+         */
+        get: operations["apps_social_api_my_follows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/needs": {
         parameters: {
             query?: never;
@@ -696,6 +988,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/media/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start an image upload
+         * @description Returns a short-lived signed URL for one JPEG, PNG or WebP image of at most 5 MB. Upload the file to it, then call complete. The browser resizes to 1440px first; the server re-encodes and removes metadata.
+         */
+        post: operations["apps_social_api_start_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/media/uploads/{upload_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish an image upload
+         * @description Checks the uploaded file really is an image, strips metadata and stores two sizes. Safe to repeat. Someone else's upload is a 404.
+         */
+        post: operations["apps_social_api_complete_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/members/{member_id}": {
         parameters: {
             query?: never;
@@ -708,6 +1040,26 @@ export interface paths {
          * @description Another member's profile. Hidden, under-18, suspended, blocked and admin accounts are a 404.
          */
         get: operations["apps_accounts_api_member_profile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/members/{member_id}/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A member's build logs
+         * @description Newest first, only the ones I am allowed to see. 404 for members I cannot see.
+         */
+        get: operations["apps_social_api_member_posts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -936,6 +1288,178 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post a build log
+         * @description Up to 4 images (each with alt text), 500 characters, 3 capability tags and an optional link. Members under 18 can only post to their organisation.
+         */
+        post: operations["apps_social_api_create_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/posts/{post_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One build log
+         * @description 404 unless the post's visibility lets me see it. Reaction totals appear only on my own posts.
+         */
+        get: operations["apps_social_api_get_post"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete my build log
+         * @description Author only; anyone else gets a 404.
+         */
+        delete: operations["apps_social_api_delete_post"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/posts/{post_id}/reactions/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * React to a build log
+         * @description Helpful, intro_me or lets_talk. Safe to repeat. Nobody but the author sees totals.
+         */
+        put: operations["apps_social_api_react"];
+        post?: never;
+        /**
+         * Remove my reaction
+         * @description Safe to repeat.
+         */
+        delete: operations["apps_social_api_unreact"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/posts/{post_id}/replies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Replies to a build log
+         * @description Oldest first, nested one level. Replies from people I blocked or who blocked me are left out.
+         */
+        get: operations["apps_social_api_list_replies"];
+        put?: never;
+        /**
+         * Reply to a build log
+         * @description Up to 300 characters. The post's author is notified.
+         */
+        post: operations["apps_social_api_reply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pulse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pulse feed
+         * @description Chronological, last 7 days, never ranked. Shows what is new since I last marked Pulse as seen; include_seen=true shows earlier items too. Ends with caught_up=true.
+         */
+        get: operations["apps_social_api_get_pulse"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pulse/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark Pulse as seen
+         * @description Call when the member reaches the end. The next visit shows only newer items.
+         */
+        post: operations["apps_social_api_pulse_seen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/replies/{reply_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a reply
+         * @description The reply's author or the post's author. Anyone else gets a 404.
+         */
+        delete: operations["apps_social_api_delete_reply"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report a post, reply, message or profile
+         * @description Goes to the Circuit moderators. You can only report what you can see (anything else is a 404). Reporting the same thing twice returns the open report.
+         */
+        post: operations["apps_moderation_api_create_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/startups/map": {
         parameters: {
             query?: never;
@@ -1040,6 +1564,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/startups/{startup_id}/follow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Follow a startup
+         * @description Safe to repeat.
+         */
+        post: operations["apps_social_api_follow"];
+        /**
+         * Unfollow a startup
+         * @description Safe to repeat.
+         */
+        delete: operations["apps_social_api_unfollow"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/startups/{startup_id}/interest": {
         parameters: {
             query?: never;
@@ -1059,6 +1607,46 @@ export interface paths {
          * @description Students only. Safe to repeat.
          */
         delete: operations["apps_startups_api_remove_interest"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Today strip
+         * @description Circles for connections, my organisation and startups I follow who posted or opened a role in the last 24 hours. Unseen first. Items are included, so the story viewer needs no second call.
+         */
+        get: operations["apps_social_api_get_today"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/today/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark a circle as viewed
+         * @description Call when a circle is opened. A circle that is not in my strip is a 404.
+         */
+        post: operations["apps_social_api_today_seen"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1099,6 +1687,23 @@ export interface components {
         AcceptanceOut: {
             bridge: components["schemas"]["AcceptanceGroup"];
             local: components["schemas"]["AcceptanceGroup"];
+        };
+        /** ActivityOut */
+        ActivityOut: {
+            /** Circuit Id */
+            circuit_id?: number | null;
+            /** Intro Id */
+            intro_id?: number | null;
+            /** Members */
+            members?: number[] | null;
+            /** Startup Id */
+            startup_id?: number | null;
+            /** Startup Name */
+            startup_name?: string | null;
+            /** Target Id */
+            target_id?: number | null;
+            /** Type */
+            type: string;
         };
         /** AnswerIn */
         AnswerIn: {
@@ -1156,6 +1761,21 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** AuthorOut */
+        AuthorOut: {
+            /** City */
+            city: string;
+            /** Display Name */
+            display_name: string;
+            /** Headline */
+            headline: string;
+            /** Id */
+            id: number;
+            /** Role */
+            role: string;
+            /** Verification Level */
+            verification_level: number;
+        };
         /** BboxParams */
         BboxParams: {
             /** Capability */
@@ -1180,6 +1800,13 @@ export interface components {
             /** Slug */
             slug: string;
         };
+        /** CapabilityTagOut */
+        CapabilityTagOut: {
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
         /** CellOut */
         CellOut: {
             /** Count */
@@ -1188,6 +1815,30 @@ export interface components {
             lat: number;
             /** Lng */
             lng: number;
+        };
+        /** CircleOut */
+        CircleOut: {
+            author: components["schemas"]["AuthorOut"] | null;
+            /** Id */
+            id: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "member" | "startup";
+            /**
+             * Latest At
+             * Format: date-time
+             */
+            latest_at: string;
+            /** Name */
+            name: string;
+            /** Posts */
+            posts: components["schemas"]["PostOut"][];
+            /** Roles */
+            roles: components["schemas"]["StoryRoleOut"][];
+            /** Seen */
+            seen: boolean;
         };
         /** CircuitOut */
         CircuitOut: {
@@ -1229,12 +1880,69 @@ export interface components {
             /** Code */
             code: string;
         };
+        /** ConnectionRequestIn */
+        ConnectionRequestIn: {
+            /** Member Id */
+            member_id: number;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** ConnectionRequestOut */
+        ConnectionRequestOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Id */
+            id: number;
+            /** Note */
+            note: string;
+            recipient: components["schemas"]["AuthorOut"];
+            sender: components["schemas"]["AuthorOut"];
+            /** Status */
+            status: string;
+        };
+        /** ConversationOut */
+        ConversationOut: {
+            /** Id */
+            id: number;
+            last_message: components["schemas"]["MessageOut"] | null;
+            /** Last Message At */
+            last_message_at: string | null;
+            other: components["schemas"]["AuthorOut"];
+            /** Started By Me */
+            started_by_me: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "request" | "active";
+            /** Unread */
+            unread: number;
+        };
         /** CountOut */
         CountOut: {
             /** Hidden */
             hidden: boolean;
             /** Value */
             value: number | null;
+        };
+        /**
+         * CursorParams
+         * @description Live feeds (Pulse, messages) use a cursor, not offsets: new items arriving must not shift the next page.
+         */
+        CursorParams: {
+            /** Cursor */
+            cursor?: string | null;
+            /**
+             * Limit
+             * @default 20
+             */
+            limit: number;
         };
         /** DemoToken */
         DemoToken: {
@@ -1254,6 +1962,33 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** DropCardOut */
+        DropCardOut: {
+            /** Is Bridge */
+            is_bridge: boolean;
+            member: components["schemas"]["AuthorOut"];
+            /** Outcome */
+            outcome: ("intro" | "skip") | null;
+            /** Reason */
+            reason: string;
+        };
+        /** DropOut */
+        DropOut: {
+            /** Cards */
+            cards: components["schemas"]["DropCardOut"][];
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Done */
+            done: boolean;
+            /**
+             * Next Drop At
+             * Format: date-time
+             */
+            next_drop_at: string;
+        };
         /** ExtractIn */
         ExtractIn: {
             /** Bio */
@@ -1267,6 +2002,26 @@ export interface components {
              */
             source: "llm" | "manual";
             suggestions: components["schemas"]["Suggestions"];
+        };
+        /** FolderParams */
+        FolderParams: {
+            /**
+             * Folder
+             * @default chats
+             * @enum {string}
+             */
+            folder: "chats" | "requests";
+        };
+        /** FollowedStartupOut */
+        FollowedStartupOut: {
+            /** Hiring */
+            hiring: boolean;
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Sector */
+            sector: string;
         };
         /** GapOut */
         GapOut: {
@@ -1610,6 +2365,45 @@ export interface components {
             /** Visible To Org */
             visible_to_org?: boolean | null;
         };
+        /** MediaIn */
+        MediaIn: {
+            /**
+             * Alt Text
+             * @description What the image shows, for people using a screen reader
+             */
+            alt_text: string;
+            /** Upload Id */
+            upload_id: number;
+        };
+        /** MessageOut */
+        MessageOut: {
+            /** Body */
+            body: string;
+            /** Conversation Id */
+            conversation_id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Id */
+            id: number;
+            /** Image */
+            image: {
+                [key: string]: unknown;
+            } | null;
+            /** Mine */
+            mine: boolean;
+            /** Removed */
+            removed: boolean;
+        };
+        /** MessagePage */
+        MessagePage: {
+            /** Items */
+            items: components["schemas"]["MessageOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
         /** NearbyParams */
         NearbyParams: {
             /** Capability */
@@ -1871,6 +2665,79 @@ export interface components {
             /** Sector */
             sector: string;
         };
+        /** PostIn */
+        PostIn: {
+            /**
+             * Body
+             * @default
+             */
+            body: string;
+            /**
+             * Capabilities
+             * @description Capability slugs from our list
+             */
+            capabilities?: string[];
+            /**
+             * Link
+             * @default
+             */
+            link: string;
+            /** Media */
+            media?: components["schemas"]["MediaIn"][];
+            /**
+             * Visibility
+             * @enum {string}
+             */
+            visibility: "everyone" | "connections" | "organisation";
+        };
+        /** PostMediaOut */
+        PostMediaOut: {
+            /** Alt Text */
+            alt_text: string;
+            /** Height */
+            height: number | null;
+            /** W1440 */
+            w1440: string;
+            /** W480 */
+            w480: string;
+            /** Width */
+            width: number | null;
+        };
+        /** PostOut */
+        PostOut: {
+            author: components["schemas"]["AuthorOut"];
+            /** Body */
+            body: string;
+            /** Capabilities */
+            capabilities: components["schemas"]["CapabilityTagOut"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Id */
+            id: number;
+            /** Link */
+            link: string;
+            /** Media */
+            media: components["schemas"]["PostMediaOut"][];
+            /** My Reactions */
+            my_reactions: string[];
+            private_stats?: components["schemas"]["PrivateStatsOut"] | null;
+            /** Status */
+            status: string;
+            /** Visibility */
+            visibility: string;
+        };
+        /** PrivateStatsOut */
+        PrivateStatsOut: {
+            /** Reactions */
+            reactions: {
+                [key: string]: number;
+            };
+            /** Replies */
+            replies: number;
+        };
         /** ProfileOut */
         ProfileOut: {
             /** Bio */
@@ -1896,10 +2763,144 @@ export interface components {
             /** Verification Level */
             verification_level: number;
         };
+        /** PulseItemOut */
+        PulseItemOut: {
+            activity?: components["schemas"]["ActivityOut"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "post" | "role" | "activity" | "skills_in_demand";
+            post?: components["schemas"]["PostOut"] | null;
+            role?: components["schemas"]["JobOut"] | null;
+            /** Seen */
+            seen: boolean;
+            skills_in_demand?: components["schemas"]["SkillsInDemandOut"] | null;
+        };
+        /** PulseOut */
+        PulseOut: {
+            /** Caught Up */
+            caught_up: boolean;
+            /** Items */
+            items: components["schemas"]["PulseItemOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
+        /** PulseParams */
+        PulseParams: {
+            /** Cursor */
+            cursor?: string | null;
+            /**
+             * Include Seen
+             * @default false
+             */
+            include_seen: boolean;
+            /**
+             * Limit
+             * @default 20
+             */
+            limit: number;
+        };
         /** RatingIn */
         RatingIn: {
             /** Rating */
             rating: number;
+        };
+        /** ReplyIn */
+        ReplyIn: {
+            /** Body */
+            body: string;
+            /**
+             * Parent Id
+             * @description Reply to a top-level reply (one level deep only)
+             */
+            parent_id?: number | null;
+        };
+        /** ReplyOut */
+        ReplyOut: {
+            author: components["schemas"]["AuthorOut"];
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Id */
+            id: number;
+            /** Replies */
+            replies: components["schemas"]["ReplyOut"][];
+        };
+        /** ReportIn */
+        ReportIn: {
+            /** Reason */
+            reason: string;
+            /** Target Id */
+            target_id: number;
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "post" | "reply" | "message" | "member";
+        };
+        /** ReportOut */
+        ReportOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Id */
+            id: number;
+            /** Status */
+            status: string;
+            /** Target Id */
+            target_id: number;
+            /** Target Type */
+            target_type: string;
+        };
+        /** RequestParams */
+        RequestParams: {
+            /**
+             * Box
+             * @default incoming
+             * @enum {string}
+             */
+            box: "incoming" | "outgoing";
+        };
+        /** RespondIn */
+        RespondIn: {
+            /** Accept */
+            accept: boolean;
+        };
+        /** SendIn */
+        SendIn: {
+            /**
+             * Body
+             * @default
+             */
+            body: string;
+            /**
+             * Upload Id
+             * @description A finished upload with purpose=message
+             */
+            upload_id?: number | null;
+        };
+        /** SkillDemandOut */
+        SkillDemandOut: {
+            /** Name */
+            name: string;
+            /** Open Roles */
+            open_roles: number;
+            /** Slug */
+            slug: string;
         };
         /** SkillIn */
         SkillIn: {
@@ -1924,6 +2925,28 @@ export interface components {
             level: number;
             /** Proof Url */
             proof_url: string;
+        };
+        /** SkillsInDemandOut */
+        SkillsInDemandOut: {
+            /** Skills */
+            skills: components["schemas"]["SkillDemandOut"][];
+        };
+        /** StartIn */
+        StartIn: {
+            /**
+             * Body
+             * @default
+             */
+            body: string;
+            /** Member Id */
+            member_id: number;
+            /** Upload Id */
+            upload_id?: number | null;
+        };
+        /** StartedOut */
+        StartedOut: {
+            conversation: components["schemas"]["ConversationOut"];
+            message: components["schemas"]["MessageOut"];
         };
         /** StartupOut */
         StartupOut: {
@@ -1991,6 +3014,22 @@ export interface components {
              */
             status: "shortlisted" | "rejected" | "hired";
         };
+        /** StoryRoleOut */
+        StoryRoleOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Id */
+            id: number;
+            /** Kind */
+            kind: string;
+            /** Startup Id */
+            startup_id: number;
+            /** Title */
+            title: string;
+        };
         /** Suggestions */
         Suggestions: {
             /** Needs */
@@ -2002,12 +3041,70 @@ export interface components {
             /** Traits */
             traits: string[];
         };
+        /** SwipeIn */
+        SwipeIn: {
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "intro" | "skip";
+        };
         /** TraitOut */
         TraitOut: {
             /** Name */
             name: string;
             /** Slug */
             slug: string;
+        };
+        /** UnreadOut */
+        UnreadOut: {
+            /** Marked */
+            marked: number;
+        };
+        /** UploadDoneOut */
+        UploadDoneOut: {
+            /** Height */
+            height: number | null;
+            /** Id */
+            id: number;
+            /** Status */
+            status: string;
+            /** Width */
+            width: number | null;
+        };
+        /** UploadIn */
+        UploadIn: {
+            /**
+             * Content Type
+             * @enum {string}
+             */
+            content_type: "image/jpeg" | "image/png" | "image/webp";
+            /**
+             * Purpose
+             * @enum {string}
+             */
+            purpose: "post" | "message";
+            /** Size */
+            size: number;
+        };
+        /** UploadOut */
+        UploadOut: {
+            /** Id */
+            id: number;
+            /** Status */
+            status: string;
+            /** Upload Url */
+            upload_url: string;
+        };
+        /** ViewedIn */
+        ViewedIn: {
+            /** Id */
+            id: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "member" | "startup";
         };
         /** WorkEmailIn */
         WorkEmailIn: {
@@ -2219,6 +3316,324 @@ export interface operations {
             };
         };
     };
+    apps_social_api_list_connections: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthorOut"][];
+                };
+            };
+        };
+    };
+    apps_social_api_list_requests: {
+        parameters: {
+            query?: {
+                box?: "incoming" | "outgoing";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionRequestOut"][];
+                };
+            };
+        };
+    };
+    apps_social_api_send_request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectionRequestIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionRequestOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_respond: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RespondIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionRequestOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_remove_connection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_messaging_api_list_conversations: {
+        parameters: {
+            query?: {
+                folder?: "chats" | "requests";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationOut"][];
+                };
+            };
+        };
+    };
+    apps_messaging_api_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartedOut"];
+                };
+            };
+        };
+    };
+    apps_messaging_api_get_conversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationOut"];
+                };
+            };
+        };
+    };
+    apps_messaging_api_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationOut"];
+                };
+            };
+        };
+    };
+    apps_messaging_api_block: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_messaging_api_list_messages: {
+        parameters: {
+            query?: {
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                conversation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessagePage"];
+                };
+            };
+        };
+    };
+    apps_messaging_api_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"];
+                };
+            };
+        };
+    };
+    apps_messaging_api_get_message: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: number;
+                message_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"];
+                };
+            };
+        };
+    };
+    apps_messaging_api_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadOut"];
+                };
+            };
+        };
+    };
     apps_dashboard_api_acceptance: {
         parameters: {
             query?: never;
@@ -2341,6 +3756,52 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DemoToken"];
+                };
+            };
+        };
+    };
+    apps_social_api_get_drop: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DropOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_swipe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwipeIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DropOut"];
                 };
             };
         };
@@ -2772,6 +4233,26 @@ export interface operations {
             };
         };
     };
+    apps_social_api_my_follows: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowedStartupOut"][];
+                };
+            };
+        };
+    };
     apps_accounts_api_get_needs: {
         parameters: {
             query?: never;
@@ -2996,6 +4477,52 @@ export interface operations {
             };
         };
     };
+    apps_social_api_start_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_complete_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                upload_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadDoneOut"];
+                };
+            };
+        };
+    };
     apps_accounts_api_member_profile: {
         parameters: {
             query?: never;
@@ -3014,6 +4541,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_member_posts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostOut"][];
                 };
             };
         };
@@ -3253,6 +4802,248 @@ export interface operations {
             };
         };
     };
+    apps_social_api_create_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_get_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_delete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_social_api_react: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+                kind: "helpful" | "intro_me" | "lets_talk";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_social_api_unreact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+                kind: "helpful" | "intro_me" | "lets_talk";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_social_api_list_replies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReplyOut"][];
+                };
+            };
+        };
+    };
+    apps_social_api_reply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                post_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplyIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReplyOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_get_pulse: {
+        parameters: {
+            query?: {
+                cursor?: string | null;
+                limit?: number;
+                include_seen?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PulseOut"];
+                };
+            };
+        };
+    };
+    apps_social_api_pulse_seen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_social_api_delete_reply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reply_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_moderation_api_create_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportIn"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
+                };
+            };
+        };
+    };
     apps_startups_api_map_pins: {
         parameters: {
             query: {
@@ -3407,6 +5198,46 @@ export interface operations {
             };
         };
     };
+    apps_social_api_follow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                startup_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_social_api_unfollow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                startup_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     apps_startups_api_add_interest: {
         parameters: {
             query?: never;
@@ -3437,6 +5268,48 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_social_api_get_today: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CircleOut"][];
+                };
+            };
+        };
+    };
+    apps_social_api_today_seen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ViewedIn"];
+            };
+        };
         responses: {
             /** @description No Content */
             204: {

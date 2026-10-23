@@ -1,6 +1,6 @@
-import type { HTMLAttributes } from "react";
 import { cx } from "./cx";
 
-export function Card({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cx("rounded-card border border-rule bg-surface p-4", className)} {...rest} />;
+/** Surface with a hairline border. No shadow: depth comes from layering (DESIGN.md §5). */
+export function Card({ className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cx("rounded-card border border-border bg-surface", className)} {...rest} />;
 }

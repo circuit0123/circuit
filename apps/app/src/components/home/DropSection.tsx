@@ -1,0 +1,47 @@
+"use client";
+
+import { DropSkeleton, DropStack, EmptyState, useToast } from "@circuit/ui";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDrop, useSwipe } from "@/hooks/home";
+import { toPerson } from "@/lib/map";
+import { useSession } from "../Providers";
+
+export function DropSection({ className }: { className?: string }) {
+  const drop = useDrop();
+  const swipe = useSwipe();
+  const toast = useToast();
+  const qc = useQueryClient();
+  const { token } = useSession();
+
+  if (drop.isPending) return <DropSkeleton />;
+  if (drop.isError) return <p role="alert" className="t-body text-danger">Couldn't load today's drop. Check your connection and try again.</p>;
+  const d = drop.data;
+  if (d.cards.length === 0) {
+    return <EmptyState className="px-0" text="No new people for you today. Add what you need and what you can offer to get a drop." />;
+  }
+  return (
+    <DropStack
+      className={className}
+      doneText="That's today's drop. New one tomorrow at 8."
+      cards={d.cards.map((c) => ({
+        id: c.member.id,
+        person: toPerson(c.member),
+        reason: c.reason,
+        bridge: c.is_bridge,
+        answered: (c.outcome as "intro" | "skip" | null) ?? null,
+      }))}
+      onAnswer={(id, direction) =>
+        swipe.mutate(
+          { id, direction },
+          {
+            onSuccess: () => { if (direction === "intro") toast({ text: "Intro requested. We'll tell you when they reply." }); },
+            onError: () => {
+              toast({ text: "Couldn't send that. Try again." });
+              qc.invalidateQueries({ queryKey: [token, "drop"] });
+            },
+          },
+        )
+      }
+    />
+  );
+}

@@ -1,28 +1,37 @@
-import type { ButtonHTMLAttributes } from "react";
+import { X } from "lucide-react";
 import { cx } from "./cx";
-import { Icon } from "./icons";
 
-type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> & {
+type Props = {
+  label: string;
   selected?: boolean;
-  onToggle?: (next: boolean) => void;
+  onToggle?: () => void;
+  onRemove?: () => void;
+  className?: string;
 };
 
-/** A selectable chip (toggle button). Used for needs, offers, skills and filters. */
-export function Chip({ selected = false, onToggle, className, children, ...rest }: Props) {
+/** Static, selectable (onToggle) or removable (onRemove). Tap target stays 44px via the hit area. */
+export function Chip({ label, selected, onToggle, onRemove, className }: Props) {
+  const base = "inline-flex min-h-8 items-center gap-1 rounded-full px-3 t-caption";
+  if (onToggle) {
+    return (
+      <button
+        type="button"
+        aria-pressed={!!selected}
+        onClick={onToggle}
+        className={cx(base, "relative before:absolute before:-inset-1.5 before:content-['']", selected ? "bg-text text-bg font-semibold" : "bg-surface-2 text-text", className)}
+      >
+        {label}
+      </button>
+    );
+  }
   return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={() => onToggle?.(!selected)}
-      className={cx(
-        "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-base transition-colors duration-150",
-        selected ? "border-line bg-line-wash font-semibold text-ink" : "border-rule bg-surface text-ink hover:border-ink-soft",
-        className,
+    <span className={cx(base, "bg-surface-2 text-text", className)}>
+      {label}
+      {onRemove && (
+        <button type="button" onClick={onRemove} aria-label={`Remove ${label}`} className="-mr-1 inline-flex h-6 w-6 items-center justify-center rounded-full text-text-muted">
+          <X size={14} strokeWidth={1.75} />
+        </button>
       )}
-      {...rest}
-    >
-      {selected && <Icon name="check" size={16} strokeWidth={2.25} />}
-      {children}
-    </button>
+    </span>
   );
 }
