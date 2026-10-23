@@ -99,7 +99,7 @@
 /* Geist Mono only for numbers that matter. */
 @utility num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
-/* The signature gradient: unseen Today rings, the circuit ring, the app icon. Nothing else. */
+/* The signature gradient: the circuit ring and its closing animation, the app icon. Nothing else. */
 @utility ring-signature { background: linear-gradient(135deg, #ff5a36, #ff2e93, #7c5cff); }
 
 @keyframes skeleton { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }

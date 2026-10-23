@@ -25,7 +25,7 @@ hiring for exactly your skills. You tap "Intro me" and close the app feeling ahe
 
 | From | Borrow | Refuse |
 |---|---|---|
-| Instagram | Full-bleed visual posts; a circle strip at the top (Today); profile as a visual grid; messaging as a primary destination; physical, weighted motion; create button in the top bar so the bottom bar holds destinations | Infinite scroll with no end; public like and follower counts; filters that fake reality; algorithmic outrage |
+| Instagram | Full-bleed visual posts; profile as a visual grid; messaging as a primary destination; physical, weighted motion; create button in the top bar so the bottom bar holds destinations | Circle "story" rings with gradient borders (instantly reads as a copy); infinite scroll with no end; public like and follower counts; filters that fake reality; algorithmic outrage |
 | BeReal | Scarcity that creates meaning (the Daily Drop is finite); authenticity over polish (no beauty filters); a dark-first, content-first interface | Daily posting pressure; notifications that guilt you |
 | Threads | Short text posts that feel light and quick; replies as conversation | Engagement-bait reposts |
 | Read.cv / Posts.cv | Work-first profiles; calm, confident typography | Being so minimal it feels empty |
@@ -50,14 +50,32 @@ Mobile bottom bar (5 destinations, icons with labels):
 ## 4. Core screens
 
 ### Home
-1. **Today strip** (top, horizontal circles, 64px): people you're connected to, startups
-   you follow and your organisation, who posted a build log or a role in the last 24h.
-   Unseen = signature ring; seen = thin neutral ring. Tap opens a full-screen viewer;
-   tap right/left to move, swipe down to close.
-2. **Daily Drop** (card stack, 3 cards per day, refreshed at 8:00 local time):
-   each card is a person or startup with a large photo, name, headline, verification
-   badge, the one-line match reason, a "Bridge match" badge when cross-sector, and two
-   actions: `Intro me` and `Skip`. Swipe right = intro, left = skip; buttons always present.
+1. **Live wire** (top of Home; replaces any "stories" pattern). This is Circuit's own
+   idea, not a copy of Instagram stories. A single thin horizontal trace line (1.5px,
+   `border` colour) runs across the top of the feed like a circuit board track. Along it
+   sit **nodes**: rounded-square (12px radius) 44px thumbnails, each with a verb label
+   under it in Caption size — `shipped`, `hiring`, `needs`, `joined`, `closed a circuit`.
+   - The node image is the most relevant visual of the update (a build log's first image,
+     a startup logo, a circuit mini-ring), with the person's 20px avatar overlapping its
+     bottom-right corner. Never a big initials circle.
+   - Unseen nodes are "powered": the node gets a 2px `accent` outline and a small dot of
+     current travels along the trace into it (§7). Seen nodes are dimmed to 60% opacity.
+   - Order: updates most relevant to you first (shared capabilities, mutuals, distance),
+     max 12 nodes; if none: the trace line shows "Quiet on the wire today" and one action.
+   - Tap a node: a full-screen **Update view** (not a story viewer): the image, one line
+     of what happened, why it matters to you ("You both build with Kotlin · 3 km away"),
+     and one action (`Intro me`, `View role`, `Reply`). Swipe left/right between updates.
+2. **Daily Drop** (card stack, 3 cards per day, refreshed at 8:00 local time). The card
+   leads with the REASON, not a giant avatar:
+   - Top: "Sakthi can help you with **mentoring**" in Title size, with the capability in
+     `accent`. Below: the mutual connection ("via Meera, mentor") with both tiny avatars.
+   - Middle: their photo (or their best build log image) at 4:3, then name, verification
+     badge, headline, place.
+   - Chips: up to 3 of what they offer that you need.
+   - Match strength as words, never a raw low percentage: `Strong match` (score ≥ 0.75),
+     `Good match` (≥ 0.55); below 0.55 they don't appear in the drop at all.
+   - A "Bridge match" badge when cross-sector. Actions: `Intro me` and `Skip`; swipe
+     right/left; buttons always present.
    After the third card: "That's today's drop. New one tomorrow at 8."
 3. **Pulse** (vertical feed below), mixing, in this order of priority:
    - Build logs from your connections, followed startups and organisation
@@ -145,8 +163,7 @@ viewed your profile" more than once a week.
 | `danger` | `#FF4D5E` | `#D92D3E` | Destructive, errors |
 
 **Signature gradient (the only gradient allowed):** `#FF5A36 → #FF2E93 → #7C5CFF`
-at 135°. Used ONLY for: unseen Today-strip rings, the circuit ring and its closing
-animation, the app icon. Never on buttons, backgrounds or text.
+at 135°. Used ONLY for: the circuit ring and its closing animation, and the app icon. Never on buttons, backgrounds or text.
 
 Contrast: all text meets WCAG AA on its background in both themes.
 
@@ -168,19 +185,27 @@ Contrast: all text meets WCAG AA on its background in both themes.
 
 ### Imagery
 - Real people and real work, full-bleed. No stock photos, no 3D blobs, no AI art.
-- Avatars without a photo: initials on a colour derived from the name (from a fixed set
-  of 8 muted tones), never a generic silhouette.
-- Startup cards without a logo: the startup's initial in Geist 600 on `surface-2`.
+- Real users are asked for a photo during onboarding (skippable, re-prompted once).
+- Avatars without a photo: a deterministic geometric "circuit pattern" (traces and nodes
+  drawn from a hash of the member id, in 2 of the 8 muted tones) with the first initial
+  small in a corner. Never a big initials-only circle, never a silhouette.
+- Startup cards without a logo: the same pattern style, squared, with the name beside it.
+- Build log images must look like real work: real UI screenshots with readable text and
+  data, code, hardware, whiteboards, event photos. Grey skeleton bars inside an image are
+  banned — they read as a broken loading state.
+- Demo/seed imagery: render each persona's project as a believable, specific screen
+  (e.g. a Kannada voice-assistant app with real labels, an inventory dashboard with real
+  numbers in ₹) from HTML/SVG mockups. No stock photos and no AI-generated people.
 
 ### Iconography
 - One outline icon set (Lucide), 1.75px stroke, 24px in the tab bar, 20px elsewhere.
 - Icons always paired with a label in navigation and primary actions.
 
 ## 6. Components (packages/ui)
-Avatar (with story ring states), Badge (verification 1–3, Bridge, Hiring, Under-18
+Avatar (photo or circuit pattern), Badge (verification 1–3, Bridge, Hiring, Under-18
 private), Button (primary, secondary, ghost, destructive; 48px tall on mobile), Chip
 (selectable, removable), Card (person, startup, job, build log, match, circuit),
-TodayStrip, StoryViewer, DropStack, PostComposer, MediaPager, ReactionBar, ReplyThread,
+LiveWire (trace + nodes), UpdateView, MatchStrength (words, not %), DropStack, PostComposer, MediaPager, ReactionBar, ReplyThread,
 BottomSheet, Modal, Tabs, SegmentedControl, SearchField, Toast (with undo), Skeleton,
 EmptyState (illustration + one sentence + one action), CircuitRing (animated).
 
@@ -196,7 +221,8 @@ staggered, movement follows physics, and the UI layers like paper in light.
 | Card stack swipe | follows finger 1:1; rotates up to 8°; throw threshold 30% width or 800px/s |
 | List entrance | fade + rise 12px, 40ms stagger, first 8 items only |
 | Tab switch | 150ms crossfade; no slide between tabs |
-| Story ring "seen" | ring fades from gradient to neutral over 400ms after viewing |
+| Live wire current | on load, a 6px `accent` dot travels along the trace from left to each unseen node (600ms, ease-out, 80ms stagger), then the node outline lights; plays once per session, not on every scroll |
+| Node "seen" | outline fades out and node dims to 60% over 300ms after the Update view closes |
 | Reaction tap | icon scales 1 → 1.25 → 1 in 220ms; light haptic where supported |
 | **Circuit closing (signature)** | the three ring segments draw in sequence (3 × 300ms), the gradient sweeps once around (600ms), avatars pulse once; total ≤ 1.6s; plays once per circuit |
 
@@ -232,7 +258,8 @@ staggered, movement follows physics, and the UI layers like paper in light.
 - Every swipe has a button alternative; every icon-only control has a label.
 - Images in build logs require alt text (composer suggests it; author can edit).
 - Full keyboard support on desktop; visible focus rings (2px `accent`).
-- Screen reader order matches visual order; the Today strip is a labelled list.
+- Screen reader order matches visual order; the Live wire is a labelled list
+  ("Harini shipped a build log, 4 hours ago").
 
 ## 11. Performance (budget Android phones, slow 4G)
 - App initial JS < 250KB gzipped; route-level code splitting; map and dashboard lazy.
@@ -244,7 +271,12 @@ staggered, movement follows physics, and the UI layers like paper in light.
 
 ## 12. Banned (never ship these)
 - Any gradient other than the signature gradient, and the signature gradient anywhere
-  outside rings, the circuit animation and the app icon
+  outside the circuit ring, its closing animation and the app icon
+- Instagram-style circular story rings with gradient borders, or anything that looks
+  like a copy of another app's signature pattern
+- Initials-only avatars as the main visual of a card (Daily Drop, Live wire, Discover)
+- Grey skeleton bars used as content inside images or cards (skeletons are for loading only)
+- Raw match percentages below 55%, or any number that makes a recommendation look weak
 - Glassmorphism, neon glows, blurred blobs, aurora backgrounds
 - Emoji as icons; sparkle icons; "AI-powered" labels
 - Stock photos, lorem ipsum, "John Doe", fake stats, placeholder logos

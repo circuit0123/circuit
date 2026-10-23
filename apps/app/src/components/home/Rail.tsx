@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Skeleton } from "@circuit/ui";
+import { Avatar, MatchStrength, Skeleton, strengthLabel } from "@circuit/ui";
 import { useMorePeople } from "@/hooks/home";
 import { DropSection } from "./DropSection";
 
@@ -16,12 +16,12 @@ export function Rail() {
         <ul className="divide-y divide-border">
           {more.data?.items.map((m) => (
             <li key={m.candidate_id} className="flex items-center gap-3 py-3">
-              <Avatar name={m.display_name} size={40} />
+              <Avatar id={m.candidate_id} name={m.display_name} size={40} />
               <div className="min-w-0 flex-1">
                 <p className="t-body truncate font-semibold">{m.display_name}</p>
                 <p className="t-caption truncate text-text-muted">{m.city}</p>
               </div>
-              <span className="num t-caption">{m.score_percent}%</span>
+              <MatchStrength strength={strengthLabel(m.score_percent / 100)} />
             </li>
           ))}
         </ul>

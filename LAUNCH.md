@@ -56,10 +56,12 @@ How to use this file:
 - [x] OpenAPI spec clean; every endpoint described
 
 ## Stage 3b — Social API (Session A)
-- [x] social app: posts, post_media (Supabase Storage uploads, size/type checks, server-side resize variants), reactions, replies, follows, story_views
+- [x] social app: posts, post_media (Supabase Storage uploads, size/type checks, server-side resize variants), reactions, replies, follows, update_views
 - [x] Pulse endpoint: chronological last 7 days, visibility rules, mixes build logs + nearby matching roles + system activity, cursor pagination, "caught up" marker
 - [x] Daily Drop: `manage.py build_daily_drops` (08:00 IST job) using match_results; 3 per member; swipe outcomes logged as events
-- [x] Today strip endpoint (authors with posts or roles in the last 24h among connections, follows, organisation)
+- [x] Today strip endpoint (authors with posts or roles in the last 24h among connections, follows, organisation) (to be replaced by the Live wire endpoint below)
+- [ ] Live wire endpoint: up to 12 updates from the last 24h (shipped, hiring, needs, joined, closed a circuit), ranked by relevance to the viewer, each with image, verb, one-line reason and one action
+- [ ] Daily Drop returns match strength as a label (Strong ≥ 0.75, Good ≥ 0.55) and excludes candidates below 0.55; API never exposes raw low scores
 - [x] messaging app: conversations (request | active | blocked), messages, Realtime channel per conversation with RLS; under-18 rules enforced server-side
 - [x] Reports on posts, replies, messages and profiles; hide/remove from Django admin; audit-logged
 - [x] Rate limits on posting, replies, messages and connection requests
@@ -73,7 +75,7 @@ How to use this file:
 - [ ] apps/landing: hero, students / founders / circuits sections, partner CTA, footer (privacy, terms, contact), SEO + OG metadata, links to APP_URL
 - [ ] apps/app shell: Supabase sign-in (Google + OTP), auth callback, navigation per DESIGN.md §3 (Home · Discover · Circuits · Inbox · Profile; create in top bar), environment banner, persona switcher (dev/demo)
 - [ ] Onboarding: role → photo → paste bio → confirm chips → location → consent (under-18 private)
-- [ ] Home: Today strip + story viewer, Daily Drop stack, Pulse feed with build logs and "caught up" end
+- [ ] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end
 - [ ] Build log composer and post view (media pager, reactions, replies, report)
 - [ ] Discover: People, Startups, Jobs (+ job page, apply), Map
 - [ ] Circuits: ring cards, live status, signature closing animation

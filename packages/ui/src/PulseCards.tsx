@@ -13,7 +13,7 @@ export function RoleCard({ role, onOpen }: { role: RoleView; onOpen: () => void 
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 t-caption">
         {role.stipend && <span className="num">{role.stipend}</span>}
         {role.km !== null && <span className="num text-text-muted">{role.km < 10 ? role.km.toFixed(1) : Math.round(role.km)} km</span>}
-        {role.match !== null && <span className="num font-semibold">{role.match}% match</span>}
+        {role.match !== null && role.match >= 55 && <span className="num font-semibold">{role.match}% match</span>}
       </div>
       {role.tags.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{role.tags.map((t) => <Chip key={t} label={t} />)}</div>}
       <Button className="mt-4 w-full" onClick={onOpen}>See role</Button>

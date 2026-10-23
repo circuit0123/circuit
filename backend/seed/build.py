@@ -394,12 +394,10 @@ class Seeder:
         Consent.objects.bulk_create([Consent(member=m, policy_version="2026-01", accepted_at=now) for m in Member.objects.all()])
 
     # -- social (F15-F17): build logs with drawn project screenshots, replies, follows, requests, chats -------------
-    def _image(self, owner: Member, n: int, title: str, subtitle: str) -> MediaUpload:
+    def _image(self, owner: Member, n: int, scene: str) -> MediaUpload:
         """A drawn 'screenshot' stored through the storage provider (same two sizes the upload flow produces)."""
-        from seed.mockups import KINDS
-
         path = f"post/{owner.pk}/seed{n}"
-        png = mockups.render(KINDS[n % len(KINDS)], title, subtitle, owner.pk + n)
+        png = mockups.render(scene)
         from apps.social import media
 
         variants, (w, h) = media._process(png)
@@ -412,8 +410,8 @@ class Seeder:
         post = Post.objects.create(author=author, body=body, visibility=visibility, link=link)
         Post.objects.filter(pk=post.pk).update(created_at=timezone.now() - timedelta(hours=hours_ago))
         post.capabilities.set([self.cap[t] for t in tags])
-        for i, (title, subtitle, alt) in enumerate(images):
-            up = self._image(author, self.image_n, title, subtitle)
+        for i, (scene, alt) in enumerate(images):
+            up = self._image(author, self.image_n, scene)
             self.image_n += 1
             PostMedia.objects.create(post=post, upload=up, alt_text=alt, order=i)
         return post
@@ -429,9 +427,8 @@ class Seeder:
                 3,
                 [
                     (
-                        "Turnaround tracker",
-                        "Asha's lab · week 6",
-                        "Dashboard with sample counts and a bar chart of daily turnaround",
+                        "turnaround_tracker",
+                        "Dashboard: 1,284 samples this week, 91.4% on time, 37 late, a bar chart of daily turnaround against a 6 hour limit, and a table of five labs",
                     )
                 ],
                 ["brand-marketing"],
@@ -441,7 +438,12 @@ class Seeder:
                 "Rebuilt our investor update as a single page. Three numbers, one ask. Fundraising is mostly editing.",
                 "connections",
                 7,
-                [("Investor update", "Priya · Q3", "Line chart of monthly revenue with one highlighted point")],
+                [
+                    (
+                        "investor_update",
+                        "Investor update page: MRR of ₹4.8L, 14 months of runway, 11 hospitals live, a revenue line rising from April to September, and the ask for two intros",
+                    )
+                ],
                 ["fundraising"],
             ),
             (
@@ -449,7 +451,12 @@ class Seeder:
                 "Our hiring board after switching to two-day trial projects. Fewer interviews, better hires.",
                 "everyone",
                 21,
-                [("Hiring board", "Arjun · trial projects", "Kanban board with three columns: to do, doing, done")],
+                [
+                    (
+                        "hiring_board",
+                        "Hiring board with three columns, trial sent, in progress and reviewed, and a candidate with a trial task on each card",
+                    )
+                ],
                 ["recruiting"],
             ),
             (
@@ -457,7 +464,12 @@ class Seeder:
                 "Assay run 14: signal-to-noise finally above 10. Posting the plate reader chart before I lose the settings.",
                 "everyone",
                 30,
-                [("Assay run 14", "Kavya · plate reader", "Line chart of signal over nine time points")],
+                [
+                    (
+                        "assay_run",
+                        "Plate reader chart of fluorescence over 60 minutes, sample rising to 9,400 against a flat blank, signal to noise 10.4",
+                    )
+                ],
                 ["clinical-research"],
             ),
             (
@@ -465,7 +477,12 @@ class Seeder:
                 "We are hiring a frontend intern at Pixelwave. React, a designer next to you, real users by week three.",
                 "everyone",
                 5,
-                [("Pixelwave onboarding", "Divya · intern project", "Mobile screen with a list of onboarding steps")],
+                [
+                    (
+                        "onboarding_phone",
+                        "Phone screen, Set up your studio, with two of four steps done and Pick your first campaign next",
+                    )
+                ],
                 ["frontend-dev", "ui-design"],
             ),
             (
@@ -474,8 +491,14 @@ class Seeder:
                 "everyone",
                 2,
                 [
-                    ("Attendance app", "Ravi · v0.3", "App screen listing four classes with attendance status"),
-                    ("Attendance app", "Ravi · code", "Code editor showing the sync function"),
+                    (
+                        "attendance_phone",
+                        "Attendance app showing today's four classes, two present, one absent, one not marked, and an offline banner",
+                    ),
+                    (
+                        "sync_code",
+                        "Code editor showing the function that syncs saved attendance marks when the phone is back online",
+                    ),
                 ],
                 ["frontend-dev"],
             ),
@@ -492,7 +515,7 @@ class Seeder:
                 "Deep-tech sales cycles are 9 months. Writing down what moved a deal forward each month.",
                 "everyone",
                 40,
-                [("Deal log", "Rohan · 9 months", "Board of deals by stage")],
+                [("deal_log", "Deal log of six institutional deals by stage, from intro to won, with values in rupees")],
                 ["b2b-marketing"],
             ),
             (
@@ -510,20 +533,43 @@ class Seeder:
             Job.objects.filter(pk=job.pk).update(created_at=timezone.now() - timedelta(hours=rnd.randint(1, 160)))
         posts: dict[str, Post] = {}
         for key, body, vis, hrs, imgs, tags in feature:
-            posts[key] = self._post(m[key], body, vis, hrs, [(t, s_, a) for t, s_, a in imgs], tags)
+            posts[key] = self._post(m[key], body, vis, hrs, imgs, tags)
         # Everyday posts from partner-college students (organisation-only for under-18s) and other builders.
         topics = [
-            ("Finished the sensor wiring for our Arduino soil-moisture project.", "app", ["embedded-systems"]),
-            ("Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.", "app", ["frontend-dev"]),
-            ("Tried Figma for the first time. The auto layout clicked on day two.", "board", ["ui-design"]),
-            ("Learning SQL by cleaning our college library's CSV. 400 duplicate rows so far.", "code", ["data-analysis"]),
-            ("Wrote my first cold email to a startup. Got a reply in an hour.", "chart", ["b2b-marketing"]),
+            (
+                "Finished the sensor wiring for our Arduino soil-moisture project. The pump switches on below 35%.",
+                ("serial_monitor", "Serial monitor log of soil moisture readings; the pump turns on when moisture falls to 34%"),
+                ["embedded-systems"],
+            ),
+            (
+                "Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.",
+                ("bus_app", "App screen listing the next five buses at Hostel Gate with minutes to arrival"),
+                ["frontend-dev"],
+            ),
+            (
+                "Tried Figma for the first time. The auto layout clicked on day two.",
+                (
+                    "figma_frames",
+                    "Figma window with a profile card selected and its auto layout settings: vertical, gap 8, padding 16",
+                ),
+                ["ui-design"],
+            ),
+            (
+                "Learning SQL by cleaning our college library's CSV. 400 duplicate rows so far.",
+                ("dedupe_sql", "SQL query grouping books by ISBN and a result listing ISBNs with duplicate copies"),
+                ["data-analysis"],
+            ),
+            (
+                "Wrote my first cold email to a startup. Got a reply in an hour.",
+                ("cold_email", "Email reply from a startup founder asking for a 20 minute call tomorrow at 4 pm"),
+                ["b2b-marketing"],
+            ),
         ]
         org_students = [s for s in self.bulk_students if s.organisation_id and s.pk != m["ravi"].pk]
         others = [s for s in self.bulk_students if not s.organisation_id] + self.bulk_founders
         authors = rnd.sample(org_students, 14) + rnd.sample(others, 12)
         for i, who in enumerate(authors):
-            text, kind, tags = topics[i % len(topics)]
+            text, shot, tags = topics[i % len(topics)]
             vis = (
                 "organisation"
                 if who.is_minor or (who.organisation_id and i % 3 == 0)
@@ -531,11 +577,7 @@ class Seeder:
             )
             if who.is_minor or (vis == "organisation" and not who.organisation_id):
                 vis = "organisation" if who.organisation_id else "connections"
-            imgs = (
-                [(f"{who.display_name.split()[0]}'s project", "work in progress", "Screenshot of a work-in-progress project")]
-                if i % 2 == 0
-                else []
-            )
+            imgs = [shot] if i % 2 == 0 else []
             tags = [t for t in tags if t in self.cap][:3]
             self._post(who, text, vis, rnd.choice([1, 4, 9, 20, 30, 50, 90, 120]), imgs, tags)
         # A thread, a few reactions and follows.

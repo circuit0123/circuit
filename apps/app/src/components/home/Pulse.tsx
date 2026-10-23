@@ -80,6 +80,7 @@ export function Pulse() {
 
   return (
     <section aria-label="Pulse">
+      <h2 className="sr-only">Pulse</h2>
       <div ref={listRef} style={{ height: v.getTotalSize(), position: "relative" }}>
         {v.getVirtualItems().map((row) => (
           <div

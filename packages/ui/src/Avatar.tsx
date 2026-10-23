@@ -1,67 +1,53 @@
-"use client";
-
-import { animate, useReducedMotion } from "motion/react";
-import { useEffect, useRef } from "react";
 import { cx } from "./cx";
-import { initials, toneFor } from "./theme";
+import { circuitPattern } from "./pattern";
+import { initials } from "./theme";
 
-export type RingState = "none" | "unseen" | "seen";
-const SIZES = { 32: "t-micro", 40: "t-caption", 64: "t-headline", 96: "t-title", 128: "t-display" } as const;
-export type AvatarSize = keyof typeof SIZES;
+export type AvatarSize = 20 | 32 | 40 | 44 | 64 | 96 | 128;
 
 type Props = {
+  /** Seeds the pattern, so the same member always looks the same. */
+  id: string | number;
   name: string;
   src?: string | null;
   size?: AvatarSize;
-  ring?: RingState;
+  shape?: "round" | "square";
   className?: string;
 };
 
-/** Initials on a name-derived tone when there is no photo; never a silhouette. */
-export function Avatar({ name, src, size = 40, ring = "none", className }: Props) {
-  const tone = toneFor(name);
-  const inner = (
-    <span
-      className={cx("flex h-full w-full items-center justify-center overflow-hidden rounded-full font-semibold", SIZES[size])}
-      style={{ background: tone.bg, color: tone.fg }}
-      aria-hidden
-    >
-      {src ? <img src={src} alt="" className="h-full w-full object-cover" /> : initials(name)}
+/** A photo, or a circuit pattern from the member id with the first initial small in a corner. Never a silhouette or big initials. */
+export function Avatar({ id, name, src, size = 40, shape = "round", className }: Props) {
+  const radius = shape === "round" ? "rounded-full" : "rounded-card";
+  return (
+    <span className={cx("relative inline-flex shrink-0 overflow-hidden", radius, className)} style={{ width: size, height: size }} aria-hidden>
+      {src ? <img src={src} alt="" className="h-full w-full object-cover" /> : <PatternArt id={id} initial={size > 20 ? initials(name)[0] : null} size={size} />}
     </span>
   );
-  if (ring === "none") {
-    return (
-      <span className={cx("inline-flex shrink-0", className)} style={{ width: size, height: size }}>
-        {inner}
-      </span>
-    );
-  }
-  return <RingedAvatar ring={ring} size={size} className={className}>{inner}</RingedAvatar>;
 }
 
-/** Unseen = signature gradient. Seen = thin neutral ring; the gradient fades out over 400ms. */
-function RingedAvatar({ ring, size, className, children }: { ring: RingState; size: number; className?: string; children: React.ReactNode }) {
-  const reduce = useReducedMotion();
-  const gradient = useRef<HTMLSpanElement>(null);
-  const first = useRef(true);
-  useEffect(() => {
-    const el = gradient.current;
-    if (!el) return;
-    const target = ring === "unseen" ? 1 : 0;
-    if (first.current || reduce) {
-      el.style.opacity = String(target);
-    } else {
-      animate(el, { opacity: target }, { duration: 0.4 });
-    }
-    first.current = false;
-  }, [ring, reduce]);
-  const pad = size >= 64 ? 3 : 2;
+/** The pattern alone. `banner` fills a wide area (a Daily Drop card without a photo) with more traces. */
+export function PatternArt({ id, initial, size, banner = false }: { id: string | number; initial?: string | null; size?: number; banner?: boolean }) {
+  const p = circuitPattern(id, banner);
+  const wide = banner ? 2.6 : (size ?? 128) >= 64 ? 2.4 : 3;
+  const node = banner ? 1.5 : 1.8;
+  const thin = banner ? 0.6 : 0.9;
   return (
-    <span className={cx("relative inline-flex shrink-0 rounded-full", className)} style={{ width: size, height: size }}>
-      <span className="absolute inset-0 rounded-full border border-border" aria-hidden />
-      <span ref={gradient} className="ring-signature absolute inset-0 rounded-full" style={{ opacity: ring === "unseen" ? 1 : 0 }} aria-hidden />
-      <span className="absolute rounded-full bg-bg" style={{ inset: pad }} aria-hidden />
-      <span className="absolute" style={{ inset: pad + 2 }}>{children}</span>
-    </span>
+    <svg viewBox={`0 0 ${p.w} ${p.h}`} preserveAspectRatio="xMidYMid slice" className="h-full w-full" focusable="false" aria-hidden>
+      <rect width={p.w} height={p.h} fill={p.bg} />
+      {p.traces.map((t, i) => (
+        <polyline key={`w${i}`} points={t} fill="none" stroke={p.wide} strokeWidth={wide + (banner ? 1 : 1.6)} strokeLinejoin="round" strokeLinecap="round" />
+      ))}
+      {p.traces.map((t, i) => (
+        <polyline key={`l${i}`} points={t} fill="none" stroke={p.line} strokeOpacity={0.55} strokeWidth={thin} strokeLinejoin="round" strokeLinecap="round" />
+      ))}
+      {p.nodes.map((n, i) => (
+        <circle key={i} cx={n.x} cy={n.y} r={node} fill={p.bg} stroke={p.line} strokeWidth={thin} />
+      ))}
+      {initial && banner && <rect x="1" y={p.h - 8} width="6" height="7" rx="1.2" fill={p.bg} />}
+      {initial && (
+        <text x="2.2" y={p.h - 2} fontSize={banner ? 5 : size && size >= 64 ? 6 : 8} fontWeight={600} fill={p.line} fontFamily="var(--font-geist-sans), system-ui, sans-serif">
+          {initial}
+        </text>
+      )}
+    </svg>
   );
 }

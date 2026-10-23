@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-/** Shared by Modal, BottomSheet and StoryViewer: Esc closes, page scroll locks, focus moves in and returns. */
+/** Shared by Modal, BottomSheet and UpdateView: Esc closes, page scroll locks, focus moves in and returns. */
 export function useOverlay(open: boolean, onClose: () => void) {
   const ref = useRef<HTMLDivElement>(null);
   const close = useRef(onClose);

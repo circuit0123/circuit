@@ -52,8 +52,9 @@ F15 Build logs + Pulse: members post up to 4 images + 500 chars + up to 3 capabi
     nearby matching roles and system activity. Reactions Helpful / Intro me / Let's
     talk (no public counts); one-level replies. Every post reportable; moderated in
     Django admin.
-F16 Daily Drop + Today strip: 3 matches per day at 08:00 local time as a swipeable
-    stack; Today strip of connections/followed startups/org who posted in 24h.
+F16 Daily Drop + Live wire: 3 matches per day at 08:00 local time as a swipeable
+    stack (reason-first cards, match strength in words); Live wire of the most relevant
+    updates (shipped, hiring, needs, joined, closed a circuit) from the last 24h.
 F17 Connections, follows and Inbox: connect (with note) to people, follow startups;
     1-to-1 messages via Supabase Realtime; Requests folder for non-connections;
     under-18 students receive no Requests from strangers.

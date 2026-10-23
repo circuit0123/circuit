@@ -30,7 +30,7 @@ export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, classN
     <article className={cx("border-b border-border pb-4", className)}>
       <header className="flex items-center gap-3 px-4 py-3 lg:px-0">
         <button onClick={onOpenAuthor} className="flex min-w-0 flex-1 items-center gap-3 text-left">
-          <Avatar name={a.name} src={a.photo} size={40} />
+          <Avatar id={a.id} name={a.name} src={a.photo} size={40} />
           <span className="min-w-0">
             <span className="t-body block truncate font-semibold">{a.name} <VerifiedBadge level={a.level} /></span>
             <span className="t-caption block truncate text-text-muted">{[a.headline || a.role, a.place].filter(Boolean).join(", ")} · {post.when}</span>

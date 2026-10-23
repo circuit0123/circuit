@@ -27,6 +27,9 @@ export function DropSection({ className }: { className?: string }) {
         id: c.member.id,
         person: toPerson(c.member),
         reason: c.reason,
+        helpWith: c.helpWith,
+        offers: c.offers,
+        strength: c.strength,
         bridge: c.is_bridge,
         answered: (c.outcome as "intro" | "skip" | null) ?? null,
       }))}

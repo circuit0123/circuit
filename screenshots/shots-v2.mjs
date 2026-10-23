@@ -1,4 +1,4 @@
-// Usage: node shots-v2.mjs <outDir> [persona] — Home at 375 (dark, light) and 1280, plus axe + overflow checks.
+// Usage: node shots-v2.mjs <outDir> [persona] — Home at 375 (dark, light) and 1280, plus Update view, axe + overflow checks.
 import { chromium } from "/home/klk/circuit/apps/app/node_modules/@playwright/test/index.mjs";
 import AxeBuilder from "/home/klk/circuit/apps/app/node_modules/@axe-core/playwright/dist/index.mjs";
 import { mkdirSync } from "node:fs";
@@ -35,17 +35,18 @@ for (const [name, w, h, scheme] of runs) {
   }
 }
 
-// Story viewer and the finished drop (375 dark). These change server state, so reset the demo afterwards.
+// Update view and the finished drop (375). These change server state, so reset the demo afterwards.
 for (const scheme of ["dark", "light"]) {
   const ctx = await b.newContext({ viewport: { width: 375, height: 812 }, colorScheme: scheme, reducedMotion: "reduce" });
   await ctx.addInitScript((t) => localStorage.setItem("circuit.token", t), access_token);
   const p = await ctx.newPage();
-  await p.goto(APP); await p.waitForSelector('ul[aria-label="Today"] button');
-  await p.locator('ul[aria-label="Today"] button').first().click(); await p.waitForTimeout(600);
-  await p.screenshot({ path: `${out}/story-375-${scheme}.png` });
-  await p.keyboard.press("Escape"); await p.waitForTimeout(300);
+  await p.goto(APP); await p.waitForSelector('ul[aria-label="Live wire"] button');
+  await p.locator('ul[aria-label="Live wire"] button').first().click(); await p.waitForTimeout(600);
+  await p.screenshot({ path: `${out}/update-375-${scheme}.png` });
+  await p.keyboard.press("Escape"); await p.waitForTimeout(400);
+  await p.screenshot({ path: `${out}/home-after-update-375-${scheme}.png` });
   if (scheme === "dark") {
-    for (let i = 0; i < 3; i++) { await p.getByRole("button", { name: "Skip" }).click(); await p.waitForTimeout(500); }
+    for (let i = 0; i < 3; i++) { const skip = p.getByRole("button", { name: "Skip" }); if (!(await skip.count())) break; await skip.click(); await p.waitForTimeout(500); }
     await p.waitForTimeout(500);
     await p.screenshot({ path: `${out}/drop-done-375-dark.png` });
   }
