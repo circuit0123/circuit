@@ -20,6 +20,7 @@ from apps.events.services import record
 from apps.jobs.models import Job, JobCapability
 from apps.matching.models import MemberSkill
 from apps.matching.scoring import skill_match
+from apps.notifications.services import notify, notify_many
 from apps.startups.models import ClaimRequest, Startup, StartupInterest, StartupMember
 from core import codes
 from core.cache import get_cache
@@ -126,6 +127,13 @@ def is_team(member: Member, startup: Startup) -> bool:
     return startup.claimed_by_id is not None and StartupMember.objects.filter(startup=startup, member=member).exists()
 
 
+def team_member_ids(startup: Startup) -> list[int]:
+    ids = set(StartupMember.objects.filter(startup=startup).values_list("member_id", flat=True))
+    if startup.claimed_by_id:
+        ids.add(startup.claimed_by_id)
+    return sorted(ids)
+
+
 def get_startup(startup_id: int) -> Startup:
     s = Startup.objects.filter(pk=startup_id).first()
     if s is None:
@@ -168,6 +176,7 @@ def add_interest(member: Member, startup: Startup) -> None:
     _, created = StartupInterest.objects.get_or_create(startup=startup, member=member)
     if created:
         record("startup.interest_added", actor=member, target_type="startup", target_id=startup.pk)
+        notify_many(team_member_ids(startup), "startup.interest", startup_id=startup.pk)
 
 
 def remove_interest(member: Member, startup: Startup) -> None:
@@ -244,6 +253,7 @@ def verify_claim(member: Member, startup_id: int, code: str) -> Startup:
     StartupMember.objects.get_or_create(startup=startup, member=member, defaults={"role": "founder"})
     raise_level(member, 2, reason="startup_claim")
     record("startup.claimed", actor=member, target_type="startup", target_id=startup.pk)
+    notify(member, "startup.claimed", startup_id=startup.pk)
     return startup
 
 

@@ -161,6 +161,22 @@ EMAIL_BACKEND = {
 # Matching weights (CLAUDE.md: weights live in settings)
 MATCH_WEIGHTS = {"complementarity": 0.5, "affinity": 0.2, "trust_path": 0.15, "timing": 0.1, "load_penalty": 0.05}
 MATCH_BRIDGE_SHARE = 0.25
+MATCH_TOP_N = 20  # matches kept per member
+MATCH_MIN_SIMILARITY = 0.8  # text-embedding cosine needed for a "similar capability" to count; tune with eval_matching
+MATCH_MIN_COMPLEMENTARITY = 0.05  # below this the pair is not a need/offer fit at all and is not shown
+MATCH_KNN = 30  # nearest-neighbour candidates fetched per need/offer
+MATCH_MAX_PER_SECTOR = 5  # diversity: at most this many matches from one sector in a member's list
+MATCH_MAX_APPEARANCES = 30  # capacity: one person is shown in at most this many members' lists
+MATCH_CACHE_TTL = 6 * 3600
+
+INTRO_WEEKLY_LIMIT = 3  # warm intros one member may send per rolling 7 days (a target's own cap is open_intro_slots)
+INTRO_EXPIRY_DAYS = 7
+
+CIRCUIT_CONSENT_HOURS = 72
+DASHBOARD_MIN_COUNT = 5  # partner dashboards never show a count below this (CLAUDE.md privacy rules)
+DASHBOARD_CACHE_SECONDS = 300
+HEATMAP_CELL_DEGREES = 0.02  # about 2 km
+CIRCUIT_MIN_LEG_SCORE = 0.2  # a loop is only proposed if even its weakest handover is at least this good a match
 STUDENT_MAX_DISTANCE_KM = 25
 
 from core.logging import configure_logging  # noqa: E402

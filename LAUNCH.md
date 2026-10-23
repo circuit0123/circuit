@@ -38,22 +38,22 @@ How to use this file:
 - [x] Permission helpers: require_role, require_level, organisation scoping
 - [x] Organisations: create (super admin), join by code or verified email domain, leave, remove
 - [x] RLS deny-by-default on every table (migration); app DB role documented
-- [ ] Rate limits on extraction, intros, applications, reports, claims (helper `core.ratelimit.check_rate` + limits are built and wired on org join; the other endpoints do not exist yet, so Stage 3 adds one call to each)
+- [ ] Rate limits on extraction, intros, applications, reports, claims (helper `core.ratelimit.check_rate` + limits are built and wired on org join, extraction, verify, claim and applications; intros added in Stage 3; reports arrive with report/block in Stage 6)
 - [x] CORS exact origins + staging preview regex; security headers; Django SECURE_* settings
 - [x] Tests: expired/forged tokens, every role on every endpoint, IDOR on every ID, org scoping, no PII in logs
 
 ## Stage 3 — Core features API (Session A)
-- [ ] Members, startups, needs, offers; smart onboarding endpoint with LLM + manual fallback (F1)
-- [ ] Geo: nearby + bbox endpoints; student skill-to-startup score; view/interest tracking (F2)
-- [ ] Claim flow via company email domain (simulated in dev/demo) (F3)
-- [ ] Jobs + applications endpoints (F11)
-- [ ] Matching: scoring, candidates, ranking, reasons, bridge flag; `compute_matches`; Redis cache; eval set + `eval_matching` (F4)
-- [ ] Warm intros with capacity limits and outcome rating (F5)
-- [ ] Circuits: edges, cycles, CP-SAT, `run_circuit_round`, consent, expiry, mark done, rating (F6)
-- [ ] Verification levels (F7); partner dashboard endpoints with counts < 5 hidden (F8)
-- [ ] Events written for every product action (F10); notifications model + endpoints
-- [ ] Demo story tests 1–5 pass; `make check` prints PASS/FAIL per story
-- [ ] OpenAPI spec clean; every endpoint described
+- [x] Members, startups, needs, offers; smart onboarding endpoint with LLM + manual fallback (F1)
+- [x] Geo: nearby + bbox endpoints; student skill-to-startup score; view/interest tracking (F2)
+- [x] Claim flow via company email domain (simulated in dev/demo) (F3)
+- [x] Jobs + applications endpoints (F11)
+- [x] Matching: scoring, candidates, ranking, reasons, bridge flag; `compute_matches`; Redis cache; eval set + `eval_matching` (F4)
+- [x] Warm intros with capacity limits and outcome rating (F5)
+- [x] Circuits: edges, cycles, CP-SAT, `run_circuit_round`, consent, expiry, mark done, rating (F6)
+- [x] Verification levels (F7); partner dashboard endpoints with counts < 5 hidden (F8)
+- [x] Events written for every product action (F10); notifications model + endpoints
+- [x] Demo story tests 1–5 pass; `make check` prints PASS/FAIL per story
+- [x] OpenAPI spec clean; every endpoint described
 
 ## Stage 4 — Frontends (Session B, in parallel with Stages 1–3)
 - [ ] DESIGN.md first: palette (hex), type scale, spacing, motion rules, circuit line motif, voice; banned list (gradients, glassmorphism, emoji icons, buzzword copy, lorem ipsum, fake stats)

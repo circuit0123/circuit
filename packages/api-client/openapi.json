@@ -1,6 +1,182 @@
 {
   "components": {
     "schemas": {
+      "AcceptanceGroup": {
+        "properties": {
+          "accepted": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "rate_percent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate Percent"
+          },
+          "requested": {
+            "$ref": "#/components/schemas/CountOut"
+          }
+        },
+        "required": [
+          "requested",
+          "accepted",
+          "rate_percent"
+        ],
+        "title": "AcceptanceGroup",
+        "type": "object"
+      },
+      "AcceptanceOut": {
+        "properties": {
+          "bridge": {
+            "$ref": "#/components/schemas/AcceptanceGroup"
+          },
+          "local": {
+            "$ref": "#/components/schemas/AcceptanceGroup"
+          }
+        },
+        "required": [
+          "local",
+          "bridge"
+        ],
+        "title": "AcceptanceOut",
+        "type": "object"
+      },
+      "AnswerIn": {
+        "properties": {
+          "accept": {
+            "title": "Accept",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accept"
+        ],
+        "title": "AnswerIn",
+        "type": "object"
+      },
+      "ApplicantOut": {
+        "properties": {
+          "application_id": {
+            "title": "Application Id",
+            "type": "integer"
+          },
+          "applied_at": {
+            "format": "date-time",
+            "title": "Applied At",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "skill_match": {
+            "title": "Skill Match",
+            "type": "number"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicantSkill"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "student_id": {
+            "title": "Student Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "application_id",
+          "student_id",
+          "display_name",
+          "status",
+          "skill_match",
+          "skills",
+          "applied_at"
+        ],
+        "title": "ApplicantOut",
+        "type": "object"
+      },
+      "ApplicantSkill": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "proof_url": {
+            "title": "Proof Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capability",
+          "level",
+          "proof_url"
+        ],
+        "title": "ApplicantSkill",
+        "type": "object"
+      },
+      "ApplicationOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "integer"
+          },
+          "job_title": {
+            "title": "Job Title",
+            "type": "string"
+          },
+          "skill_match": {
+            "title": "Skill Match",
+            "type": "number"
+          },
+          "startup_id": {
+            "title": "Startup Id",
+            "type": "integer"
+          },
+          "startup_name": {
+            "title": "Startup Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "job_id",
+          "job_title",
+          "startup_id",
+          "startup_name",
+          "status",
+          "skill_match",
+          "created_at"
+        ],
+        "title": "ApplicationOut",
+        "type": "object"
+      },
       "BboxParams": {
         "properties": {
           "capability": {
@@ -83,6 +259,82 @@
         "title": "CapabilityOut",
         "type": "object"
       },
+      "CellOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lng": {
+            "title": "Lng",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat",
+          "lng",
+          "count"
+        ],
+        "title": "CellOut",
+        "type": "object"
+      },
+      "CircuitOut": {
+        "properties": {
+          "consent_deadline": {
+            "format": "date-time",
+            "title": "Consent Deadline",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "legs": {
+            "items": {
+              "$ref": "#/components/schemas/LegOut"
+            },
+            "title": "Legs",
+            "type": "array"
+          },
+          "my_consent": {
+            "title": "My Consent",
+            "type": "string"
+          },
+          "score_percent": {
+            "title": "Score Percent",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "week": {
+            "title": "Week",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "score_percent",
+          "week",
+          "consent_deadline",
+          "created_at",
+          "my_consent",
+          "legs"
+        ],
+        "title": "CircuitOut",
+        "type": "object"
+      },
       "ClaimConfirmIn": {
         "properties": {
           "code": {
@@ -125,6 +377,31 @@
           "code"
         ],
         "title": "CodeIn",
+        "type": "object"
+      },
+      "CountOut": {
+        "properties": {
+          "hidden": {
+            "title": "Hidden",
+            "type": "boolean"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "hidden"
+        ],
+        "title": "CountOut",
         "type": "object"
       },
       "DemoToken": {
@@ -209,6 +486,46 @@
         "title": "ExtractOut",
         "type": "object"
       },
+      "GapOut": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "is_gap": {
+            "title": "Is Gap",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needed_by": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "offered_by": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "offered_outside": {
+            "$ref": "#/components/schemas/CountOut"
+          }
+        },
+        "required": [
+          "capability",
+          "name",
+          "category",
+          "needed_by",
+          "offered_by",
+          "offered_outside",
+          "is_gap"
+        ],
+        "title": "GapOut",
+        "type": "object"
+      },
       "Health": {
         "properties": {
           "status": {
@@ -222,6 +539,647 @@
         "title": "Health",
         "type": "object"
       },
+      "HeatmapOut": {
+        "properties": {
+          "capability": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capability"
+          },
+          "cell_degrees": {
+            "title": "Cell Degrees",
+            "type": "number"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/CellOut"
+            },
+            "title": "Cells",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cell_degrees",
+          "capability",
+          "cells"
+        ],
+        "title": "HeatmapOut",
+        "type": "object"
+      },
+      "IntroIn": {
+        "properties": {
+          "message": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Message",
+            "type": "string"
+          },
+          "target_id": {
+            "title": "Target Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "target_id"
+        ],
+        "title": "IntroIn",
+        "type": "object"
+      },
+      "IntroOut": {
+        "properties": {
+          "can_respond": {
+            "title": "Can Respond",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "my_role": {
+            "enum": [
+              "requester",
+              "broker",
+              "target"
+            ],
+            "title": "My Role",
+            "type": "string"
+          },
+          "outcome_rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome Rating"
+          },
+          "requester": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "target": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "my_role",
+          "status",
+          "stage",
+          "can_respond",
+          "requester",
+          "target",
+          "via",
+          "message",
+          "outcome_rating",
+          "created_at",
+          "expires_at"
+        ],
+        "title": "IntroOut",
+        "type": "object"
+      },
+      "IntroParams": {
+        "properties": {
+          "box": {
+            "default": "sent",
+            "enum": [
+              "sent",
+              "received",
+              "brokered"
+            ],
+            "title": "Box",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "title": "IntroParams",
+        "type": "object"
+      },
+      "JobCapabilityIn": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "required": {
+            "default": true,
+            "title": "Required",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "capability"
+        ],
+        "title": "JobCapabilityIn",
+        "type": "object"
+      },
+      "JobCapabilityOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "your_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Your Level"
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "required"
+        ],
+        "title": "JobCapabilityOut",
+        "type": "object"
+      },
+      "JobFilters": {
+        "properties": {
+          "capability": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capability"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "internship",
+                  "full_time",
+                  "part_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "max_distance_km": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 200,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Distance Km"
+          },
+          "min_stipend": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Stipend"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          },
+          "startup_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Startup Id"
+          }
+        },
+        "title": "JobFilters",
+        "type": "object"
+      },
+      "JobIn": {
+        "properties": {
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/JobCapabilityIn"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 5000,
+            "title": "Description",
+            "type": "string"
+          },
+          "kind": {
+            "default": "internship",
+            "enum": [
+              "internship",
+              "full_time",
+              "part_time"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "location": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Location",
+            "type": "string"
+          },
+          "startup_id": {
+            "title": "Startup Id",
+            "type": "integer"
+          },
+          "stipend_max": {
+            "anyOf": [
+              {
+                "maximum": 10000000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stipend Max"
+          },
+          "stipend_min": {
+            "anyOf": [
+              {
+                "maximum": 10000000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stipend Min"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "startup_id",
+          "title",
+          "capabilities"
+        ],
+        "title": "JobIn",
+        "type": "object"
+      },
+      "JobOut": {
+        "properties": {
+          "applied": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied"
+          },
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/JobCapabilityOut"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "is_open": {
+            "title": "Is Open",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lng": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lng"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "sector": {
+            "title": "Sector",
+            "type": "string"
+          },
+          "skill_match": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill Match"
+          },
+          "startup_id": {
+            "title": "Startup Id",
+            "type": "integer"
+          },
+          "startup_name": {
+            "title": "Startup Name",
+            "type": "string"
+          },
+          "stipend_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stipend Max"
+          },
+          "stipend_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stipend Min"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "description",
+          "stipend_min",
+          "stipend_max",
+          "location",
+          "is_open",
+          "created_at",
+          "startup_id",
+          "startup_name",
+          "sector",
+          "lat",
+          "lng",
+          "distance_km",
+          "capabilities"
+        ],
+        "title": "JobOut",
+        "type": "object"
+      },
+      "JobPatch": {
+        "properties": {
+          "capabilities": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/JobCapabilityIn"
+                },
+                "maxItems": 8,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capabilities"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "is_open": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Open"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "internship",
+                  "full_time",
+                  "part_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "stipend_max": {
+            "anyOf": [
+              {
+                "maximum": 10000000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stipend Max"
+          },
+          "stipend_min": {
+            "anyOf": [
+              {
+                "maximum": 10000000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stipend Min"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 3,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "JobPatch",
+        "type": "object"
+      },
       "JoinIn": {
         "properties": {
           "code": {
@@ -233,6 +1191,154 @@
           "code"
         ],
         "title": "JoinIn",
+        "type": "object"
+      },
+      "LegOut": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "consent": {
+            "title": "Consent",
+            "type": "string"
+          },
+          "fulfilled": {
+            "title": "Fulfilled",
+            "type": "boolean"
+          },
+          "giver": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "i_give": {
+            "title": "I Give",
+            "type": "boolean"
+          },
+          "i_receive": {
+            "title": "I Receive",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/PersonOut"
+          }
+        },
+        "required": [
+          "id",
+          "giver",
+          "receiver",
+          "capability",
+          "consent",
+          "fulfilled",
+          "rating",
+          "i_give",
+          "i_receive"
+        ],
+        "title": "LegOut",
+        "type": "object"
+      },
+      "MatchOut": {
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "integer"
+          },
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "is_bridge": {
+            "title": "Is Bridge",
+            "type": "boolean"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "score_percent": {
+            "title": "Score Percent",
+            "type": "integer"
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sector"
+          },
+          "verification_level": {
+            "title": "Verification Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "display_name",
+          "role",
+          "verification_level",
+          "city",
+          "sector",
+          "score_percent",
+          "reason",
+          "is_bridge"
+        ],
+        "title": "MatchOut",
+        "type": "object"
+      },
+      "MatchParams": {
+        "properties": {
+          "bridge": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bridge"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "title": "MatchParams",
         "type": "object"
       },
       "MeOut": {
@@ -594,6 +1700,101 @@
         "title": "NeedOfferOut",
         "type": "object"
       },
+      "NetworkOut": {
+        "properties": {
+          "applications": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "circuits_completed": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "intros_accepted": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "intros_requested": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "members": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "members_with_matches": {
+            "$ref": "#/components/schemas/CountOut"
+          },
+          "new_members_30d": {
+            "$ref": "#/components/schemas/CountOut"
+          }
+        },
+        "required": [
+          "members",
+          "new_members_30d",
+          "members_with_matches",
+          "intros_requested",
+          "intros_accepted",
+          "circuits_completed",
+          "applications"
+        ],
+        "title": "NetworkOut",
+        "type": "object"
+      },
+      "NotificationOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "read": {
+            "title": "Read",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "payload",
+          "read",
+          "created_at"
+        ],
+        "title": "NotificationOut",
+        "type": "object"
+      },
+      "NotificationParams": {
+        "properties": {
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          },
+          "unread": {
+            "default": false,
+            "title": "Unread",
+            "type": "boolean"
+          }
+        },
+        "title": "NotificationParams",
+        "type": "object"
+      },
       "OpenJobOut": {
         "properties": {
           "id": {
@@ -732,6 +1933,230 @@
         "title": "PageParams",
         "type": "object"
       },
+      "Page_ApplicantOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicantOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[ApplicantOut]",
+        "type": "object"
+      },
+      "Page_ApplicationOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[ApplicationOut]",
+        "type": "object"
+      },
+      "Page_CircuitOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CircuitOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[CircuitOut]",
+        "type": "object"
+      },
+      "Page_IntroOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IntroOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[IntroOut]",
+        "type": "object"
+      },
+      "Page_JobOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/JobOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[JobOut]",
+        "type": "object"
+      },
+      "Page_MatchOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatchOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[MatchOut]",
+        "type": "object"
+      },
+      "Page_NotificationOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[NotificationOut]",
+        "type": "object"
+      },
       "Page_OrgMemberOut_": {
         "properties": {
           "count": {
@@ -762,6 +2187,57 @@
           "count"
         ],
         "title": "Page[OrgMemberOut]",
+        "type": "object"
+      },
+      "PathOut": {
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "target",
+          "via"
+        ],
+        "title": "PathOut",
+        "type": "object"
+      },
+      "PersonOut": {
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "verification_level": {
+            "title": "Verification Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "role",
+          "verification_level"
+        ],
+        "title": "PersonOut",
         "type": "object"
       },
       "Persona": {
@@ -943,6 +2419,21 @@
           "traits"
         ],
         "title": "ProfileOut",
+        "type": "object"
+      },
+      "RatingIn": {
+        "properties": {
+          "rating": {
+            "maximum": 5,
+            "minimum": 1,
+            "title": "Rating",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rating"
+        ],
+        "title": "RatingIn",
         "type": "object"
       },
       "SkillIn": {
@@ -1216,6 +2707,24 @@
         "title": "StartupPatch",
         "type": "object"
       },
+      "StatusIn": {
+        "properties": {
+          "status": {
+            "enum": [
+              "shortlisted",
+              "rejected",
+              "hired"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "StatusIn",
+        "type": "object"
+      },
       "Suggestions": {
         "properties": {
           "needs": {
@@ -1327,6 +2836,92 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/applications/{application_id}": {
+      "patch": {
+        "description": "The startup's team only. applied can become shortlisted or rejected; shortlisted can become hired or rejected. Other people's applications are a 404. The student is notified.",
+        "operationId": "apps_jobs_api_set_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "application_id",
+            "required": true,
+            "schema": {
+              "title": "Application Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Shortlist, reject or hire",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/applications/{application_id}/withdraw": {
+      "post": {
+        "description": "Students only, my own application. Safe to repeat. Decided applications are a 409.",
+        "operationId": "apps_jobs_api_withdraw",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "application_id",
+            "required": true,
+            "schema": {
+              "title": "Application Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Withdraw an application",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
     "/api/capabilities": {
       "get": {
         "description": "The fixed list of capabilities used for needs, offers and skills.",
@@ -1356,6 +2951,381 @@
         "summary": "Capability list",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/circuits": {
+      "get": {
+        "description": "Exchange circuits I am part of, newest first, with live status: who gives what to whom, who has said yes, what has been handed over. A proposal nobody finished answering in 72 hours reads as expired.",
+        "operationId": "apps_circuits_api_list_circuits",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CircuitOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My circuits",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/circuits/{circuit_id}": {
+      "get": {
+        "description": "A circuit I am part of. Anyone else's circuit is a 404.",
+        "operationId": "apps_circuits_api_get_circuit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "circuit_id",
+            "required": true,
+            "schema": {
+              "title": "Circuit Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "One circuit",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/circuits/{circuit_id}/legs/{leg_id}/done": {
+      "post": {
+        "description": "The person giving says they have done their part. When all three are done the circuit is completed. Only the giver can do this, and only while the circuit is active. Safe to repeat.",
+        "operationId": "apps_circuits_api_mark_done",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "circuit_id",
+            "required": true,
+            "schema": {
+              "title": "Circuit Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "leg_id",
+            "required": true,
+            "schema": {
+              "title": "Leg Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Mark my handover done",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/circuits/{circuit_id}/legs/{leg_id}/rating": {
+      "post": {
+        "description": "The person receiving rates the handover from 1 to 5, once it is marked done. The first rating stands.",
+        "operationId": "apps_circuits_api_rate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "circuit_id",
+            "required": true,
+            "schema": {
+              "title": "Circuit Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "leg_id",
+            "required": true,
+            "schema": {
+              "title": "Leg Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RatingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Rate what I received",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/circuits/{circuit_id}/respond": {
+      "post": {
+        "description": "Each of the three people answers within 72 hours. When all three say yes the circuit becomes active; one no ends it for everyone. Answering the same way again is safe; changing your answer is a 409; an expired proposal is a 409.",
+        "operationId": "apps_circuits_api_respond",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "circuit_id",
+            "required": true,
+            "schema": {
+              "title": "Circuit Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Say yes or no to a circuit",
+        "tags": [
+          "circuits"
+        ]
+      }
+    },
+    "/api/dashboard/acceptance": {
+      "get": {
+        "description": "Introductions my members asked for, split into local and Bridge matches, with how many were accepted. The rate appears only when both counts are at least 5.",
+        "operationId": "apps_dashboard_api_acceptance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptanceOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Local vs Bridge introductions",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/gaps": {
+      "get": {
+        "description": "What my organisation's members need against what they offer, biggest gaps first. Partner admins only, and only for their own organisation. Counts below 5 are hidden.",
+        "operationId": "apps_dashboard_api_gaps",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GapOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Gap chart",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/heatmap": {
+      "get": {
+        "description": "Members on a grid of roughly 2 km cells; cells with fewer than 5 members are left out. Add capability=<slug> to show only members who need that capability.",
+        "operationId": "apps_dashboard_api_heatmap",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "capability",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capability"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HeatmapOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Where my members are",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/network": {
+      "get": {
+        "description": "Members, new members, matches, introductions, completed circuits and applications for my organisation. Counts below 5 are hidden.",
+        "operationId": "apps_dashboard_api_network",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Network statistics",
+        "tags": [
+          "dashboard"
         ]
       }
     },
@@ -1475,6 +3445,691 @@
         ]
       }
     },
+    "/api/intros": {
+      "get": {
+        "description": "box=sent (what I asked for), received (requests that reached me), brokered (where I am the mutual connection). Newest first. can_respond says whether it is my turn to answer.",
+        "operationId": "apps_intros_api_list_intros",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "box",
+            "required": false,
+            "schema": {
+              "default": "sent",
+              "enum": [
+                "sent",
+                "received",
+                "brokered"
+              ],
+              "title": "Box",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_IntroOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My introductions",
+        "tags": [
+          "intros"
+        ]
+      },
+      "post": {
+        "description": "Ask for an introduction to someone through my best mutual connection, who is asked first and then the person. 201 for a new request, 200 if one is already open (safe to repeat). At most 3 new requests a week; 409 if the person is not taking more introductions this week. Not available for under-18 accounts. Rate limited.",
+        "operationId": "apps_intros_api_request_intro",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntroIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Ask for a warm intro",
+        "tags": [
+          "intros"
+        ]
+      }
+    },
+    "/api/intros/path/{target_id}": {
+      "get": {
+        "description": "Who would introduce me to this person: the best mutual connection within two hops. 404 if the person is hidden or I have no mutual connection.",
+        "operationId": "apps_intros_api_preview_path",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "target_id",
+            "required": true,
+            "schema": {
+              "title": "Target Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PathOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Preview a warm path",
+        "tags": [
+          "intros"
+        ]
+      }
+    },
+    "/api/intros/{intro_id}/rating": {
+      "post": {
+        "description": "The person who asked rates how it went, 1 to 5. Only after it was accepted. Safe to repeat.",
+        "operationId": "apps_intros_api_rate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intro_id",
+            "required": true,
+            "schema": {
+              "title": "Intro Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RatingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Rate an introduction",
+        "tags": [
+          "intros"
+        ]
+      }
+    },
+    "/api/intros/{intro_id}/respond": {
+      "post": {
+        "description": "The mutual connection answers first (accepting means vouching), then the person. Answering again is safe. Not my turn is a 409; a request I am not part of is a 404.",
+        "operationId": "apps_intros_api_respond",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intro_id",
+            "required": true,
+            "schema": {
+              "title": "Intro Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Accept or decline",
+        "tags": [
+          "intros"
+        ]
+      }
+    },
+    "/api/jobs": {
+      "get": {
+        "description": "Open jobs with filters (kind, capability, startup, distance from my location or the city centre, minimum stipend). Students get skill_match (0 to 1) and the best match first; everyone else gets newest first.",
+        "operationId": "apps_jobs_api_list_jobs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "internship",
+                    "full_time",
+                    "part_time"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "capability",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capability"
+            }
+          },
+          {
+            "in": "query",
+            "name": "startup_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Startup Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_distance_km",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "maximum": 200,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Distance Km"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_stipend",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Stipend"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_JobOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Open jobs",
+        "tags": [
+          "jobs"
+        ]
+      },
+      "post": {
+        "description": "Founders on a claimed startup's team. Needs 1 to 8 capabilities from the fixed list. Marks the startup as hiring.",
+        "operationId": "apps_jobs_api_create_job",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Post a job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}": {
+      "get": {
+        "description": "One job. Students see their skill match and which required skills they have. A closed job is visible to its team only.",
+        "operationId": "apps_jobs_api_job_page",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Job page",
+        "tags": [
+          "jobs"
+        ]
+      },
+      "patch": {
+        "description": "The startup's team only. Set is_open to false to close it. Changing capabilities re-scores existing applications.",
+        "operationId": "apps_jobs_api_update_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Edit or close a job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}/applicants": {
+      "get": {
+        "description": "The startup's team only. Ranked by skill match, then earliest application. College is not shown or used.",
+        "operationId": "apps_jobs_api_applicants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ApplicantOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Applicants for my job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/jobs/{job_id}/apply": {
+      "post": {
+        "description": "Students only, one click. 201 for a new application, 200 if I had already applied (safe to repeat). A withdrawn application is reopened. Closed jobs are a 409. Rate limited.",
+        "operationId": "apps_jobs_api_apply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Apply to a job",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/matches": {
+      "get": {
+        "description": "People who fit what I need and offer, best first, each with a one-line reason. Computed ahead of time, so this is a cheap read. bridge=true shows only Bridge matches (different sector), bridge=false only the rest. Partner admins and super admins have no matches.",
+        "operationId": "apps_matching_api_list_matches",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "bridge",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bridge"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_MatchOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My matches",
+        "tags": [
+          "matching"
+        ]
+      }
+    },
     "/api/me": {
       "get": {
         "description": "The signed-in member's own profile and settings.",
@@ -1536,6 +4191,58 @@
         "summary": "Update my profile",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/me/applications": {
+      "get": {
+        "description": "Students: my applications with their status, newest first.",
+        "operationId": "apps_jobs_api_my_applications",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ApplicationOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My applications",
+        "tags": [
+          "jobs"
         ]
       }
     },
@@ -1954,6 +4661,162 @@
         "summary": "A member's profile",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "description": "Newest first. Add unread=true for unread only. Payloads hold ids only; look details up with the other endpoints.",
+        "operationId": "apps_notifications_api_list_notifications",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "unread",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Unread",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_NotificationOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My notifications",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/notifications/read-all": {
+      "post": {
+        "description": "Marks all my notifications read. Returns how many changed.",
+        "operationId": "apps_notifications_api_read_all",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Mark all read",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/notifications/unread-count": {
+      "get": {
+        "description": "How many notifications I have not read.",
+        "operationId": "apps_notifications_api_unread_count",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Unread count",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/notifications/{notification_id}/read": {
+      "post": {
+        "description": "Marks one of my notifications read. Safe to repeat. Anyone else's id is a 404.",
+        "operationId": "apps_notifications_api_read_one",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notification_id",
+            "required": true,
+            "schema": {
+              "title": "Notification Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Mark one read",
+        "tags": [
+          "notifications"
         ]
       }
     },

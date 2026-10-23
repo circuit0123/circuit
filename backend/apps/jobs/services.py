@@ -1,0 +1,265 @@
+"""Jobs and applications (F11). Skill match decides ranking: the applicant's college is never used."""
+
+from typing import cast
+
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
+from django.db import transaction
+from django.db.models import Q, QuerySet
+
+from apps.accounts.models import Member, Role
+from apps.events.services import record
+from apps.jobs.models import Application, Job, JobCapability
+from apps.matching.models import Capability, MemberSkill
+from apps.matching.scoring import skill_match
+from apps.notifications.services import notify, notify_many
+from apps.startups.models import Startup
+from apps.startups.services import default_centre, get_startup, is_team, team_member_ids
+from core.errors import ApiError, Conflict, Forbidden, NotFound
+from core.ratelimit import check_rate
+
+MAX_JOB_CAPABILITIES = 8
+MAX_LISTED_JOBS = 500  # students get a skill-ranked list, so we rank at most this many in memory
+STATUS_FLOW = {
+    Application.Status.APPLIED: {Application.Status.SHORTLISTED, Application.Status.REJECTED},
+    Application.Status.SHORTLISTED: {Application.Status.HIRED, Application.Status.REJECTED},
+}
+STUDENT_CAN_WITHDRAW = {Application.Status.APPLIED, Application.Status.SHORTLISTED}
+
+
+# -- helpers ----------------------------------------------------------------------------------
+def student_skills(member: Member) -> dict[int, int]:
+    return {s.capability_id: s.level for s in MemberSkill.objects.filter(member=member)}
+
+
+def job_match(skills: dict[int, int], job: Job) -> float:
+    caps = list(job.capabilities.all())  # prefetched by callers that list many jobs
+    required = {c.capability_id for c in caps if c.required}
+    optional = {c.capability_id for c in caps if not c.required}
+    return skill_match(skills, required, optional)
+
+
+def get_job_for_team(member: Member, job_id: int) -> Job:
+    """A job the member's team owns. Unknown id is a 404; a real job of someone else's startup is a 403."""
+    job = Job.objects.select_related("startup").filter(pk=job_id).first()
+    if job is None:
+        raise NotFound()
+    if not is_team(member, job.startup):
+        raise Forbidden("Only the startup's team can do this")
+    return job
+
+
+def get_visible_job(member: Member, job_id: int) -> Job:
+    """Open jobs are public to signed-in members; a closed job is visible to its team only."""
+    job = Job.objects.select_related("startup").prefetch_related("capabilities__capability").filter(pk=job_id).first()
+    if job is None or (not job.is_open and not is_team(member, job.startup)):
+        raise NotFound()
+    return job
+
+
+def _set_capabilities(job: Job, items: list[dict]) -> None:
+    seen: dict[str, bool] = {}
+    for it in items:
+        seen.setdefault(it["capability"], it["required"])
+    if not seen or len(seen) > MAX_JOB_CAPABILITIES:
+        raise ApiError(422, "validation_error", f"A job needs 1 to {MAX_JOB_CAPABILITIES} capabilities")
+    caps = {c.slug: c for c in Capability.objects.filter(slug__in=seen)}
+    unknown = sorted(set(seen) - set(caps))
+    if unknown:
+        raise ApiError(422, "unknown_capability", "Unknown capability", {"slugs": unknown})
+    JobCapability.objects.filter(job=job).delete()
+    JobCapability.objects.bulk_create(JobCapability(job=job, capability=caps[s], required=req) for s, req in seen.items())
+
+
+def _check_stipend(lo, hi) -> None:
+    if lo is not None and hi is not None and lo > hi:
+        raise ApiError(422, "validation_error", "stipend_min cannot be above stipend_max")
+
+
+# -- listing ---------------------------------------------------------------------------------
+def list_jobs(member: Member, f: dict) -> list[dict]:
+    """Open jobs, filtered. Students get a match score and the best match first; everyone else gets newest first."""
+    qs: QuerySet[Job] = Job.objects.filter(is_open=True).select_related("startup").prefetch_related("capabilities__capability")
+    if f.get("kind"):
+        qs = qs.filter(kind=f["kind"])
+    if f.get("startup_id"):
+        qs = qs.filter(startup_id=f["startup_id"])
+    if f.get("capability"):
+        qs = qs.filter(capabilities__capability__slug=f["capability"])
+    if f.get("min_stipend") is not None:
+        qs = qs.filter(Q(stipend_max__gte=f["min_stipend"]) | Q(stipend_max__isnull=True, stipend_min__gte=f["min_stipend"]))
+    lat, lng = default_centre(member)
+    centre = Point(lng, lat, srid=4326)
+    qs = qs.annotate(dist=Distance("startup__location", centre))
+    if f.get("max_distance_km") is not None:
+        from django.contrib.gis.measure import D
+
+        qs = qs.filter(startup__location__isnull=False, dist__lte=D(km=f["max_distance_km"]))
+    jobs = list(qs.order_by("-created_at", "-id").distinct()[:MAX_LISTED_JOBS])
+    skills = student_skills(member) if member.role == Role.STUDENT else None
+    applied = (
+        set(Application.objects.filter(student=member, job__in=jobs).exclude(status="withdrawn").values_list("job_id", flat=True))
+        if skills is not None
+        else set()
+    )
+    rows = [_job_row(j, skills, applied) for j in jobs]
+    if skills is not None:
+        rows.sort(key=lambda r: -r["skill_match"])  # stable: ties keep newest first
+    return rows
+
+
+def _job_row(job: Job, skills: dict[int, int] | None, applied: set[int] | None = None) -> dict:
+    dist = getattr(job, "dist", None)
+    loc = cast(Point | None, job.startup.location)
+    return {
+        "id": job.pk, "title": job.title, "kind": job.kind, "description": job.description, "stipend_min": job.stipend_min,
+        "stipend_max": job.stipend_max, "location": job.location, "is_open": job.is_open, "created_at": job.created_at,
+        "startup_id": job.startup_id, "startup_name": job.startup.name, "sector": job.startup.sector,
+        "lat": loc.y if loc else None, "lng": loc.x if loc else None,
+        "distance_km": round(dist.km, 2) if dist is not None else None,
+        "capabilities": [{"slug": c.capability.slug, "name": c.capability.name, "required": c.required} for c in job.capabilities.all()],
+        "skill_match": job_match(skills, job) if skills is not None else None,
+        "applied": (job.pk in applied) if applied is not None and skills is not None else None,
+    }  # fmt: skip
+
+
+def job_detail(member: Member, job: Job) -> dict:
+    skills = student_skills(member) if member.role == Role.STUDENT else None
+    applied = None
+    if skills is not None:
+        applied = set(
+            Application.objects.filter(student=member, job=job).exclude(status="withdrawn").values_list("job_id", flat=True)
+        )
+    row = _job_row(job, skills, applied)
+    if skills is not None:
+        row["capabilities"] = [
+            {**c, "your_level": skills.get(cap.capability_id)} for c, cap in zip(row["capabilities"], job.capabilities.all())
+        ]
+    return row
+
+
+# -- posting -------------------------------------------------------------------------------------
+@transaction.atomic
+def create_job(member: Member, startup_id: int, data: dict, capabilities: list[dict]) -> Job:
+    startup = get_startup(startup_id)
+    if not is_team(member, startup):
+        raise Forbidden("Only the startup's team can post jobs")
+    _check_stipend(data.get("stipend_min"), data.get("stipend_max"))
+    job = Job.objects.create(startup=startup, posted_by=member, **data)
+    _set_capabilities(job, capabilities)
+    if not startup.hiring:
+        Startup.objects.filter(pk=startup.pk).update(hiring=True)  # an open role means the startup is hiring
+    record("job.created", actor=member, target_type="job", target_id=job.pk, startup_id=startup.pk)
+    return job
+
+
+@transaction.atomic
+def update_job(member: Member, job_id: int, changes: dict, capabilities: list[dict] | None) -> Job:
+    job = get_job_for_team(member, job_id)
+    merged = {"stipend_min": job.stipend_min, "stipend_max": job.stipend_max, **changes}
+    _check_stipend(merged["stipend_min"], merged["stipend_max"])
+    for field, value in changes.items():
+        setattr(job, field, value)
+    job.save()
+    if capabilities is not None:
+        _set_capabilities(job, capabilities)
+        _refresh_scores(job)
+    if not Job.objects.filter(startup=job.startup, is_open=True).exists():
+        Startup.objects.filter(pk=job.startup_id).update(hiring=False)
+    elif job.is_open:
+        Startup.objects.filter(pk=job.startup_id).update(hiring=True)
+    record(
+        "job.updated",
+        actor=member,
+        target_type="job",
+        target_id=job.pk,
+        fields=sorted(changes) + (["capabilities"] if capabilities is not None else []),
+    )
+    return job
+
+
+def _refresh_scores(job: Job) -> None:
+    """When the requirements change, applications are re-scored against the new ones."""
+    job = Job.objects.prefetch_related("capabilities").get(pk=job.pk)
+    for app in Application.objects.filter(job=job).select_related("student"):
+        app.skill_match = job_match(student_skills(app.student), job)
+        app.save(update_fields=["skill_match", "updated_at"])
+
+
+# -- applying ------------------------------------------------------------------------------------
+def apply(member: Member, job_id: int) -> tuple[Application, bool]:
+    """Apply to an open job. Repeating returns the same application (second item False); a withdrawn one is reopened."""
+    job = Job.objects.select_related("startup").prefetch_related("capabilities").filter(pk=job_id).first()
+    if job is None:
+        raise NotFound()
+    existing = Application.objects.filter(job=job, student=member).first()
+    if existing is not None and existing.status != Application.Status.WITHDRAWN:
+        return existing, False
+    if not job.is_open:
+        raise Conflict("This job is closed", code="job_closed")
+    check_rate(member.pk, "application")  # only real new applications count against the limit
+    score = job_match(student_skills(member), job)
+    with transaction.atomic():
+        if existing is None:
+            app = Application.objects.create(job=job, student=member, skill_match=score)
+        else:
+            app = existing
+            app.status, app.skill_match = Application.Status.APPLIED, score
+            app.save(update_fields=["status", "skill_match", "updated_at"])
+        record(
+            "application.created",
+            actor=member,
+            target_type="application",
+            target_id=app.pk,
+            job_id=job.pk,
+            reapplied=existing is not None,
+        )
+        notify_many(
+            team_member_ids(job.startup), "application.received", application_id=app.pk, job_id=job.pk, startup_id=job.startup_id
+        )
+    return app, True
+
+
+def withdraw(member: Member, application_id: int) -> Application:
+    app = Application.objects.filter(pk=application_id, student=member).first()
+    if app is None:
+        raise NotFound()
+    if app.status == Application.Status.WITHDRAWN:
+        return app  # safe to repeat
+    if app.status not in STUDENT_CAN_WITHDRAW:
+        raise Conflict("This application is already decided", code="application_decided")
+    app.status = Application.Status.WITHDRAWN
+    app.save(update_fields=["status", "updated_at"])
+    record("application.withdrawn", actor=member, target_type="application", target_id=app.pk, job_id=app.job_id)
+    return app
+
+
+def my_applications(member: Member) -> QuerySet[Application]:
+    return Application.objects.filter(student=member).select_related("job__startup").order_by("-created_at", "-id")
+
+
+def applicants(member: Member, job_id: int) -> tuple[Job, QuerySet[Application]]:
+    """Applicants for one of the team's jobs, best skill match first (ties: earliest). Withdrawn ones are left out."""
+    job = get_job_for_team(member, job_id)
+    qs = (
+        Application.objects.filter(job=job)
+        .exclude(status=Application.Status.WITHDRAWN)
+        .select_related("student")
+        .order_by("-skill_match", "created_at", "id")
+    )
+    return job, qs
+
+
+def set_status(member: Member, application_id: int, new_status: str) -> Application:
+    """Founders move applications along. An application on someone else's job is a plain 404 (ids are private)."""
+    app = Application.objects.select_related("job__startup").filter(pk=application_id).first()
+    if app is None or not is_team(member, app.job.startup):
+        raise NotFound()
+    if new_status not in STATUS_FLOW.get(Application.Status(app.status), set()):
+        raise Conflict(f"An application that is {app.status} cannot become {new_status}", code="invalid_transition")
+    old = app.status
+    app.status = new_status
+    app.save(update_fields=["status", "updated_at"])
+    record("application.status_changed", actor=member, target_type="application", target_id=app.pk, old=old, new=new_status)
+    notify(app.student_id, "application.status", application_id=app.pk, job_id=app.job_id, status=new_status)
+    return app
