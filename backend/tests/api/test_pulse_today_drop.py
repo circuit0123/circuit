@@ -191,7 +191,7 @@ def matched(make_member):
     me = make_member("student", display_name="Me")
     others = [make_member("founder", display_name=f"Candidate {i}") for i in range(5)]
     for i, o in enumerate(others):
-        MatchResult.objects.create(member=me, candidate=o, score=0.9 - i / 10, reason=f"reason {i}", is_bridge=i == 1)
+        MatchResult.objects.create(member=me, candidate=o, score=0.94 - i * 0.08, reason=f"reason {i}", is_bridge=i == 1)
     return me, others
 
 
@@ -256,3 +256,54 @@ def test_the_command_runs(matched, capsys):
 
     call_command("build_daily_drops")
     assert "1 drops built" in capsys.readouterr().out
+
+
+# -- Daily Drop: reason first, strength in words ------------------------------------------------------------
+def test_drop_never_includes_a_match_below_good_and_labels_the_rest(make_member):
+    from apps.matching.models import MatchResult
+
+    me = make_member("student", display_name="Me")
+    scores = {"strong": 0.8, "good": 0.6, "weak": 0.54}
+    people = {k: make_member("founder", display_name=k) for k in scores}
+    for k, o in people.items():
+        MatchResult.objects.create(member=me, candidate=o, score=scores[k], reason=k, is_bridge=False)
+    build_all()
+    got = {c["member_id"]: c["strength"] for c in DailyDrop.objects.get(member=me).candidates}
+    assert got == {people["strong"].pk: "strong", people["good"].pk: "good"}
+
+
+def test_drop_cards_say_what_they_offer_who_connects_us_and_show_their_work(make_member, make_post, connect, client_for, lists):
+    from apps.matching.models import Capability, MatchResult, Need, Offer
+    from apps.social.models import MediaUpload, PostMedia
+
+    me = make_member("student", display_name="Me")
+    broker = make_member("mentor", display_name="Meera")
+    sakthi = make_member("investor", display_name="Sakthi")
+    connect(me, broker)
+    connect(broker, sakthi)
+    mentoring, seo = Capability.objects.get(slug="mentoring"), Capability.objects.get(slug="seo")
+    Need.objects.create(member=me, capability=mentoring)
+    Offer.objects.create(member=sakthi, capability=mentoring)
+    Offer.objects.create(member=sakthi, capability=seo)  # I do not need this one
+    MatchResult.objects.create(
+        member=me, candidate=sakthi, score=0.7, reason="They offer mentoring, which you need.", is_bridge=False
+    )
+    post = make_post(sakthi, body="Our board")
+    up = MediaUpload.objects.create(owner=sakthi, purpose="post", path="post/1/x", status="ready", width=10, height=10)
+    PostMedia.objects.create(post=post, upload=up, alt_text="A board with three columns", order=0)
+    build_all()
+    [card] = client_for(me).get("/api/drop/today").json()["cards"]
+    assert card["strength"] == "good" and card["help_with"] == "Mentoring" and card["offers_you_need"] == ["Mentoring"]
+    assert card["via"]["id"] == broker.pk
+    assert card["image"]["alt"] == "A board with three columns"
+    assert "score" not in card and "score_percent" not in card
+
+
+def test_matches_show_strength_in_words_and_no_number(make_member):
+    from apps.matching.models import MatchResult
+
+    me, other = make_member("student", display_name="Me"), make_member("founder", display_name="Other")
+    MatchResult.objects.create(member=me, candidate=other, score=0.42, reason="r", is_bridge=False)
+    from apps.matching.services import strength_for
+
+    assert [strength_for(x) for x in (0.8, 0.75, 0.6, 0.55, 0.54, 0.1)] == ["strong", "strong", "good", "good", None, None]

@@ -135,3 +135,15 @@ class StoryView(models.Model):
             ),
         ]
         indexes = [models.Index(fields=["author"]), models.Index(fields=["startup"])]
+
+
+class UpdateView(models.Model):
+    """The viewer opened this Live wire update (F16). `key` names the update, such as "post:12" or "job:7"."""
+
+    viewer = models.ForeignKey("accounts.Member", on_delete=models.CASCADE, related_name="update_views")
+    key = models.CharField(max_length=64)
+    date = models.DateField()
+    viewed_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["viewer", "key"], name="updateview_viewer_key")]

@@ -7,7 +7,7 @@ from pydantic import Field, field_validator
 
 from apps.accounts.models import ConnectionRequest
 from apps.jobs.api import JobOut
-from apps.social import connections, drop, media, pulse, services, today
+from apps.social import connections, drop, livewire, media, pulse, services, today
 from apps.social.models import Post
 from apps.social.schemas import AuthorOut, author
 from core.auth import current_member
@@ -340,10 +340,71 @@ def today_seen(request, body: ViewedIn):
     return Status(204, None)
 
 
+class WireImageOut(Schema):
+    w480: str
+    w1440: str
+    alt: str
+
+
+class WireStartupOut(Schema):
+    id: int
+    name: str
+
+
+class WireActionOut(Schema):
+    kind: Literal["intro", "view_role", "reply"]  # intro: ask for an intro; view_role: open the job; reply: message them
+    target_id: int  # the member to ask or message, or the job
+
+
+class WireItemOut(Schema):
+    key: str
+    kind: Literal["shipped", "hiring", "needs", "joined", "circuit_closed"]
+    actor: AuthorOut | None  # null for a startup's new role
+    startup: WireStartupOut | None
+    image: WireImageOut | None
+    headline: str  # what happened
+    reason: str  # why it matters to me, e.g. "You both work with Kotlin · 3 km away"
+    action: WireActionOut
+    created_at: datetime
+    seen: bool
+
+
+@router.get(
+    "/livewire",
+    response=list[WireItemOut],
+    summary="Live wire",
+    description="Up to 12 updates from the last 24 hours (shipped, hiring, needs, joined, closed a circuit), most relevant "
+    "to me first, unseen before seen. Each has one line of what happened, why it matters to me, and one action. "
+    "No view or reaction counts.",
+)
+def get_livewire(request):
+    return livewire.live_wire(current_member(request))
+
+
+class WireSeenIn(Schema):
+    key: str
+
+
+@router.post(
+    "/livewire/seen",
+    response={204: None},
+    summary="Mark an update as viewed",
+    description="Call when an update is opened. A key that is not on my wire is a 404.",
+)
+def livewire_seen(request, body: WireSeenIn):
+    livewire.mark_viewed(current_member(request), body.key)
+    return Status(204, None)
+
+
 class DropCardOut(Schema):
     member: AuthorOut
     reason: str
     is_bridge: bool
+    strength: Literal["strong", "good"] | None  # match strength in words; the API never returns a raw score
+    help_with: str | None  # the capability they offer that I need, first
+    offers_you_need: list[str]  # up to 3
+    via: AuthorOut | None  # the mutual connection who knows them, if there is one
+    image: WireImageOut | None  # their newest build log image I may see
     outcome: Literal["intro", "skip"] | None
 
 
@@ -358,7 +419,8 @@ class DropOut(Schema):
     "/drop/today",
     response=DropOut,
     summary="Today's Daily Drop",
-    description="Up to 3 people, ready at 08:00 IST. Empty until the daily job has run. Members under 18 get no drop.",
+    description="Up to 3 people, ready at 08:00 IST, each a Strong or Good match (anything weaker is never dropped). Empty until "
+    "the daily job has run. Members under 18 get no drop.",
 )
 def get_drop(request):
     return drop.today_drop(current_member(request))

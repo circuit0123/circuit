@@ -1,3 +1,5 @@
+from typing import Literal
+
 from ninja import Query, Router, Schema
 
 from apps.matching import services
@@ -14,7 +16,7 @@ class MatchOut(Schema):
     verification_level: int
     city: str
     sector: str | None
-    score_percent: int  # 0 to 100
+    strength: Literal["strong", "good"] | None  # in words; null when the fit is below "good" (no number is shown)
     reason: str  # one plain sentence, no personal details
     is_bridge: bool  # connects two different sectors
 

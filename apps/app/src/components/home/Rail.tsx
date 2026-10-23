@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, MatchStrength, Skeleton, strengthLabel } from "@circuit/ui";
+import { Avatar, MatchStrength, Skeleton } from "@circuit/ui";
 import { useMorePeople } from "@/hooks/home";
 import { DropSection } from "./DropSection";
 
@@ -21,7 +21,7 @@ export function Rail() {
                 <p className="t-body truncate font-semibold">{m.display_name}</p>
                 <p className="t-caption truncate text-text-muted">{m.city}</p>
               </div>
-              <MatchStrength strength={strengthLabel(m.score_percent / 100)} />
+              <MatchStrength strength={m.strength} />
             </li>
           ))}
         </ul>

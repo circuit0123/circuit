@@ -60,8 +60,8 @@ How to use this file:
 - [x] Pulse endpoint: chronological last 7 days, visibility rules, mixes build logs + nearby matching roles + system activity, cursor pagination, "caught up" marker
 - [x] Daily Drop: `manage.py build_daily_drops` (08:00 IST job) using match_results; 3 per member; swipe outcomes logged as events
 - [x] Today strip endpoint (authors with posts or roles in the last 24h among connections, follows, organisation) (to be replaced by the Live wire endpoint below)
-- [ ] Live wire endpoint: up to 12 updates from the last 24h (shipped, hiring, needs, joined, closed a circuit), ranked by relevance to the viewer, each with image, verb, one-line reason and one action
-- [ ] Daily Drop returns match strength as a label (Strong ≥ 0.75, Good ≥ 0.55) and excludes candidates below 0.55; API never exposes raw low scores
+- [x] Live wire endpoint: up to 12 updates from the last 24h (shipped, hiring, needs, joined, closed a circuit), ranked by relevance to the viewer, each with image, verb, one-line reason and one action
+- [x] Daily Drop returns match strength as a label (Strong ≥ 0.75, Good ≥ 0.55) and excludes candidates below 0.55; API never exposes raw low scores
 - [x] messaging app: conversations (request | active | blocked), messages, Realtime channel per conversation with RLS; under-18 rules enforced server-side
 - [x] Reports on posts, replies, messages and profiles; hide/remove from Django admin; audit-logged
 - [x] Rate limits on posting, replies, messages and connection requests

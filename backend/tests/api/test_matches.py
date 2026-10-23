@@ -50,7 +50,9 @@ def test_a_need_meets_an_offer_with_a_reason(pair, client_for):
     assert stats["members"] == 2 and stats["matches"] == 2
     assert MatchResult.objects.get(member=giver).reason.startswith("You offer")
     row = client_for(seeker).get("/api/matches").json()["items"][0]
-    assert row["candidate_id"] == giver.pk and row["reason"].startswith("They offer") and 0 < row["score_percent"] <= 100
+    assert (
+        row["candidate_id"] == giver.pk and row["reason"].startswith("They offer") and row["strength"] in ("strong", "good", None)
+    )
     assert Event.objects.filter(type="matches.computed").count() == 1
 
 
@@ -273,6 +275,6 @@ def test_my_matches_are_mine_only_and_paginated(lists, make_member, client_for):
     assert page["count"] == 3 and len(page["items"]) == 2 and page["next_offset"] == 2
     assert client_for(other).get("/api/matches").json()["items"] == []
     assert set(page["items"][0]) == {
-        "candidate_id", "display_name", "role", "verification_level", "city", "sector", "score_percent", "reason", "is_bridge",
+        "candidate_id", "display_name", "role", "verification_level", "city", "sector", "strength", "reason", "is_bridge",
     }  # fmt: skip
     assert client_for(seeker).get("/api/matches?limit=0").status_code == 422
