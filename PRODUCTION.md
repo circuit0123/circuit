@@ -100,7 +100,6 @@ Switching to the real domain (config only, ~1 hour plus DNS wait):
 - RLS on every table (deny by default); service role key only in the backend.
 - Django admin: staff only, TOTP 2FA required, non-obvious path, disabled in demo,
   all actions audit-logged. Django's security settings on (SECURE_*, HSTS, secure cookies).
-- Rate limits (Redis): onboarding extraction, intros, applications, reports, claims.
 - Rate limits: `core.ratelimit.check_rate(member_id, action)` with limits in `settings.RATE_LIMITS`
   (extraction, intro, application, report, claim, org_join). Redis first; Postgres fallback if Redis is down.
 - CORS: exact origins only. Headers: CSP, HSTS, nosniff, Referrer-Policy, frame-ancestors.

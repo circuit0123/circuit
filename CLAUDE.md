@@ -46,13 +46,27 @@ F13 Admin: Django admin for super admins (verify members, moderate reports, revi
     crawled startups, takedowns, run circuit round, metrics), every action audit-logged.
 F14 Landing site: separate public marketing site (own domain) explaining Circuit for
     students, founders and partners, linking into the app. Never calls private APIs.
+F15 Build logs + Pulse: members post up to 4 images + 500 chars + up to 3 capability
+    tags + optional link, visibility Everyone / Connections / My organisation. Pulse
+    feed (chronological, last 7 days, ends with "You're caught up") mixes build logs,
+    nearby matching roles and system activity. Reactions Helpful / Intro me / Let's
+    talk (no public counts); one-level replies. Every post reportable; moderated in
+    Django admin.
+F16 Daily Drop + Today strip: 3 matches per day at 08:00 local time as a swipeable
+    stack; Today strip of connections/followed startups/org who posted in 24h.
+F17 Connections, follows and Inbox: connect (with note) to people, follow startups;
+    1-to-1 messages via Supabase Realtime; Requests folder for non-connections;
+    under-18 students receive no Requests from strangers.
+DESIGN.md defines every screen, component, motion and healthy-habit rule for these.
 
 ## Repo layout (one monorepo)
 ```
 backend/                 Django project (Python, uv)
   circuit/               settings (per ENV), urls, asgi/wsgi
   apps/                  accounts, organisations, startups, jobs, matching, intros,
-                         circuits, dashboard, notifications, moderation, events
+                         circuits, dashboard, notifications, moderation, events,
+                         social (posts, reactions, replies, follows, daily drop),
+                         messaging
   core/                  auth (Supabase JWT), permissions, cache/, graph/, embeddings/,
                          llm/, logging, errors, pagination
   tests/                 unit, api, demo (story tests), eval (matching pairs)
@@ -92,8 +106,10 @@ Frontend
 Approved supporting libraries (no need to ask):
 - Backend: google-genai (Gemini), groq, anthropic (one active via LLM_PROVIDER),
   PyJWT[crypto] (JWKS), django-otp (admin 2FA), redis, fakeredis (tests),
-  httpx, sentry-sdk, resend, django-environ or pydantic-settings (pick one), ruff, mypy
-- Frontend: @supabase/supabase-js, @tanstack/react-query, openapi-typescript,
+  httpx, sentry-sdk, resend, django-environ or pydantic-settings (pick one), ruff, mypy,
+  pillow (image checks and resize variants)
+- Frontend: @supabase/supabase-js, @tanstack/react-query, @tanstack/react-virtual,
+  openapi-typescript, motion (animations), lucide-react (icons), geist (font),
   maplibre-gl, recharts, serwist (PWA, Stage 10), @playwright/test, @axe-core/playwright,
   @sentry/nextjs, eslint, prettier
 
@@ -151,6 +167,14 @@ behind core/graph. Neo4j is NOT in scope (trigger in BACKLOG.md).
 - connections; intro_requests; match_results (score, components json, reason, is_bridge)
 - circuits; circuit_legs (giver, receiver, capability, consent, fulfilled, rating)
 - notifications; reports; blocks; audit_log; consents (policy_version, accepted_at)
+- posts (author, body, link, visibility, capability tags, status: visible | hidden |
+  removed), post_media (storage path, width, height, alt_text, order),
+  reactions (post, member, kind; unique per member+post+kind), replies (post, author,
+  body, parent nullable one level)
+- follows (member → startup); connections (above) for people; daily_drops (member,
+  date, candidate list); story_views (viewer, author, date)
+- conversations (two members, status: request | active | blocked), messages
+  (conversation, sender, body, image, created_at, read_at)
 - events (append-only: actor, type, target_type, target_id, payload, created_at)
 GIST indexes on locations, HNSW on embeddings, indexes on every foreign key.
 
