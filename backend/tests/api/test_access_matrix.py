@@ -62,6 +62,12 @@ MATRIX = {
     ("POST", "/api/applications/{application_id}/withdraw"): by_role(403, student=404),
     ("PATCH", "/api/applications/{application_id}"): by_role(403, founder=404),
     ("GET", "/api/matches"): by_role(200),
+    # Stage 3, part 4: intros (admins have no intros; everyone else is checked against an id that does not exist)
+    ("GET", "/api/intros/path/{target_id}"): by_role(403, **{r: 404 for r in JOINABLE}),
+    ("POST", "/api/intros"): by_role(403, **{r: 404 for r in JOINABLE}),
+    ("GET", "/api/intros"): by_role(403, **{r: 200 for r in JOINABLE}),
+    ("POST", "/api/intros/{intro_id}/respond"): by_role(403, **{r: 404 for r in JOINABLE}),
+    ("POST", "/api/intros/{intro_id}/rating"): by_role(403, **{r: 404 for r in JOINABLE}),
     ("GET", "/api/notifications"): by_role(200),
     ("GET", "/api/notifications/unread-count"): by_role(200),
     ("POST", "/api/notifications/read-all"): by_role(200),
@@ -82,6 +88,9 @@ BODIES = {
     ("POST", "/api/startups/{startup_id}/claim"): '{"email": "me@acme.io"}',
     ("POST", "/api/startups/{startup_id}/claim/verify"): '{"code": "ABCDEFGH"}',
     ("POST", "/api/jobs"): '{"startup_id": 999999, "title": "Intern", "capabilities": [{"capability": "seo"}]}',
+    ("POST", "/api/intros"): '{"target_id": 999999}',
+    ("POST", "/api/intros/{intro_id}/respond"): '{"accept": true}',
+    ("POST", "/api/intros/{intro_id}/rating"): '{"rating": 3}',
     ("PATCH", "/api/jobs/{job_id}"): "{}",
     ("PATCH", "/api/applications/{application_id}"): '{"status": "shortlisted"}',
 }
@@ -91,7 +100,7 @@ QUERIES = {("GET", "/api/startups/map"): "?min_lng=80&min_lat=13&max_lng=80.5&ma
 def call(client, method, path):
     key = (method, path)
     url = path
-    for name in ("member_id", "startup_id", "job_id", "application_id", "notification_id"):
+    for name in ("member_id", "startup_id", "job_id", "application_id", "notification_id", "target_id", "intro_id"):
         url = url.replace("{" + name + "}", "999999")
     url += QUERIES.get(key, "")
     body = BODIES.get(key, '{"code": "X"}' if method == "POST" else None)

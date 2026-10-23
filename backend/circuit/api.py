@@ -2,6 +2,7 @@ from django.conf import settings
 from ninja import NinjaAPI
 
 from apps.accounts.api import router as accounts_router
+from apps.intros.api import router as intros_router
 from apps.jobs.api import router as jobs_router
 from apps.matching.api import router as matching_router
 from apps.notifications.api import router as notifications_router
@@ -29,3 +30,4 @@ api.add_router("/startups", startups_router, tags=["startups"])
 api.add_router("", jobs_router, tags=["jobs"])
 api.add_router("/notifications", notifications_router, tags=["notifications"])
 api.add_router("/matches", matching_router, tags=["matching"])
+api.add_router("/intros", intros_router, tags=["intros"])

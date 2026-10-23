@@ -1,6 +1,19 @@
 {
   "components": {
     "schemas": {
+      "AnswerIn": {
+        "properties": {
+          "accept": {
+            "title": "Accept",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accept"
+        ],
+        "title": "AnswerIn",
+        "type": "object"
+      },
       "ApplicantOut": {
         "properties": {
           "application_id": {
@@ -352,6 +365,140 @@
           "status"
         ],
         "title": "Health",
+        "type": "object"
+      },
+      "IntroIn": {
+        "properties": {
+          "message": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Message",
+            "type": "string"
+          },
+          "target_id": {
+            "title": "Target Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "target_id"
+        ],
+        "title": "IntroIn",
+        "type": "object"
+      },
+      "IntroOut": {
+        "properties": {
+          "can_respond": {
+            "title": "Can Respond",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "my_role": {
+            "enum": [
+              "requester",
+              "broker",
+              "target"
+            ],
+            "title": "My Role",
+            "type": "string"
+          },
+          "outcome_rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome Rating"
+          },
+          "requester": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "target": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "my_role",
+          "status",
+          "stage",
+          "can_respond",
+          "requester",
+          "target",
+          "via",
+          "message",
+          "outcome_rating",
+          "created_at",
+          "expires_at"
+        ],
+        "title": "IntroOut",
+        "type": "object"
+      },
+      "IntroParams": {
+        "properties": {
+          "box": {
+            "default": "sent",
+            "enum": [
+              "sent",
+              "received",
+              "brokered"
+            ],
+            "title": "Box",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "title": "IntroParams",
         "type": "object"
       },
       "JobCapabilityIn": {
@@ -1551,6 +1698,38 @@
         "title": "Page[ApplicationOut]",
         "type": "object"
       },
+      "Page_IntroOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IntroOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[IntroOut]",
+        "type": "object"
+      },
       "Page_JobOut_": {
         "properties": {
           "count": {
@@ -1677,6 +1856,57 @@
           "count"
         ],
         "title": "Page[OrgMemberOut]",
+        "type": "object"
+      },
+      "PathOut": {
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "target",
+          "via"
+        ],
+        "title": "PathOut",
+        "type": "object"
+      },
+      "PersonOut": {
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "verification_level": {
+            "title": "Verification Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "role",
+          "verification_level"
+        ],
+        "title": "PersonOut",
         "type": "object"
       },
       "Persona": {
@@ -1858,6 +2088,21 @@
           "traits"
         ],
         "title": "ProfileOut",
+        "type": "object"
+      },
+      "RatingIn": {
+        "properties": {
+          "rating": {
+            "maximum": 5,
+            "minimum": 1,
+            "title": "Rating",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rating"
+        ],
+        "title": "RatingIn",
         "type": "object"
       },
       "SkillIn": {
@@ -2491,6 +2736,253 @@
         "summary": "Dependency health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/intros": {
+      "get": {
+        "description": "box=sent (what I asked for), received (requests that reached me), brokered (where I am the mutual connection). Newest first. can_respond says whether it is my turn to answer.",
+        "operationId": "apps_intros_api_list_intros",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "box",
+            "required": false,
+            "schema": {
+              "default": "sent",
+              "enum": [
+                "sent",
+                "received",
+                "brokered"
+              ],
+              "title": "Box",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_IntroOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My introductions",
+        "tags": [
+          "intros"
+        ]
+      },
+      "post": {
+        "description": "Ask for an introduction to someone through my best mutual connection, who is asked first and then the person. 201 for a new request, 200 if one is already open (safe to repeat). At most 3 new requests a week; 409 if the person is not taking more introductions this week. Not available for under-18 accounts. Rate limited.",
+        "operationId": "apps_intros_api_request_intro",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntroIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroOut"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Ask for a warm intro",
+        "tags": [
+          "intros"
+        ]
+      }
+    },
+    "/api/intros/path/{target_id}": {
+      "get": {
+        "description": "Who would introduce me to this person: the best mutual connection within two hops. 404 if the person is hidden or I have no mutual connection.",
+        "operationId": "apps_intros_api_preview_path",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "target_id",
+            "required": true,
+            "schema": {
+              "title": "Target Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PathOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Preview a warm path",
+        "tags": [
+          "intros"
+        ]
+      }
+    },
+    "/api/intros/{intro_id}/rating": {
+      "post": {
+        "description": "The person who asked rates how it went, 1 to 5. Only after it was accepted. Safe to repeat.",
+        "operationId": "apps_intros_api_rate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intro_id",
+            "required": true,
+            "schema": {
+              "title": "Intro Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RatingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Rate an introduction",
+        "tags": [
+          "intros"
+        ]
+      }
+    },
+    "/api/intros/{intro_id}/respond": {
+      "post": {
+        "description": "The mutual connection answers first (accepting means vouching), then the person. Answering again is safe. Not my turn is a 409; a request I am not part of is a 404.",
+        "operationId": "apps_intros_api_respond",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intro_id",
+            "required": true,
+            "schema": {
+              "title": "Intro Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Accept or decline",
+        "tags": [
+          "intros"
         ]
       }
     },

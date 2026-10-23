@@ -20,6 +20,8 @@ EVENT_TYPES = frozenset(
         "startup.claimed",
         # jobs
         "job.created", "job.updated", "application.created", "application.withdrawn", "application.status_changed",
+        # intros
+        "intro.requested", "intro.broker_responded", "intro.responded", "intro.rated", "intro.expired",
         # matching
         "matches.computed",
         # notifications

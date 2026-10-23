@@ -168,6 +168,9 @@ MATCH_KNN = 30  # nearest-neighbour candidates fetched per need/offer
 MATCH_MAX_PER_SECTOR = 5  # diversity: at most this many matches from one sector in a member's list
 MATCH_MAX_APPEARANCES = 30  # capacity: one person is shown in at most this many members' lists
 MATCH_CACHE_TTL = 6 * 3600
+
+INTRO_WEEKLY_LIMIT = 3  # warm intros one member may send per rolling 7 days (a target's own cap is open_intro_slots)
+INTRO_EXPIRY_DAYS = 7
 STUDENT_MAX_DISTANCE_KM = 25
 
 from core.logging import configure_logging  # noqa: E402
