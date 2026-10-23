@@ -1,0 +1,348 @@
+{
+ "_about": "Hand-labelled preference pairs: for `member`, `better` should score higher than `worse`. Written by the engineers; replace and extend with real feedback from the pilot. links: 'a|b' -> [hops, strength].",
+ "profiles": {
+  "seeker_bio": {
+   "role": "founder",
+   "sector": "biotech",
+   "needs": {
+    "b2b-marketing": "Looking for help with b2b marketing"
+   },
+   "offers": {
+    "biotech-lab": "Can help with biotech lab"
+   },
+   "traits": [
+    "long-sales-cycle",
+    "technical-buyers",
+    "regulated-industry"
+   ],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "marketer_deeptech": {
+   "role": "founder",
+   "sector": "deeptech",
+   "needs": {
+    "fundraising": "Looking for help with fundraising"
+   },
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [
+    "long-sales-cycle",
+    "technical-buyers",
+    "deep-tech"
+   ],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "accountant": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "accounting": "Can help with accounting"
+   },
+   "traits": [
+    "long-sales-cycle",
+    "technical-buyers",
+    "regulated-industry"
+   ],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "marketer_two_way": {
+   "role": "founder",
+   "sector": "saas",
+   "needs": {
+    "biotech-lab": "Looking for help with biotech lab"
+   },
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "marketer_one_way": {
+   "role": "founder",
+   "sector": "saas",
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "marketer_friend": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "marketer_stranger": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "marketer_traits": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [
+    "long-sales-cycle",
+    "technical-buyers"
+   ],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "marketer_fresh": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 2
+  },
+  "marketer_stale": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 85
+  },
+  "marketer_roomy": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 3,
+   "active_days": 5
+  },
+  "marketer_busy": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 1,
+   "active_days": 5
+  },
+  "marketer_similar": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "brand-marketing": "Looking for help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "seeker_two": {
+   "role": "founder",
+   "sector": "d2c",
+   "needs": {
+    "b2b-marketing": "Looking for help with b2b marketing",
+    "fundraising": "Looking for help with fundraising"
+   },
+   "offers": {},
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "both_provider": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing",
+    "fundraising": "Can help with fundraising"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "one_provider": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "seeker_ops": {
+   "role": "founder",
+   "sector": "logistics",
+   "needs": {
+    "recruiting": "Looking for help with recruiting"
+   },
+   "offers": {
+    "fundraising": "Can help with fundraising"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "recruiter_two_way": {
+   "role": "founder",
+   "sector": "saas",
+   "needs": {
+    "fundraising": "Looking for help with fundraising"
+   },
+   "offers": {
+    "recruiting": "Can help with recruiting"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "recruiter_plain": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "recruiting": "Can help with recruiting"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  },
+  "marketer_fof": {
+   "role": "mentor",
+   "sector": null,
+   "needs": {},
+   "offers": {
+    "b2b-marketing": "Can help with b2b marketing"
+   },
+   "traits": [],
+   "open_slots": 2,
+   "active_days": 5
+  }
+ },
+ "links": {
+  "seeker_bio|marketer_friend": [
+   1,
+   0.9
+  ],
+  "seeker_bio|marketer_fof": [
+   2,
+   0.6
+  ]
+ },
+ "pairs": [
+  {
+   "member": "seeker_bio",
+   "better": "marketer_deeptech",
+   "worse": "accountant",
+   "why": "an offer that meets my need beats one that does not, even with shared traits"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_two_way",
+   "worse": "marketer_one_way",
+   "why": "two-way help beats one-way help"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_friend",
+   "worse": "marketer_stranger",
+   "why": "a direct connection beats a stranger"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_fof",
+   "worse": "marketer_stranger",
+   "why": "a mutual connection beats a stranger"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_traits",
+   "worse": "marketer_stranger",
+   "why": "shared traits beat none"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_fresh",
+   "worse": "marketer_stale",
+   "why": "a fresh offer beats a stale one"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_roomy",
+   "worse": "marketer_busy",
+   "why": "someone with free intro slots beats someone nearly full"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_stranger",
+   "worse": "marketer_similar",
+   "why": "the exact capability beats a similar-sounding one"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_similar",
+   "worse": "accountant",
+   "why": "a similar-sounding offer beats an unrelated one"
+  },
+  {
+   "member": "seeker_two",
+   "better": "both_provider",
+   "worse": "one_provider",
+   "why": "covering both needs beats covering one"
+  },
+  {
+   "member": "seeker_ops",
+   "better": "recruiter_two_way",
+   "worse": "recruiter_plain",
+   "why": "two-way help beats one-way help (recruiting for fundraising)"
+  },
+  {
+   "member": "seeker_ops",
+   "better": "recruiter_plain",
+   "worse": "marketer_stranger",
+   "why": "meeting my need beats an unrelated offer"
+  },
+  {
+   "member": "seeker_bio",
+   "better": "marketer_deeptech",
+   "worse": "marketer_one_way",
+   "why": "same fit, but shared traits make the deep-tech marketer better"
+  },
+  {
+   "member": "marketer_deeptech",
+   "better": "seeker_bio",
+   "worse": "accountant",
+   "why": "a person who needs what I offer beats an unrelated one"
+  }
+ ]
+}

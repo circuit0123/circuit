@@ -841,6 +841,96 @@
         "title": "JoinIn",
         "type": "object"
       },
+      "MatchOut": {
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "integer"
+          },
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "is_bridge": {
+            "title": "Is Bridge",
+            "type": "boolean"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "score_percent": {
+            "title": "Score Percent",
+            "type": "integer"
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sector"
+          },
+          "verification_level": {
+            "title": "Verification Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "display_name",
+          "role",
+          "verification_level",
+          "city",
+          "sector",
+          "score_percent",
+          "reason",
+          "is_bridge"
+        ],
+        "title": "MatchOut",
+        "type": "object"
+      },
+      "MatchParams": {
+        "properties": {
+          "bridge": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bridge"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "title": "MatchParams",
+        "type": "object"
+      },
       "MeOut": {
         "properties": {
           "bio": {
@@ -1491,6 +1581,38 @@
           "count"
         ],
         "title": "Page[JobOut]",
+        "type": "object"
+      },
+      "Page_MatchOut_": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatchOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "Page[MatchOut]",
         "type": "object"
       },
       "Page_NotificationOut_": {
@@ -2739,6 +2861,74 @@
         "summary": "Apply to a job",
         "tags": [
           "jobs"
+        ]
+      }
+    },
+    "/api/matches": {
+      "get": {
+        "description": "People who fit what I need and offer, best first, each with a one-line reason. Computed ahead of time, so this is a cheap read. bridge=true shows only Bridge matches (different sector), bridge=false only the rest. Partner admins and super admins have no matches.",
+        "operationId": "apps_matching_api_list_matches",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "bridge",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bridge"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_MatchOut_"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My matches",
+        "tags": [
+          "matching"
         ]
       }
     },

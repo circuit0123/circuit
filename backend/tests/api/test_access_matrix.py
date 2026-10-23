@@ -61,6 +61,7 @@ MATRIX = {
     ("GET", "/api/me/applications"): by_role(403, student=200),
     ("POST", "/api/applications/{application_id}/withdraw"): by_role(403, student=404),
     ("PATCH", "/api/applications/{application_id}"): by_role(403, founder=404),
+    ("GET", "/api/matches"): by_role(200),
     ("GET", "/api/notifications"): by_role(200),
     ("GET", "/api/notifications/unread-count"): by_role(200),
     ("POST", "/api/notifications/read-all"): by_role(200),

@@ -47,7 +47,7 @@ How to use this file:
 - [x] Geo: nearby + bbox endpoints; student skill-to-startup score; view/interest tracking (F2)
 - [x] Claim flow via company email domain (simulated in dev/demo) (F3)
 - [x] Jobs + applications endpoints (F11)
-- [ ] Matching: scoring, candidates, ranking, reasons, bridge flag; `compute_matches`; Redis cache; eval set + `eval_matching` (F4)
+- [x] Matching: scoring, candidates, ranking, reasons, bridge flag; `compute_matches`; Redis cache; eval set + `eval_matching` (F4)
 - [ ] Warm intros with capacity limits and outcome rating (F5)
 - [ ] Circuits: edges, cycles, CP-SAT, `run_circuit_round`, consent, expiry, mark done, rating (F6)
 - [ ] Verification levels (F7); partner dashboard endpoints with counts < 5 hidden (F8)

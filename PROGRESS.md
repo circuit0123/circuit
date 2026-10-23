@@ -6,10 +6,11 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 gets i
 - Stage 1 — Backend foundation: **done and merged**
 - Stage 2 — Auth and security: **done and merged** (make check green: ruff, mypy, 321 tests; finecomb audit done, findings fixed)
   - One box stays open on purpose: rate limits on extraction/intros/applications/reports/claims. The helper and limits exist and org join uses them; those endpoints arrive in Stage 3, and each adds one `check_rate(member.pk, "<action>")` line.
-- Stage 3 — Core features API: **in progress** (parts 1–2 done, make check green: ruff, mypy, 827 tests)
+- Stage 3 — Core features API: **in progress** (parts 1–3 done, make check green: ruff, mypy, 883 tests)
   - Part 1 (committed): members/profile, onboarding extraction, work-email verification, startups nearby/map/views/interest, claim flow.
   - Part 2: jobs and applications (F11), in-app notifications, strict list of event types (`EVENT_TYPES`; an unknown type raises).
-  - Still to do: matching + `compute_matches` + eval set (F4), warm intros (F5), circuits (F6), partner dashboard (F8), demo story tests 1–5, notifications for intros/circuits.
+  - Part 3: matching (F4). `manage.py compute_matches` (1.3 s for the 300-member seed), `GET /api/matches`, `manage.py eval_matching` with 14 hand-labelled pairs, demo story 1 test.
+  - Still to do: warm intros (F5), circuits (F6), partner dashboard (F8), demo story tests 1–5, notifications for intros/circuits.
 
 ## What exists (Stage 2)
 - `core/auth.py`: `SupabaseAuth` is the API-wide default (an endpoint is protected unless it says `auth=None`). Checks signature (ES256 pinned), expiry, audience, issuer, `role=authenticated`, no anonymous users. Keys come from Supabase's JWKS (cached, throttled, served stale only up to 6 h). First login creates a `student` Member.
@@ -66,6 +67,20 @@ Checked, nothing found: algorithm confusion (alg none, HS256 with the public key
 - `.env` got new dev defaults; `.env.example` documents all.
 
 ## Next
-Stage 3 part 3: matching (F4) with the eval set, then intros, circuits, dashboard and the demo story tests. `tests/demo/` and `tests/eval/` are still empty.
+Stage 3 part 4: warm intros (F5), circuits (F6), partner dashboard (F8), demo stories 2–5 and `make check` printing PASS/FAIL per story.
+
+## Matching: how it works and what to know (part 3)
+- **Pipeline:** `compute_matches` backfills missing embeddings, then for each member finds candidates (same capability in need/offer, plus pgvector nearest neighbours on the need/offer text), applies the hard filters, scores, ranks and replaces that member's `match_results` rows and Redis copy. The API only reads. At read time suspended, hidden and blocked people are filtered out again, so they vanish without waiting for the next run.
+- **Score:** `0.5*complementarity + 0.2*affinity + 0.15*trust_path + 0.1*timing - 0.05*load_penalty` (weights in settings). Complementarity counts both directions: two people who help each other score 1.0, one-way help at most 0.6. Trust path uses the existing `core.graph.neighbours` (weakest link). Reasons are one sentence with no names.
+- **A fit is shown to both sides.** If Priya needs SEO and Sam offers it, Priya sees Sam ("They offer seo, which you need") and Sam sees Priya ("You offer seo, which they need").
+- **A match needs a real need/offer fit** (complementarity at least 0.05). Same-city or shared-trait people with no fit are not shown; "A possible fit" would not help anyone. The local/bridge split is therefore only a label and a ranking rule.
+- **Hard filters:** self, blocks (either way), hidden profiles, candidates with 0 free intro slots, partner/super admins, and any pair involving a student who is farther than 25 km (or in another city when a location is missing). Under-18s match only people in their organisation or already connected.
+- **Ranking:** top 20, at most 5 per sector, about 25% Bridge when enough exist, and nobody appears in more than 30 lists.
+
+### Things for you to decide or know
+1. **Bridge share is about 3% on the seed, not 25%.** Bridge needs two known, different sectors, and only founders have one (taken from their startup). Mentors, investors and students have none, so they are never Bridge. Story 1 works. If you want mentors and students to count (for example by the sectors they say they know), that is a data-model decision; I did not change it.
+2. **The appearance cap depends on processing order** (members by id), so later members are more likely to miss a popular mentor. Fair enough for v1; a fairer split is a BACKLOG item.
+3. **The eval set was written by the engineers, not real users.** 14 pairs, 100% agreement on the fake embedder. It guards against regressions; it cannot tell us whether the weights are right. Replace and extend it with pilot feedback. There is no baseline for the real `fastembed` model yet (it needs a model download): run `manage.py eval_matching --update-baseline` once with `EMBEDDING_PROVIDER=fastembed`. `MATCH_MIN_SIMILARITY` (0.8) is a guess until then.
+4. **Heads-up on a slip I made and fixed:** I overwrote the existing `core/graph/__init__.py` with a new file, noticed when the old tests failed to import, restored it from git and used the existing `neighbours()` instead. Nothing was lost.
 
 Note: Stage 3 part 1 was committed on `backend-core`, the branch Stages 1–2 were merged from. Say if you want a fresh `stage-3` branch from here.
