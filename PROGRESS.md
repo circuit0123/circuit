@@ -6,7 +6,10 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 gets i
 - Stage 1 — Backend foundation: **done and merged**
 - Stage 2 — Auth and security: **done and merged** (make check green: ruff, mypy, 321 tests; finecomb audit done, findings fixed)
   - One box stays open on purpose: rate limits on extraction/intros/applications/reports/claims. The helper and limits exist and org join uses them; those endpoints arrive in Stage 3, and each adds one `check_rate(member.pk, "<action>")` line.
-- Stage 3 — Core features API: not started
+- Stage 3 — Core features API: **in progress** (parts 1–2 done, make check green: ruff, mypy, 827 tests)
+  - Part 1 (committed): members/profile, onboarding extraction, work-email verification, startups nearby/map/views/interest, claim flow.
+  - Part 2: jobs and applications (F11), in-app notifications, strict list of event types (`EVENT_TYPES`; an unknown type raises).
+  - Still to do: matching + `compute_matches` + eval set (F4), warm intros (F5), circuits (F6), partner dashboard (F8), demo story tests 1–5, notifications for intros/circuits.
 
 ## What exists (Stage 2)
 - `core/auth.py`: `SupabaseAuth` is the API-wide default (an endpoint is protected unless it says `auth=None`). Checks signature (ES256 pinned), expiry, audience, issuer, `role=authenticated`, no anonymous users. Keys come from Supabase's JWKS (cached, throttled, served stale only up to 6 h). First login creates a `student` Member.
@@ -63,4 +66,6 @@ Checked, nothing found: algorithm confusion (alg none, HS256 with the public key
 - `.env` got new dev defaults; `.env.example` documents all.
 
 ## Next
-Stage 3 (core features API), after your OK. Demo story tests (`tests/demo/`) and the eval set are still empty; they belong to Stage 3.
+Stage 3 part 3: matching (F4) with the eval set, then intros, circuits, dashboard and the demo story tests. `tests/demo/` and `tests/eval/` are still empty.
+
+Note: Stage 3 part 1 was committed on `backend-core`, the branch Stages 1–2 were merged from. Say if you want a fresh `stage-3` branch from here.

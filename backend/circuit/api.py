@@ -2,6 +2,8 @@ from django.conf import settings
 from ninja import NinjaAPI
 
 from apps.accounts.api import router as accounts_router
+from apps.jobs.api import router as jobs_router
+from apps.notifications.api import router as notifications_router
 from apps.organisations.api import router as organisations_router
 from apps.startups.api import router as startups_router
 from core.auth import SupabaseAuth
@@ -23,3 +25,5 @@ api.add_router("/demo", demo_router, tags=["demo"])
 api.add_router("", accounts_router, tags=["accounts"])
 api.add_router("/organisations", organisations_router, tags=["organisations"])
 api.add_router("/startups", startups_router, tags=["startups"])
+api.add_router("", jobs_router, tags=["jobs"])
+api.add_router("/notifications", notifications_router, tags=["notifications"])
