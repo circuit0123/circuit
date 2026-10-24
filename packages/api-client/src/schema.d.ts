@@ -1476,6 +1476,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/onboarding/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Onboarding progress
+         * @description Where this member is in sign-up, what they answered, and which screens to show, skip or reorder, in one call. Open while the beta gate is on.
+         */
+        get: operations["apps_accounts_onboarding_api_get_state"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Save an onboarding step
+         * @description Saves the current step and merges answers per step (each answer at most 2,000 characters). `signup_source` is kept from the first call that sends one; later values are ignored. `completed: true` marks onboarding finished. Unknown steps or fields are 422. Rate limited.
+         */
+        patch: operations["apps_accounts_onboarding_api_patch_state"];
+        trace?: never;
+    };
     "/api/organisations/join": {
         parameters: {
             query?: never;
@@ -3030,6 +3054,43 @@ export interface components {
             intros?: components["schemas"]["ChannelsPatch"] | null;
             messages?: components["schemas"]["ChannelsPatch"] | null;
             pulse_replies?: components["schemas"]["ChannelsPatch"] | null;
+        };
+        /** OnboardingOut */
+        OnboardingOut: {
+            /** Answers */
+            answers: {
+                [key: string]: unknown;
+            };
+            /**
+             * Branch
+             * @enum {string}
+             */
+            branch: "default" | "investor" | "partner";
+            /** Completed At */
+            completed_at: string | null;
+            /** Current Step */
+            current_step: string | null;
+            /** Signup Source */
+            signup_source: string;
+            /** Skip */
+            skip: string[];
+            /** Steps */
+            steps: string[];
+        };
+        /** OnboardingPatch */
+        OnboardingPatch: {
+            /** Answers */
+            answers?: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            } | null;
+            /** Completed */
+            completed?: boolean | null;
+            /** Current Step */
+            current_step?: ("invite" | "name" | "role" | "age" | "safety" | "where" | "work" | "offers" | "needs" | "organisation" | "photo" | "colour" | "ready" | "focus" | "stage" | "cheque" | "verify" | "org_kind" | "org" | "org_verify" | "goal") | null;
+            /** Signup Source */
+            signup_source?: string | null;
         };
         /** OpenJobOut */
         OpenJobOut: {
@@ -5755,6 +5816,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExtractOut"];
+                };
+            };
+        };
+    };
+    apps_accounts_onboarding_api_get_state: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingOut"];
+                };
+            };
+        };
+    };
+    apps_accounts_onboarding_api_patch_state: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OnboardingPatch"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingOut"];
                 };
             };
         };

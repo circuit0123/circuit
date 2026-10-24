@@ -247,8 +247,9 @@ Code for every feature can be merged and deployed; flags decide what members see
   (json: type -> {in_app, email}), allow_requests (strangers may send requests; always off for
   under-18s), deletion_requested_at, deleted_at ("Deleted member" tombstone that old posts,
   replies and messages point at),
-  onboarding (json: current_step, completed_at, saved answers), signup_source (src),
-  created_at, updated_at
+  onboarding (json: current_step, completed_at, saved answers), signup_source (src; first
+  touch wins), is_simulated (synthetic members from `simulate_network`, never matched with
+  real ones), created_at, updated_at
 - organisations: id, name, kind (college | incubator | accelerator | coworking |
   government_program | corporate_program), city, website, logo, about, email_domains,
   join_code, verified_at, created_by. A member belongs to at most one organisation. Super admins
@@ -279,7 +280,8 @@ Code for every feature can be merged and deployed; flags decide what members see
   per pick: requested | passed | ignored)
 - capabilities (40–80), traits (20–30); needs; offers (embedding vector(384))
 - member_traits, startup_traits, member_skills
-- connections; intro_requests; match_results (score, components json, reason, is_bridge)
+- connections; intro_requests; match_results (score, components json, reason, is_bridge, features json, position, arm,
+  model_version, model_score)
 - circuits; circuit_legs (giver, receiver, capability, consent, fulfilled, rating)
 - notifications; reports (target: post | reply | message | member | startup; action: hide |
   remove | warn | suspend | dismiss, handled_at); blocks; audit_log; consents (policy_version,
@@ -312,8 +314,12 @@ Code for every feature can be merged and deployed; flags decide what members see
   status, method, captured_at), refunds (payment, razorpay_refund_id, amount_paise,
   reason, created_by), webhook_events (provider, event_id unique, type, received_at,
   processed_at, result) — money is always integer paise, never floats
-- feature_snapshots, model_versions (version, trained_at, metrics json, status:
-  candidate | shadow | ab | active | retired, file path)
+- feature_snapshots (viewer, candidate, surface: matches | daily_drop | simulation,
+  model_version, arm, features json, position, rule_score, model_score, shown_at, shown_on;
+  one per viewer+candidate+surface+day), model_versions (version, trained_at, metrics json,
+  status: candidate | shadow | ab | active | retired, file_path, sha256, data_source: real |
+  simulated | mixed, real_rows, simulated_rows, trained_env, data_hash, beats_rule,
+  fairness_passed; one model per serving status)
 - feature_flags (name unique, audience: off | testers | everyone, note, updated_by,
   updated_at); every change audit-logged
 - events (append-only: actor, type, target_type, target_id, payload, created_at)
@@ -356,18 +362,22 @@ GIST indexes on locations, HNSW on embeddings, indexes on every foreign key.
   fallback) and ModelRanker (LightGBM LambdaRank learning-to-rank model).
 - Features are logged for every candidate shown (feature_snapshots: viewer, candidate,
   surface, model_version, features json, position, shown_at), so training data is the
-  exact input the model saw.
+  exact input the model saw. Never logged for under-18s.
 - Features: complementarity both directions, embedding similarity, shared capabilities
   and traits, distance, mutual connections and best path strength, candidate activity
   recency, capacity left, verification levels, role pair, is_bridge, candidate's past
   response rate. NEVER use college name/tier, gender, religion, caste, language or any
   proxy for them — matching on skills over pedigree is the product.
 - Labels (graded): 0 skipped/ignored, 1 intro requested, 2 intro accepted, 3 met and
-  rated helpful. Built by `manage.py build_training_set` from events.
+  rated helpful. Built by `manage.py build_training_set` from the feature snapshots and
+  the intro outcomes (events carry only the intro's id, so pair and outcome come from
+  intro_requests).
 - Bootstrapping before real data: `manage.py simulate_network` creates synthetic members
   with hidden preferences and simulated responses; plus the hand-labelled eval set.
   A model trained only on simulation is NEVER served to real users; it exists to test
-  the pipeline end to end.
+  the pipeline end to end. In production only a model trained there on real data alone may
+  be in shadow, A/B or active (apps/matching/ranker/guard.py, checked on promotion, on
+  save and again when compute_matches loads models).
 - `manage.py train_ranker` (Cloud Run Job, weekly): trains, evaluates offline (NDCG@10,
   acceptance-rate proxy, eval-set agreement, fairness check: score distributions by
   college tier and by bridge vs local must not diverge beyond a set threshold), writes

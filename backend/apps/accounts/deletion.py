@@ -32,7 +32,7 @@ from apps.circuits.services import nudge
 from apps.events.services import record
 from apps.intros.models import IntroRequest
 from apps.jobs.models import Application, Job
-from apps.matching.models import MatchResult, MemberSkill, MemberTrait, Need, Offer
+from apps.matching.models import FeatureSnapshot, MatchResult, MemberSkill, MemberTrait, Need, Offer
 from apps.moderation.models import Block
 from apps.notifications.models import Notification
 from apps.notifications.services import notify_many
@@ -126,6 +126,7 @@ def _erase_rows(member: Member) -> None:
     for model in (Need, Offer, MemberSkill, MemberTrait, Reaction, Follow, StartupInterest, Notification, DailyDrop, UpdateView):
         model.objects.filter(**{"viewer" if model is UpdateView else "member": member}).delete()
     MatchResult.objects.filter(Q(member=member) | Q(candidate=member)).delete()
+    FeatureSnapshot.objects.filter(Q(viewer=member) | Q(candidate=member)).delete()  # what the ranker saw about them
     Application.objects.filter(student=member).delete()
     Block.objects.filter(Q(blocker=member) | Q(blocked=member)).delete()
     WorkEmailVerification.objects.filter(member=member).delete()
@@ -143,6 +144,7 @@ def _erase_rows(member: Member) -> None:
     member.circuits_opt_in = member.visible_to_org = member.is_tester = member.allow_requests = False
     member.profile_visibility = Member.Visibility.HIDDEN if member.is_minor else Member.Visibility.MEMBERS
     member.appearance, member.notification_prefs, member.pulse_seen_at = {}, {}, None
+    member.onboarding = {}  # their answers are personal; signup_source stays, it is only a landing-page label
     member.deleted_at = timezone.now()
     member.save()
 

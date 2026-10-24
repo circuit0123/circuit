@@ -42,6 +42,8 @@ EVENT_TYPES = frozenset(
         "member.unblocked", "consent.accepted", "export.requested", "export.ready", "export.failed", "export.downloaded",
         "account.deletion_requested", "account.deleted", "support.requested", "email.unsubscribed", "report.actioned",
         "retention.cleaned",
+        # matching ML (Stage 4c)
+        "ranker.trained", "ranker.promoted", "ranker.retired", "onboarding.updated",
     }
 )  # fmt: skip
 
