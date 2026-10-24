@@ -129,9 +129,9 @@ export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
     );
   }
   return (
-    <div className={cx("-mx-4 overflow-x-auto px-4 no-scrollbar lg:mx-0 lg:px-0", className)}>
-      <ul ref={box} aria-label="Live wire" className="relative flex w-max min-w-full gap-4 py-3 pr-4">
-        <span className="pointer-events-none absolute inset-x-0 top-[34px] h-[1.5px] bg-separator" aria-hidden />
+    <div className={cx("fade-edge-x -mx-4 overflow-x-auto px-4 no-scrollbar lg:-mx-1 lg:px-1", className)}>
+      <ul ref={box} aria-label="Live wire" className="relative flex w-max min-w-full gap-4 pb-3 pt-1 pr-8">
+        <span className="pointer-events-none absolute inset-x-0 top-[26px] h-[1.5px] bg-separator" aria-hidden />
         {nodes.map((u, i) => (
           <li key={u.key} className="relative w-16 shrink-0">
             <button className="group block w-full text-left" onClick={() => onOpen(i)}>
@@ -143,7 +143,7 @@ export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
                 </span>
               </span>
               <span className={cx("t-footnote mt-2 block leading-tight", u.seen && "text-text-muted")} aria-hidden>{u.verb}</span>
-              <span className="t-caption block truncate text-text-muted" aria-hidden>{firstName(u.person.name)}</span>
+              <span className="t-footnote block truncate text-text-muted" aria-hidden>{firstName(u.person.name)}</span>
               <span className="sr-only">{spokenUpdate(u)}{u.seen ? "" : ", new"}</span>
             </button>
             {!u.seen && <span data-dot className="pointer-events-none absolute left-[19px] top-[19px] h-1.5 w-1.5 rounded-full bg-live opacity-0" aria-hidden />}

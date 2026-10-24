@@ -12,7 +12,7 @@ export function strengthLabel(score: number): Strength | null {
 export function MatchStrength({ strength, className }: { strength: Strength | null | undefined; className?: string }) {
   if (!strength) return null;
   return (
-    <span className={cx("inline-flex items-center rounded-full bg-surface-2 px-2 py-0.5 t-caption font-semibold", strength === "strong" ? "text-live" : "text-text", className)}>
+    <span className={cx("inline-flex items-center rounded-full bg-surface-2 px-2 py-0.5 t-footnote font-semibold text-text", className)}>
       {strength === "strong" ? "Strong match" : "Good match"}
     </span>
   );

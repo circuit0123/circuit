@@ -28,8 +28,6 @@ function useCollapse(ref: React.RefObject<HTMLElement | null>) {
 type BarProps = {
   /** Inline title; it appears as the large title collapses. */
   title?: string;
-  /** Show this in the centre all the time (the Circuit wordmark on Home). */
-  wordmark?: React.ReactNode;
   left?: React.ReactNode;
   right?: React.ReactNode;
   /** Hide on desktop, where the left rail and the large title do the job. */
@@ -38,7 +36,7 @@ type BarProps = {
 };
 
 /** Translucent top bar (DESIGN.md §5 Materials). 44px plus the top safe area. */
-export function ScreenBar({ title, wordmark, left, right, mobileOnly, className }: BarProps) {
+export function ScreenBar({ title, left, right, mobileOnly, className }: BarProps) {
   const ref = useRef<HTMLElement>(null);
   useCollapse(ref);
   return (
@@ -49,10 +47,10 @@ export function ScreenBar({ title, wordmark, left, right, mobileOnly, className 
     >
       <div className="flex justify-start">{left}</div>
       <div className="min-w-0 text-center">
-        {wordmark ?? (title && <span className="t-headline block truncate" style={{ opacity: "var(--collapse)" }}>{title}</span>)}
+        {title && <span className="t-headline block truncate" style={{ opacity: "var(--collapse)" }}>{title}</span>}
       </div>
       <div className="flex justify-end">{right}</div>
-      <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-separator" style={{ opacity: wordmark ? 1 : "var(--collapse)" }} />
+      <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-separator" style={{ opacity: "var(--collapse)" }} />
     </header>
   );
 }
@@ -66,13 +64,17 @@ export function BarButton({ label, children, ...rest }: { label: string } & Reac
   );
 }
 
-/** A top-level tab screen: bar, a Large title that collapses into the bar, then the content. */
-export function Screen({ title, right, children, className }: { title: string; right?: React.ReactNode; children: React.ReactNode; className?: string }) {
+/**
+ * A top-level tab screen (DESIGN.md §5 "Large titles"): the bar, then a Large title that collapses into the bar on scroll, with 8px
+ * between it and the first block. Content is a stack of `Section`s; they bring their own side padding, so a feed can run edge to edge.
+ */
+export function Screen({ title, left, right, children, className }: { title: string; left?: React.ReactNode; right?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
     <>
-      <ScreenBar title={title} right={right} mobileOnly />
-      <div className={cx("px-4 lg:px-0", className)}>
-        <h1 className="t-large pb-3 pt-1 lg:pt-8">{title}</h1>
+      <ScreenBar title={title} left={left} right={right} mobileOnly />
+      {/* The first block sits 8px under the title (the h1's padding), not a section gap away. */}
+      <div className={cx("[&>h1+*]:mt-0", className)}>
+        <h1 className="t-large px-4 pb-2 pt-1 lg:px-0 lg:pt-8">{title}</h1>
         {children}
       </div>
     </>

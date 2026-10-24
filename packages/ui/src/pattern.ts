@@ -39,8 +39,8 @@ export function circuitPattern(id: string | number, banner = false): Pattern {
   const hit = cache.get(key);
   if (hit) return hit;
   const rnd = prng(hash(String(id)));
-  const a = Math.floor(rnd() * AVATAR_TONES.length);
-  const b = (a + 1 + Math.floor(rnd() * (AVATAR_TONES.length - 1))) % AVATAR_TONES.length;
+  const tone = AVATAR_TONES[Math.floor(rnd() * AVATAR_TONES.length)];
+  rnd(); // keeps the traces the same as before the colours became grey
   const traces: string[] = [];
   const nodes: Pattern["nodes"] = [];
   const count = banner ? 9 + Math.floor(rnd() * 5) : 3 + Math.floor(rnd() * 3);
@@ -62,7 +62,7 @@ export function circuitPattern(id: string | number, banner = false): Pattern {
     traces.push(pts.map((p) => p.join(",")).join(" "));
     nodes.push({ x, y });
   }
-  const p = { w, h, bg: AVATAR_TONES[a].bg, wide: AVATAR_TONES[b].bg, line: AVATAR_TONES[a].fg, traces, nodes };
+  const p = { w, h, bg: tone.bg, wide: tone.wide, line: tone.fg, traces, nodes };
   cache.set(key, p);
   return p;
 }
