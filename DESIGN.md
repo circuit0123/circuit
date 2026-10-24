@@ -64,8 +64,9 @@ Mobile bottom bar (5 destinations, icons with labels):
 
 `Home` · `Discover` · `Circuits` · `Inbox` · `Profile`
 
-- **Top bar on Home:** `+` (create build log) on the left, the Circuit wordmark in the
-  centre, notifications bell on the right (dot for unread, never a number over 9 → "9+").
+- **Top bar on Home:** `+` (create build log) on the left, notifications bell on the
+  right (dot for unread, never a number over 9 → "9+"). Home starts with a `Today` Large
+  title that collapses into the bar's centre on scroll, like every other tab.
 - **Circuits** sits in the centre as our signature, like Instagram centres what it values most.
 - Desktop (≥1024px): left rail with the same five destinations + create button; centre
   column max 600px for Home and Profile; ONE right rail (max 340px, 48px gap from the
@@ -478,7 +479,7 @@ checked in review and by the `premium` Playwright checks (§13):
   for sheets and the Daily Drop stack only (`0 12px 40px rgba(0,0,0,.45)` dark, `.10` light).
 
 ### iOS-quality patterns (mobile)
-- **Large titles** on top-level screens (Home excepted) that collapse into a centred
+- **Large titles** on top-level screens that collapse into a centred
   inline title on scroll, with the translucent bar appearing as content passes under it.
 - **Grouped inset lists** for settings, profile About and account screens.
 - **Sheets with detents** (medium and large), a grabber, drag-to-dismiss and the page
