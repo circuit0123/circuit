@@ -12,7 +12,7 @@ export function MediaPager({ media, priority }: { media: MediaItem[]; priority?:
   const first = media[0];
   const ratio = first.width && first.height && first.width / first.height > 0.9 ? "1 / 1" : "4 / 5";
   return (
-    <div className="relative">
+    <div data-no-swipe className="relative">
       <div
         ref={scroller}
         className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto"

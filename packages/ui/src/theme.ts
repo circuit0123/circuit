@@ -1,6 +1,7 @@
 /** Motion constants from DESIGN.md §7. */
-export const spring = { type: "spring", stiffness: 380, damping: 32, mass: 1 } as const;
-export const sheetSpring = { type: "spring", stiffness: 300, damping: 30, mass: 1 } as const;
+export const spring = { type: "spring", duration: 0.35, bounce: 0 } as const;
+export const sheetSpring = { type: "spring", duration: 0.45, bounce: 0.1 } as const;
+export const pushSpring = { type: "spring", duration: 0.4, bounce: 0 } as const;
 export const fade = { duration: 0.15 } as const;
 
 /** Eight muted tones for avatars without a photo (DESIGN.md §5 Imagery). Text on each is AA. */

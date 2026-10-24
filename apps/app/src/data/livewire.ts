@@ -1,6 +1,6 @@
 import type { Schemas } from "@circuit/api-client";
 import type { WireUpdate } from "@circuit/ui";
-import { ago } from "./format";
+import { ago } from "@/lib/format";
 
 type Item = Schemas["WireItemOut"];
 export type LiveWireItem = WireUpdate & { action: Item["action"] };

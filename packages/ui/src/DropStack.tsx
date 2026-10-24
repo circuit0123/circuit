@@ -54,18 +54,18 @@ export function DropStack({ cards, onAnswer, doneText, className }: Props) {
 
   if (!top) {
     return (
-      <div className={cx("rounded-card border border-border bg-surface px-5 py-8", className)}>
+      <div className={cx("rounded-card border border-separator bg-surface px-5 py-8", className)}>
         <p className="t-headline">{doneText}</p>
         <p className="t-body mt-1 text-text-muted">Take a look at Pulse below.</p>
       </div>
     );
   }
   return (
-    <section aria-label="Daily Drop" className={className}>
-      <p className="t-caption mb-2 text-text-muted" aria-live="polite">{cards.length - live.length + 1} of {cards.length} today</p>
+    <section aria-label="Daily Drop" data-no-swipe className={className}>
+      <p className="t-footnote mb-2 text-text-muted" aria-live="polite">{cards.length - live.length + 1} of {cards.length} today</p>
       <div className="relative pb-3">
         {live.slice(1, 3).reverse().map((c, n, arr) => (
-          <div key={c.id} aria-hidden className="absolute inset-x-0 top-0 bottom-0 rounded-card border border-border bg-surface-2" style={{ transform: `translateY(${(arr.length - n) * 6}px) scale(${1 - (arr.length - n) * 0.04})`, zIndex: -(arr.length - n) }} />
+          <div key={c.id} aria-hidden className="absolute inset-x-0 top-0 bottom-0 rounded-card border border-separator bg-surface-2" style={{ transform: `translateY(${(arr.length - n) * 6}px) scale(${1 - (arr.length - n) * 0.04})`, zIndex: -(arr.length - n) }} />
         ))}
         <TopCard key={top.id} ref={topRef} card={top} onThrow={(a) => answer(top.id, a)} />
       </div>
@@ -101,7 +101,7 @@ const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | 
   return (
     <motion.div
       ref={el}
-      className="relative touch-pan-y overflow-hidden rounded-card border border-border bg-surface shadow-lift"
+      className="relative touch-pan-y overflow-hidden rounded-card border border-separator bg-surface shadow-lift"
       style={{ x, rotate: reduce ? 0 : rotate }}
       drag={reduce ? false : "x"}
       dragSnapToOrigin
@@ -117,15 +117,15 @@ const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | 
       transition={fade}
     >
       <div className="flex flex-col gap-2 px-4 pb-3 pt-4">
-        <h2 className="t-title line-clamp-3">
+        <h2 className="t-title2 line-clamp-3">
           {card.helpWith ? (
-            <>{firstName(p.name)} can help you with <span className="text-accent">{card.helpWith}</span></>
+            <>{firstName(p.name)} can help you with <span className="text-live">{card.helpWith}</span></>
           ) : (
             card.reason
           )}
         </h2>
         {card.via && (
-          <p className="t-caption flex items-center gap-2 text-text-muted">
+          <p className="t-footnote flex items-center gap-2 text-text-muted">
             <span className="flex -space-x-1.5">
               <Avatar id={card.via.id} name={card.via.name} src={card.via.photo} size={20} className="ring-2 ring-surface" />
               <Avatar id={p.id} name={p.name} src={p.photo} size={20} className="ring-2 ring-surface" />
@@ -140,15 +140,15 @@ const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | 
         ) : (
           <PatternArt id={p.id} initial={p.name[0]} banner />
         )}
-        <motion.span style={{ opacity: introOpacity }} className="pointer-events-none absolute left-4 top-4 rounded-full bg-text px-3 py-1 t-caption font-semibold text-bg" aria-hidden>Intro me</motion.span>
-        <motion.span style={{ opacity: skipOpacity }} className="pointer-events-none absolute right-4 top-4 rounded-full bg-text px-3 py-1 t-caption font-semibold text-bg" aria-hidden>Skip</motion.span>
+        <motion.span style={{ opacity: introOpacity }} className="pointer-events-none absolute left-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Intro me</motion.span>
+        <motion.span style={{ opacity: skipOpacity }} className="pointer-events-none absolute right-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Skip</motion.span>
       </div>
       <div className="flex flex-col gap-2 p-4">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="t-headline min-w-0 truncate">{p.name}</h3>
           <VerifiedBadge level={p.level} />
         </div>
-        <p className="t-caption text-text-muted">{[p.headline || p.role, p.place].filter(Boolean).join(", ")}</p>
+        <p className="t-footnote text-text-muted">{[p.headline || p.role, p.place].filter(Boolean).join(", ")}</p>
         {card.detail && <p className="t-body line-clamp-2">{card.detail}</p>}
         {(card.offers.length > 0 || card.strength || card.bridge) && (
           <div className="flex flex-wrap items-center gap-2">

@@ -8,3 +8,6 @@ __pycache__/
 dist/
 coverage/
 .DS_Store
+*.tsbuildinfo
+/apps/app/test-results/
+/apps/app/playwright-report/

@@ -23,7 +23,7 @@ export function ReactionBar({ active, onToggle, className }: { active: ReactionK
             key={id}
             aria-pressed={on}
             onClick={() => { navigator.vibrate?.(8); onToggle(id, !on); }}
-            className={cx("flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-3 t-caption", on ? "bg-text font-semibold text-bg" : "bg-surface-2 text-text")}
+            className={cx("flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-3 t-footnote", on ? "bg-text font-semibold text-bg" : "bg-surface-2 text-text")}
           >
             <motion.span key={String(on)} animate={reduce ? undefined : { scale: [1, 1.25, 1] }} transition={{ duration: 0.22 }} className="flex">
               <Icon size={20} strokeWidth={1.75} fill={on && id === "helpful" ? "currentColor" : "none"} aria-hidden />

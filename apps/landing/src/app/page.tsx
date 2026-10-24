@@ -2,7 +2,7 @@
 export default function Page() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-xl flex-col justify-center gap-4 px-4">
-      <h1 className="t-display">Circuit</h1>
+      <h1 className="t-large">Circuit</h1>
       <p className="t-body text-text-muted">Find who near you is building, who needs help and who is hiring.</p>
     </main>
   );

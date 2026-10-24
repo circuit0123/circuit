@@ -3,7 +3,7 @@
 import { LiveWire, LiveWireSkeleton, UpdateView, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useLiveWire, useMarkUpdateSeen, useRequestIntro } from "@/hooks/home";
+import { loadFailed, useLiveWire, useMarkUpdateSeen, useRequestIntro } from "@/data";
 
 export function LiveWireSection() {
   const wire = useLiveWire();
@@ -16,7 +16,7 @@ export function LiveWireSection() {
   const current = open === null ? undefined : items[open];
 
   if (wire.isPending) return <LiveWireSkeleton />;
-  if (wire.isError) return <p role="alert" className="t-caption py-3 text-text-muted">Couldn't load the Live wire. Check your connection and try again.</p>;
+  if (wire.isError) return <p role="alert" className="t-footnote py-3 text-text-muted">{loadFailed("the Live wire")}</p>;
 
   const show = (i: number | null) => {
     if (i !== null && items[i] && !items[i].seen) seen.mutate(items[i].key);

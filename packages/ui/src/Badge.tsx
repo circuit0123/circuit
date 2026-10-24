@@ -12,14 +12,14 @@ export function VerifiedBadge({ level, className }: { level: number; className?:
       role="img"
       aria-label={LABELS[l]}
       title={LABELS[l]}
-      className={cx("inline-flex shrink-0 align-middle", l === 3 ? "text-success" : l === 2 ? "text-text" : "text-text-muted", className)}
+      className={cx("inline-flex shrink-0 align-middle", l === 3 ? "text-live" : l === 2 ? "text-text" : "text-text-muted", className)}
     >
       <BadgeCheck size={16} strokeWidth={1.75} />
     </span>
   );
 }
 
-const pill = "inline-flex items-center gap-1 rounded-full px-2 py-0.5 t-micro font-semibold";
+const pill = "inline-flex items-center gap-1 rounded-full px-2 py-0.5 t-caption font-semibold";
 
 export function BridgeBadge({ className }: { className?: string }) {
   return (
@@ -31,7 +31,7 @@ export function BridgeBadge({ className }: { className?: string }) {
 }
 
 export function HiringBadge({ className }: { className?: string }) {
-  return <span className={cx(pill, "bg-success/15 text-success", className)}>Hiring</span>;
+  return <span className={cx(pill, "bg-live/15 text-live", className)}>Hiring</span>;
 }
 
 export function PrivateBadge({ className }: { className?: string }) {
@@ -45,7 +45,7 @@ export function PrivateBadge({ className }: { className?: string }) {
 
 export function DistanceBadge({ km, className }: { km: number; className?: string }) {
   return (
-    <span className={cx("inline-flex items-center gap-1 t-caption text-text-muted", className)}>
+    <span className={cx("inline-flex items-center gap-1 t-footnote text-text-muted", className)}>
       <MapPin size={14} strokeWidth={1.75} aria-hidden />
       <span className="num">{km < 10 ? km.toFixed(1) : Math.round(km)} km</span>
     </span>

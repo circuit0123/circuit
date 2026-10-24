@@ -34,7 +34,7 @@ export function BottomSheet({ open, onClose, title, children, className }: Props
             dragElastic={{ top: 0, bottom: 0.6 }}
             onDragEnd={(_, i) => { if (i.offset.y > 120 || i.velocity.y > 600) onClose(); }}
           >
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" aria-hidden />
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-separator" aria-hidden />
             <h2 id={id} className="t-headline mb-3">{title}</h2>
             {children}
           </motion.div>

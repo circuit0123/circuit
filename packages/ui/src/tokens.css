@@ -1,77 +1,115 @@
-/* Design tokens from DESIGN.md §5. Import once per app, after `@import "tailwindcss"`.
-   Dark is the default; light follows the system unless data-theme overrides it. */
+/* Design tokens from DESIGN.md §5 "Graphite & Current". Import once per app, after `@import "tailwindcss"`.
+   Dark is the default; light follows the system unless data-theme overrides it.
+   `data-accent` (mint | sky | indigo | rose | lime | mono) changes only `current` and, for
+   Indigo, the paired `bridge` colour. Everything else is fixed. */
 :root {
   color-scheme: dark;
-  --bg: #0b0b0e;
-  --surface: #15151a;
-  --surface-2: #1e1e25;
-  --border: #2a2a33;
-  --text: #f5f4f0;
-  --text-muted: #a3a1a8;
-  --accent: #ff5a36;
-  --on-accent: #0b0b0e;
-  --bridge: #7c5cff;
-  --success: #2ecc8f;
-  --warning: #ffb020;
-  --danger: #ff4d5e;
-  --shadow-lift: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --bg: #000000;
+  --bg-grouped: #000000;
+  --surface: #111113;
+  --surface-2: #1c1c1f;
+  --surface-3: #2a2a2e;
+  --separator: rgba(255, 255, 255, 0.1);
+  --text: #f5f5f7;
+  --text-muted: #98989f;
+  --text-subtle: #6e6e73;
+  --primary: #f5f5f7;
+  --on-primary: #000000;
+  --current: #3ddbb0;
+  --bridge: #8e8cff;
+  --warning: #ffb340;
+  --danger: #ff453a;
+  --shadow-lift: 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     color-scheme: light;
-    --bg: #fafaf7;
+    --bg: #ffffff;
+    --bg-grouped: #f2f2f7;
     --surface: #ffffff;
-    --surface-2: #f1f0ec;
-    --border: #e3e1db;
-    --text: #121215;
-    --text-muted: #5e5c63;
-    --accent: #e8431f;
-    --on-accent: #121215;
-    --bridge: #5b3df0;
-    --success: #14a36b;
-    --warning: #c98200;
-    --danger: #d92d3e;
-    --shadow-lift: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --surface-2: #f2f2f5;
+    --surface-3: #e5e5ea;
+    --separator: rgba(0, 0, 0, 0.1);
+    --text: #1d1d1f;
+    --text-muted: #6e6e73;
+    --text-subtle: #8e8e93;
+    --primary: #1d1d1f;
+    --on-primary: #ffffff;
+    --current: #0a8a69;
+    --bridge: #5856d6;
+    --warning: #b25e00;
+    --danger: #d70015;
+    --shadow-lift: 0 12px 40px rgba(0, 0, 0, 0.1);
   }
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #fafaf7;
+  --bg: #ffffff;
+  --bg-grouped: #f2f2f7;
   --surface: #ffffff;
-  --surface-2: #f1f0ec;
-  --border: #e3e1db;
-  --text: #121215;
-  --text-muted: #5e5c63;
-  --accent: #e8431f;
-  --on-accent: #121215;
-  --bridge: #5b3df0;
-  --success: #14a36b;
-  --warning: #c98200;
-  --danger: #d92d3e;
-  --shadow-lift: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --surface-2: #f2f2f5;
+  --surface-3: #e5e5ea;
+  --separator: rgba(0, 0, 0, 0.1);
+  --text: #1d1d1f;
+  --text-muted: #6e6e73;
+  --text-subtle: #8e8e93;
+  --primary: #1d1d1f;
+  --on-primary: #ffffff;
+  --current: #0a8a69;
+  --bridge: #5856d6;
+  --warning: #b25e00;
+  --danger: #d70015;
+  --shadow-lift: 0 12px 40px rgba(0, 0, 0, 0.1);
 }
 
+/* Personal accents. Dark values first, then light (system light, then forced light).
+   The light rules are one step more specific so they win over the dark ones. */
+:root[data-accent="sky"] { --current: #5ac8fa; }
+:root[data-accent="indigo"] { --current: #8e8cff; --bridge: #3ddbb0; }
+:root[data-accent="rose"] { --current: #ff6482; }
+:root[data-accent="lime"] { --current: #b6e85a; }
+:root[data-accent="mono"] { --current: #f5f5f7; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"])[data-accent="sky"] { --current: #0071c2; }
+  :root:not([data-theme="dark"])[data-accent="indigo"] { --current: #5856d6; --bridge: #0a8a69; }
+  :root:not([data-theme="dark"])[data-accent="rose"] { --current: #c7254e; }
+  :root:not([data-theme="dark"])[data-accent="lime"] { --current: #4d7c0f; }
+  :root:not([data-theme="dark"])[data-accent="mono"] { --current: #1d1d1f; }
+}
+:root[data-theme="light"][data-accent="sky"] { --current: #0071c2; }
+:root[data-theme="light"][data-accent="indigo"] { --current: #5856d6; --bridge: #0a8a69; }
+:root[data-theme="light"][data-accent="rose"] { --current: #c7254e; }
+:root[data-theme="light"][data-accent="lime"] { --current: #4d7c0f; }
+:root[data-theme="light"][data-accent="mono"] { --current: #1d1d1f; }
+
+/* `current` is the live/active colour. Tailwind already owns `text-current` (currentColor),
+   so the utility is named `live`: text-live, bg-live, border-live, ring-live. */
 @theme inline {
   --color-bg: var(--bg);
+  --color-grouped: var(--bg-grouped);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
-  --color-border: var(--border);
+  --color-surface-3: var(--surface-3);
+  --color-separator: var(--separator);
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
-  --color-accent: var(--accent);
-  --color-on-accent: var(--on-accent);
+  --color-text-subtle: var(--text-subtle);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-live: var(--current);
   --color-bridge: var(--bridge);
-  --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  --radius-card: 12px;
-  --radius-sheet: 20px;
+  --radius-card: 14px;
+  --radius-control: 12px;
+  --radius-group: 10px;
+  --radius-sheet: 22px;
   --shadow-lift: var(--shadow-lift);
 }
 
@@ -79,28 +117,47 @@
   html { background: var(--bg); color: var(--text); }
   body {
     font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.35;
+    font-size: 17px;
+    line-height: 1.4;
     -webkit-font-smoothing: antialiased;
     text-align: left;
+    background: var(--bg);
   }
-  @media (min-width: 1024px) { body { font-size: 16px; } }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--current); outline-offset: 2px; }
   button, a, [role="button"] { -webkit-tap-highlight-color: transparent; }
+  a { color: inherit; text-decoration: none; }
+  /* Press state (DESIGN.md §5): scale 0.97 and 80% opacity within 100ms. */
+  button:not(:disabled):active, a[data-press]:active { opacity: 0.8; }
 }
 
-/* Type scale (DESIGN.md §5): mobile / desktop. Two weights only: 400 and 600. */
-@utility t-display { font-size: 32px; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; @media (min-width: 1024px) { font-size: 40px; } }
-@utility t-title { font-size: 22px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; @media (min-width: 1024px) { font-size: 24px; } }
-@utility t-headline { font-size: 17px; line-height: 1.25; font-weight: 600; @media (min-width: 1024px) { font-size: 18px; } }
-@utility t-body { font-size: 15px; line-height: 1.35; @media (min-width: 1024px) { font-size: 16px; } }
-@utility t-caption { font-size: 13px; line-height: 1.35; }
-@utility t-micro { font-size: 11px; line-height: 1.3; }
-/* Geist Mono only for numbers that matter. */
+/* Type scale (DESIGN.md §5), mobile. Large title and Title 1 grow by 2px on desktop. Sentence case, left aligned.
+   Tracking: -0.022em at 28px and up, -0.012em for 20-22px, 0 for body, +0.01em for 12-13px. */
+@utility t-large { font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em; @media (min-width: 1024px) { font-size: 36px; } }
+@utility t-title1 { font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em; @media (min-width: 1024px) { font-size: 30px; } }
+@utility t-title2 { font-size: 22px; line-height: 1.2; font-weight: 600; letter-spacing: -0.012em; }
+@utility t-title3 { font-size: 20px; line-height: 1.2; font-weight: 500; letter-spacing: -0.012em; }
+@utility t-headline { font-size: 17px; line-height: 1.3; font-weight: 600; }
+@utility t-body { font-size: 17px; line-height: 1.4; font-weight: 400; }
+@utility t-callout { font-size: 16px; line-height: 1.4; font-weight: 400; }
+@utility t-subhead { font-size: 15px; line-height: 1.4; font-weight: 400; }
+@utility t-footnote { font-size: 13px; line-height: 1.4; font-weight: 400; letter-spacing: 0.01em; }
+@utility t-caption { font-size: 12px; line-height: 1.4; font-weight: 400; letter-spacing: 0.01em; }
+/* Geist Mono only for numbers that matter (stipend, distance, dashboard figures). */
 @utility num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
-/* The signature gradient: the circuit ring and its closing animation, the app icon. Nothing else. */
-@utility ring-signature { background: linear-gradient(135deg, #ff5a36, #ff2e93, #7c5cff); }
+/* The signature gradient: current -> bridge at 135deg. The circuit ring, its closing animation and the app icon. Nothing else. */
+@utility ring-signature { background: linear-gradient(135deg, var(--current), var(--bridge)); }
+
+/* Translucent system bars (DESIGN.md §5 Materials): top bar, tab bar, sheet headers. Never on cards or content. */
+@utility material {
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  @media (prefers-reduced-transparency: reduce) { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .material { background: var(--bg); }
+}
 
 @keyframes skeleton { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 @utility skeleton { animation: skeleton 1.4s ease-in-out infinite; background: var(--surface-2); @media (prefers-reduced-motion: reduce) { animation: none; } }
