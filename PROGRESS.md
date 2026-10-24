@@ -180,11 +180,12 @@ Note: Stage 3 part 1 was committed on `backend-core`, the branch Stages 1–2 we
 Read-only check of the backend against CLAUDE.md, LAUNCH.md and PRODUCTION.md. Judged by code and tests, not ticked boxes. Branch `main` (clean, no unmerged branches).
 
 ### Sessions
+_Update: B0 has since been built; rows marked FIXED below are resolved by it. Everything else is as found._
 | Session | Status | What's missing or wrong | Size |
 |---|---|---|---|
 | Stages 1–3 (foundation, auth, core API) | DONE (boxes in LAUNCH.md are unticked) | Tick Stages 1, 2, 3. Gaps inside Stage 3: no `members.onboarding` (resumable state), no `signup_source`, no LinkedIn level-2 proof | S |
-| B0 Stage 1b flags + commands | MISSING | No `core/flags.py`, `feature_flags` model/admin, `members.is_tester`, `@require_flag`, `/api/config`, `manage.py flags`. Makefile has 9 targets (up, down, migrate, run, test, check, reset-demo, openapi, lint); no `make help` and about 25 COMMANDS.md targets are absent | M |
-| B1 Stage 3b social API | WRONG (boxes ticked, code and tests exist) | Pulse, Daily Drop, Live wire and circuits are not behind flags. Legacy `/api/today`, `StoryView` still present (replaced by Live wire) | S |
+| B0 Stage 1b flags + commands | MISSING at check time; **FIXED in B0 (branch `backend-b0`)** | No `core/flags.py`, `feature_flags` model/admin, `members.is_tester`, `@require_flag`, `/api/config`, `manage.py flags`. Makefile has 9 targets (up, down, migrate, run, test, check, reset-demo, openapi, lint); no `make help` and about 25 COMMANDS.md targets are absent | M |
+| B1 Stage 3b social API | WRONG at check time; **flags and Today-strip removal FIXED in B0** (boxes ticked, code and tests exist) | Pulse, Daily Drop, Live wire and circuits are not behind flags. Legacy `/api/today`, `StoryView` still present (replaced by Live wire) | S |
 | B2 Stage 4b beta gate | MISSING | No invite_codes, beta_access, waitlist, `BETA_MODE`, gate, waitlist endpoint, invite emails (no resend) | M |
 | B3 Stage 6+7 backend | PARTIAL | Only `Consent` and in-app notifications exist. Missing: settings and appearance endpoint, notification prefs, export, delete, email notifications, block from profile, data requests, retention job, `docs/legal/` | L |
 | B3b Stage 4d promotions | MISSING | Nothing built | L |
