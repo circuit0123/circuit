@@ -29,7 +29,7 @@ export function Modal({ open, onClose, title, children, className }: Props) {
             exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
             transition={reduce ? fade : sheetSpring}
           >
-            <h2 id={id} className="t-title mb-3">{title}</h2>
+            <h2 id={id} className="t-title2 mb-3">{title}</h2>
             {children}
           </motion.div>
         </div>

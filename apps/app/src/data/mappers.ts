@@ -1,6 +1,6 @@
 import type { Schemas } from "@circuit/api-client";
 import type { MediaItem, Person, PostView, RoleView } from "@circuit/ui";
-import { ago, rupees, roleLabel } from "./format";
+import { ago, rupees, roleLabel } from "@/lib/format";
 
 export function toPerson(a: Schemas["AuthorOut"]): Person {
   return { id: a.id, name: a.display_name, role: roleLabel(a.role), headline: a.headline, place: a.city, level: a.verification_level };

@@ -67,12 +67,12 @@ export function UpdateView({ open, updates, index, onIndex, onClose, onAction }:
               else if (d.offset.x > SWIPE || d.velocity.x > 600) prev();
             }}
           >
-            <p className="t-caption px-4 pt-3 text-text-muted" aria-live="polite">{index + 1} of {updates.length}</p>
+            <p className="t-footnote px-4 pt-3 text-text-muted" aria-live="polite">{index + 1} of {updates.length}</p>
             <div className="flex items-center gap-3 px-4 py-2">
               <Avatar id={u.person.id} name={u.person.name} src={u.person.photo} size={40} />
               <div className="min-w-0 flex-1">
                 <p className="t-body truncate font-semibold">{u.person.name} <VerifiedBadge level={u.person.level} /></p>
-                <p className="t-caption truncate text-text-muted">{whenSpoken(u.when)}</p>
+                <p className="t-footnote truncate text-text-muted">{whenSpoken(u.when)}</p>
               </div>
               <button onClick={onClose} aria-label="Close" className="flex h-11 w-11 items-center justify-center rounded-full text-text">
                 <X size={24} strokeWidth={1.75} />
@@ -84,7 +84,7 @@ export function UpdateView({ open, updates, index, onIndex, onClose, onAction }:
                   <WireVisual visual={u.visual} />
                 </div>
                 <div className="flex flex-col gap-1 px-4 py-4">
-                  <h2 className="t-title">{u.headline}</h2>
+                  <h2 className="t-title2">{u.headline}</h2>
                   <p className="t-body text-text-muted">{u.reason}</p>
                 </div>
               </motion.div>

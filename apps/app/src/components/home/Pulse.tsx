@@ -3,25 +3,15 @@
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { motion, useReducedMotion } from "motion/react";
 import { ActivityCard, BottomSheet, Button, CaughtUp, PostCard, RoleCard, Skeleton, SkillsInDemandCard, spring, useToast, type ReactionKind } from "@circuit/ui";
-import type { Schemas } from "@circuit/api-client";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useMarkPulseSeen, useMe, usePulse, useReact, useReport } from "@/hooks/home";
-import { toPost, toRole } from "@/lib/map";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { loadFailed, useMarkPulseSeen, usePulse, useReact, useReport, type PulseEntry } from "@/data";
 
-type Item = Schemas["PulseItemOut"];
 const REASONS = ["Spam or scam", "Harassment or hate", "Misleading or fake", "Something else"];
-
-function activityText(a: Schemas["ActivityOut"]): { type: "circuit_completed" | "intro_accepted" | "startup_claimed"; text: string } {
-  if (a.type === "circuit_completed") return { type: a.type, text: "A circuit closed in your network. Three people helped each other." };
-  if (a.type === "intro_accepted") return { type: a.type, text: "Your intro was accepted." };
-  return { type: "startup_claimed", text: `${a.startup_name ?? "A startup"} claimed its profile near you.` };
-}
 
 export function Pulse() {
   const [earlier, setEarlier] = useState(false);
   const q = usePulse(earlier);
-  const me = useMe().data;
   const router = useRouter();
   const toast = useToast();
   const react = useReact();
@@ -30,8 +20,8 @@ export function Pulse() {
   const reduce = useReducedMotion();
   const [menu, setMenu] = useState<number | null>(null);
 
-  const items = useMemo(() => q.data?.pages.flatMap((p) => p.items) ?? [], [q.data]);
-  const caughtUp = !!q.data && !q.hasNextPage && q.data.pages[q.data.pages.length - 1].caught_up;
+  const items = q.items;
+  const caughtUp = q.caughtUp;
 
   const marked = useRef(false);
   useEffect(() => {
@@ -54,7 +44,7 @@ export function Pulse() {
   }, [last, items.length, q]);
 
   if (q.isPending) return <PulseSkeleton />;
-  if (q.isError) return <p role="alert" className="px-4 py-6 t-body text-danger lg:px-0">Couldn't load Pulse. Check your connection and try again.</p>;
+  if (q.isError) return <p role="alert" className="px-4 py-6 t-body text-danger lg:px-0">{loadFailed("Pulse")}</p>;
 
   const reactTo = (post: number) => (kind: ReactionKind, on: boolean) =>
     react.mutate({ post, kind, on }, {
@@ -62,20 +52,13 @@ export function Pulse() {
       onError: () => toast({ text: "Couldn't save that. Try again." }),
     });
 
-  const renderItem = (it: Item) => {
-    if (it.kind === "post" && it.post) {
-      const post = toPost(it.post, me?.id);
-      return <PostCard post={post} onReact={reactTo(post.id)} onMore={() => setMenu(post.id)} onOpenAuthor={() => router.push(`/members/${post.author.id}`)} priority={false} />;
+  const renderItem = (it: PulseEntry) => {
+    if (it.kind === "post") {
+      return <PostCard post={it.post} onReact={reactTo(it.post.id)} onMore={() => setMenu(it.post.id)} onOpenAuthor={() => router.push(`/members/${it.post.author.id}`)} priority={false} />;
     }
-    if (it.kind === "role" && it.role) {
-      const r = toRole(it.role);
-      return <div className="py-3"><RoleCard role={r} onOpen={() => router.push(`/discover/jobs/${r.id}`)} /></div>;
-    }
-    if (it.kind === "activity" && it.activity) { const a = activityText(it.activity); return <div className="py-3"><ActivityCard {...a} /></div>; }
-    if (it.kind === "skills_in_demand" && it.skills_in_demand) {
-      return <div className="py-3"><SkillsInDemandCard skills={it.skills_in_demand.skills.map((s) => ({ name: s.name, roles: s.open_roles }))} /></div>;
-    }
-    return null;
+    if (it.kind === "role") return <div className="py-3"><RoleCard role={it.role} onOpen={() => router.push(`/discover/jobs/${it.role.id}`)} /></div>;
+    if (it.kind === "activity") return <div className="py-3"><ActivityCard type={it.type} text={it.text} /></div>;
+    return <div className="py-3"><SkillsInDemandCard skills={it.skills} /></div>;
   };
 
   return (

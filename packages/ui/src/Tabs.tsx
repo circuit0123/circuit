@@ -15,7 +15,7 @@ export function Tabs<T extends string>({ items, value, onChange, label, classNam
     onChange(items[(n + items.length) % items.length].id);
   };
   return (
-    <div role="tablist" aria-label={label} className={cx("flex border-b border-border", className)}>
+    <div role="tablist" aria-label={label} className={cx("flex border-b border-separator", className)}>
       {items.map((it, i) => {
         const on = it.id === value;
         return (

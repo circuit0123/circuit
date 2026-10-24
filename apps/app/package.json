@@ -12,10 +12,12 @@
   "dependencies": {
     "@circuit/api-client": "workspace:*",
     "@circuit/ui": "workspace:*",
+    "@supabase/supabase-js": "^2.118.0",
     "@tanstack/react-query": "^5.104.5",
     "@tanstack/react-virtual": "^3.14.22",
     "geist": "^1.8.2",
     "lucide-react": "^1.61.0",
+    "maplibre-gl": "^6.15.0",
     "motion": "^14.6.0",
     "next": "^16.4.0",
     "react": "^19.0.0",

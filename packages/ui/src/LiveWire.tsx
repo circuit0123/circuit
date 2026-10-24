@@ -56,9 +56,8 @@ export function WireVisual({ visual, className }: { visual: WireVisualData; clas
     <svg viewBox="0 0 48 48" className={cx("h-full w-full bg-surface-2", className)} role="img" aria-label="A closed circuit of three people">
       <defs>
         <linearGradient id="wire-ring" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ff5a36" />
-          <stop offset="0.5" stopColor="#ff2e93" />
-          <stop offset="1" stopColor="#7c5cff" />
+          <stop offset="0" style={{ stopColor: "var(--current)" }} />
+          <stop offset="1" style={{ stopColor: "var(--bridge)" }} />
         </linearGradient>
       </defs>
       <circle cx="24" cy="24" r="13" fill="none" stroke="url(#wire-ring)" strokeWidth="3" />
@@ -90,7 +89,7 @@ type Props = {
 
 /**
  * Circuit's own take on "what happened today": a thin trace with a node per update (DESIGN.md §4).
- * Unseen nodes are powered (accent outline); a dot of current travels in once per session.
+ * Unseen nodes are powered (current outline); a dot of current travels in once per session.
  */
 export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
   const reduce = useReducedMotion();
@@ -121,7 +120,7 @@ export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
   if (nodes.length === 0) {
     return (
       <div className={cx("py-3", className)}>
-        <div className="relative flex h-11 items-center"><span className="absolute inset-x-0 top-1/2 h-[1.5px] -translate-y-1/2 bg-border" aria-hidden /></div>
+        <div className="relative flex h-11 items-center"><span className="absolute inset-x-0 top-1/2 h-[1.5px] -translate-y-1/2 bg-separator" aria-hidden /></div>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
           <p className="t-body text-text-muted">Quiet on the wire today</p>
           {onEmptyAction && <Button variant="ghost" className="min-h-11 px-2" onClick={onEmptyAction}>Post a build log</Button>}
@@ -132,22 +131,22 @@ export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
   return (
     <div className={cx("-mx-4 overflow-x-auto px-4 no-scrollbar lg:mx-0 lg:px-0", className)}>
       <ul ref={box} aria-label="Live wire" className="relative flex w-max min-w-full gap-4 py-3 pr-4">
-        <span className="pointer-events-none absolute inset-x-0 top-[34px] h-[1.5px] bg-border" aria-hidden />
+        <span className="pointer-events-none absolute inset-x-0 top-[34px] h-[1.5px] bg-separator" aria-hidden />
         {nodes.map((u, i) => (
           <li key={u.key} className="relative w-16 shrink-0">
             <button className="group block w-full text-left" onClick={() => onOpen(i)}>
               <span className={cx("relative block h-11 w-11 transition-opacity duration-300", u.seen && "opacity-60")}>
-                <span className="relative block h-full w-full overflow-hidden rounded-card bg-surface-2"><WireVisual visual={u.visual} /></span>
-                {!u.seen && <span data-lit className="pointer-events-none absolute -inset-0.5 rounded-[14px] border-2 border-accent" aria-hidden />}
+                <span className="relative block h-full w-full overflow-hidden rounded-control bg-surface-2"><WireVisual visual={u.visual} /></span>
+                {!u.seen && <span data-lit className="pointer-events-none absolute -inset-0.5 rounded-[14px] border-2 border-live" aria-hidden />}
                 <span className="absolute -bottom-1.5 -right-1.5 rounded-full ring-2 ring-bg">
                   <Avatar id={u.person.id} name={u.person.name} src={u.person.photo} size={20} />
                 </span>
               </span>
-              <span className={cx("t-caption mt-2 block leading-tight", u.seen && "text-text-muted")} aria-hidden>{u.verb}</span>
-              <span className="t-micro block truncate text-text-muted" aria-hidden>{firstName(u.person.name)}</span>
+              <span className={cx("t-footnote mt-2 block leading-tight", u.seen && "text-text-muted")} aria-hidden>{u.verb}</span>
+              <span className="t-caption block truncate text-text-muted" aria-hidden>{firstName(u.person.name)}</span>
               <span className="sr-only">{spokenUpdate(u)}{u.seen ? "" : ", new"}</span>
             </button>
-            {!u.seen && <span data-dot className="pointer-events-none absolute left-[19px] top-[19px] h-1.5 w-1.5 rounded-full bg-accent opacity-0" aria-hidden />}
+            {!u.seen && <span data-dot className="pointer-events-none absolute left-[19px] top-[19px] h-1.5 w-1.5 rounded-full bg-live opacity-0" aria-hidden />}
           </li>
         ))}
       </ul>
@@ -160,7 +159,7 @@ export function LiveWireSkeleton() {
     <div className="flex gap-4 py-3" aria-hidden>
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="w-16 shrink-0">
-          <Skeleton className="h-11 w-11 rounded-card" />
+          <Skeleton className="h-11 w-11 rounded-control" />
           <Skeleton className="mt-2 h-3 w-12" />
         </div>
       ))}
