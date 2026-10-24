@@ -54,6 +54,8 @@ class PairScore:
     i_give: tuple[str, str] | None
     shared_traits: tuple[str, ...]
     hops: int | None
+    ab: float = 0.0  # how well their offers cover my needs, 0..1 (kept for the ranker's features; not part of the score itself)
+    ba: float = 0.0  # how well my offers cover their needs
 
 
 def cosine(a: list[float], b: list[float]) -> float:
@@ -151,6 +153,8 @@ def score_pair(
         i_give=i_give if ba > 0 else None,
         shared_traits=tuple(sorted(me.traits & other.traits)),
         hops=hops[0] if hops else None,
+        ab=round(ab, 4),
+        ba=round(ba, 4),
     )
 
 
@@ -184,13 +188,21 @@ def rank(
     limit: int,
     bridge_share: float,
     max_per_sector: int,
+    order: dict[int, float] | None = None,
 ) -> list[tuple[int, PairScore]]:
     """Pick up to `limit` matches, best first. `scored` holds (candidate id, score, candidate sector).
+
+    `order` (candidate id -> number) replaces the score as the sort key, which is how a learned ranker reorders the list.
+    Diversity and Bridge share still apply, and who is *allowed* in a list never depends on it.
 
     Diversity: no more than `max_per_sector` from one sector. Bridge share: about `bridge_share` of the list is
     Bridge matches when enough exist, and if there are too few the rest of the list is filled with the next best.
     """
-    pool = sorted(scored, key=lambda t: (-t[1].score, t[0]))
+
+    def key(t: tuple) -> float:  # (candidate id, score, ...)
+        return order.get(t[0], t[1].score) if order is not None else t[1].score
+
+    pool = sorted(scored, key=lambda t: (-key(t), t[0]))
     taken_per_sector: dict[str, int] = {}
     diverse = []
     for cid, ps, sector in pool:
@@ -207,7 +219,7 @@ def rank(
     picked = bridges + locals_
     if len(picked) < limit:  # too few local matches: let more bridge matches in
         picked += [t for t in diverse if t[0] not in chosen][: limit - len(picked)]
-    return sorted(picked, key=lambda t: (-t[1].score, t[0]))
+    return sorted(picked, key=lambda t: (-key(t), t[0]))
 
 
 def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:

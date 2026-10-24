@@ -50,7 +50,7 @@ README = (
     "circuits, notifications, reports, blocks, consents and the product events recorded about your actions.\n"
     "media/: the pictures you uploaded.\n\n"
     "Other people appear as numbers only. What other people wrote to you (their messages and notes) and recommendations "
-    "we computed for you (matches, Daily Drop) are not included.\n"
+    "we computed for you (matches, Daily Drop, and the records of what the matcher showed you) are not included.\n"
     "Questions or corrections: see the contact details in the app, under Settings.\n"
 )
 
@@ -102,6 +102,7 @@ def member_data(member: Member) -> dict:
             "circuits_opt_in": member.circuits_opt_in, "allow_requests": member.allow_requests,
             "open_intro_slots": member.open_intro_slots, "appearance": member.appearance,
             "notification_preferences": member.notification_prefs, "joined_at": member.created_at,
+            "onboarding": member.onboarding, "signup_source": member.signup_source,
         },
         "needs": _rows(Need.objects.filter(member=member).order_by("id"), "capability__slug", "description", "is_active", "created_at"),
         "offers": _rows(Offer.objects.filter(member=member).order_by("id"), "capability__slug", "description", "is_active", "created_at"),

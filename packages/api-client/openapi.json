@@ -2991,6 +2991,180 @@
         "title": "NotificationPrefsPatch",
         "type": "object"
       },
+      "OnboardingOut": {
+        "properties": {
+          "answers": {
+            "additionalProperties": true,
+            "title": "Answers",
+            "type": "object"
+          },
+          "branch": {
+            "enum": [
+              "default",
+              "investor",
+              "partner"
+            ],
+            "title": "Branch",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "current_step": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Step"
+          },
+          "signup_source": {
+            "title": "Signup Source",
+            "type": "string"
+          },
+          "skip": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skip",
+            "type": "array"
+          },
+          "steps": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "branch",
+          "steps",
+          "skip",
+          "current_step",
+          "completed_at",
+          "answers",
+          "signup_source"
+        ],
+        "title": "OnboardingOut",
+        "type": "object"
+      },
+      "OnboardingPatch": {
+        "additionalProperties": false,
+        "properties": {
+          "answers": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "propertyNames": {
+                  "enum": [
+                    "invite",
+                    "name",
+                    "role",
+                    "age",
+                    "safety",
+                    "where",
+                    "work",
+                    "offers",
+                    "needs",
+                    "organisation",
+                    "photo",
+                    "colour",
+                    "ready",
+                    "focus",
+                    "stage",
+                    "cheque",
+                    "verify",
+                    "org_kind",
+                    "org",
+                    "org_verify",
+                    "goal"
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answers"
+          },
+          "completed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed"
+          },
+          "current_step": {
+            "anyOf": [
+              {
+                "enum": [
+                  "invite",
+                  "name",
+                  "role",
+                  "age",
+                  "safety",
+                  "where",
+                  "work",
+                  "offers",
+                  "needs",
+                  "organisation",
+                  "photo",
+                  "colour",
+                  "ready",
+                  "focus",
+                  "stage",
+                  "cheque",
+                  "verify",
+                  "org_kind",
+                  "org",
+                  "org_verify",
+                  "goal"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Step"
+          },
+          "signup_source": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "pattern": "^[a-z0-9_-]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signup Source"
+          }
+        },
+        "title": "OnboardingPatch",
+        "type": "object"
+      },
       "OpenJobOut": {
         "properties": {
           "id": {
@@ -8678,6 +8852,70 @@
           }
         ],
         "summary": "Suggest needs and offers from a bio",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/api/onboarding/state": {
+      "get": {
+        "description": "Where this member is in sign-up, what they answered, and which screens to show, skip or reorder, in one call. Open while the beta gate is on.",
+        "operationId": "apps_accounts_onboarding_api_get_state",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Onboarding progress",
+        "tags": [
+          "accounts"
+        ]
+      },
+      "patch": {
+        "description": "Saves the current step and merges answers per step (each answer at most 2,000 characters). `signup_source` is kept from the first call that sends one; later values are ignored. `completed: true` marks onboarding finished. Unknown steps or fields are 422. Rate limited.",
+        "operationId": "apps_accounts_onboarding_api_patch_state",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Save an onboarding step",
         "tags": [
           "accounts"
         ]

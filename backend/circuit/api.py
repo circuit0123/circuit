@@ -2,6 +2,7 @@ from django.conf import settings
 from ninja import NinjaAPI
 
 from apps.accounts.api import router as accounts_router
+from apps.accounts.onboarding_api import router as onboarding_router
 from apps.accounts.privacy_api import router as privacy_router
 from apps.accounts.settings_api import router as settings_router
 from apps.beta.api import router as beta_router
@@ -39,6 +40,7 @@ api.add_router("/health", health_router, tags=["health"])
 api.add_router("/demo", demo_router, tags=["demo"])
 api.add_router("", accounts_router, tags=["accounts"])
 api.add_router("", settings_router, tags=["settings"])
+api.add_router("", onboarding_router, tags=["accounts"])
 api.add_router("", privacy_router, tags=["privacy"])
 api.add_router("/organisations", organisations_router, tags=["organisations"])
 api.add_router("/startups", startups_router, tags=["startups"])

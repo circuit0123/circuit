@@ -11,7 +11,7 @@ define not_yet
 endef
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
+.PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web lint fmt check \
 	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback
 
@@ -113,8 +113,9 @@ jobs: ## List the jobs and when they should run in the cloud
 	  'send_emails          every 5 minutes (retries emails the provider refused)' \
 	  'build_exports        every 5 minutes (builds the data exports members asked for)' \
 	  'delete_accounts      every 5 minutes (finishes the account deletions members asked for)' \
-	  'retention_cleanup    daily (purges stale accounts, export files, old waitlist entries)' \
-	  '(build_investor_picks, reconcile_payments, train_ranker: added by their stages)' \
+	  'retention_cleanup    daily (purges stale accounts, export files, old waitlist entries, old ranker snapshots)' \
+	  'train_ranker         weekly (trains a candidate ranker; a super admin promotes it in Django admin)' \
+	  '(build_investor_picks, reconcile_payments: added by their stages)' \
 	  'Cloud schedules are created in Stage 5.'
 
 daily: ## The 08:00 set: matches, then the Daily Drop (investor picks arrive with Stage 4f)
@@ -134,6 +135,15 @@ export: ## DEV ONLY: build one member's data export now: make export MEMBER=<id>
 delete-account: ## DEV ONLY: delete one member's account (asks to confirm): make delete-account MEMBER=<id>
 	@test -n "$(MEMBER)" || { echo "usage: make delete-account MEMBER=<member id>"; exit 1; }
 	$(MANAGE) delete_member --member $(MEMBER)
+
+simulate: ## DEV ONLY. Build a synthetic network to test the ML pipeline: make simulate [MEMBERS=400] [RESET=1]
+	$(MANAGE) simulate_network --members $(or $(MEMBERS),400) $(if $(RESET),--reset)
+
+train: ## Train a candidate ranker from the feature snapshots (never changes what members see)
+	$(MANAGE) train_ranker
+
+ranker-report: ## Intro request / accept rates per ranker arm and model version: make ranker-report [DAYS=28]
+	$(MANAGE) ranker_report --days $(or $(DAYS),28)
 
 eval: ## Matching eval set against tests/eval/pairs.json
 	$(MANAGE) eval_matching

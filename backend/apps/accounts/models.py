@@ -51,6 +51,15 @@ class Member(models.Model):
     deleted_at = models.DateTimeField(
         null=True, blank=True
     )  # set = anonymised "Deleted member" tombstone that old content points at
+    onboarding = models.JSONField(
+        default=dict, db_default={}, blank=True
+    )  # current_step, completed_at, answers (one key per step); lets the app resume mid-flow (onboarding_state.py)
+    signup_source = models.CharField(
+        max_length=40, blank=True, db_default=""
+    )  # the landing page or invite that brought them; first touch wins
+    is_simulated = models.BooleanField(
+        default=False, db_default=False
+    )  # synthetic member from `simulate_network`; never matched with real people
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -61,7 +70,7 @@ class Member(models.Model):
                 name="member_verification_level_1_3",
             )
         ]
-        indexes = [models.Index(fields=["role"]), models.Index(fields=["city"])]
+        indexes = [models.Index(fields=["role"]), models.Index(fields=["city"]), models.Index(fields=["is_simulated"])]
 
     def save(self, *args, **kwargs):
         # Under-18 members are hidden by default (CLAUDE.md privacy rules).

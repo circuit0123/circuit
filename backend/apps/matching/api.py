@@ -3,6 +3,7 @@ from typing import Literal
 from ninja import Query, Router, Schema
 
 from apps.matching import services
+from apps.matching.ranker import snapshots
 from core.auth import current_member
 from core.pagination import Page, PageParams, paginate
 
@@ -34,4 +35,7 @@ class MatchParams(PageParams):
     "Partner admins and super admins have no matches.",
 )
 def list_matches(request, params: MatchParams = Query(...)):
-    return paginate(services.matches_for(current_member(request), params.bridge), params)
+    member = current_member(request)
+    page = paginate(services.matches_for(member, params.bridge), params)
+    snapshots.log_matches(member, [(m["candidate_id"], params.offset + i) for i, m in enumerate(page["items"])])
+    return page

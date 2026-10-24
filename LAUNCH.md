@@ -82,7 +82,7 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 
 ## Stage 3 — Core features API (Session A)
 - [x] Members, startups, needs, offers; smart onboarding endpoint with LLM + manual fallback (F1)
-- [ ] Onboarding state on the member (current step + saved answers) so the app resumes mid-flow; organisation auto-detect from verified email domain; instant first Daily Drop for brand-new members
+- [ ] Onboarding state on the member (current step + saved answers) so the app resumes mid-flow (done in B4: `members.onboarding`, `members.signup_source`, `GET/PATCH /api/onboarding/state`); organisation auto-detect from verified email domain; instant first Daily Drop for brand-new members
 - [x] Geo: nearby + bbox endpoints; student skill-to-startup score; view/interest tracking (F2)
 - [x] Claim flow via company email domain (simulated in dev/demo) (F3)
 - [x] Jobs + applications endpoints (F11)
@@ -138,13 +138,13 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [x] Each beta member can invite 3 others (codes tied to the inviter, logged)
 
 ## Stage 4c — Matching ML pipeline (backend)
-- [ ] Ranker interface: RuleRanker (v1) + ModelRanker (LightGBM LambdaRank); RuleRanker fallback on any error
-- [ ] feature_snapshots logged for every candidate shown; banned features test (no college, gender or proxies)
-- [ ] `simulate_network` (synthetic members, hidden preferences, simulated responses)
-- [ ] `build_training_set` (graded labels from events) and `train_ranker` (offline NDCG@10, eval-set agreement, fairness check by college tier and bridge vs local)
-- [ ] model_versions + versioned model files in private Supabase Storage; promotion in Django admin only when it beats RuleRanker and passes fairness
-- [ ] Shadow mode and A/B split setting; acceptance-rate comparison report per arm
-- [ ] Tests: pipeline runs end to end on simulated data; a simulation-only model can never be promoted to active in production
+- [x] Ranker interface: RuleRanker (v1) + ModelRanker (LightGBM LambdaRank); RuleRanker fallback on any error
+- [x] feature_snapshots logged for every candidate shown; banned features test (no college, gender or proxies)
+- [x] `simulate_network` (synthetic members, hidden preferences, simulated responses)
+- [x] `build_training_set` (graded labels from events) and `train_ranker` (offline NDCG@10, eval-set agreement, fairness check by college tier and bridge vs local)
+- [x] model_versions + versioned model files in private Supabase Storage; promotion in Django admin only when it beats RuleRanker and passes fairness
+- [x] Shadow mode and A/B split setting; acceptance-rate comparison report per arm
+- [x] Tests: pipeline runs end to end on simulated data; a simulation-only model can never be promoted to active in production
 
 ## Stage 4d — Promoted startups and roles (F19)
 - [ ] apps/promotions: campaigns, campaign_stats_daily, hidden_promotions; Django admin to create, pause and end campaigns and record price and invoice reference
@@ -152,6 +152,7 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Server-side aggregate impression/tap counting; applications attributed to a campaign when started from a promoted item
 - [ ] "Why am I seeing this?" text generated from targeting only
 - [ ] Fill `on_startup_unclaimed` (apps/startups/services.py): pause every active campaign of a startup whose claimant was deleted or replaced; test it with account deletion (B3 built the hook, deletion calls it)
+- [ ] Block switching `promotions` off in admin while a paid campaign is active (B0 left only a comment in `flags.set_audience`)
 - [ ] Founder endpoint: promotion results (daily aggregates)
 - [ ] Tests: ranker/Daily Drop/Live wire/search/applicant outputs identical with and without campaigns; caps; no promotion in banned surfaces; under-18 rules; no per-member tracking stored
 - [ ] Frontend: Promoted label and "…" menu on cards, slot rendering in Pulse/Discover/Jobs, founder "Promotion results" card
@@ -163,6 +164,7 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] POST verify checkout (payment signature, constant-time compare) → order shows "processing" until webhook
 - [ ] Webhook endpoint: raw-body signature check with webhook secret, event-id idempotency, handles payment.captured, payment.failed, refund.processed; activates the campaign in one transaction
 - [ ] `reconcile_payments` job (10 min) + 24h expiry; refunds from Django admin; receipt email
+- [ ] Block switching `payments` off in admin while an order is `created` (pause or refund first); webhooks are processed even with `payments` off
 - [ ] Startup check: live keys refused outside production
 - [ ] CSP allows Razorpay Checkout only on the payment screen
 - [ ] Frontend: package picker on the startup page, Checkout, "processing" → "Your promotion is live" states, payment history

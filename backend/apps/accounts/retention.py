@@ -4,6 +4,7 @@
   Welcome screen). Removed through the same deletion pipeline as "delete my account". Staff roles are never purged.
 - Export files whose link has expired (the zip is deleted from the private bucket; the row stays as a record).
 - Rejected waitlist entries older than REJECTED_WAITLIST_DAYS.
+- Ranker snapshots (what the matcher showed and saw) older than RANKER_SNAPSHOT_RETENTION_DAYS.
 
 Request-log retention (30 days) is NOT done here: it is a Cloud Logging setting (RUNBOOK.md "Retention").
 Idempotent, and it logs counts only: no names, emails or ids.
@@ -20,6 +21,7 @@ from apps.accounts import deletion, export
 from apps.accounts.models import Consent, Member, Role
 from apps.beta.models import WaitlistEntry
 from apps.events.services import record
+from apps.matching.models import FeatureSnapshot
 
 log = structlog.get_logger("retention")
 STAFF = (Role.SUPER_ADMIN, Role.PARTNER_ADMIN)
@@ -28,7 +30,9 @@ STAFF = (Role.SUPER_ADMIN, Role.PARTNER_ADMIN)
 def purge_unverified(now=None) -> int:
     cutoff = (now or timezone.now()) - timedelta(days=settings.UNVERIFIED_ACCOUNT_DAYS)
     stale = (
-        Member.objects.filter(created_at__lt=cutoff, deleted_at__isnull=True)
+        Member.objects.filter(
+            created_at__lt=cutoff, deleted_at__isnull=True, is_simulated=False
+        )  # simulated members never consent
         .exclude(role__in=STAFF)
         .exclude(pk__in=Consent.objects.values("member_id"))
         .order_by("pk")
@@ -51,11 +55,18 @@ def purge_waitlist(now=None) -> int:
     return deleted
 
 
+def purge_snapshots(now=None) -> int:
+    cutoff = (now or timezone.now()) - timedelta(days=settings.RANKER_SNAPSHOT_RETENTION_DAYS)
+    deleted, _ = FeatureSnapshot.objects.filter(shown_at__lt=cutoff, viewer__is_simulated=False).delete()
+    return deleted
+
+
 def run() -> dict[str, int]:
     counts = {
         "unverified_accounts": purge_unverified(),
         "export_files": export.expire_old(),
         "waitlist_entries": purge_waitlist(),
+        "ranker_snapshots": purge_snapshots(),
     }
     log.info("retention_cleanup", **counts)
     record("retention.cleaned", counts=counts)

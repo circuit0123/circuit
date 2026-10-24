@@ -114,6 +114,7 @@ STORAGE_BUCKETS = {
     "post": "posts",
     "message": "messages",
     "export": "private",
+    "ml": "private",  # trained ranker files under ml/models/<version>/
 }  # private buckets; reads use short-lived signed URLs
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MEDIA_VARIANT_WIDTHS = (1440, 480)
@@ -187,6 +188,7 @@ RATE_LIMITS = {
     "export": (3, 86400),
     "support": (5, 86400),
     "consent": (20, 3600),
+    "onboarding_state": (120, 3600),  # saving a step as the person moves through the sign-up screens
     "unsubscribe_ip": (30, 3600),  # per client address; public endpoint
 }
 
@@ -234,6 +236,14 @@ MATCH_KNN = 30  # nearest-neighbour candidates fetched per need/offer
 MATCH_MAX_PER_SECTOR = 5  # diversity: at most this many matches from one sector in a member's list
 MATCH_MAX_APPEARANCES = 30  # capacity: one person is shown in at most this many members' lists
 MATCH_CACHE_TTL = 6 * 3600
+# -- learned ranker (Stage 4c). The model only changes the ORDER of a list; the Strong/Good words and the 0.55 cut stay on the rule score.
+RANKER_AB_PERCENT = 20  # share of members whose list a model in "ab" status orders
+RANKER_LABEL_WINDOW_DAYS = 14  # an intro counts for the latest snapshot of the same pair within this many days before it
+RANKER_MIN_GROUPS = 30  # fewer (viewer, day) lists than this and train_ranker skips: too little to learn from
+RANKER_FAIRNESS_MAX_GAP = 0.10  # largest allowed gap in mean within-list percentile between college tiers / bridge vs local
+RANKER_FAIRNESS_MIN_GROUP = 20  # a group with fewer scored rows than this is left out of the fairness comparison
+RANKER_SNAPSHOT_RETENTION_DAYS = 365
+RANKER_RESPONSE_DAYS = 90  # window for a candidate's past response rate
 
 INTRO_WEEKLY_LIMIT = 3  # warm intros one member may send per rolling 7 days (a target's own cap is open_intro_slots)
 INTRO_EXPIRY_DAYS = 7

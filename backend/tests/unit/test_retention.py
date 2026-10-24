@@ -136,12 +136,12 @@ def test_running_it_twice_changes_nothing_the_second_time(make_member):
     aged(make_member("student"), days=60)
     entry("a@example.org", "rejected", reviewed_days=200)
     first = retention.run()
-    assert first == {"unverified_accounts": 1, "export_files": 0, "waitlist_entries": 1}
-    assert retention.run() == {"unverified_accounts": 0, "export_files": 0, "waitlist_entries": 0}
+    assert first == {"unverified_accounts": 1, "export_files": 0, "waitlist_entries": 1, "ranker_snapshots": 0}
+    assert retention.run() == {"unverified_accounts": 0, "export_files": 0, "waitlist_entries": 0, "ranker_snapshots": 0}
 
 
 def test_nothing_to_do_is_fine(db):
-    assert retention.run() == {"unverified_accounts": 0, "export_files": 0, "waitlist_entries": 0}
+    assert retention.run() == {"unverified_accounts": 0, "export_files": 0, "waitlist_entries": 0, "ranker_snapshots": 0}
 
 
 def test_it_logs_counts_only_and_records_one_event(make_member, capfd):
@@ -155,6 +155,6 @@ def test_it_logs_counts_only_and_records_one_event(make_member, capfd):
         assert private not in out
     event = Event.objects.get(type="retention.cleaned")
     assert (
-        event.payload == {"counts": {"unverified_accounts": 1, "export_files": 0, "waitlist_entries": 1}}
+        event.payload == {"counts": {"unverified_accounts": 1, "export_files": 0, "waitlist_entries": 1, "ranker_snapshots": 0}}
         and event.actor_id is None
     )

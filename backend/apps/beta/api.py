@@ -6,6 +6,7 @@ from pydantic import Field
 from apps.beta import services
 from core.auth import current_member
 from core.ratelimit import check_rate, ip_key
+from core.schemas import SRC_MAX, SRC_PATTERN
 
 router = Router()
 
@@ -61,7 +62,7 @@ class WaitlistIn(Schema):
     city: str = Field("", max_length=100)
     college: str = Field("", max_length=200)
     note: str = Field("", max_length=500)
-    src: str = Field("", max_length=40, pattern=r"^[a-z0-9_-]*$")  # which landing page, e.g. landing-students
+    src: str = Field("", max_length=SRC_MAX, pattern=SRC_PATTERN)  # which landing page, e.g. landing-students
 
 
 class WaitlistOut(Schema):

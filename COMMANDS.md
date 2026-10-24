@@ -83,10 +83,13 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 | `make job NAME=send_emails` | Send queued emails that are due (invite emails retry here when the provider was down). Scheduled every 5 minutes in the cloud |
 | `make job NAME=build_exports` | Build the data exports members asked for and email their download links (24-hour link). Scheduled every 5 minutes in the cloud |
 | `make job NAME=delete_accounts` | Finish the account deletions members asked for (sign-in, files, profile and personal data removed; posts and messages show "Deleted member"). Scheduled every 5 minutes in the cloud |
-| `make retention` | The daily clean-up now: accounts that never accepted the terms (30 days), expired export files, rejected waitlist entries older than 90 days. Logs counts only. Request logs are kept 30 days in Cloud Logging, not here |
+| `make retention` | The daily clean-up now: accounts that never accepted the terms (30 days), expired export files, rejected waitlist entries older than 90 days, ranker snapshots older than a year. Logs counts only. Request logs are kept 30 days in Cloud Logging, not here |
 | `make export MEMBER=<id>` | DEV ONLY. Build one member's data export right now and print where the zip is (members normally ask in the app) |
 | `make delete-account MEMBER=<id>` | DEV ONLY. Delete one member's account right now (asks you to type DELETE). Refuses outside dev |
 | `make eval` | `eval_matching` against tests/eval/pairs.json |
+| `make simulate [MEMBERS=400] [RESET=1]` | DEV ONLY (refuses in production). Builds a synthetic network (members with hidden tastes who see lists and answer intros) so the ML pipeline can be tested end to end. Does nothing if one exists, unless `RESET=1`. Simulated members are never matched with real ones |
+| `make train` | `train_ranker`: builds the training set from feature snapshots and intro outcomes, trains a LightGBM ranker, evaluates it against the rule ranker (NDCG@10, acceptance proxy, eval-set agreement, fairness by college tier and Bridge vs local) and saves it as a **candidate**. It never changes what members see; a super admin promotes it in Django admin (Matching → Model versions). Scheduled weekly in the cloud |
+| `make ranker-report [DAYS=28]` | Intro request and accept rates per ranker arm and model version (real members only) |
 
 ## 6. Tests and quality
 | Command | What it does |

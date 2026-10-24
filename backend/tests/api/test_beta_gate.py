@@ -14,6 +14,8 @@ OPEN_TO_MEMBERS_WITHOUT_ACCESS = {
     ("GET", "/api/me"),
     ("POST", "/api/beta/redeem"),
     ("POST", "/api/onboarding/extract"),
+    ("GET", "/api/onboarding/state"),
+    ("PATCH", "/api/onboarding/state"),
     ("POST", "/api/me/consent"),
     ("GET", "/api/me/export"),
     ("POST", "/api/me/export"),

@@ -13,7 +13,8 @@ from django.utils import timezone
 
 from apps.accounts.models import Member
 from apps.events.services import record
-from apps.matching.models import Need, Offer
+from apps.matching.models import MatchResult, Need, Offer
+from apps.matching.ranker import snapshots
 from apps.matching.services import matches_for, strength_for
 from apps.social import services
 from apps.social.models import DailyDrop
@@ -47,6 +48,7 @@ def build_for(member: Member, day: date) -> bool:
     skip = recent | connected_ids(member.pk)
     minors = set(Member.objects.filter(is_minor=True).values_list("pk", flat=True))
     picks = []
+    stored = {r.candidate_id: r for r in MatchResult.objects.filter(member=member)}
     for m in matches_for(member):
         strength = strength_for(m["score"])
         if strength is None or m["candidate_id"] in skip or m["candidate_id"] in minors or m["role"] not in SOCIAL_ROLES:
@@ -58,6 +60,7 @@ def build_for(member: Member, day: date) -> bool:
                 "is_bridge": m["is_bridge"],
                 "strength": strength,
                 "outcome": None,
+                "snap": _snap(stored.get(m["candidate_id"])),
             }
         )
         if len(picks) == settings.DROP_SIZE:
@@ -66,6 +69,19 @@ def build_for(member: Member, day: date) -> bool:
         return False
     _, created = DailyDrop.objects.get_or_create(member=member, date=day, defaults={"candidates": picks})
     return created
+
+
+def _snap(r: MatchResult | None) -> dict | None:
+    """What the ranker saw for this card, kept with the card so the snapshot logged when it is shown is exact."""
+    if r is None or not r.features:
+        return None
+    return {
+        "features": r.features,
+        "rule_score": r.score,
+        "arm": r.arm,
+        "model_version": r.model_version,
+        "model_score": r.model_score,
+    }
 
 
 def build_all(now: datetime | None = None) -> dict:
@@ -124,7 +140,7 @@ def today_drop(member: Member) -> dict:
     services.require_social(member)
     now = timezone.now()
     drop = DailyDrop.objects.filter(member=member, date=drop_day(now)).first()
-    cards = []
+    cards: list[dict] = []
     if drop and not member.is_minor:
         hidden = blocked_ids(member.pk)
         people = {
@@ -138,13 +154,17 @@ def today_drop(member: Member) -> dict:
         }
         shown = {pk: p for pk, p in people.items() if pk not in hidden}
         extras = _card_extras(member, shown)
+        seen = []
         for c in drop.candidates:
             p = shown.get(c["member_id"])
             if p is not None:
+                if c.get("snap"):
+                    seen.append((p.pk, len(cards), c["snap"]))
                 cards.append(
                     {"member": author(p), "reason": c["reason"], "is_bridge": c["is_bridge"], "outcome": c["outcome"],
                      "strength": c.get("strength"), **extras[p.pk]}
                 )  # fmt: skip
+        snapshots.log_drop(member, seen, drop.date, now)
     return {
         "date": drop.date if drop else drop_day(now), "cards": cards,
         "done": bool(cards) and all(c["outcome"] for c in cards), "next_drop_at": next_drop_at(now),

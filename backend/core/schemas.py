@@ -2,6 +2,9 @@
 
 from ninja import Schema
 
+SRC_PATTERN = r"^[a-z0-9_-]*$"  # a signup source label such as "landing-students": lower-case letters, digits, - and _ only
+SRC_MAX = 40
+
 
 class PersonOut(Schema):
     id: int

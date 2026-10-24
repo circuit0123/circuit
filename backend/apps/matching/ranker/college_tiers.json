@@ -1,0 +1,13 @@
+{
+ "_about": "College name -> tier (1 = top-ranked, 3 = tier-3). Used ONLY by the fairness check in training.py, to see whether a model scores candidates from some tiers lower. It is never a model input: features.py must not import this file. Colleges not listed are left out of the check.",
+ "tiers": {
+  "Madras School of Engineering": 1,
+  "Southern Institute of Management": 1,
+  "Sri Vinayaka Engineering College": 2,
+  "Thiruvalluvar College of Arts and Science": 2,
+  "Adyar Polytechnic College": 2,
+  "Poonamallee Institute of Engineering": 2,
+  "Coastal City Institute of Technology": 2,
+  "Kaveri Institute of Technology": 3
+ }
+}
