@@ -525,7 +525,7 @@ export interface paths {
         };
         /**
          * Today's Daily Drop
-         * @description Up to 3 people, ready at 08:00 IST. Empty until the daily job has run. Members under 18 get no drop.
+         * @description Up to 3 people, ready at 08:00 IST, each a Strong or Good match (anything weaker is never dropped). Empty until the daily job has run. Members under 18 get no drop.
          */
         get: operations["apps_social_api_get_drop"];
         put?: never;
@@ -762,6 +762,46 @@ export interface paths {
          * @description Students only, one click. 201 for a new application, 200 if I had already applied (safe to repeat). A withdrawn application is reopened. Closed jobs are a 409. Rate limited.
          */
         post: operations["apps_jobs_api_apply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/livewire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Live wire
+         * @description Up to 12 updates from the last 24 hours (shipped, hiring, needs, joined, closed a circuit), most relevant to me first, unseen before seen. Each has one line of what happened, why it matters to me, and one action. No view or reaction counts.
+         */
+        get: operations["apps_social_api_get_livewire"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/livewire/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark an update as viewed
+         * @description Call when an update is opened. A key that is not on my wire is a 404.
+         */
+        post: operations["apps_social_api_livewire_seen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1964,13 +2004,21 @@ export interface components {
         };
         /** DropCardOut */
         DropCardOut: {
+            /** Help With */
+            help_with: string | null;
+            image: components["schemas"]["WireImageOut"] | null;
             /** Is Bridge */
             is_bridge: boolean;
             member: components["schemas"]["AuthorOut"];
+            /** Offers You Need */
+            offers_you_need: string[];
             /** Outcome */
             outcome: ("intro" | "skip") | null;
             /** Reason */
             reason: string;
+            /** Strength */
+            strength: ("strong" | "good") | null;
+            via: components["schemas"]["AuthorOut"] | null;
         };
         /** DropOut */
         DropOut: {
@@ -2285,10 +2333,10 @@ export interface components {
             reason: string;
             /** Role */
             role: string;
-            /** Score Percent */
-            score_percent: number;
             /** Sector */
             sector: string | null;
+            /** Strength */
+            strength: ("strong" | "good") | null;
             /** Verification Level */
             verification_level: number;
         };
@@ -3105,6 +3153,62 @@ export interface components {
              * @enum {string}
              */
             kind: "member" | "startup";
+        };
+        /** WireActionOut */
+        WireActionOut: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "intro" | "view_role" | "reply";
+            /** Target Id */
+            target_id: number;
+        };
+        /** WireImageOut */
+        WireImageOut: {
+            /** Alt */
+            alt: string;
+            /** W1440 */
+            w1440: string;
+            /** W480 */
+            w480: string;
+        };
+        /** WireItemOut */
+        WireItemOut: {
+            action: components["schemas"]["WireActionOut"];
+            actor: components["schemas"]["AuthorOut"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Headline */
+            headline: string;
+            image: components["schemas"]["WireImageOut"] | null;
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "shipped" | "hiring" | "needs" | "joined" | "circuit_closed";
+            /** Reason */
+            reason: string;
+            /** Seen */
+            seen: boolean;
+            startup: components["schemas"]["WireStartupOut"] | null;
+        };
+        /** WireSeenIn */
+        WireSeenIn: {
+            /** Key */
+            key: string;
+        };
+        /** WireStartupOut */
+        WireStartupOut: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
         };
         /** WorkEmailIn */
         WorkEmailIn: {
@@ -4139,6 +4243,48 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApplicationOut"];
                 };
+            };
+        };
+    };
+    apps_social_api_get_livewire: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WireItemOut"][];
+                };
+            };
+        };
+    };
+    apps_social_api_livewire_seen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WireSeenIn"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -215,6 +215,15 @@ def _cached(r: MatchResult) -> dict:
     return {"candidate_id": r.candidate_id, "score": r.score, "reason": r.reason, "is_bridge": r.is_bridge}
 
 
+def strength_for(score: float) -> str | None:
+    """Match strength in words. Below the 'good' line there is no label, and the API never shows a low number."""
+    if score >= settings.MATCH_STRONG:
+        return "strong"
+    if score >= settings.MATCH_GOOD:
+        return "good"
+    return None
+
+
 # -- the read path -------------------------------------------------------------------------------------
 def matches_for(member: Member, bridge: bool | None = None) -> list[dict]:
     """Precomputed matches, best first. Redis first, Postgres if Redis is down or cold.
@@ -244,7 +253,7 @@ def matches_for(member: Member, bridge: bool | None = None) -> list[dict]:
         out.append(
             {
                 "candidate_id": p.pk, "display_name": p.display_name, "role": p.role, "verification_level": p.verification_level,
-                "city": p.city, "sector": sectors.get(p.pk), "score_percent": round(r["score"] * 100),
+                "city": p.city, "sector": sectors.get(p.pk), "score": r["score"], "strength": strength_for(r["score"]),
                 "reason": r["reason"], "is_bridge": r["is_bridge"],
             }
         )  # fmt: skip

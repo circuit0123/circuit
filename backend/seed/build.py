@@ -8,6 +8,7 @@ from django.db import connection, transaction
 from django.utils import timezone
 
 from apps.accounts.models import Connection, ConnectionRequest, Consent, Member
+from apps.events.services import record
 from apps.jobs.models import Application, Job, JobCapability
 from apps.matching.lists import sync_lists
 from apps.matching.models import Capability, MemberSkill, MemberTrait, Need, Offer, Trait
@@ -326,31 +327,82 @@ class Seeder:
         for key, mem in everyone:
             for slug in self.member_traits_extra.get(key, []):
                 traits.append(MemberTrait(member=mem, trait=self.trait[slug]))
+        free: list[
+            tuple[Member, list[str], list[str]]
+        ] = []  # students whose needs and offers are set below: (who, offers, traits)
         for s in self.bulk_students:
             picks = self.rnd.sample(data.STUDENT_SKILL_POOL, self.rnd.randint(2, 4))
             over = self.skill_overrides.get(s.pk)
             for slug, lvl, proof in over or [(p, self.rnd.randint(1, 2), "") for p in picks]:
                 skills.append(MemberSkill(member=s, capability=self.cap[slug], level=lvl, proof_url=proof))
-            for t in self.rnd.sample(data.STUDENT_TRAITS, 2):
-                traits.append(MemberTrait(member=s, trait=self.trait[t]))
-            if not over:
-                self.add_needs_offers(s, self.rnd.sample(data.STUDENT_NEED_POOL, 1), [p for p, _ in zip(picks, range(2))])
+            own_traits = self.rnd.sample(data.STUDENT_TRAITS, 2)
+            if over:
+                traits.extend(MemberTrait(member=s, trait=self.trait[t]) for t in own_traits)
+            else:
+                free.append((s, picks[:2], own_traits))
+        traits.extend(self.pair_students(free))
         for slug, lvl, proof in self.skill_overrides["ravi"]:
             skills.append(MemberSkill(member=self.members["ravi"], capability=self.cap[slug], level=lvl, proof_url=proof))
         for t in ("student-friendly", "tier2-3-focus"):
             traits.append(MemberTrait(member=self.members["ravi"], trait=self.trait[t]))
         sectors = list(data.SECTORS)
+        # What a student can do. A few founders and mentors need exactly the skills the demo students have, and offer
+        # a mentor's hour in return: two-way fits are what make Good and Strong matches (DESIGN.md §4).
+        wanted = [
+            "frontend-dev",
+            "ui-design",
+            "mobile-dev",
+            "backend-dev",
+            "data-science",
+            "content-marketing",
+            "seo",
+            "market-research",
+        ]
         for i, f in enumerate(self.bulk_founders):
-            sector_traits, _, f_needs = data.SECTORS[sectors[i % len(sectors)]]
+            sector_traits, sector_offers, f_needs = data.SECTORS[sectors[i % len(sectors)]]
             for t in sector_traits[:2]:
                 traits.append(MemberTrait(member=f, trait=self.trait[t]))
-            self.add_needs_offers(f, self.rnd.sample(f_needs, 1), self.rnd.sample(data.SECTORS[sectors[i % len(sectors)]][1], 1))
-        for m in self.bulk_mentors + self.bulk_investors:
-            self.add_needs_offers(
-                m, [], self.rnd.sample(["mentoring", "fundraising", "business-strategy", "investor-intros", "pitch-coaching"], 2)
-            )
+            offers = [self.rnd.choice(sector_offers), "mentoring"]
+            need = wanted[(i // 2) % len(wanted)] if i % 2 == 0 else self.rnd.choice(f_needs)
+            self.add_needs_offers(f, [need], offers)
+        for i, m in enumerate(self.bulk_mentors + self.bulk_investors):
+            offers = self.rnd.sample(["mentoring", "fundraising", "business-strategy", "investor-intros", "pitch-coaching"], 2)
+            if i % 2 == 0 and "mentoring" not in offers:
+                offers[0] = "mentoring"
+            self.add_needs_offers(m, [wanted[(i + 3) % len(wanted)]] if i % 2 == 0 else [], offers)
         MemberSkill.objects.bulk_create(skills)
         MemberTrait.objects.bulk_create(traits)
+
+    def pair_students(self, free: list[tuple[Member, list[str], list[str]]]) -> list[MemberTrait]:
+        """Most students trade skills with a classmate (each needs what the other offers); the rest want a mentor.
+
+        Every student has one need, because a match scores the share of needs the other person covers. A quarter of the
+        pairs also share their traits, which is what makes a match Strong rather than Good.
+        """
+        order = list(free)
+        self.rnd.shuffle(order)
+        paired = int(len(order) * 0.6) // 2 * 2
+        traits: list[MemberTrait] = []
+        for k in range(0, paired, 2):
+            (a, a_off, a_tr), (b, b_off, b_tr) = order[k], order[k + 1]
+            a_need = next((x for x in b_off if x not in a_off), None)
+            b_need = next((x for x in a_off if x not in b_off), None)
+            if a_need is None or b_need is None:
+                order.append(order[k])  # no trade possible: they just want a mentor
+                order.append(order[k + 1])
+                continue
+            if k % 8 == 0:
+                b_tr = a_tr
+            self.add_needs_offers(a, [a_need], a_off)
+            self.add_needs_offers(b, [b_need], b_off)
+            traits += [MemberTrait(member=a, trait=self.trait[t]) for t in a_tr]
+            traits += [MemberTrait(member=b, trait=self.trait[t]) for t in b_tr]
+        for s, off, tr in order[paired:]:
+            self.add_needs_offers(
+                s, ["mentoring"] if self.rnd.random() < 0.6 else self.rnd.sample(data.STUDENT_NEED_POOL, 1), off
+            )
+            traits += [MemberTrait(member=s, trait=self.trait[t]) for t in tr]
+        return traits
 
     def save_needs_offers(self) -> None:
         embedder = get_embedder()
@@ -369,6 +421,18 @@ class Seeder:
                 offers.append(Offer(member=m, capability=self.cap[slug], description=text, embedding=v))
         Need.objects.bulk_create(needs)
         Offer.objects.bulk_create(offers)
+        self.spread_needs()
+
+    def spread_needs(self) -> None:
+        """Needs were all created at seed time. Spread them over the last days; a few are from the last 20 hours, so the
+        Live wire has some "needs" nodes. Kept recent, because freshness feeds the match score (timing)."""
+        now = timezone.now()
+        fresh = []
+        for n in Need.objects.order_by("pk"):
+            hours = self.rnd.randint(1, 20) if self.rnd.random() < 0.06 else self.rnd.randint(30, 240)
+            n.created_at = now - timedelta(hours=hours)
+            fresh.append(n)
+        Need.objects.bulk_update(fresh, ["created_at"])
 
     def build_connections(self) -> None:
         pairs: dict[tuple[int, int], tuple[float, str]] = {}
@@ -630,6 +694,10 @@ class Seeder:
         self._chat(
             m["ravi"], m["divya"], ["Hi, I am applying to the frontend internship. Happy to share my portfolio."], active=False
         )
+        # Two classmates joined the partner organisation just now: "joined" nodes on Ravi's Live wire. Events are append-only,
+        # so they cannot be back-dated; the nightly demo reset keeps them fresh.
+        for who in rnd.sample(org_students, 2):
+            record("org.joined", actor=who, target_type="organisation", target_id=who.organisation_id, method="seed")
 
     def _chat(self, a: Member, b: Member, lines: list[str], active: bool) -> None:
         x, y = sorted((a.pk, b.pk))

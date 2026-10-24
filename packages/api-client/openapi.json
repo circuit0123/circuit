@@ -796,12 +796,40 @@
       },
       "DropCardOut": {
         "properties": {
+          "help_with": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Help With"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WireImageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "is_bridge": {
             "title": "Is Bridge",
             "type": "boolean"
           },
           "member": {
             "$ref": "#/components/schemas/AuthorOut"
+          },
+          "offers_you_need": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Offers You Need",
+            "type": "array"
           },
           "outcome": {
             "anyOf": [
@@ -821,12 +849,42 @@
           "reason": {
             "title": "Reason",
             "type": "string"
+          },
+          "strength": {
+            "anyOf": [
+              {
+                "enum": [
+                  "strong",
+                  "good"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strength"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthorOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
           "member",
           "reason",
           "is_bridge",
+          "strength",
+          "help_with",
+          "offers_you_need",
+          "via",
+          "image",
           "outcome"
         ],
         "title": "DropCardOut",
@@ -1735,10 +1793,6 @@
             "title": "Role",
             "type": "string"
           },
-          "score_percent": {
-            "title": "Score Percent",
-            "type": "integer"
-          },
           "sector": {
             "anyOf": [
               {
@@ -1749,6 +1803,21 @@
               }
             ],
             "title": "Sector"
+          },
+          "strength": {
+            "anyOf": [
+              {
+                "enum": [
+                  "strong",
+                  "good"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strength"
           },
           "verification_level": {
             "title": "Verification Level",
@@ -1762,7 +1831,7 @@
           "verification_level",
           "city",
           "sector",
-          "score_percent",
+          "strength",
           "reason",
           "is_bridge"
         ],
@@ -4120,6 +4189,166 @@
         "title": "ViewedIn",
         "type": "object"
       },
+      "WireActionOut": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "intro",
+              "view_role",
+              "reply"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "target_id": {
+            "title": "Target Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "target_id"
+        ],
+        "title": "WireActionOut",
+        "type": "object"
+      },
+      "WireImageOut": {
+        "properties": {
+          "alt": {
+            "title": "Alt",
+            "type": "string"
+          },
+          "w1440": {
+            "title": "W1440",
+            "type": "string"
+          },
+          "w480": {
+            "title": "W480",
+            "type": "string"
+          }
+        },
+        "required": [
+          "w480",
+          "w1440",
+          "alt"
+        ],
+        "title": "WireImageOut",
+        "type": "object"
+      },
+      "WireItemOut": {
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/WireActionOut"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthorOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WireImageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "shipped",
+              "hiring",
+              "needs",
+              "joined",
+              "circuit_closed"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "seen": {
+            "title": "Seen",
+            "type": "boolean"
+          },
+          "startup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WireStartupOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "actor",
+          "startup",
+          "image",
+          "headline",
+          "reason",
+          "action",
+          "created_at",
+          "seen"
+        ],
+        "title": "WireItemOut",
+        "type": "object"
+      },
+      "WireSeenIn": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "title": "WireSeenIn",
+        "type": "object"
+      },
+      "WireStartupOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "WireStartupOut",
+        "type": "object"
+      },
       "WorkEmailIn": {
         "properties": {
           "email": {
@@ -5309,7 +5538,7 @@
     },
     "/api/drop/today": {
       "get": {
-        "description": "Up to 3 people, ready at 08:00 IST. Empty until the daily job has run. Members under 18 get no drop.",
+        "description": "Up to 3 people, ready at 08:00 IST, each a Strong or Good match (anything weaker is never dropped). Empty until the daily job has run. Members under 18 get no drop.",
         "operationId": "apps_social_api_get_drop",
         "parameters": [],
         "responses": {
@@ -6053,6 +6282,69 @@
         "summary": "Apply to a job",
         "tags": [
           "jobs"
+        ]
+      }
+    },
+    "/api/livewire": {
+      "get": {
+        "description": "Up to 12 updates from the last 24 hours (shipped, hiring, needs, joined, closed a circuit), most relevant to me first, unseen before seen. Each has one line of what happened, why it matters to me, and one action. No view or reaction counts.",
+        "operationId": "apps_social_api_get_livewire",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WireItemOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Live wire",
+        "tags": [
+          "social"
+        ]
+      }
+    },
+    "/api/livewire/seen": {
+      "post": {
+        "description": "Call when an update is opened. A key that is not on my wire is a 404.",
+        "operationId": "apps_social_api_livewire_seen",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WireSeenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Mark an update as viewed",
+        "tags": [
+          "social"
         ]
       }
     },

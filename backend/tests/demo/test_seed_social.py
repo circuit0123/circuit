@@ -76,6 +76,8 @@ def test_ravi_sees_a_living_home_screen(seeded, client_for):
 
 
 def test_the_daily_drop_job_fills_drops_after_the_seed(seeded, client_for):
-    assert build_all()["built"] > 100
-    cards = client_for(person("asha")).get("/api/drop/today").json()["cards"]
+    assert build_all()["built"] > 150
+    cards = client_for(person("ravi")).get("/api/drop/today").json()["cards"]
     assert 1 <= len(cards) <= 3
+    assert all(c["strength"] in ("strong", "good") for c in cards)  # nothing weaker is ever dropped
+    assert any(c["help_with"] for c in cards)  # most cards can say what they offer that he needs

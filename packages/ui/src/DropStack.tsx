@@ -17,8 +17,10 @@ import type { Person } from "./types";
 export type DropCard = {
   id: number;
   person: Person;
-  /** The one-line match reason. Used as the headline when `helpWith` is missing. */
+  /** The first sentence of the match reason. It is the headline when `helpWith` is missing. */
   reason: string;
+  /** The rest of the reason, shown under the name. */
+  detail?: string;
   /** The capability they offer that you need, e.g. "mentoring". */
   helpWith?: string | null;
   /** Best mutual connection, e.g. Meera, mentor. */
@@ -147,7 +149,7 @@ const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | 
           <VerifiedBadge level={p.level} />
         </div>
         <p className="t-caption text-text-muted">{[p.headline || p.role, p.place].filter(Boolean).join(", ")}</p>
-        {card.reason && card.helpWith && <p className="t-body line-clamp-2">{card.reason}</p>}
+        {card.detail && <p className="t-body line-clamp-2">{card.detail}</p>}
         {(card.offers.length > 0 || card.strength || card.bridge) && (
           <div className="flex flex-wrap items-center gap-2">
             {card.offers.slice(0, 3).map((o) => <Chip key={o} label={o} />)}
