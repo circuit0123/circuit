@@ -286,9 +286,14 @@ Code for every feature can be merged and deployed; flags decide what members see
   date, candidate list); update_views (viewer, update, date)
 - conversations (two members, status: request | active | blocked), messages
   (conversation, sender, body, image, created_at, read_at)
-- invite_codes (code, max_uses, uses, expires_at, organisation nullable, created_by),
-  beta_access (member, source: code | allowlist | approved, granted_at), waitlist
-  (email, role, city, college, note, status, created_at)
+- invite_codes (code, kind: admin | member | waitlist, max_uses, uses, expires_at,
+  organisation nullable, created_by (member) or created_by_staff, note, revoked_at),
+  beta_access (member, source: code | allowlist | approved, invite_code, granted_at,
+  revoked_at, revoked_by; a revoked row stays so nothing re-grants it), waitlist (email,
+  role, city, college, note, src, status: pending | approved | rejected, reviewed_by,
+  invite_code, created_at), allowlist (email, note, added_by), outbound_emails (email
+  outbox: to, kind, subject, body, status: pending | sent | failed, attempts,
+  next_attempt_at; sent after commit, retried by the `send_emails` job)
 - campaigns (startup, kind: profile | role | build_log, target id, cities, radius_km,
   capabilities, starts_at, ends_at, daily_cap, total_impressions_cap, status: draft |
   active | paused | ended, price_inr, invoice_ref, created_by), campaign_stats_daily

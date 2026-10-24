@@ -22,3 +22,32 @@ class FeatureFlag(models.Model):
     note = models.CharField(max_length=200, blank=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class OutboundEmail(models.Model):
+    """Email outbox. An email is written here first and sent after commit; if the provider is down the row stays pending and
+    `manage.py send_emails` retries with backoff, so a flaky provider never fails the request that wanted the email."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending"
+        SENT = "sent"
+        FAILED = "failed"  # gave up after the last retry
+
+    to_email = models.CharField(max_length=254)
+    kind = models.CharField(max_length=40)
+    subject = models.CharField(max_length=200)
+    body = models.TextField()
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    next_attempt_at = models.DateTimeField()
+    last_error = models.CharField(
+        max_length=80, blank=True
+    )  # exception class name only, never a message that could hold an address
+    sent_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["status", "next_attempt_at"]), models.Index(fields=["created_at"])]
+
+    def __str__(self) -> str:
+        return f"Email #{self.pk} ({self.kind}, {self.status})"

@@ -2,6 +2,7 @@
 
 import hashlib
 import hmac
+import re
 import secrets
 
 from django.conf import settings
@@ -10,6 +11,20 @@ from django.core.mail import send_mail
 ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"  # no 0/O/1/I/L: codes get typed on phones
 CODE_LENGTH = 8
 MAX_ATTEMPTS = 5
+
+
+# Deliberately narrow. The domain decides which organisation someone joins and whether they pass the beta gate, so we accept
+# only plain ASCII addresses. Quoted strings, comments, encoded words, Unicode (the Kelvin sign lower-cases to a plain "k")
+# and similar tricks are the ones mail systems read differently from us. Rejecting them only costs convenience.
+_SIMPLE_EMAIL = re.compile(r"[a-z0-9][a-z0-9._+-]{0,63}@[a-z0-9-]+(?:\.[a-z0-9-]+)+")
+
+
+def plain_email(email: str) -> str | None:
+    """Lower-cased address if it is a plain ASCII address (see above), else None."""
+    if not email.isascii():  # before lower(): the Kelvin sign lowercases to a plain "k" (audit F-06)
+        return None
+    email = email.lower()
+    return email if len(email) <= 254 and _SIMPLE_EMAIL.fullmatch(email) else None
 
 
 def new_code() -> str:

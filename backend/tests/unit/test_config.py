@@ -16,6 +16,8 @@ BASE = dict(
     seed_city_name="C",
     seed_city_lat=1.0,
     seed_city_lng=2.0,
+    trusted_proxy_hops=1,  # deployed environments need it; dev ignores it
+    email_from="Circuit <hello@example.com>",  # production refuses the Resend test sender
 )
 
 

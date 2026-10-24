@@ -2,6 +2,7 @@ from django.conf import settings
 from ninja import NinjaAPI
 
 from apps.accounts.api import router as accounts_router
+from apps.beta.api import router as beta_router
 from apps.circuits.api import router as circuits_router
 from apps.dashboard.api import router as dashboard_router
 from apps.intros.api import router as intros_router
@@ -29,6 +30,7 @@ api = NinjaAPI(
 )
 install_handlers(api)
 api.add_router("/config", config_router, tags=["config"])
+api.add_router("", beta_router, tags=["beta"])
 api.add_router("/health", health_router, tags=["health"])
 api.add_router("/demo", demo_router, tags=["demo"])
 api.add_router("", accounts_router, tags=["accounts"])

@@ -519,6 +519,10 @@
       },
       "ConfigOut": {
         "properties": {
+          "beta_access": {
+            "title": "Beta Access",
+            "type": "boolean"
+          },
           "beta_mode": {
             "title": "Beta Mode",
             "type": "boolean"
@@ -538,6 +542,7 @@
         "required": [
           "env",
           "beta_mode",
+          "beta_access",
           "features"
         ],
         "title": "ConfigOut",
@@ -1181,6 +1186,51 @@
           }
         },
         "title": "IntroParams",
+        "type": "object"
+      },
+      "InviteOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "used",
+              "expired",
+              "revoked"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "link",
+          "status"
+        ],
+        "title": "InviteOut",
+        "type": "object"
+      },
+      "InvitesOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InviteOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "InvitesOut",
         "type": "object"
       },
       "JobCapabilityIn": {
@@ -1831,6 +1881,10 @@
       },
       "MeOut": {
         "properties": {
+          "beta_access": {
+            "title": "Beta Access",
+            "type": "boolean"
+          },
           "bio": {
             "title": "Bio",
             "type": "string"
@@ -1928,7 +1982,8 @@
           "profile_visibility",
           "visible_to_org",
           "circuits_opt_in",
-          "open_intro_slots"
+          "open_intro_slots",
+          "beta_access"
         ],
         "title": "MeOut",
         "type": "object"
@@ -3354,6 +3409,45 @@
         "title": "RatingIn",
         "type": "object"
       },
+      "RedeemIn": {
+        "properties": {
+          "code": {
+            "maxLength": 64,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "RedeemIn",
+        "type": "object"
+      },
+      "RedeemOut": {
+        "properties": {
+          "beta_access": {
+            "title": "Beta Access",
+            "type": "boolean"
+          },
+          "organisation_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organisation Id"
+          }
+        },
+        "required": [
+          "beta_access",
+          "organisation_id"
+        ],
+        "title": "RedeemOut",
+        "type": "object"
+      },
       "ReplyIn": {
         "properties": {
           "body": {
@@ -4094,6 +4188,72 @@
         "title": "UploadOut",
         "type": "object"
       },
+      "WaitlistIn": {
+        "properties": {
+          "city": {
+            "default": "",
+            "maxLength": 100,
+            "title": "City",
+            "type": "string"
+          },
+          "college": {
+            "default": "",
+            "maxLength": 200,
+            "title": "College",
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 254,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Note",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "student",
+              "founder",
+              "mentor",
+              "investor",
+              "partner"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "src": {
+            "default": "",
+            "maxLength": 40,
+            "pattern": "^[a-z0-9_-]*$",
+            "title": "Src",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "role"
+        ],
+        "title": "WaitlistIn",
+        "type": "object"
+      },
+      "WaitlistOut": {
+        "properties": {
+          "status": {
+            "const": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "WaitlistOut",
+        "type": "object"
+      },
       "WireActionOut": {
         "properties": {
           "kind": {
@@ -4393,6 +4553,44 @@
         ]
       }
     },
+    "/api/beta/redeem": {
+      "post": {
+        "description": "Gives the signed-in member beta access, and joins the code's organisation if it has one and they have none. A code that is unknown, expired, used up or revoked all get the same 400 `invalid_code` so the answer never helps guessing. Someone who already has access gets 200 and no code is used. Rate limited per member and per address.",
+        "operationId": "apps_beta_api_redeem",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedeemOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Use an invite code",
+        "tags": [
+          "beta"
+        ]
+      }
+    },
     "/api/capabilities": {
       "get": {
         "description": "The fixed list of capabilities used for needs, offers and skills.",
@@ -4669,7 +4867,7 @@
     },
     "/api/config": {
       "get": {
-        "description": "Public. Environment, whether the invite-only beta is on, and which features are on for the caller (anonymous visitors get the `everyone` audience). The app hides screens for features that are off.",
+        "description": "Public. Environment, whether the invite-only beta is on, whether the caller may get past the beta gate (`beta_access`; false for anonymous visitors while the beta is on) and which features are on for the caller (anonymous visitors get the `everyone` audience). The app hides screens for features that are off.",
         "operationId": "core_config_api_get_config",
         "parameters": [],
         "responses": {
@@ -5843,6 +6041,34 @@
         ]
       }
     },
+    "/api/invites": {
+      "get": {
+        "description": "The member's own single-use invite codes with one-tap links to share. Missing codes are created on the way, up to the beta limit (3 by default), so this is safe to call repeatedly.",
+        "operationId": "apps_beta_api_my_invites",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitesOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My invite codes",
+        "tags": [
+          "beta"
+        ]
+      }
+    },
     "/api/jobs": {
       "get": {
         "description": "Open jobs with filters (kind, capability, startup, distance from my location or the city centre, minimum stipend). Students get skill_match (0 to 1) and the best match first; everyone else gets newest first.",
@@ -6346,7 +6572,7 @@
     },
     "/api/me": {
       "get": {
-        "description": "The signed-in member's own profile and settings.",
+        "description": "The signed-in member's own profile and settings. `beta_access` is false while the invite-only beta is on and the member has not got in yet: show the invite-code screen (everything else answers 403 `beta_required`).",
         "operationId": "apps_accounts_api_me",
         "parameters": [],
         "responses": {
@@ -8423,6 +8649,39 @@
         "summary": "Trait list",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/waitlist": {
+      "post": {
+        "description": "Public, for the landing site. No account needed. Always answers 202 `ok` for a valid request, including when the email is already on the list, so it never reveals who has signed up. Rate limited per address. The app calls this too, from the invite-code screen.",
+        "operationId": "apps_beta_api_join_waitlist",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaitlistIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaitlistOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "summary": "Join the waitlist",
+        "tags": [
+          "beta"
         ]
       }
     }

@@ -72,6 +72,15 @@ def join_by_code(member: Member, code: str) -> Organisation:
     return org
 
 
+def join_by_invite(member: Member, org: Organisation) -> bool:
+    """Join the organisation an invite code carries. Quiet: someone who already has an organisation (or an admin role) stays
+    where they are, and the code still gets them into the beta."""
+    if member.organisation_id is not None or member.role not in JOINABLE_ROLES:
+        return False
+    _attach(member, org, "invite")
+    return True
+
+
 def _org_for_domain(domain: str) -> Organisation | None:
     """The one organisation that owns this domain. If two claim it (possible outside the admin form), nobody does."""
     if not domain:

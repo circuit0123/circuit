@@ -40,6 +40,11 @@ class AccountSuspended(ApiError):
         super().__init__(403, "account_suspended", "This account is suspended")
 
 
+class BetaRequired(ApiError):
+    def __init__(self):
+        super().__init__(403, "beta_required", "Circuit is invite-only for now. Enter an invite code or join the waitlist.")
+
+
 class Conflict(ApiError):
     def __init__(self, message: str, code: str = "conflict"):
         super().__init__(409, code, message)

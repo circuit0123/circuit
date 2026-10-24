@@ -35,6 +35,8 @@ EVENT_TYPES = frozenset(
         "connection.requested", "connection.responded", "connection.removed",
         # messaging and reports
         "conversation.started", "conversation.accepted", "conversation.blocked", "message.sent", "report.created",
+        # invite-only beta (F18)
+        "beta.access_granted", "invite.created", "waitlist.joined",
     }
 )  # fmt: skip
 

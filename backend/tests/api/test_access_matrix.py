@@ -17,6 +17,7 @@ PUBLIC = {
     ("GET", "/api/health/deps"),
     ("GET", "/api/demo/personas"),
     ("POST", "/api/demo/token"),
+    ("POST", "/api/waitlist"),
 }
 
 
@@ -133,6 +134,9 @@ MATRIX = {
     ("POST", "/api/conversations/{conversation_id}/block"): messaging(404),
     ("POST", "/api/conversations/{conversation_id}/read"): messaging(404),
     ("POST", "/api/reports"): by_role(404, super_admin=403),
+    # Stage 4b: invite-only beta (F18). BETA_MODE is off here; tests/api/test_beta_gate.py covers the gate itself.
+    ("GET", "/api/invites"): by_role(200),
+    ("POST", "/api/beta/redeem"): by_role(400),  # "X" is not a code, for anyone
 }
 
 # Request bodies and query strings for routes that need them (default POST body is {"code": "X"}).
