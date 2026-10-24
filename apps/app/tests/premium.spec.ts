@@ -163,7 +163,8 @@ async function scan(page: Page, wide: boolean): Promise<Scan> {
       let node: Element = root;
       for (let i = 0; i < 6; i++) {
         const kids = flowChildren(node);
-        if (kids.length !== 1) break;
+        // A labelled section (the Daily Drop in the rail) is one block, not a pile of sections.
+        if (kids.length !== 1 || kids[0].matches("section[aria-label]")) break;
         node = kids[0];
       }
       return flowChildren(node);
@@ -206,8 +207,10 @@ async function scan(page: Page, wide: boolean): Promise<Scan> {
         const need = wide ? 56 : 40;
         if (gap < need) hit("section-gap", inks[i].b, `${gap}px above this block (need ${need}px)`);
       }
-      if (isMain && !wide) {
-        const above = inks.filter((x) => x.top - sy < window.innerHeight).length;
+      if (isMain && !wide && sy === 0) {
+        // The dev banner (dev and demo only) isn't part of the product, so the fold is measured from under it.
+        const banner = document.querySelector('[aria-label="Development tools"]')?.getBoundingClientRect().height ?? 0;
+        const above = inks.filter((x) => x.top - banner < window.innerHeight).length;
         if (above > 3) hit("above-the-fold", null, `${above} blocks before the first scroll (max 3)`);
       }
     }

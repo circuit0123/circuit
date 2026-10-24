@@ -27,12 +27,12 @@ test.beforeEach(async ({ context }, info) => {
 async function home(page: Page) {
   await page.goto("/");
   await expect(page.getByRole("list", { name: "Live wire" })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Worth meeting" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Daily Drop" })).toBeVisible();
   await page.waitForTimeout(600);
 }
-/** A spot on the page that belongs to no swipeable widget: the "Worth meeting" heading, scrolled into view. */
+/** A spot on the page that belongs to no swipeable widget: the "Today" title, scrolled into view. */
 const spot = async (page: Page) => {
-  const h = page.getByRole("heading", { name: "Worth meeting" });
+  const h = page.getByRole("heading", { name: "Today", level: 1 });
   await h.scrollIntoViewIfNeeded();
   await page.waitForTimeout(200);
   return (await h.boundingBox())!;

@@ -5,7 +5,7 @@ test.beforeEach(async ({ context }) => { await signInAs(context, "ravi"); });
 
 test("Home in the new shell", async ({ page }, info) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Home", level: 1 })).toBeAttached();
+  await expect(page.getByRole("heading", { name: "Today", level: 1 })).toBeAttached();
   await expect(page.getByRole("list", { name: "Live wire" })).toBeVisible();
   await page.waitForLoadState("networkidle");
   await inBothThemes(page, async (theme) => {

@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const tabs: TabItem[] = defs.map((d) => ({ id: d.id, label: d.label, href: d.href, icon: <d.Icon size={24} strokeWidth={1.75} aria-hidden />, dot: d.id === "inbox" ? false : undefined }));
   const panes: PagerTab[] = defs.map((d) => ({ id: d.id, node: d.node }));
   const pushed = active === null;
-  const rail = !pushed && desktop && active === "home" ? <HomeRail showMatches={features.on("pulse")} /> : null;
+  const rail = !pushed && desktop && active === "home" ? <HomeRail /> : null;
 
   return (
     <div className="min-h-dvh">
@@ -82,12 +82,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="lg:pl-60">
-        <div className="mx-auto flex w-full max-w-[1000px] justify-center gap-10 lg:px-6">
+        <div className="mx-auto flex w-full max-w-[1036px] justify-center gap-12 lg:px-6">
           <main className="w-full min-w-0 overflow-x-clip pb-24 lg:max-w-[600px] lg:pb-12">
             <TabPager className="min-h-dvh overflow-x-clip" tabs={panes} value={active} progress={progress} swipe={!!me?.appearance.swipeTabs && !desktop && !pushed} onSwipe={(id) => select(id)} />
             {pushed && children}
           </main>
-          {rail && <aside aria-label="For you" className="sticky hidden w-80 shrink-0 self-start py-6 lg:block" style={{ top: "var(--dev-bar, 0px)" }}>{rail}</aside>}
+          {rail && <aside aria-label="For you" className="sticky hidden w-[340px] shrink-0 self-start py-6 lg:block" style={{ top: "var(--dev-bar, 0px)" }}>{rail}</aside>}
         </div>
       </div>
 

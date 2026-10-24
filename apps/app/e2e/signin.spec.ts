@@ -116,12 +116,12 @@ test.describe("local dev (demo people)", () => {
     await page.waitForLoadState("networkidle");
     await inBothThemes(page, async (theme) => { await page.waitForTimeout(200); await shot(page, "signin", `welcome-dev-${size(info)}-${theme}`); });
     await people.getByRole("button", { name: /Ravi Kumar/ }).click();
-    await expect(page.getByRole("heading", { name: "Home", level: 1 })).toBeAttached();
+    await expect(page.getByRole("heading", { name: "Today", level: 1 })).toBeAttached();
   });
 
   test("a signed-in person goes straight to Home", async ({ page, context }) => {
     await signInAs(context, "ravi");
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Home", level: 1 })).toBeAttached();
+    await expect(page.getByRole("heading", { name: "Today", level: 1 })).toBeAttached();
   });
 });

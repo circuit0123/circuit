@@ -1,7 +1,7 @@
 "use client";
 
-import { EmptyState, Screen } from "@circuit/ui";
+import { EmptyState, Screen, Section } from "@circuit/ui";
 
 export function Discover() {
-  return <Screen title="Discover"><EmptyState className="px-0" text="Jobs and the map arrive in the next step." /></Screen>;
+  return <Screen title="Discover"><Section><EmptyState text="Jobs and the map arrive in the next step." /></Section></Screen>;
 }
