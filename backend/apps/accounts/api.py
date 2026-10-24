@@ -1,17 +1,24 @@
 from typing import Literal
 
+from django.conf import settings
 from ninja import Router, Schema
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
-from apps.accounts import services
+from apps.accounts import appearance, services
 from apps.accounts.models import Member
-from apps.beta import gate
 from apps.matching.models import Capability, MemberSkill, MemberTrait, Need, Offer, Trait
+from core import gate
 from core.auth import current_context, current_member
 from core.ratelimit import check_rate
 
 router = Router()
 RoleChoice = Literal["student", "founder", "mentor", "investor"]
+
+
+class AppearanceOut(Schema):
+    theme: Literal["system", "dark", "light"]
+    accent: Literal["mint", "sky", "indigo", "rose", "lime", "mono"]
+    swipe_tabs: bool
 
 
 class MeOut(Schema):
@@ -29,11 +36,17 @@ class MeOut(Schema):
     profile_visibility: str
     visible_to_org: bool
     circuits_opt_in: bool
+    allow_requests: bool
     open_intro_slots: int
     beta_access: bool  # false while BETA_MODE is on and the member has not got in: show the invite-code screen
+    needs_consent: bool  # true until the member accepts policy_version: show the consent screen (everything else answers 403 consent_required)
+    policy_version: str
+    appearance: AppearanceOut  # theme, accent, swipe_tabs: applied before first paint
 
 
 class MePatch(Schema):
+    model_config = ConfigDict(extra="forbid")  # privacy fields have their own endpoint: never silently ignore them here
+
     display_name: str | None = Field(None, min_length=1, max_length=120)
     bio: str | None = Field(None, max_length=2000)
     city: str | None = Field(None, max_length=100)
@@ -41,9 +54,6 @@ class MePatch(Schema):
     role: RoleChoice | None = None
     lat: float | None = Field(None, ge=-90, le=90)
     lng: float | None = Field(None, ge=-180, le=180)
-    profile_visibility: Literal["public", "members", "hidden"] | None = None
-    visible_to_org: bool | None = None
-    circuits_opt_in: bool | None = None
     open_intro_slots: int | None = Field(None, ge=0, le=10)
 
 
@@ -53,7 +63,8 @@ def _me(m: Member, beta_access: bool) -> dict:
         "lat": m.location.y if m.location else None, "lng": m.location.x if m.location else None,
         "verification_level": m.verification_level, "organisation_id": m.organisation_id, "is_minor": m.is_minor,
         "profile_visibility": m.profile_visibility, "visible_to_org": m.visible_to_org, "circuits_opt_in": m.circuits_opt_in,
-        "open_intro_slots": m.open_intro_slots, "beta_access": beta_access,
+        "allow_requests": m.allow_requests, "open_intro_slots": m.open_intro_slots, "beta_access": beta_access,
+        "needs_consent": gate.needs_consent(m), "policy_version": settings.POLICY_VERSION, "appearance": appearance.resolved(m),
     }  # fmt: skip
 
 
@@ -72,8 +83,8 @@ def me(request):
     "/me",
     response=MeOut,
     summary="Update my profile",
-    description="Send only the fields to change. Role may be student, founder, mentor or investor (admin roles are set by Circuit). "
-    "Joining circuits needs verification level 2. Under-18 members stay students and are never public.",
+    description="Send only the fields to change. Role may be student, founder, mentor or investor (admin roles are set by Circuit); "
+    "under-18 members stay students. Privacy and appearance have their own endpoints; unknown fields are a 422.",
 )
 def update_me(request, body: MePatch):
     member = current_member(request)

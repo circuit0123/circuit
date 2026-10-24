@@ -1,7 +1,5 @@
 import pytest
 from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.messages.storage.cookie import CookieStorage
 
 from apps.events.models import Event
 from apps.messaging.models import Conversation, Message
@@ -73,15 +71,6 @@ def test_a_member_i_can_only_reach_through_a_request_can_still_be_reported(make_
 
 
 # -- moderation in Django admin ---------------------------------------------------------------------
-@pytest.fixture
-def staff_request(rf):
-    staff = get_user_model().objects.create_superuser("mod", password="a-long-test-password-1")
-    request = rf.post("/")
-    request.user = staff
-    request._messages = CookieStorage(request)
-    return request, staff
-
-
 def test_hide_remove_and_restore_posts_and_replies_are_audit_logged(make_member, make_post, staff_request):
     request, staff = staff_request
     post = make_post(make_member("founder"), "everyone")
@@ -120,13 +109,13 @@ def test_report_admin_shows_the_reported_message_and_takes_it_down(make_member, 
     rep = Report.objects.get(pk=r.json()["id"])
     ra = admin.site._registry[Report]
     assert "pay me now" in ra.target_preview(rep)  # the only place a moderator can read a DM
-    ra.take_down(request, Report.objects.filter(pk=rep.pk))
+    ra.remove(request, Report.objects.filter(pk=rep.pk))
     rep.refresh_from_db()
     assert rep.status == "actioned" and rep.handled_by == staff
     assert Message.objects.get(pk=msg_id).removed_at is not None
     shown = client_for(b).get(f"/api/conversations/{cid['conversation']['id']}/messages").json()["items"][0]
     assert shown["removed"] is True and shown["body"] == ""  # hidden from both sides
-    assert AuditLog.objects.filter(actor=staff, action="take_down", target_id=str(rep.pk)).exists()
+    assert AuditLog.objects.filter(actor=staff, action="remove", target_id=str(rep.pk)).exists()
 
 
 def test_dismissing_a_report_changes_nothing_else(make_member, make_post, client_for, staff_request):

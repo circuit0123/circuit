@@ -151,6 +151,7 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Serving endpoint per slot (pulse, discover_startups, jobs) applying targeting, dates, caps, frequency rules and hidden campaigns; under-18 only verified-startup roles
 - [ ] Server-side aggregate impression/tap counting; applications attributed to a campaign when started from a promoted item
 - [ ] "Why am I seeing this?" text generated from targeting only
+- [ ] Fill `on_startup_unclaimed` (apps/startups/services.py): pause every active campaign of a startup whose claimant was deleted or replaced; test it with account deletion (B3 built the hook, deletion calls it)
 - [ ] Founder endpoint: promotion results (daily aggregates)
 - [ ] Tests: ranker/Daily Drop/Live wire/search/applicant outputs identical with and without campaigns; caps; no promotion in banned surfaces; under-18 rules; no per-member tracking stored
 - [ ] Frontend: Promoted label and "…" menu on cards, slot rendering in Pulse/Discover/Jobs, founder "Promotion results" card
@@ -165,6 +166,7 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Startup check: live keys refused outside production
 - [ ] CSP allows Razorpay Checkout only on the payment screen
 - [ ] Frontend: package picker on the startup page, Checkout, "processing" → "Your promotion is live" states, payment history
+- [ ] Account deletion keeps orders, payments, refunds and invoices for FINANCIAL_RECORD_RETENTION_YEARS (accountant confirms); add the test that deleting a member with a paid order keeps every payment row (B3 never deletes the Member row, so the foreign keys hold)
 - [ ] Tests: PRODUCTION.md §14 rows 7–9, 18 (payments), plus amount tampering, wrong-startup purchase, duplicate webhooks, out-of-order events, refund flow, all in Razorpay test mode
 
 ## Stage 4f — Investor mode (F21)
@@ -198,17 +200,17 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Smoke passes on staging and demo
 
 ## Stage 6 — Product basics
-- [ ] Account settings: edit profile, notification preferences, privacy, export, delete
-- [ ] Appearance: theme, personal accent (six options, validated server-side), swipe between tabs toggle; GET/PATCH endpoint; accent offered once at the end of onboarding
-- [ ] Notifications in-app (Supabase Realtime) + email (Resend) for intros, applications, circuits; unsubscribe
-- [ ] Report and block users; moderation via Django admin
-- [ ] Help/FAQ, support contact, 404 and 500 pages
-- [ ] Circuit completion moment and live status polished
+- [x] Account settings: edit profile, notification preferences, privacy, export, delete (backend, B3; screens: PROGRESS.md "Frontend remaining")
+- [x] Appearance: theme, personal accent (six options, validated server-side), swipe between tabs toggle; GET/PATCH endpoint; accent offered once at the end of onboarding (backend, B3; the onboarding step and picker are frontend)
+- [x] Notifications in-app (Supabase Realtime) + email (Resend) for intros, applications, circuits; unsubscribe (backend, B3)
+- [x] Report and block users; moderation via Django admin (backend, B3; the report and block sheets are frontend)
+- [ ] Help/FAQ, support contact, 404 and 500 pages (backend done in B3: support/grievance endpoint, public contact endpoint, JSON 404/500; the Help/FAQ content and the 404/500 screens are frontend)
+- [ ] Circuit completion moment and live status polished (backend done in B3: one call returns members, consent, done, ratings, next step, time left, Realtime nudges; the screen and animation are frontend)
 
 ## Stage 7 — Legal and privacy
-- [ ] Privacy policy, terms, cookie notice drafts (landing + app)
+- [x] Privacy policy, terms, cookie notice drafts (docs/legal/, B3; also refund policy, community guidelines, grievance officer page; the landing and app pages are frontend)
 - [ ] [YOU] Lawyer review
-- [ ] Consent stored with version + timestamp; data request process; retention cleanup job
+- [x] Consent stored with version + timestamp; data request process; retention cleanup job (backend, B3)
 
 ## Stage 8 — Reliability and monitoring
 - [ ] Sentry (backend + app), uptime monitors, alerts to a phone

@@ -243,6 +243,10 @@ Code for every feature can be merged and deployed; flags decide what members see
   college, organisation_id (nullable), verification_level, open_intro_slots,
   circuits_opt_in, is_minor, is_tester, profile_visibility, visible_to_org,
   appearance (json: theme, accent, swipe_tabs; validated against the allowed values),
+  email (copied from the verified sign-in email; used only to send mail), notification_prefs
+  (json: type -> {in_app, email}), allow_requests (strangers may send requests; always off for
+  under-18s), deletion_requested_at, deleted_at ("Deleted member" tombstone that old posts,
+  replies and messages point at),
   onboarding (json: current_step, completed_at, saved answers), signup_source (src),
   created_at, updated_at
 - organisations: id, name, kind (college | incubator | accelerator | coworking |
@@ -254,7 +258,7 @@ Code for every feature can be merged and deployed; flags decide what members see
   over their own members only, plus members with visible_to_org = true.
 - startups: id, name, website_domain (unique), description, sector, stage, address,
   location, hiring, tech_stack (json), claimed_by (member), source (seed | crawler | user),
-  confidence, view_count, created_at
+  confidence, view_count, hidden_at (set by a moderator after a report), created_at
 - startup_members; jobs; job_capabilities; applications (unique per student per job)
 - cohorts (organisation, name, year, kind: incubation | accelerator | batch | class),
   cohort_startups / cohort_members (invited_at, accepted_at; membership only after
@@ -277,7 +281,9 @@ Code for every feature can be merged and deployed; flags decide what members see
 - member_traits, startup_traits, member_skills
 - connections; intro_requests; match_results (score, components json, reason, is_bridge)
 - circuits; circuit_legs (giver, receiver, capability, consent, fulfilled, rating)
-- notifications; reports; blocks; audit_log; consents (policy_version, accepted_at)
+- notifications; reports (target: post | reply | message | member | startup; action: hide |
+  remove | warn | suspend | dismiss, handled_at); blocks; audit_log; consents (policy_version,
+  accepted_at); data_exports (member, status, path, expires_at: one open per member)
 - posts (author, body, link, visibility, capability tags, status: visible | hidden |
   removed), post_media (storage path, width, height, alt_text, order),
   reactions (post, member, kind; unique per member+post+kind), replies (post, author,

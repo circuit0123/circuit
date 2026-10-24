@@ -19,6 +19,8 @@ from apps.events.services import record
 from apps.matching import scoring
 from apps.matching import services as matching
 from apps.notifications.services import notify_many
+from apps.social.relations import blocked_ids
+from core import realtime
 from core.errors import Conflict, Forbidden, NotFound
 from core.graph import find_cycles, neighbours
 from core.permissions import NETWORK_ROLES
@@ -167,6 +169,11 @@ def effective_status(circuit: Circuit, now=None) -> str:
     return C.EXPIRED if circuit.status == C.PROPOSED and circuit.consent_deadline <= (now or timezone.now()) else circuit.status
 
 
+def nudge(circuit_id: int) -> None:
+    """Tell the three members' open apps that this circuit changed (ids only; they refetch). Sent after the commit."""
+    transaction.on_commit(lambda: realtime.send(f"circuit:{circuit_id}", "status", {"circuit_id": circuit_id}))
+
+
 def _participants(circuit: Circuit) -> list[int]:
     return list(circuit.legs.values_list("giver_id", flat=True))
 
@@ -176,6 +183,7 @@ def _expire(circuit: Circuit) -> None:
     circuit.save(update_fields=["status"])
     record("circuit.expired", target_type="circuit", target_id=circuit.pk)
     notify_many(_participants(circuit), "circuit.expired", circuit_id=circuit.pk)
+    nudge(circuit.pk)
 
 
 def expire_due() -> int:
@@ -190,7 +198,11 @@ def expire_due() -> int:
 # -- members' actions ---------------------------------------------------------------------------------------
 def my_circuits(member: Member):
     ids = CircuitLeg.objects.filter(giver=member).values("circuit_id")
-    return Circuit.objects.filter(pk__in=ids).select_related("round").prefetch_related(
+    qs = Circuit.objects.filter(pk__in=ids)
+    blocked = blocked_ids(member.pk)  # a circuit with someone I blocked (or who blocked me) is out of sight, history included
+    if blocked:
+        qs = qs.exclude(pk__in=CircuitLeg.objects.filter(giver_id__in=blocked).values("circuit_id"))
+    return qs.select_related("round").prefetch_related(
         "legs__giver", "legs__receiver", "legs__capability"
     ).order_by("-created_at", "-id")  # fmt: skip
 
@@ -234,9 +246,13 @@ def respond(member: Member, circuit_id: int, accept: bool) -> bool:
             circuit.status = C.DECLINED
             circuit.save(update_fields=["status"])
             record("circuit.declined", actor=member, target_type="circuit", target_id=circuit.pk)
-            notify_many([p for p in _participants(circuit) if p != member.pk], "circuit.declined", circuit_id=circuit.pk)
+            notify_many(
+                [p for p in _participants(circuit) if p != member.pk], "circuit.declined", actor=member, circuit_id=circuit.pk
+            )
+            nudge(circuit.pk)
             return True
         record("circuit.accepted", actor=member, target_type="circuit", target_id=circuit.pk)
+        nudge(circuit.pk)
         if not circuit.legs.exclude(consent=L.ACCEPTED).exists():
             circuit.status = C.ACTIVE
             circuit.save(update_fields=["status"])
@@ -265,8 +281,9 @@ def mark_done(member: Member, circuit_id: int, leg_id: int) -> None:
             raise Conflict("This circuit is not active", code="circuit_not_active")
         leg.fulfilled = True
         leg.save(update_fields=["fulfilled"])
+        nudge(circuit.pk)
         record("circuit.leg_done", actor=member, target_type="circuit", target_id=circuit.pk, leg_id=leg.pk)
-        notify_many([leg.receiver_id], "circuit.leg_done", circuit_id=circuit.pk, leg_id=leg.pk)
+        notify_many([leg.receiver_id], "circuit.leg_done", actor=member, circuit_id=circuit.pk, leg_id=leg.pk)
         if not circuit.legs.filter(fulfilled=False).exists():
             circuit.status = C.COMPLETED
             circuit.save(update_fields=["status"])
@@ -287,4 +304,5 @@ def rate_leg(member: Member, circuit_id: int, leg_id: int, rating: int) -> None:
             raise Conflict("Wait until it has been handed over", code="leg_not_done")
         leg.rating = rating
         leg.save(update_fields=["rating"])
+        nudge(circuit.pk)
         record("circuit.rated", actor=member, target_type="circuit", target_id=circuit.pk, leg_id=leg.pk, rating=rating)

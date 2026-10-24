@@ -53,6 +53,42 @@ def beta_on(settings):
     settings.BETA_MODE = True
 
 
+@pytest.fixture(autouse=True)
+def consent_ok(request, monkeypatch, settings):
+    """Test members have not clicked through the consent screen; the consent gate is off unless a test uses `consent_on`."""
+    settings.POLICY_VERSION = "2026-01"
+    if "consent_on" not in request.fixturenames:
+        from core import gate
+
+        monkeypatch.setattr(gate, "needs_consent", lambda member: False)
+
+
+@pytest.fixture
+def consent_on():
+    """Marker: run this test with the real consent gate (members need a Consent row for the current POLICY_VERSION)."""
+
+
+@pytest.fixture(autouse=True)
+def auth_deletions():
+    """No call to Supabase's admin API: account deletion records the auth user ids it was asked to delete."""
+    from core import supabase_admin
+
+    deleted: list = []
+    supabase_admin.set_deleter(lambda auth_user_id: deleted.append(auth_user_id) or True)
+    yield deleted
+    supabase_admin.set_deleter(None)
+
+
+@pytest.fixture
+def realtime_events():
+    """Everything broadcast over Realtime during the test, as (topic, event, payload)."""
+    from core import realtime
+
+    sent: list = []
+    realtime.set_sender(lambda topic, event, payload: sent.append((topic, event, payload)))
+    return sent
+
+
 @pytest.fixture
 def let_in(db):
     """Give a member beta access the way a redeemed code would."""
@@ -288,3 +324,16 @@ def pytest_terminal_summary(terminalreporter):
     for n, name in STORY_NAMES.items():
         result = _story_outcomes.get(n, "NOT RUN")
         terminalreporter.write_line(f"Story {n}: {result}  {name}", red=result != "PASS", green=result == "PASS")
+
+
+@pytest.fixture
+def staff_request(rf):
+    """A fake Django admin request from a staff superuser, for calling admin actions directly. Returns (request, staff user)."""
+    from django.contrib.auth import get_user_model
+    from django.contrib.messages.storage.cookie import CookieStorage
+
+    staff = get_user_model().objects.create_superuser("mod", password="a-long-test-password-1")
+    request = rf.post("/")
+    request.user = staff
+    request._messages = CookieStorage(request)
+    return request, staff

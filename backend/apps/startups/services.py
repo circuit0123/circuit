@@ -37,7 +37,7 @@ EDITABLE = {"description", "stage", "hiring", "address", "tech_stack"}
 
 # -- search ----------------------------------------------------------------------------------
 def _filtered(hiring: bool | None, capability: str | None) -> QuerySet[Startup]:
-    qs = Startup.objects.filter(location__isnull=False)
+    qs = Startup.objects.filter(location__isnull=False, hidden_at__isnull=True)  # a reported startup a moderator hid is gone
     if hiring is not None:
         qs = qs.filter(hiring=hiring)
     if capability:
@@ -135,7 +135,7 @@ def team_member_ids(startup: Startup) -> list[int]:
 
 
 def get_startup(startup_id: int) -> Startup:
-    s = Startup.objects.filter(pk=startup_id).first()
+    s = Startup.objects.filter(pk=startup_id, hidden_at__isnull=True).first()
     if s is None:
         raise NotFound()
     return s
@@ -255,6 +255,14 @@ def verify_claim(member: Member, startup_id: int, code: str) -> Startup:
     record("startup.claimed", actor=member, target_type="startup", target_id=startup.pk)
     notify(member, "startup.claimed", startup_id=startup.pk)
     return startup
+
+
+def on_startup_unclaimed(startup: Startup, transferred_to: int | None = None) -> None:
+    """Called when the member who claimed a startup is deleted: `transferred_to` is the new owner, or None if it is now unclaimed.
+
+    HOOK FOR STAGE 4d (promotions): pause every active campaign of this startup here, because the person who bought it is gone.
+    Orders and payments are never touched (they are kept for the tax period, Stage 4e). Nothing to do until campaigns exist."""
+    log.info("startup_owner_removed", startup_id=startup.pk, transferred=transferred_to is not None)
 
 
 def expire_claims() -> int:

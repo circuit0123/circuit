@@ -122,6 +122,7 @@ def activity_items(member: Member, since: datetime, upto: datetime) -> list[Item
         )
     lat, lng = default_centre(member)
     claimed = Startup.objects.filter(
+        hidden_at__isnull=True,
         claimed_at__gte=since,
         claimed_at__lte=upto,
         location__distance_lte=(Point(lng, lat, srid=4326), D(km=settings.STUDENT_MAX_DISTANCE_KM)),
@@ -155,6 +156,7 @@ def skills_item(member: Member, since: datetime, upto: datetime, now: datetime) 
     counts: dict[str, tuple[str, int]] = {}
     qs = JobCapability.objects.filter(
         job__is_open=True,
+        job__startup__hidden_at__isnull=True,
         job__created_at__gte=now - timedelta(days=settings.PULSE_WINDOW_DAYS),
         job__startup__location__distance_lte=(centre, D(km=settings.STUDENT_MAX_DISTANCE_KM)),
     ).values_list("capability__slug", "capability__name")

@@ -93,7 +93,7 @@ export interface paths {
         };
         /**
          * My circuits
-         * @description Exchange circuits I am part of, newest first, with live status: who gives what to whom, who has said yes, what has been handed over. A proposal nobody finished answering in 72 hours reads as expired.
+         * @description Exchange circuits I am part of, newest first, each with everything its screen shows (see One circuit). A proposal nobody finished answering in 72 hours reads as expired.
          */
         get: operations["apps_circuits_api_list_circuits"];
         put?: never;
@@ -113,7 +113,7 @@ export interface paths {
         };
         /**
          * One circuit
-         * @description A circuit I am part of. Anyone else's circuit is a 404.
+         * @description A circuit I am part of; anyone else's is a 404. One call returns everything the circuit screen and the completion moment need: the three members with their yes and their done, who helps whom (`you_help`, `helps_you`), the time left to answer, what I can do next (`next_step`), each handover with `can_mark_done` and `can_rate`, and ratings (a rating shows only on handovers I give or receive). Realtime: listen to the private channel `circuit:<id>`; an event means refetch.
          */
         get: operations["apps_circuits_api_get_circuit"];
         put?: never;
@@ -907,9 +907,29 @@ export interface paths {
         head?: never;
         /**
          * Update my profile
-         * @description Send only the fields to change. Role may be student, founder, mentor or investor (admin roles are set by Circuit). Joining circuits needs verification level 2. Under-18 members stay students and are never public.
+         * @description Send only the fields to change. Role may be student, founder, mentor or investor (admin roles are set by Circuit); under-18 members stay students. Privacy and appearance have their own endpoints; unknown fields are a 422.
          */
         patch: operations["apps_accounts_api_update_me"];
+        trace?: never;
+    };
+    "/api/me/appearance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update my appearance
+         * @description Theme (system, dark, light), personal accent (mint, sky, indigo, rose, lime, mono) and swipe between tabs. Send only the fields to change. Any other value or field is a 422. Stored on the member so it follows them across devices.
+         */
+        patch: operations["apps_accounts_settings_api_patch_appearance"];
         trace?: never;
     };
     "/api/me/applications": {
@@ -924,6 +944,110 @@ export interface paths {
          * @description Students: my applications with their status, newest first.
          */
         get: operations["apps_jobs_api_my_applications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * People I blocked
+         * @description Only the people I blocked, newest first. Who blocked me is never shown.
+         */
+        get: operations["apps_moderation_blocks_api_my_blocks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept the current policy
+         * @description Records that I accepted the current Privacy Policy and Terms (policy_version from `/api/me`). Safe to repeat. A version that is not the current one is a 422. Open to members who have not accepted yet and to members without beta access.
+         */
+        post: operations["apps_accounts_settings_api_accept_consent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Delete my account
+         * @description Send {"confirm": "DELETE"}. The account is locked at once (every call answers 403 `account_deleted`) and a job removes the sign-in, files, profile, needs, offers and connections, and shows old posts and messages as "Deleted member". Payment records are kept as tax law requires. Startups I claimed pass to another team member or become unclaimed. Safe to repeat. Circuit admins cannot delete themselves here.
+         */
+        post: operations["apps_accounts_privacy_api_delete_account"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My latest data export
+         * @description Status of my most recent export (pending, building, ready, failed, expired), or null if I never asked. Open to members who have not accepted the latest policy or have no beta access.
+         */
+        get: operations["apps_accounts_privacy_api_my_export"];
+        put?: never;
+        /**
+         * Ask for a copy of my data
+         * @description Starts an export of only my own data (profile, posts, messages I sent, connections, circuits and more) as a zip. A job builds it and emails a link that works for 24 hours. One at a time (409 `export_in_progress`); 3 a day.
+         */
+        post: operations["apps_accounts_privacy_api_request_export"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/export/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the download link for my export
+         * @description Send the `token` from the email link while signed in as the same member. Returns a storage link that works for a few minutes. Someone else's token is a 404; an old one is 410 `export_expired`.
+         */
+        get: operations["apps_accounts_privacy_api_download_export"];
         put?: never;
         post?: never;
         delete?: never;
@@ -976,6 +1100,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/notification-preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update my notification preferences
+         * @description Per type (intros, applications, circuits, messages, pulse_replies, announcements) and channel (in_app, email). Send only what changes, e.g. {"intros": {"email": false}}. Account notices (a warning from a moderator) are always shown in the app and cannot be turned off.
+         */
+        patch: operations["apps_accounts_settings_api_patch_notification_preferences"];
+        trace?: never;
+    };
     "/api/me/offers": {
         parameters: {
             query?: never;
@@ -993,6 +1137,46 @@ export interface paths {
          * @description Replaces my offers with this list (max 8, capability slugs from /capabilities). Safe to repeat.
          */
         put: operations["apps_accounts_api_put_offers"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/privacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update my privacy
+         * @description Send only the fields to change: profile_visibility (public, members, hidden), visible_to_org, circuits_opt_in (needs verification level 2) and allow_requests (strangers may send requests). Members under 18 can never make the profile public or open requests to strangers: 403 `under_18_restricted`, whatever the client sends. Unknown fields are a 422.
+         */
+        patch: operations["apps_accounts_settings_api_patch_privacy"];
+        trace?: never;
+    };
+    "/api/me/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Settings screen
+         * @description Everything the Settings screens show, in one call: profile summary (email as a hint only), privacy, appearance, notification preferences per type and channel, how many people I have blocked, my latest data export, which policy version I accepted, and the support and grievance contacts.
+         */
+        get: operations["apps_accounts_settings_api_get_settings"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1148,6 +1332,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/members/{member_id}/block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Block a member
+         * @description Works both ways: neither of you sees the other in matches, Daily Drop, Pulse, Live wire, intros, circuits or Inbox. Removes the connection, closes the chat, stops pending intros between you and ends shared circuits. Anyone you cannot see or have not been in contact with is a 404. Safe to repeat. Rate limited.
+         */
+        post: operations["apps_moderation_blocks_api_block_member"];
+        /**
+         * Unblock a member
+         * @description Lifts my block. A closed chat comes back as a request; the connection is not restored. 404 if I had not blocked them.
+         */
+        delete: operations["apps_moderation_blocks_api_unblock_member"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/members/{member_id}/posts": {
         parameters: {
             query?: never;
@@ -1177,7 +1385,7 @@ export interface paths {
         };
         /**
          * My notifications
-         * @description Newest first. Add unread=true for unread only. Payloads hold ids only; look details up with the other endpoints.
+         * @description Newest first. Add unread=true for unread only. Each item has the line to show (`text`), who did it (`actor`) and what to open (`target`), so the notification centre needs no follow-up calls. Notifications from people I blocked (or who blocked me) and from features switched off for me are left out.
          */
         get: operations["apps_notifications_api_list_notifications"];
         put?: never;
@@ -1550,8 +1758,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Report a post, reply, message or profile
-         * @description Goes to the Circuit moderators. You can only report what you can see (anything else is a 404). Reporting the same thing twice returns the open report.
+         * Report a post, reply, message, profile or startup
+         * @description Goes to the Circuit moderators. You can only report what you can see (anything else is a 404). Reporting the same thing twice returns the open report. Rate limited to 10 a day.
          */
         post: operations["apps_moderation_api_create_report"];
         delete?: never;
@@ -1712,6 +1920,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/support": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write to support or the grievance officer
+         * @description A question, a correction, a data request or a grievance. Emails the right inbox and sends me an acknowledgement with a reference. 5 a day. Open to members who have not accepted the latest policy or have no beta access.
+         */
+        post: operations["apps_accounts_privacy_api_write_support"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/support/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Support and grievance contacts
+         * @description Public. The support address and the grievance officer's name, email and address (from settings), for the legal pages and the Help screen.
+         */
+        get: operations["apps_accounts_privacy_api_contact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/traits": {
         parameters: {
             query?: never;
@@ -1726,6 +1974,30 @@ export interface paths {
         get: operations["apps_accounts_api_traits"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check an unsubscribe link
+         * @description Public. Shows which email type the link switches off. Changes nothing, so mail scanners that open links are harmless. A tampered or expired token is a 400 `invalid_token`. Rate limited per address.
+         */
+        get: operations["apps_notifications_unsubscribe_api_check_unsubscribe"];
+        put?: never;
+        /**
+         * Unsubscribe from one type of email
+         * @description Public, one click (also the target of the List-Unsubscribe-Post header). Turns off the email channel of the one notification type in the link and nothing else. Safe to repeat. A tampered or expired token is a 400 `invalid_token`.
+         */
+        post: operations["apps_notifications_unsubscribe_api_do_unsubscribe"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1789,6 +2061,30 @@ export interface components {
         AnswerIn: {
             /** Accept */
             accept: boolean;
+        };
+        /** AppearanceOut */
+        AppearanceOut: {
+            /**
+             * Accent
+             * @enum {string}
+             */
+            accent: "mint" | "sky" | "indigo" | "rose" | "lime" | "mono";
+            /** Swipe Tabs */
+            swipe_tabs: boolean;
+            /**
+             * Theme
+             * @enum {string}
+             */
+            theme: "system" | "dark" | "light";
+        };
+        /** AppearancePatch */
+        AppearancePatch: {
+            /** Accent */
+            accent?: ("mint" | "sky" | "indigo" | "rose" | "lime" | "mono") | null;
+            /** Swipe Tabs */
+            swipe_tabs?: boolean | null;
+            /** Theme */
+            theme?: ("system" | "dark" | "light") | null;
         };
         /** ApplicantOut */
         ApplicantOut: {
@@ -1871,6 +2167,11 @@ export interface components {
             /** Min Lng */
             min_lng: number;
         };
+        /** BlockedOut */
+        BlockedOut: {
+            /** Items */
+            items: components["schemas"]["PersonOut"][];
+        };
         /** CapabilityOut */
         CapabilityOut: {
             /** Category */
@@ -1896,6 +2197,20 @@ export interface components {
             /** Lng */
             lng: number;
         };
+        /** ChannelsOut */
+        ChannelsOut: {
+            /** Email */
+            email: boolean;
+            /** In App */
+            in_app: boolean;
+        };
+        /** ChannelsPatch */
+        ChannelsPatch: {
+            /** Email */
+            email?: boolean | null;
+            /** In App */
+            in_app?: boolean | null;
+        };
         /** CircuitOut */
         CircuitOut: {
             /**
@@ -1908,18 +2223,26 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            helps_you: components["schemas"]["LineOut"];
             /** Id */
             id: number;
             /** Legs */
             legs: components["schemas"]["LegOut"][];
+            /** Members */
+            members: components["schemas"]["MemberStatusOut"][];
             /** My Consent */
             my_consent: string;
+            /** Next Step */
+            next_step: string;
             /** Score Percent */
             score_percent: number;
             /** Status */
             status: string;
+            /** Time Left Seconds */
+            time_left_seconds: number | null;
             /** Week */
             week: string;
+            you_help: components["schemas"]["LineOut"];
         };
         /** ClaimConfirmIn */
         ClaimConfirmIn: {
@@ -1975,6 +2298,32 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** ConsentIn */
+        ConsentIn: {
+            /** Policy Version */
+            policy_version: string;
+        };
+        /** ConsentOut */
+        ConsentOut: {
+            /**
+             * Accepted At
+             * Format: date-time
+             */
+            accepted_at: string;
+            /** Policy Version */
+            policy_version: string;
+        };
+        /** ConsentStatus */
+        ConsentStatus: {
+            /** Accepted At */
+            accepted_at: string | null;
+            /** Accepted Version */
+            accepted_version: string | null;
+            /** Needs Consent */
+            needs_consent: boolean;
+            /** Policy Version */
+            policy_version: string;
+        };
         /** ConversationOut */
         ConversationOut: {
             /** Id */
@@ -2013,6 +2362,27 @@ export interface components {
              */
             limit: number;
         };
+        /** DeletionIn */
+        DeletionIn: {
+            /**
+             * Confirm
+             * @constant
+             */
+            confirm: "DELETE";
+        };
+        /** DeletionOut */
+        DeletionOut: {
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /**
+             * Status
+             * @constant
+             */
+            status: "scheduled";
+        };
         /** DemoToken */
         DemoToken: {
             /** Access Token */
@@ -2030,6 +2400,15 @@ export interface components {
             redis: string;
             /** Status */
             status: string;
+        };
+        /** DownloadOut */
+        DownloadOut: {
+            /** Expires In */
+            expires_in: number;
+            /** Size Bytes */
+            size_bytes: number;
+            /** Url */
+            url: string;
         };
         /** DropCardOut */
         DropCardOut: {
@@ -2065,6 +2444,20 @@ export interface components {
              * Format: date-time
              */
             next_drop_at: string;
+        };
+        /** ExportStatus */
+        ExportStatus: {
+            /** Expires At */
+            expires_at: string | null;
+            /** Ready At */
+            ready_at: string | null;
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /** Status */
+            status: string;
         };
         /** ExtractIn */
         ExtractIn: {
@@ -2113,6 +2506,15 @@ export interface components {
             needed_by: components["schemas"]["CountOut"];
             offered_by: components["schemas"]["CountOut"];
             offered_outside: components["schemas"]["CountOut"];
+        };
+        /** GrievanceOut */
+        GrievanceOut: {
+            /** Address */
+            address: string;
+            /** Email */
+            email: string;
+            /** Name */
+            name: string;
         };
         /** Health */
         Health: {
@@ -2348,6 +2750,10 @@ export interface components {
         };
         /** LegOut */
         LegOut: {
+            /** Can Mark Done */
+            can_mark_done: boolean;
+            /** Can Rate */
+            can_rate: boolean;
             /** Capability */
             capability: string;
             /** Consent */
@@ -2361,9 +2767,17 @@ export interface components {
             i_receive: boolean;
             /** Id */
             id: number;
+            /** Rated */
+            rated: boolean;
             /** Rating */
             rating: number | null;
             receiver: components["schemas"]["PersonOut"];
+        };
+        /** LineOut */
+        LineOut: {
+            /** Capability */
+            capability: string;
+            person: components["schemas"]["PersonOut"];
         };
         /** MatchOut */
         MatchOut: {
@@ -2403,6 +2817,9 @@ export interface components {
         };
         /** MeOut */
         MeOut: {
+            /** Allow Requests */
+            allow_requests: boolean;
+            appearance: components["schemas"]["AppearanceOut"];
             /** Beta Access */
             beta_access: boolean;
             /** Bio */
@@ -2423,10 +2840,14 @@ export interface components {
             lat: number | null;
             /** Lng */
             lng: number | null;
+            /** Needs Consent */
+            needs_consent: boolean;
             /** Open Intro Slots */
             open_intro_slots: number;
             /** Organisation Id */
             organisation_id: number | null;
+            /** Policy Version */
+            policy_version: string;
             /** Profile Visibility */
             profile_visibility: string;
             /** Role */
@@ -2440,8 +2861,6 @@ export interface components {
         MePatch: {
             /** Bio */
             bio?: string | null;
-            /** Circuits Opt In */
-            circuits_opt_in?: boolean | null;
             /** City */
             city?: string | null;
             /** College */
@@ -2454,12 +2873,8 @@ export interface components {
             lng?: number | null;
             /** Open Intro Slots */
             open_intro_slots?: number | null;
-            /** Profile Visibility */
-            profile_visibility?: ("public" | "members" | "hidden") | null;
             /** Role */
             role?: ("student" | "founder" | "mentor" | "investor") | null;
-            /** Visible To Org */
-            visible_to_org?: boolean | null;
         };
         /** MediaIn */
         MediaIn: {
@@ -2470,6 +2885,16 @@ export interface components {
             alt_text: string;
             /** Upload Id */
             upload_id: number;
+        };
+        /** MemberStatusOut */
+        MemberStatusOut: {
+            /** Consent */
+            consent: string;
+            /** Done */
+            done: boolean;
+            /** Is Me */
+            is_me: boolean;
+            person: components["schemas"]["PersonOut"];
         };
         /** MessageOut */
         MessageOut: {
@@ -2550,6 +2975,7 @@ export interface components {
         };
         /** NotificationOut */
         NotificationOut: {
+            actor: components["schemas"]["PersonOut"] | null;
             /**
              * Created At
              * Format: date-time
@@ -2565,6 +2991,9 @@ export interface components {
             };
             /** Read */
             read: boolean;
+            target: components["schemas"]["TargetOut"] | null;
+            /** Text */
+            text: string;
         };
         /** NotificationParams */
         NotificationParams: {
@@ -2583,6 +3012,24 @@ export interface components {
              * @default false
              */
             unread: boolean;
+        };
+        /** NotificationPrefsOut */
+        NotificationPrefsOut: {
+            announcements: components["schemas"]["ChannelsOut"];
+            applications: components["schemas"]["ChannelsOut"];
+            circuits: components["schemas"]["ChannelsOut"];
+            intros: components["schemas"]["ChannelsOut"];
+            messages: components["schemas"]["ChannelsOut"];
+            pulse_replies: components["schemas"]["ChannelsOut"];
+        };
+        /** NotificationPrefsPatch */
+        NotificationPrefsPatch: {
+            announcements?: components["schemas"]["ChannelsPatch"] | null;
+            applications?: components["schemas"]["ChannelsPatch"] | null;
+            circuits?: components["schemas"]["ChannelsPatch"] | null;
+            intros?: components["schemas"]["ChannelsPatch"] | null;
+            messages?: components["schemas"]["ChannelsPatch"] | null;
+            pulse_replies?: components["schemas"]["ChannelsPatch"] | null;
         };
         /** OpenJobOut */
         OpenJobOut: {
@@ -2825,6 +3272,31 @@ export interface components {
             /** Visibility */
             visibility: string;
         };
+        /** PrivacyOut */
+        PrivacyOut: {
+            /** Allow Requests */
+            allow_requests: boolean;
+            /** Circuits Opt In */
+            circuits_opt_in: boolean;
+            /**
+             * Profile Visibility
+             * @enum {string}
+             */
+            profile_visibility: "public" | "members" | "hidden";
+            /** Visible To Org */
+            visible_to_org: boolean;
+        };
+        /** PrivacyPatch */
+        PrivacyPatch: {
+            /** Allow Requests */
+            allow_requests?: boolean | null;
+            /** Circuits Opt In */
+            circuits_opt_in?: boolean | null;
+            /** Profile Visibility */
+            profile_visibility?: ("public" | "members" | "hidden") | null;
+            /** Visible To Org */
+            visible_to_org?: boolean | null;
+        };
         /** PrivateStatsOut */
         PrivateStatsOut: {
             /** Reactions */
@@ -2856,6 +3328,23 @@ export interface components {
             skills: components["schemas"]["SkillOut"][];
             /** Traits */
             traits: string[];
+            /** Verification Level */
+            verification_level: number;
+        };
+        /** ProfileSummary */
+        ProfileSummary: {
+            /** City */
+            city: string;
+            /** College */
+            college: string;
+            /** Display Name */
+            display_name: string;
+            /** Email Hint */
+            email_hint: string;
+            /** Is Minor */
+            is_minor: boolean;
+            /** Role */
+            role: string;
             /** Verification Level */
             verification_level: number;
         };
@@ -2956,7 +3445,7 @@ export interface components {
              * Target Type
              * @enum {string}
              */
-            target_type: "post" | "reply" | "message" | "member";
+            target_type: "post" | "reply" | "message" | "member" | "startup";
         };
         /** ReportOut */
         ReportOut: {
@@ -3000,6 +3489,18 @@ export interface components {
              * @description A finished upload with purpose=message
              */
             upload_id?: number | null;
+        };
+        /** SettingsOut */
+        SettingsOut: {
+            appearance: components["schemas"]["AppearanceOut"];
+            /** Blocked Count */
+            blocked_count: number;
+            consent: components["schemas"]["ConsentStatus"];
+            export: components["schemas"]["ExportStatus"] | null;
+            notifications: components["schemas"]["NotificationPrefsOut"];
+            privacy: components["schemas"]["PrivacyOut"];
+            profile: components["schemas"]["ProfileSummary"];
+            support: components["schemas"]["SupportOut"];
         };
         /** SkillDemandOut */
         SkillDemandOut: {
@@ -3133,6 +3634,27 @@ export interface components {
             /** Traits */
             traits: string[];
         };
+        /** SupportIn */
+        SupportIn: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "question" | "correction" | "data_request" | "grievance";
+            /** Message */
+            message: string;
+        };
+        /** SupportOut */
+        SupportOut: {
+            grievance: components["schemas"]["GrievanceOut"];
+            /** Support Email */
+            support_email: string;
+        };
+        /** SupportReceipt */
+        SupportReceipt: {
+            /** Reference */
+            reference: string;
+        };
         /** SwipeIn */
         SwipeIn: {
             /**
@@ -3140,6 +3662,13 @@ export interface components {
              * @enum {string}
              */
             direction: "intro" | "skip";
+        };
+        /** TargetOut */
+        TargetOut: {
+            /** Id */
+            id: number;
+            /** Type */
+            type: string;
         };
         /** TraitOut */
         TraitOut: {
@@ -3152,6 +3681,15 @@ export interface components {
         UnreadOut: {
             /** Marked */
             marked: number;
+        };
+        /** UnsubscribeOut */
+        UnsubscribeOut: {
+            /** Email On */
+            email_on: boolean;
+            /** Label */
+            label: string;
+            /** Type */
+            type: string;
         };
         /** UploadDoneOut */
         UploadDoneOut: {
@@ -4492,6 +5030,30 @@ export interface operations {
             };
         };
     };
+    apps_accounts_settings_api_patch_appearance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppearancePatch"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppearanceOut"];
+                };
+            };
+        };
+    };
     apps_jobs_api_my_applications: {
         parameters: {
             query?: {
@@ -4511,6 +5073,136 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Page_ApplicationOut_"];
+                };
+            };
+        };
+    };
+    apps_moderation_blocks_api_my_blocks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlockedOut"];
+                };
+            };
+        };
+    };
+    apps_accounts_settings_api_accept_consent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentOut"];
+                };
+            };
+        };
+    };
+    apps_accounts_privacy_api_delete_account: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeletionIn"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionOut"];
+                };
+            };
+        };
+    };
+    apps_accounts_privacy_api_my_export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportStatus"] | null;
+                };
+            };
+        };
+    };
+    apps_accounts_privacy_api_request_export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportStatus"];
+                };
+            };
+        };
+    };
+    apps_accounts_privacy_api_download_export: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
                 };
             };
         };
@@ -4579,6 +5271,30 @@ export interface operations {
             };
         };
     };
+    apps_accounts_settings_api_patch_notification_preferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationPrefsPatch"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPrefsOut"];
+                };
+            };
+        };
+    };
     apps_accounts_api_get_offers: {
         parameters: {
             query?: never;
@@ -4619,6 +5335,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NeedOfferOut"][];
+                };
+            };
+        };
+    };
+    apps_accounts_settings_api_patch_privacy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrivacyPatch"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrivacyOut"];
+                };
+            };
+        };
+    };
+    apps_accounts_settings_api_get_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
                 };
             };
         };
@@ -4824,6 +5584,46 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ProfileOut"];
                 };
+            };
+        };
+    };
+    apps_moderation_blocks_api_block_member: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_moderation_blocks_api_unblock_member: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -5560,6 +6360,50 @@ export interface operations {
             };
         };
     };
+    apps_accounts_privacy_api_write_support: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupportIn"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportReceipt"];
+                };
+            };
+        };
+    };
+    apps_accounts_privacy_api_contact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportOut"];
+                };
+            };
+        };
+    };
     apps_accounts_api_traits: {
         parameters: {
             query?: never;
@@ -5576,6 +6420,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TraitOut"][];
+                };
+            };
+        };
+    };
+    apps_notifications_unsubscribe_api_check_unsubscribe: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnsubscribeOut"];
+                };
+            };
+        };
+    };
+    apps_notifications_unsubscribe_api_do_unsubscribe: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnsubscribeOut"];
                 };
             };
         };

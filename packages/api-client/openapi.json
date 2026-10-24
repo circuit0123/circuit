@@ -140,6 +140,95 @@
         "title": "AnswerIn",
         "type": "object"
       },
+      "AppearanceOut": {
+        "properties": {
+          "accent": {
+            "enum": [
+              "mint",
+              "sky",
+              "indigo",
+              "rose",
+              "lime",
+              "mono"
+            ],
+            "title": "Accent",
+            "type": "string"
+          },
+          "swipe_tabs": {
+            "title": "Swipe Tabs",
+            "type": "boolean"
+          },
+          "theme": {
+            "enum": [
+              "system",
+              "dark",
+              "light"
+            ],
+            "title": "Theme",
+            "type": "string"
+          }
+        },
+        "required": [
+          "theme",
+          "accent",
+          "swipe_tabs"
+        ],
+        "title": "AppearanceOut",
+        "type": "object"
+      },
+      "AppearancePatch": {
+        "additionalProperties": false,
+        "properties": {
+          "accent": {
+            "anyOf": [
+              {
+                "enum": [
+                  "mint",
+                  "sky",
+                  "indigo",
+                  "rose",
+                  "lime",
+                  "mono"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accent"
+          },
+          "swipe_tabs": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Swipe Tabs"
+          },
+          "theme": {
+            "anyOf": [
+              {
+                "enum": [
+                  "system",
+                  "dark",
+                  "light"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Theme"
+          }
+        },
+        "title": "AppearancePatch",
+        "type": "object"
+      },
       "ApplicantOut": {
         "properties": {
           "application_id": {
@@ -356,6 +445,22 @@
         "title": "BboxParams",
         "type": "object"
       },
+      "BlockedOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PersonOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "BlockedOut",
+        "type": "object"
+      },
       "CapabilityOut": {
         "properties": {
           "category": {
@@ -420,6 +525,53 @@
         "title": "CellOut",
         "type": "object"
       },
+      "ChannelsOut": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "boolean"
+          },
+          "in_app": {
+            "title": "In App",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "in_app",
+          "email"
+        ],
+        "title": "ChannelsOut",
+        "type": "object"
+      },
+      "ChannelsPatch": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "in_app": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In App"
+          }
+        },
+        "title": "ChannelsPatch",
+        "type": "object"
+      },
       "CircuitOut": {
         "properties": {
           "consent_deadline": {
@@ -432,6 +584,9 @@
             "title": "Created At",
             "type": "string"
           },
+          "helps_you": {
+            "$ref": "#/components/schemas/LineOut"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -443,8 +598,19 @@
             "title": "Legs",
             "type": "array"
           },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberStatusOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
           "my_consent": {
             "title": "My Consent",
+            "type": "string"
+          },
+          "next_step": {
+            "title": "Next Step",
             "type": "string"
           },
           "score_percent": {
@@ -455,9 +621,23 @@
             "title": "Status",
             "type": "string"
           },
+          "time_left_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Left Seconds"
+          },
           "week": {
             "title": "Week",
             "type": "string"
+          },
+          "you_help": {
+            "$ref": "#/components/schemas/LineOut"
           }
         },
         "required": [
@@ -466,8 +646,13 @@
           "score_percent",
           "week",
           "consent_deadline",
+          "time_left_seconds",
           "created_at",
           "my_consent",
+          "next_step",
+          "you_help",
+          "helps_you",
+          "members",
           "legs"
         ],
         "title": "CircuitOut",
@@ -604,6 +789,81 @@
         "title": "ConnectionRequestOut",
         "type": "object"
       },
+      "ConsentIn": {
+        "properties": {
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "policy_version"
+        ],
+        "title": "ConsentIn",
+        "type": "object"
+      },
+      "ConsentOut": {
+        "properties": {
+          "accepted_at": {
+            "format": "date-time",
+            "title": "Accepted At",
+            "type": "string"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "policy_version",
+          "accepted_at"
+        ],
+        "title": "ConsentOut",
+        "type": "object"
+      },
+      "ConsentStatus": {
+        "properties": {
+          "accepted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted At"
+          },
+          "accepted_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Version"
+          },
+          "needs_consent": {
+            "title": "Needs Consent",
+            "type": "boolean"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "policy_version",
+          "accepted_version",
+          "accepted_at",
+          "needs_consent"
+        ],
+        "title": "ConsentStatus",
+        "type": "object"
+      },
       "ConversationOut": {
         "properties": {
           "id": {
@@ -714,6 +974,40 @@
         "title": "CursorParams",
         "type": "object"
       },
+      "DeletionIn": {
+        "properties": {
+          "confirm": {
+            "const": "DELETE",
+            "title": "Confirm",
+            "type": "string"
+          }
+        },
+        "required": [
+          "confirm"
+        ],
+        "title": "DeletionIn",
+        "type": "object"
+      },
+      "DeletionOut": {
+        "properties": {
+          "requested_at": {
+            "format": "date-time",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "status": {
+            "const": "scheduled",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "requested_at"
+        ],
+        "title": "DeletionOut",
+        "type": "object"
+      },
       "DemoToken": {
         "properties": {
           "access_token": {
@@ -758,6 +1052,29 @@
           "jwks"
         ],
         "title": "DepStatus",
+        "type": "object"
+      },
+      "DownloadOut": {
+        "properties": {
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "expires_in",
+          "size_bytes"
+        ],
+        "title": "DownloadOut",
         "type": "object"
       },
       "DropCardOut": {
@@ -889,6 +1206,51 @@
         "title": "DropOut",
         "type": "object"
       },
+      "ExportStatus": {
+        "properties": {
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "ready_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ready At"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "requested_at",
+          "ready_at",
+          "expires_at"
+        ],
+        "title": "ExportStatus",
+        "type": "object"
+      },
       "ExtractIn": {
         "properties": {
           "bio": {
@@ -1006,6 +1368,29 @@
           "is_gap"
         ],
         "title": "GapOut",
+        "type": "object"
+      },
+      "GrievanceOut": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "address"
+        ],
+        "title": "GrievanceOut",
         "type": "object"
       },
       "Health": {
@@ -1722,6 +2107,14 @@
       },
       "LegOut": {
         "properties": {
+          "can_mark_done": {
+            "title": "Can Mark Done",
+            "type": "boolean"
+          },
+          "can_rate": {
+            "title": "Can Rate",
+            "type": "boolean"
+          },
           "capability": {
             "title": "Capability",
             "type": "string"
@@ -1749,6 +2142,10 @@
             "title": "Id",
             "type": "integer"
           },
+          "rated": {
+            "title": "Rated",
+            "type": "boolean"
+          },
           "rating": {
             "anyOf": [
               {
@@ -1771,11 +2168,31 @@
           "capability",
           "consent",
           "fulfilled",
+          "rated",
           "rating",
           "i_give",
-          "i_receive"
+          "i_receive",
+          "can_mark_done",
+          "can_rate"
         ],
         "title": "LegOut",
+        "type": "object"
+      },
+      "LineOut": {
+        "properties": {
+          "capability": {
+            "title": "Capability",
+            "type": "string"
+          },
+          "person": {
+            "$ref": "#/components/schemas/PersonOut"
+          }
+        },
+        "required": [
+          "person",
+          "capability"
+        ],
+        "title": "LineOut",
         "type": "object"
       },
       "MatchOut": {
@@ -1881,6 +2298,13 @@
       },
       "MeOut": {
         "properties": {
+          "allow_requests": {
+            "title": "Allow Requests",
+            "type": "boolean"
+          },
+          "appearance": {
+            "$ref": "#/components/schemas/AppearanceOut"
+          },
           "beta_access": {
             "title": "Beta Access",
             "type": "boolean"
@@ -1935,6 +2359,10 @@
             ],
             "title": "Lng"
           },
+          "needs_consent": {
+            "title": "Needs Consent",
+            "type": "boolean"
+          },
           "open_intro_slots": {
             "title": "Open Intro Slots",
             "type": "integer"
@@ -1949,6 +2377,10 @@
               }
             ],
             "title": "Organisation Id"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
           },
           "profile_visibility": {
             "title": "Profile Visibility",
@@ -1982,13 +2414,18 @@
           "profile_visibility",
           "visible_to_org",
           "circuits_opt_in",
+          "allow_requests",
           "open_intro_slots",
-          "beta_access"
+          "beta_access",
+          "needs_consent",
+          "policy_version",
+          "appearance"
         ],
         "title": "MeOut",
         "type": "object"
       },
       "MePatch": {
+        "additionalProperties": false,
         "properties": {
           "bio": {
             "anyOf": [
@@ -2001,17 +2438,6 @@
               }
             ],
             "title": "Bio"
-          },
-          "circuits_opt_in": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Circuits Opt In"
           },
           "city": {
             "anyOf": [
@@ -2089,22 +2515,6 @@
             ],
             "title": "Open Intro Slots"
           },
-          "profile_visibility": {
-            "anyOf": [
-              {
-                "enum": [
-                  "public",
-                  "members",
-                  "hidden"
-                ],
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Profile Visibility"
-          },
           "role": {
             "anyOf": [
               {
@@ -2121,17 +2531,6 @@
               }
             ],
             "title": "Role"
-          },
-          "visible_to_org": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Visible To Org"
           }
         },
         "title": "MePatch",
@@ -2156,6 +2555,33 @@
           "alt_text"
         ],
         "title": "MediaIn",
+        "type": "object"
+      },
+      "MemberStatusOut": {
+        "properties": {
+          "consent": {
+            "title": "Consent",
+            "type": "string"
+          },
+          "done": {
+            "title": "Done",
+            "type": "boolean"
+          },
+          "is_me": {
+            "title": "Is Me",
+            "type": "boolean"
+          },
+          "person": {
+            "$ref": "#/components/schemas/PersonOut"
+          }
+        },
+        "required": [
+          "person",
+          "is_me",
+          "consent",
+          "done"
+        ],
+        "title": "MemberStatusOut",
         "type": "object"
       },
       "MessageOut": {
@@ -2382,6 +2808,16 @@
       },
       "NotificationOut": {
         "properties": {
+          "actor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -2403,11 +2839,28 @@
           "read": {
             "title": "Read",
             "type": "boolean"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TargetOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
           }
         },
         "required": [
           "id",
           "kind",
+          "text",
+          "actor",
+          "target",
           "payload",
           "read",
           "created_at"
@@ -2437,6 +2890,105 @@
           }
         },
         "title": "NotificationParams",
+        "type": "object"
+      },
+      "NotificationPrefsOut": {
+        "properties": {
+          "announcements": {
+            "$ref": "#/components/schemas/ChannelsOut"
+          },
+          "applications": {
+            "$ref": "#/components/schemas/ChannelsOut"
+          },
+          "circuits": {
+            "$ref": "#/components/schemas/ChannelsOut"
+          },
+          "intros": {
+            "$ref": "#/components/schemas/ChannelsOut"
+          },
+          "messages": {
+            "$ref": "#/components/schemas/ChannelsOut"
+          },
+          "pulse_replies": {
+            "$ref": "#/components/schemas/ChannelsOut"
+          }
+        },
+        "required": [
+          "intros",
+          "applications",
+          "circuits",
+          "messages",
+          "pulse_replies",
+          "announcements"
+        ],
+        "title": "NotificationPrefsOut",
+        "type": "object"
+      },
+      "NotificationPrefsPatch": {
+        "additionalProperties": false,
+        "properties": {
+          "announcements": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelsPatch"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "applications": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelsPatch"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "circuits": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelsPatch"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "intros": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelsPatch"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "messages": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelsPatch"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pulse_replies": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChannelsPatch"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "NotificationPrefsPatch",
         "type": "object"
       },
       "OpenJobOut": {
@@ -3161,6 +3713,95 @@
         "title": "PostOut",
         "type": "object"
       },
+      "PrivacyOut": {
+        "properties": {
+          "allow_requests": {
+            "title": "Allow Requests",
+            "type": "boolean"
+          },
+          "circuits_opt_in": {
+            "title": "Circuits Opt In",
+            "type": "boolean"
+          },
+          "profile_visibility": {
+            "enum": [
+              "public",
+              "members",
+              "hidden"
+            ],
+            "title": "Profile Visibility",
+            "type": "string"
+          },
+          "visible_to_org": {
+            "title": "Visible To Org",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "profile_visibility",
+          "visible_to_org",
+          "circuits_opt_in",
+          "allow_requests"
+        ],
+        "title": "PrivacyOut",
+        "type": "object"
+      },
+      "PrivacyPatch": {
+        "additionalProperties": false,
+        "properties": {
+          "allow_requests": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allow Requests"
+          },
+          "circuits_opt_in": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Circuits Opt In"
+          },
+          "profile_visibility": {
+            "anyOf": [
+              {
+                "enum": [
+                  "public",
+                  "members",
+                  "hidden"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Visibility"
+          },
+          "visible_to_org": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visible To Org"
+          }
+        },
+        "title": "PrivacyPatch",
+        "type": "object"
+      },
       "PrivateStatsOut": {
         "properties": {
           "reactions": {
@@ -3255,6 +3896,49 @@
           "traits"
         ],
         "title": "ProfileOut",
+        "type": "object"
+      },
+      "ProfileSummary": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "college": {
+            "title": "College",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email_hint": {
+            "title": "Email Hint",
+            "type": "string"
+          },
+          "is_minor": {
+            "title": "Is Minor",
+            "type": "boolean"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "verification_level": {
+            "title": "Verification Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "display_name",
+          "role",
+          "city",
+          "college",
+          "is_minor",
+          "verification_level",
+          "email_hint"
+        ],
+        "title": "ProfileSummary",
         "type": "object"
       },
       "PulseItemOut": {
@@ -3528,7 +4212,8 @@
               "post",
               "reply",
               "message",
-              "member"
+              "member",
+              "startup"
             ],
             "title": "Target Type",
             "type": "string"
@@ -3626,6 +4311,54 @@
           }
         },
         "title": "SendIn",
+        "type": "object"
+      },
+      "SettingsOut": {
+        "properties": {
+          "appearance": {
+            "$ref": "#/components/schemas/AppearanceOut"
+          },
+          "blocked_count": {
+            "title": "Blocked Count",
+            "type": "integer"
+          },
+          "consent": {
+            "$ref": "#/components/schemas/ConsentStatus"
+          },
+          "export": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExportStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "notifications": {
+            "$ref": "#/components/schemas/NotificationPrefsOut"
+          },
+          "privacy": {
+            "$ref": "#/components/schemas/PrivacyOut"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/ProfileSummary"
+          },
+          "support": {
+            "$ref": "#/components/schemas/SupportOut"
+          }
+        },
+        "required": [
+          "profile",
+          "privacy",
+          "appearance",
+          "notifications",
+          "blocked_count",
+          "export",
+          "consent",
+          "support"
+        ],
+        "title": "SettingsOut",
         "type": "object"
       },
       "SkillDemandOut": {
@@ -4042,6 +4775,62 @@
         "title": "Suggestions",
         "type": "object"
       },
+      "SupportIn": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "question",
+              "correction",
+              "data_request",
+              "grievance"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "maxLength": 2000,
+            "minLength": 5,
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "message"
+        ],
+        "title": "SupportIn",
+        "type": "object"
+      },
+      "SupportOut": {
+        "properties": {
+          "grievance": {
+            "$ref": "#/components/schemas/GrievanceOut"
+          },
+          "support_email": {
+            "title": "Support Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "support_email",
+          "grievance"
+        ],
+        "title": "SupportOut",
+        "type": "object"
+      },
+      "SupportReceipt": {
+        "properties": {
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reference"
+        ],
+        "title": "SupportReceipt",
+        "type": "object"
+      },
       "SwipeIn": {
         "properties": {
           "direction": {
@@ -4057,6 +4846,24 @@
           "direction"
         ],
         "title": "SwipeIn",
+        "type": "object"
+      },
+      "TargetOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "id"
+        ],
+        "title": "TargetOut",
         "type": "object"
       },
       "TraitOut": {
@@ -4088,6 +4895,29 @@
           "marked"
         ],
         "title": "UnreadOut",
+        "type": "object"
+      },
+      "UnsubscribeOut": {
+        "properties": {
+          "email_on": {
+            "title": "Email On",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "label",
+          "email_on"
+        ],
+        "title": "UnsubscribeOut",
         "type": "object"
       },
       "UploadDoneOut": {
@@ -4625,7 +5455,7 @@
     },
     "/api/circuits": {
       "get": {
-        "description": "Exchange circuits I am part of, newest first, with live status: who gives what to whom, who has said yes, what has been handed over. A proposal nobody finished answering in 72 hours reads as expired.",
+        "description": "Exchange circuits I am part of, newest first, each with everything its screen shows (see One circuit). A proposal nobody finished answering in 72 hours reads as expired.",
         "operationId": "apps_circuits_api_list_circuits",
         "parameters": [
           {
@@ -4677,7 +5507,7 @@
     },
     "/api/circuits/{circuit_id}": {
       "get": {
-        "description": "A circuit I am part of. Anyone else's circuit is a 404.",
+        "description": "A circuit I am part of; anyone else's is a 404. One call returns everything the circuit screen and the completion moment need: the three members with their yes and their done, who helps whom (`you_help`, `helps_you`), the time left to answer, what I can do next (`next_step`), each handover with `can_mark_done` and `can_rate`, and ratings (a rating shows only on handovers I give or receive). Realtime: listen to the private channel `circuit:<id>`; an event means refetch.",
         "operationId": "apps_circuits_api_get_circuit",
         "parameters": [
           {
@@ -6598,7 +7428,7 @@
         ]
       },
       "patch": {
-        "description": "Send only the fields to change. Role may be student, founder, mentor or investor (admin roles are set by Circuit). Joining circuits needs verification level 2. Under-18 members stay students and are never public.",
+        "description": "Send only the fields to change. Role may be student, founder, mentor or investor (admin roles are set by Circuit); under-18 members stay students. Privacy and appearance have their own endpoints; unknown fields are a 422.",
         "operationId": "apps_accounts_api_update_me",
         "parameters": [],
         "requestBody": {
@@ -6631,6 +7461,44 @@
         "summary": "Update my profile",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/me/appearance": {
+      "patch": {
+        "description": "Theme (system, dark, light), personal accent (mint, sky, indigo, rose, lime, mono) and swipe between tabs. Send only the fields to change. Any other value or field is a 422. Stored on the member so it follows them across devices.",
+        "operationId": "apps_accounts_settings_api_patch_appearance",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppearancePatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppearanceOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Update my appearance",
+        "tags": [
+          "settings"
         ]
       }
     },
@@ -6683,6 +7551,209 @@
         "summary": "My applications",
         "tags": [
           "jobs"
+        ]
+      }
+    },
+    "/api/me/blocks": {
+      "get": {
+        "description": "Only the people I blocked, newest first. Who blocked me is never shown.",
+        "operationId": "apps_moderation_blocks_api_my_blocks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlockedOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "People I blocked",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/api/me/consent": {
+      "post": {
+        "description": "Records that I accepted the current Privacy Policy and Terms (policy_version from `/api/me`). Safe to repeat. A version that is not the current one is a 422. Open to members who have not accepted yet and to members without beta access.",
+        "operationId": "apps_accounts_settings_api_accept_consent",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Accept the current policy",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/me/deletion": {
+      "post": {
+        "description": "Send {\"confirm\": \"DELETE\"}. The account is locked at once (every call answers 403 `account_deleted`) and a job removes the sign-in, files, profile, needs, offers and connections, and shows old posts and messages as \"Deleted member\". Payment records are kept as tax law requires. Startups I claimed pass to another team member or become unclaimed. Safe to repeat. Circuit admins cannot delete themselves here.",
+        "operationId": "apps_accounts_privacy_api_delete_account",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletionOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Delete my account",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
+    "/api/me/export": {
+      "get": {
+        "description": "Status of my most recent export (pending, building, ready, failed, expired), or null if I never asked. Open to members who have not accepted the latest policy or have no beta access.",
+        "operationId": "apps_accounts_privacy_api_my_export",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ExportStatus"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "My latest data export",
+        "tags": [
+          "privacy"
+        ]
+      },
+      "post": {
+        "description": "Starts an export of only my own data (profile, posts, messages I sent, connections, circuits and more) as a zip. A job builds it and emails a link that works for 24 hours. One at a time (409 `export_in_progress`); 3 a day.",
+        "operationId": "apps_accounts_privacy_api_request_export",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportStatus"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Ask for a copy of my data",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
+    "/api/me/export/download": {
+      "get": {
+        "description": "Send the `token` from the email link while signed in as the same member. Returns a storage link that works for a few minutes. Someone else's token is a 404; an old one is 410 `export_expired`.",
+        "operationId": "apps_accounts_privacy_api_download_export",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Get the download link for my export",
+        "tags": [
+          "privacy"
         ]
       }
     },
@@ -6794,6 +7865,44 @@
         ]
       }
     },
+    "/api/me/notification-preferences": {
+      "patch": {
+        "description": "Per type (intros, applications, circuits, messages, pulse_replies, announcements) and channel (in_app, email). Send only what changes, e.g. {\"intros\": {\"email\": false}}. Account notices (a warning from a moderator) are always shown in the app and cannot be turned off.",
+        "operationId": "apps_accounts_settings_api_patch_notification_preferences",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPrefsPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPrefsOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Update my notification preferences",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
     "/api/me/offers": {
       "get": {
         "description": "What I can help others with.",
@@ -6867,6 +7976,72 @@
         "summary": "Set my offers",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/me/privacy": {
+      "patch": {
+        "description": "Send only the fields to change: profile_visibility (public, members, hidden), visible_to_org, circuits_opt_in (needs verification level 2) and allow_requests (strangers may send requests). Members under 18 can never make the profile public or open requests to strangers: 403 `under_18_restricted`, whatever the client sends. Unknown fields are a 422.",
+        "operationId": "apps_accounts_settings_api_patch_privacy",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrivacyPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Update my privacy",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/me/settings": {
+      "get": {
+        "description": "Everything the Settings screens show, in one call: profile summary (email as a hint only), privacy, appearance, notification preferences per type and channel, how many people I have blocked, my latest data export, which policy version I accepted, and the support and grievance contacts.",
+        "operationId": "apps_accounts_settings_api_get_settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Settings screen",
+        "tags": [
+          "settings"
         ]
       }
     },
@@ -7212,6 +8387,66 @@
         ]
       }
     },
+    "/api/members/{member_id}/block": {
+      "delete": {
+        "description": "Lifts my block. A closed chat comes back as a request; the connection is not restored. 404 if I had not blocked them.",
+        "operationId": "apps_moderation_blocks_api_unblock_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "title": "Member Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Unblock a member",
+        "tags": [
+          "moderation"
+        ]
+      },
+      "post": {
+        "description": "Works both ways: neither of you sees the other in matches, Daily Drop, Pulse, Live wire, intros, circuits or Inbox. Removes the connection, closes the chat, stops pending intros between you and ends shared circuits. Anyone you cannot see or have not been in contact with is a 404. Safe to repeat. Rate limited.",
+        "operationId": "apps_moderation_blocks_api_block_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "title": "Member Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Block a member",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
     "/api/members/{member_id}/posts": {
       "get": {
         "description": "Newest first, only the ones I am allowed to see. 404 for members I cannot see.",
@@ -7256,7 +8491,7 @@
     },
     "/api/notifications": {
       "get": {
-        "description": "Newest first. Add unread=true for unread only. Payloads hold ids only; look details up with the other endpoints.",
+        "description": "Newest first. Add unread=true for unread only. Each item has the line to show (`text`), who did it (`actor`) and what to open (`target`), so the notification centre needs no follow-up calls. Notifications from people I blocked (or who blocked me) and from features switched off for me are left out.",
         "operationId": "apps_notifications_api_list_notifications",
         "parameters": [
           {
@@ -8048,7 +9283,7 @@
     },
     "/api/reports": {
       "post": {
-        "description": "Goes to the Circuit moderators. You can only report what you can see (anything else is a 404). Reporting the same thing twice returns the open report.",
+        "description": "Goes to the Circuit moderators. You can only report what you can see (anything else is a 404). Reporting the same thing twice returns the open report. Rate limited to 10 a day.",
         "operationId": "apps_moderation_api_create_report",
         "parameters": [],
         "requestBody": {
@@ -8078,7 +9313,7 @@
             "SupabaseAuth": []
           }
         ],
-        "summary": "Report a post, reply, message or profile",
+        "summary": "Report a post, reply, message, profile or startup",
         "tags": [
           "moderation"
         ]
@@ -8620,6 +9855,67 @@
         ]
       }
     },
+    "/api/support": {
+      "post": {
+        "description": "A question, a correction, a data request or a grievance. Emails the right inbox and sends me an acknowledgement with a reference. 5 a day. Open to members who have not accepted the latest policy or have no beta access.",
+        "operationId": "apps_accounts_privacy_api_write_support",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportReceipt"
+                }
+              }
+            },
+            "description": "Accepted"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Write to support or the grievance officer",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
+    "/api/support/contact": {
+      "get": {
+        "description": "Public. The support address and the grievance officer's name, email and address (from settings), for the legal pages and the Help screen.",
+        "operationId": "apps_accounts_privacy_api_contact",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Support and grievance contacts",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
     "/api/traits": {
       "get": {
         "description": "The fixed list of traits.",
@@ -8649,6 +9945,70 @@
         "summary": "Trait list",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/unsubscribe": {
+      "get": {
+        "description": "Public. Shows which email type the link switches off. Changes nothing, so mail scanners that open links are harmless. A tampered or expired token is a 400 `invalid_token`. Rate limited per address.",
+        "operationId": "apps_notifications_unsubscribe_api_check_unsubscribe",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsubscribeOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Check an unsubscribe link",
+        "tags": [
+          "notifications"
+        ]
+      },
+      "post": {
+        "description": "Public, one click (also the target of the List-Unsubscribe-Post header). Turns off the email channel of the one notification type in the link and nothing else. Safe to repeat. A tampered or expired token is a 400 `invalid_token`.",
+        "operationId": "apps_notifications_unsubscribe_api_do_unsubscribe",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsubscribeOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Unsubscribe from one type of email",
+        "tags": [
+          "notifications"
         ]
       }
     },

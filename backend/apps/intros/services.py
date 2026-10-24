@@ -17,6 +17,7 @@ from apps.events.services import record
 from apps.intros.models import IntroRequest
 from apps.moderation.models import Block
 from apps.notifications.services import notify
+from apps.social.relations import blocked_ids
 from core.errors import ApiError, Conflict, Forbidden, NotFound
 from core.graph import neighbours
 from core.permissions import NETWORK_ROLES
@@ -85,9 +86,9 @@ def request_intro(member: Member, target_id: int, message: str) -> tuple[IntroRe
     )  # fmt: skip
     record("intro.requested", actor=member, target_type="intro", target_id=intro.pk, hops=2 if broker else 1)
     if broker:
-        notify(broker, "intro.broker_request", intro_id=intro.pk)
+        notify(broker, "intro.broker_request", actor=member, intro_id=intro.pk)
     else:
-        notify(target, "intro.received", intro_id=intro.pk)
+        notify(target, "intro.received", actor=member, intro_id=intro.pk)
     return intro, True
 
 
@@ -142,20 +143,20 @@ def _answer(intro: IntroRequest, member: Member, accept: bool) -> None:
         if accept:
             intro.stage = G.TARGET
             intro.save(update_fields=["stage"])
-            notify(intro.requester_id, "intro.vouched", intro_id=intro.pk)
-            notify(intro.target_id, "intro.received", intro_id=intro.pk)
+            notify(intro.requester_id, "intro.vouched", actor=member, intro_id=intro.pk)
+            notify(intro.target_id, "intro.received", actor=intro.requester_id, intro_id=intro.pk)
         else:
             intro.status, intro.stage, intro.responded_at = S.DECLINED, G.STOPPED, now
             intro.save(update_fields=["status", "stage", "responded_at"])
-            notify(intro.requester_id, "intro.declined", intro_id=intro.pk)
+            notify(intro.requester_id, "intro.declined", actor=member, intro_id=intro.pk)
         return
     intro.status, intro.stage, intro.responded_at = (S.ACCEPTED if accept else S.DECLINED), G.DONE, now
     intro.save(update_fields=["status", "stage", "responded_at"])
     record("intro.responded", actor=member, target_type="intro", target_id=intro.pk, accepted=accept)
     kind = "intro.accepted" if accept else "intro.declined"
-    notify(intro.requester_id, kind, intro_id=intro.pk)
+    notify(intro.requester_id, kind, actor=member, intro_id=intro.pk)
     if intro.via_id:
-        notify(intro.via_id, kind, intro_id=intro.pk)
+        notify(intro.via_id, kind, actor=member, intro_id=intro.pk)
 
 
 @transaction.atomic
@@ -177,6 +178,9 @@ def rate(member: Member, intro_id: int, rating: int) -> IntroRequest:
 def inbox(member: Member, box: str) -> QuerySet[IntroRequest]:
     """sent: what I asked for. received: what reached me (vouched for). brokered: where I am the mutual connection."""
     qs = IntroRequest.objects.select_related("requester", "target", "via").order_by("-created_at", "-id")
+    blocked = blocked_ids(member.pk)
+    if blocked:  # anyone on the request I blocked, or who blocked me, takes the request out of my sight
+        qs = qs.exclude(requester_id__in=blocked).exclude(target_id__in=blocked).exclude(via_id__in=blocked)
     if box == "sent":
         return qs.filter(requester=member)
     if box == "received":

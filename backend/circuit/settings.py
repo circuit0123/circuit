@@ -56,6 +56,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "core.errors.ApiErrorFormatMiddleware",  # innermost: a bare 405 from the router becomes our error format
 ]
 
 TEMPLATES = [
@@ -109,7 +110,11 @@ SUPABASE_JWT_ALG = cfg.supabase_jwt_alg
 SUPABASE_SERVICE_ROLE_KEY = cfg.supabase_service_role_key
 STORAGE_PROVIDER = cfg.storage_provider
 MEDIA_ROOT = BASE_DIR / ".media"  # STORAGE_PROVIDER=local only (dev)
-STORAGE_BUCKETS = {"post": "posts", "message": "messages"}  # private buckets; reads use short-lived signed URLs
+STORAGE_BUCKETS = {
+    "post": "posts",
+    "message": "messages",
+    "export": "private",
+}  # private buckets; reads use short-lived signed URLs
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MEDIA_VARIANT_WIDTHS = (1440, 480)
 MEDIA_MAX_PIXELS = 40_000_000  # decompression-bomb guard
@@ -125,6 +130,8 @@ BETA_MODE = cfg.beta_mode
 INVITES_PER_MEMBER = cfg.invites_per_member
 TRUSTED_PROXY_HOPS = cfg.trusted_proxy_hops
 RESEND_API_KEY = cfg.resend_api_key
+POLICY_VERSION = cfg.policy_version
+GRIEVANCE = {"name": cfg.grievance_officer_name, "email": cfg.grievance_email, "address": cfg.grievance_address}
 SEED_CITY = {"name": cfg.seed_city_name, "lat": cfg.seed_city_lat, "lng": cfg.seed_city_lng}
 CSRF_TRUSTED_ORIGINS = cfg.csv(cfg.csrf_trusted_origins)
 
@@ -175,7 +182,25 @@ RATE_LIMITS = {
     "redeem": (10, 3600),  # per member
     "redeem_ip": (30, 3600),  # per client address, so one network cannot grind through codes with many accounts
     "waitlist": (5, 3600),  # per client address; public endpoint
+    "settings_write": (60, 3600),  # profile privacy, appearance and notification preferences
+    "block": (30, 86400),
+    "export": (3, 86400),
+    "support": (5, 86400),
+    "consent": (20, 3600),
+    "unsubscribe_ip": (30, 3600),  # per client address; public endpoint
 }
+
+# Account basics, privacy and retention (Stages 6-7)
+UNSUBSCRIBE_TOKEN_DAYS = 90
+EXPORT_LINK_HOURS = 24
+EXPORT_DOWNLOAD_SECONDS = 300  # the storage link handed out after the signed token is checked
+UNVERIFIED_ACCOUNT_DAYS = 30  # signed in but never accepted the terms
+REJECTED_WAITLIST_DAYS = 90
+FINANCIAL_RECORD_RETENTION_YEARS = (
+    8  # orders, payments and invoices survive account deletion for this long. ACCOUNTANT TO CONFIRM the period
+)
+QUIET_HOURS_IST = (9, 19)  # under-18 members get no email or push outside these hours (CLAUDE.md F22 and DESIGN.md §8)
+NOTIFICATION_TZ = "Asia/Kolkata"
 
 # Invite-only beta (F18)
 INVITE_EXPIRY_DAYS_WAITLIST = 30  # the single-use code emailed when a waitlist entry is approved

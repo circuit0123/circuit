@@ -69,7 +69,13 @@ def test_suspended_member_is_not_listed_to_partner_admins(make_member, make_org,
 
 
 def test_public_routes_still_work_for_everyone():
-    for method, path in PUBLIC - {("POST", "/api/demo/token"), ("POST", "/api/waitlist")}:  # both need a body
+    needs_input = {
+        ("POST", "/api/demo/token"),
+        ("POST", "/api/waitlist"),
+        ("GET", "/api/unsubscribe"),
+        ("POST", "/api/unsubscribe"),
+    }
+    for method, path in PUBLIC - needs_input:  # these need a body or a token
         assert Client().generic(method, path).status_code in (200, 404)
 
 
