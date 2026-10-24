@@ -4,7 +4,7 @@ const message = "Screens and components never talk to the backend. Use a hook fr
 
 export default [
   ...next,
-  { ignores: [".next/**", "e2e/**", "playwright-report/**", "test-results/**"] },
+  { ignores: [".next/**", "e2e/**", "tests/**", "playwright-report/**", "test-results/**"] },
   // Straight apostrophes in plain-language copy ("You're caught up.") are intended.
   { rules: { "react/no-unescaped-entities": "off" } },
   // Only src/data may import the API client or Supabase, or call fetch.

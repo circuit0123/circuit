@@ -2,7 +2,7 @@
 
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { motion, useReducedMotion } from "motion/react";
-import { ActivityCard, BottomSheet, Button, CaughtUp, PostCard, RoleCard, Skeleton, SkillsInDemandCard, spring, useToast, type ReactionKind } from "@circuit/ui";
+import { ActivityCard, BottomSheet, Button, CaughtUp, FeedItem, PostCard, RoleCard, Section, Skeleton, spring, useToast, type ReactionKind } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadFailed, useMarkPulseSeen, usePulse, useReact, useReport, type PulseEntry } from "@/data";
@@ -20,7 +20,8 @@ export function Pulse() {
   const reduce = useReducedMotion();
   const [menu, setMenu] = useState<number | null>(null);
 
-  const items = q.items;
+  // "Skills in demand" belongs at the top of Discover → Jobs (DESIGN.md §4), so it is left out of Pulse.
+  const items = q.items.filter((it): it is Exclude<PulseEntry, { kind: "skills" }> => it.kind !== "skills");
   const caughtUp = q.caughtUp;
 
   const marked = useRef(false);
@@ -43,8 +44,8 @@ export function Pulse() {
     if (last >= items.length - 3 && q.hasNextPage && !q.isFetchingNextPage) q.fetchNextPage();
   }, [last, items.length, q]);
 
-  if (q.isPending) return <PulseSkeleton />;
-  if (q.isError) return <p role="alert" className="px-4 py-6 t-body text-danger lg:px-0">{loadFailed("Pulse")}</p>;
+  if (q.isPending) return <Section bleed label="Pulse"><PulseSkeleton /></Section>;
+  if (q.isError) return <Section label="Pulse"><p role="alert" className="t-body text-danger">{loadFailed("Pulse")}</p></Section>;
 
   const reactTo = (post: number) => (kind: ReactionKind, on: boolean) =>
     react.mutate({ post, kind, on }, {
@@ -52,17 +53,16 @@ export function Pulse() {
       onError: () => toast({ text: "Couldn't save that. Try again." }),
     });
 
-  const renderItem = (it: PulseEntry) => {
+  const renderItem = (it: (typeof items)[number]) => {
     if (it.kind === "post") {
-      return <PostCard post={it.post} onReact={reactTo(it.post.id)} onMore={() => setMenu(it.post.id)} onOpenAuthor={() => router.push(`/members/${it.post.author.id}`)} priority={false} />;
+      return <FeedItem><PostCard post={it.post} onReact={reactTo(it.post.id)} onMore={() => setMenu(it.post.id)} onOpenAuthor={() => router.push(`/members/${it.post.author.id}`)} priority={false} /></FeedItem>;
     }
-    if (it.kind === "role") return <div className="py-3"><RoleCard role={it.role} onOpen={() => router.push(`/discover/jobs/${it.role.id}`)} /></div>;
-    if (it.kind === "activity") return <div className="py-3"><ActivityCard type={it.type} text={it.text} /></div>;
-    return <div className="py-3"><SkillsInDemandCard skills={it.skills} /></div>;
+    if (it.kind === "role") return <FeedItem><RoleCard role={it.role} onOpen={() => router.push(`/discover/jobs/${it.role.id}`)} /></FeedItem>;
+    return <FeedItem><ActivityCard type={it.type} text={it.text} /></FeedItem>;
   };
 
   return (
-    <section aria-label="Pulse">
+    <Section bleed label="Pulse">
       <h2 className="sr-only">Pulse</h2>
       <div ref={listRef} style={{ height: v.getTotalSize(), position: "relative" }}>
         {v.getVirtualItems().map((row) => (
@@ -104,7 +104,7 @@ export function Pulse() {
           ))}
         </ul>
       </BottomSheet>
-    </section>
+    </Section>
   );
 }
 

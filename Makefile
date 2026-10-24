@@ -12,7 +12,7 @@ endef
 
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
-	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web lint fmt check \
+	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web e2e lint fmt check \
 	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback
 
 help: ## List every command
@@ -155,6 +155,9 @@ test: ## Backend tests (pytest)
 test-web: ## Frontend type check (Playwright + axe arrive with Stage 4)
 	pnpm typecheck
 	@echo "note: Playwright and axe tests are not set up yet (LAUNCH.md Stage 4)."
+
+e2e: ## Playwright (needs `make dev` running). SPEC=premium runs only the design checks
+	pnpm --filter @circuit/app exec playwright test $(if $(SPEC),$(SPEC),)
 
 lint: ## ruff, mypy, ESLint
 	$(BACKEND) ruff check . && $(BACKEND) ruff format --check . && $(BACKEND) mypy .

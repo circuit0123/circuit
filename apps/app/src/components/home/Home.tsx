@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell } from "lucide-react";
-import { BarButton, ScreenBar } from "@circuit/ui";
+import { Screen, Section } from "@circuit/ui";
 import Link from "next/link";
 import { useFeatures, useUnreadCount } from "@/data";
 import { useDesktop } from "@/hooks/useDesktop";
@@ -20,20 +20,18 @@ export function NotificationsBell() {
   );
 }
 
-/** Home (DESIGN.md §4): Live wire, Daily Drop, people worth meeting, Pulse. A feature that is off simply isn't here. */
+/** Home (DESIGN.md §4): a `Today` title, then the Live wire, the Daily Drop (in the right rail on desktop) and Pulse. A feature that is off simply isn't here. */
 export function Home() {
   const features = useFeatures();
   const desktop = useDesktop();
   const pulse = features.on("pulse");
   return (
-    <>
-      <ScreenBar wordmark={<span className="t-headline">Circuit</span>} right={<NotificationsBell />} mobileOnly />
-      <h1 className="sr-only">Home</h1>
-      {pulse && <div className="px-4 lg:px-0 lg:pt-6"><LiveWireSection /></div>}
-      {features.on("daily_drop") && !desktop && <div className="px-4 pb-6 pt-2"><DropSection /></div>}
-      {/* With a rail on desktop, People you may know lives there, unless Pulse is off and the column would be bare. */}
-      {(!desktop || !pulse) && <MatchesSection className="px-4 pb-6 pt-2 lg:px-0" limit={desktop ? 8 : 5} offset={desktop ? 3 : 0} />}
+    <Screen title="Today" right={<NotificationsBell />}>
+      {pulse && <Section><LiveWireSection /></Section>}
+      {features.on("daily_drop") && !desktop && <Section><DropSection /></Section>}
+      {/* People you may know lives in Discover. Only when Pulse is off would Home be bare, so then it carries the matches. */}
+      {!pulse && <MatchesSection limit={desktop ? 8 : 5} offset={desktop ? 3 : 0} />}
       {pulse && <Pulse />}
-    </>
+    </Screen>
   );
 }

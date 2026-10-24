@@ -5,7 +5,9 @@ import { defineConfig, devices } from "@playwright/test";
  * Two projects: a 375px phone (touch) and a 1280px desktop. Screenshots land in /screenshots/frontend-core/.
  */
 export default defineConfig({
-  testDir: "./e2e",
+  // e2e/ holds the journey tests; tests/ holds the design checks (premium.spec.ts, DESIGN.md §13).
+  testDir: ".",
+  testMatch: ["e2e/**/*.spec.ts", "tests/**/*.spec.ts"],
   timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,

@@ -4,16 +4,10 @@ export const sheetSpring = { type: "spring", duration: 0.45, bounce: 0.1 } as co
 export const pushSpring = { type: "spring", duration: 0.4, bounce: 0 } as const;
 export const fade = { duration: 0.15 } as const;
 
-/** Eight muted tones for avatars without a photo (DESIGN.md §5 Imagery). Text on each is AA. */
+/** Placeholder art is grey (DESIGN.md §5 Media): the existing surface tokens with text-subtle traces, so it follows the theme. */
 export const AVATAR_TONES = [
-  { bg: "#3b4a6b", fg: "#f1f3fa" },
-  { bg: "#4a5d4f", fg: "#f0f5f1" },
-  { bg: "#6b4a4a", fg: "#faf1f1" },
-  { bg: "#5d4a6b", fg: "#f6f1fa" },
-  { bg: "#6b5d3b", fg: "#faf6ec" },
-  { bg: "#3b6b66", fg: "#eefaf8" },
-  { bg: "#6b3b57", fg: "#faeff5" },
-  { bg: "#4d5560", fg: "#f2f4f7" },
+  { bg: "var(--surface-2)", wide: "var(--surface-3)", fg: "var(--text-subtle)" },
+  { bg: "var(--surface-3)", wide: "var(--surface-2)", fg: "var(--text-subtle)" },
 ] as const;
 
 export function initials(name: string): string {

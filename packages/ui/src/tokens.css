@@ -20,6 +20,14 @@
   --warning: #ffb340;
   --danger: #ff453a;
   --shadow-lift: 0 12px 40px rgba(0, 0, 0, 0.45);
+  /* Breathing room (DESIGN.md §5): 40px between sections on a phone, 56px on desktop; 20px / 24px inside a surface; rows 56px (64px with a subtitle). */
+  --gap-section: 40px;
+  --pad-surface: 20px;
+  --row: 56px;
+  --row-sub: 64px;
+}
+@media (min-width: 1024px) {
+  :root { --gap-section: 56px; --pad-surface: 24px; }
 }
 
 @media (prefers-color-scheme: light) {
@@ -163,3 +171,15 @@
 @utility skeleton { animation: skeleton 1.4s ease-in-out infinite; background: var(--surface-2); @media (prefers-reduced-motion: reduce) { animation: none; } }
 
 @utility no-scrollbar { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+
+/* Breathing room (DESIGN.md §5). One place for the spacing steps, so screens never invent their own. */
+@utility mt-section { margin-top: var(--gap-section); }
+@utility gap-section { gap: var(--gap-section); }
+@utility p-surface { padding: var(--pad-surface); }
+@utility px-surface { padding-left: var(--pad-surface); padding-right: var(--pad-surface); }
+@utility pt-surface { padding-top: var(--pad-surface); }
+@utility pb-surface { padding-bottom: var(--pad-surface); }
+@utility min-h-row { min-height: var(--row); }
+@utility min-h-row-sub { min-height: var(--row-sub); }
+/* A horizontal row ends in a soft 32px fade at the screen edge, never a half-cut item. */
+@utility fade-edge-x { mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent); -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent); }

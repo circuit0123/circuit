@@ -96,6 +96,7 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 |---|---|
 | `make test` | Backend tests (pytest) |
 | `make test-web` | Frontend type check (Playwright + axe arrive with Stage 4) |
+| `make e2e [SPEC=premium]` | Playwright journeys and design checks at 375px and 1280px, signed in as demo personas. Needs `make dev` running. `SPEC=premium` runs only `apps/app/tests/premium.spec.ts` (DESIGN.md §13: spacing, one primary button, accent budget, type sizes, truncation) and writes a report to `screenshots/premium/report/` |
 | `make lint` | ruff (check + format check), mypy, ESLint (prettier is not installed yet) |
 | `make fmt` | Auto-format Python with ruff (TypeScript formatting arrives with prettier) |
 | `make check` | lint + backend tests with demo stories PASS/FAIL + frontend type check. Must be green before any push |

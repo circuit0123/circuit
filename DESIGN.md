@@ -64,12 +64,15 @@ Mobile bottom bar (5 destinations, icons with labels):
 
 `Home` · `Discover` · `Circuits` · `Inbox` · `Profile`
 
-- **Top bar on Home:** `+` (create build log) on the left, the Circuit wordmark in the
-  centre, notifications bell on the right (dot for unread, never a number over 9 → "9+").
+- **Top bar on Home:** `+` (create build log) on the left, notifications bell on the
+  right (dot for unread, never a number over 9 → "9+"). Home starts with a `Today` Large
+  title that collapses into the bar's centre on scroll, like every other tab.
 - **Circuits** sits in the centre as our signature, like Instagram centres what it values most.
 - Desktop (≥1024px): left rail with the same five destinations + create button; centre
-  column max 600px for Home and Profile; right rail with the Daily Drop, nearby roles and
-  "people you may know". Discover's map and the partner dashboard may use full width.
+  column max 600px for Home and Profile; ONE right rail (max 340px, 48px gap from the
+  centre column) holding only the Daily Drop on Home. "People you may know" and nearby
+  roles live in Discover, not on Home. Discover's map and the partner dashboard may use
+  full width.
 - **Swipe between tabs (mobile):** a horizontal swipe anywhere on the content area moves
   to the neighbouring tab in bar order (Home ↔ Discover ↔ Circuits ↔ Inbox ↔ Profile).
   The screen follows the finger 1:1 and the tab bar's selection indicator slides with it;
@@ -226,7 +229,7 @@ Rules:
    - New roles near you that match your skills
    - Circuit completed ("Asha, Priya and Arjun closed a circuit"), intros that worked,
      startups newly claimed nearby
-   - A "Skills in demand near you" card at most once per day
+   - ("Skills in demand near you" lives at the top of Discover → Jobs, not in Pulse)
    Pulse is chronological within the last 7 days, not engagement-ranked. When you reach
    content you've seen: "You're caught up." with a suggestion (explore Discover). No
    infinite scroll beyond that.
@@ -430,6 +433,41 @@ Contrast: all text meets WCAG AA on its background in both themes (verify `curre
 - Sentence case everywhere. Left-aligned text. Names and numbers are the loudest things
   on a card.
 
+### Breathing room (this is what "premium" means here)
+Colour doesn't make Circuit feel like Apple; space, restraint and hierarchy do. When a
+screen feels cramped, remove something before you shrink anything. These are hard rules,
+checked in review and by the `premium` Playwright checks (§13):
+- **Fewer things per screen.** Home on mobile shows at most 3 distinct blocks before the
+  first scroll (e.g. large title, Live wire, Daily Drop card). Desktop: at most 2 columns
+  of content (centre column + one rail), never 3 competing ones.
+- **No boxes around everything.** Feed items (build logs, roles, activity) are NOT
+  bordered cards: they sit directly on `bg`, separated by 32px of space and one full-width
+  hairline. Only the Daily Drop card, sheets and grouped settings lists get a surface.
+  Never a border AND a background on the same element.
+- **Section spacing:** 40px between sections on mobile, 56px on desktop. Section headers
+  are Title 3 with 12px below. Inside a surface: 20px padding mobile, 24px desktop.
+- **Rows:** list rows min 56px tall (64px with a subtitle), 16px between avatar and text.
+- **Line length:** body text max 60 characters per line (centre column max 600px, text
+  max 540px); reasons and bios never truncate mid-sentence: show 2 full lines, then
+  "more".
+- **One loud thing per block.** Each block has one element in Headline/Title weight; the
+  rest is Body or Subhead in `text-muted`. Max 4 type sizes per screen.
+- **Accent budget:** the accent (`current`) appears on at most 2 kinds of element per
+  screen (e.g. unseen Live wire nodes + unread dot). Never on buttons, card backgrounds,
+  large icons or headlines. If you can see accent in more than ~3 places in one
+  viewport, it's too much.
+- **One primary button per screen**, graphite/white. Everything else is a secondary
+  (`surface-2` fill) or a text button. On the Daily Drop: `Intro me` is primary,
+  `Skip` is a text button.
+- **Media:** images are calm. Generated circuit-pattern avatars and placeholders use only
+  greys (`surface-2`/`surface-3` with `text-subtle` traces) plus at most a thin accent
+  line; no brown, olive or saturated fills. Daily Drop media max 200px tall on desktop.
+- **Edges:** horizontal rows (Live wire) end with a soft 32px fade at the screen edge,
+  never a half-cut item with a border.
+- **Large titles:** every tab screen starts with a Large title (`Today`, `Discover`,
+  `Circuits`, `Inbox`, profile name) with 8px above the first block; it collapses into
+  the translucent top bar on scroll (iOS behaviour).
+
 ### Space, shape, depth
 - 4px base grid; common steps 4, 8, 12, 16, 24, 32, 48.
 - Screen side padding: 16px mobile, 24px desktop.
@@ -441,7 +479,7 @@ Contrast: all text meets WCAG AA on its background in both themes (verify `curre
   for sheets and the Daily Drop stack only (`0 12px 40px rgba(0,0,0,.45)` dark, `.10` light).
 
 ### iOS-quality patterns (mobile)
-- **Large titles** on top-level screens (Home excepted) that collapse into a centred
+- **Large titles** on top-level screens that collapse into a centred
   inline title on scroll, with the translucent bar appearing as content passes under it.
 - **Grouped inset lists** for settings, profile About and account screens.
 - **Sheets with detents** (medium and large), a grabber, drag-to-dismiss and the page
@@ -564,6 +602,8 @@ staggered, movement follows physics, and the UI layers like paper in light.
 - Public follower/like counts; infinite feeds without an end; streaks
 - Centred body text; more than one primary button per screen; heavy drop shadows
 - Animations that don't explain a change
+- Bordered cards for feed items; three content columns on desktop; truncated reasons
+  ("You have a…"); muddy or saturated placeholder art; accent on buttons or headlines
 
 ## 13. Process
 1. Build packages/ui and the Home screen first; show screenshots at 375px (dark and
@@ -573,6 +613,12 @@ staggered, movement follows physics, and the UI layers like paper in light.
 3. After each screen, critique the screenshot against this file and the banned list;
    fix, then show before/after.
 4. Test on a real mid-range Android phone before calling a screen done.
+5. `premium` Playwright checks (apps/app/tests/premium.spec.ts) run on every tab screen at
+   375px and 1280px and fail the build when: more than one primary button is visible;
+   a feed item has both a border and a background; section gaps are under 40px (mobile)
+   or 56px (desktop); body text lines exceed 600px; more than 4 font sizes are used; the
+   accent colour is used on more than 2 kinds of element or on any button; text is
+   truncated mid-sentence with an ellipsis.
 
 ---
 Research references: Instagram's current tab layout and the reasoning behind it

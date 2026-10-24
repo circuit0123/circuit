@@ -1,7 +1,7 @@
 "use client";
 
-import { EmptyState, Screen } from "@circuit/ui";
+import { EmptyState, Screen, Section } from "@circuit/ui";
 
 export function Inbox() {
-  return <Screen title="Inbox"><EmptyState className="px-0" text="Chats arrive in a later step." /></Screen>;
+  return <Screen title="Inbox"><Section><EmptyState text="Chats arrive in a later step." /></Section></Screen>;
 }
