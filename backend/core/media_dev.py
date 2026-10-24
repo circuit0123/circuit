@@ -18,4 +18,4 @@ def serve(request, bucket: str, path: str):
         data = LocalStorage().get(bucket, path)
     except (FileNotFoundError, ValueError, IsADirectoryError):
         raise Http404 from None
-    return HttpResponse(data, content_type="image/webp")
+    return HttpResponse(data, content_type="application/zip" if path.endswith(".zip") else "image/webp")

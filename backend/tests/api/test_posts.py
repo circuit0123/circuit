@@ -255,7 +255,9 @@ def test_replies_nest_one_level_and_notify_the_author(make_member, make_post, cl
     thread = client_for(third).get(f"/api/posts/{post.pk}/replies").json()
     assert len(thread) == 1 and [r["body"] for r in thread[0]["replies"]] == ["Supabase"]
     kinds = list(Notification.objects.filter(member=author).values_list("kind", "payload"))
-    assert kinds == [("post.reply", {"post_id": post.pk, "reply_id": top.json()["id"]})]  # not for their own reply
+    assert kinds == [
+        ("post.reply", {"post_id": post.pk, "actor_id": fan.pk, "reply_id": top.json()["id"]})
+    ]  # not for their own reply
 
 
 @pytest.mark.parametrize("body", ["", "x" * 301])

@@ -165,7 +165,10 @@ def test_turn_rules_and_privacy_of_ids(trio, make_member, client_for):
 def test_notifications_carry_ids_only(trio, client_for):
     asker, broker, target = trio
     ask(client_for(asker), target, message="Secret pitch about my startup")
-    assert Notification.objects.get(member=broker).payload == {"intro_id": IntroRequest.objects.get().pk}
+    assert Notification.objects.get(member=broker).payload == {
+        "intro_id": IntroRequest.objects.get().pk,
+        "actor_id": asker.pk,
+    }  # ids only
 
 
 # -- limits ---------------------------------------------------------------------------------------

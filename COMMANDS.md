@@ -81,6 +81,11 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 | `make daily` | Run the 08:00 set: compute_matches, then the Daily Drop (investor picks join in Stage 4f) |
 | `make circuit-round` | Run an exchange circuit round now |
 | `make job NAME=send_emails` | Send queued emails that are due (invite emails retry here when the provider was down). Scheduled every 5 minutes in the cloud |
+| `make job NAME=build_exports` | Build the data exports members asked for and email their download links (24-hour link). Scheduled every 5 minutes in the cloud |
+| `make job NAME=delete_accounts` | Finish the account deletions members asked for (sign-in, files, profile and personal data removed; posts and messages show "Deleted member"). Scheduled every 5 minutes in the cloud |
+| `make retention` | The daily clean-up now: accounts that never accepted the terms (30 days), expired export files, rejected waitlist entries older than 90 days. Logs counts only. Request logs are kept 30 days in Cloud Logging, not here |
+| `make export MEMBER=<id>` | DEV ONLY. Build one member's data export right now and print where the zip is (members normally ask in the app) |
+| `make delete-account MEMBER=<id>` | DEV ONLY. Delete one member's account right now (asks you to type DELETE). Refuses outside dev |
 | `make eval` | `eval_matching` against tests/eval/pairs.json |
 
 ## 6. Tests and quality
@@ -133,4 +138,5 @@ manual approval. Every deploy target shows what it will do and asks before runni
 | Docker permission denied | You skipped the `usermod` step or didn't log out and back in |
 | App refuses to start | Read the first error line: it names the missing or invalid .env variable |
 | A feature is missing in the app | `make flags`: it may be switched off |
+| Everything answers 403 `consent_required` | The member has not accepted the current `POLICY_VERSION` (`.env`). Accept it in the app (`POST /api/me/consent`), or run `make reset-demo` for the personas |
 | Everything answers 403 `beta_required` | `BETA_MODE=true` and the member has no access: `make invite-codes N=1`, redeem it, or add them in Django admin (Beta → Beta access) |

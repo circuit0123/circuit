@@ -18,6 +18,9 @@ PUBLIC = {
     ("GET", "/api/demo/personas"),
     ("POST", "/api/demo/token"),
     ("POST", "/api/waitlist"),
+    ("GET", "/api/support/contact"),
+    ("GET", "/api/unsubscribe"),
+    ("POST", "/api/unsubscribe"),
 }
 
 
@@ -137,6 +140,20 @@ MATRIX = {
     # Stage 4b: invite-only beta (F18). BETA_MODE is off here; tests/api/test_beta_gate.py covers the gate itself.
     ("GET", "/api/invites"): by_role(200),
     ("POST", "/api/beta/redeem"): by_role(400),  # "X" is not a code, for anyone
+    # Stages 6-7: settings, privacy, blocks, data requests. These are about "me", so every role (admins too) may use them.
+    ("GET", "/api/me/settings"): by_role(200),
+    ("PATCH", "/api/me/privacy"): by_role(200),
+    ("PATCH", "/api/me/appearance"): by_role(200),
+    ("PATCH", "/api/me/notification-preferences"): by_role(200),
+    ("POST", "/api/me/consent"): by_role(200),
+    ("GET", "/api/me/export"): by_role(200),
+    ("POST", "/api/me/export"): by_role(202),
+    ("GET", "/api/me/export/download"): by_role(404),  # "x" is not a token
+    ("POST", "/api/me/deletion"): by_role(202, super_admin=403),
+    ("POST", "/api/support"): by_role(202),
+    ("GET", "/api/me/blocks"): by_role(200),
+    ("POST", "/api/members/{member_id}/block"): by_role(404),
+    ("DELETE", "/api/members/{member_id}/block"): by_role(404),
 }
 
 # Request bodies and query strings for routes that need them (default POST body is {"code": "X"}).
@@ -170,8 +187,17 @@ BODIES = {
     ("POST", "/api/conversations"): '{"member_id": 999999, "body": "Hi"}',
     ("POST", "/api/conversations/{conversation_id}/messages"): '{"body": "Hi"}',
     ("POST", "/api/reports"): '{"target_type": "post", "target_id": 999999, "reason": "spam"}',
+    ("PATCH", "/api/me/privacy"): "{}",
+    ("PATCH", "/api/me/appearance"): "{}",
+    ("PATCH", "/api/me/notification-preferences"): "{}",
+    ("POST", "/api/me/consent"): '{"policy_version": "2026-01"}',
+    ("POST", "/api/me/deletion"): '{"confirm": "DELETE"}',
+    ("POST", "/api/support"): '{"kind": "question", "message": "Hello, a question"}',
 }
-QUERIES = {("GET", "/api/startups/map"): "?min_lng=80&min_lat=13&max_lng=80.5&max_lat=13.5"}
+QUERIES = {
+    ("GET", "/api/startups/map"): "?min_lng=80&min_lat=13&max_lng=80.5&max_lat=13.5",
+    ("GET", "/api/me/export/download"): "?token=x",
+}
 
 
 def call(client, method, path):

@@ -1,6 +1,6 @@
 """Outgoing email that never fails the request that wanted it (PRODUCTION.md §14 row 7).
 
-    queue_email(to, kind, subject, body)
+    queue_email(to, kind, subject, body, headers=None, member=None, send_at=None)
 
 writes a row to the outbox and sends it once the surrounding transaction commits. If the provider is down the row stays
 pending and `manage.py send_emails` (a job, every few minutes) retries with backoff, then gives up after the last retry.
@@ -43,7 +43,9 @@ class ResendBackend(BaseEmailBackend):
         return sent
 
     def _send(self, message) -> None:
-        payload = {"from": message.from_email, "to": list(message.to), "subject": message.subject, "text": message.body}
+        payload: dict = {"from": message.from_email, "to": list(message.to), "subject": message.subject, "text": message.body}
+        if message.extra_headers:
+            payload["headers"] = dict(message.extra_headers)  # e.g. List-Unsubscribe on notification emails
         headers = {"Authorization": f"Bearer {settings.RESEND_API_KEY}"}
         last: Exception | None = None
         for attempt in range(RESEND_ATTEMPTS):
@@ -63,10 +65,17 @@ class ResendBackend(BaseEmailBackend):
         raise last or RuntimeError("email send failed")
 
 
-def queue_email(to: str, kind: str, subject: str, body: str) -> OutboundEmail:
-    """Put an email in the outbox and try to send it right after the current transaction commits. Never raises for delivery."""
-    row = OutboundEmail.objects.create(to_email=to, kind=kind, subject=subject, body=body, next_attempt_at=timezone.now())
-    transaction.on_commit(lambda: deliver(row.pk))
+def queue_email(
+    to: str, kind: str, subject: str, body: str, *, headers: dict | None = None, member=None, send_at=None
+) -> OutboundEmail:
+    """Put an email in the outbox and try to send it right after the current transaction commits. Never raises for delivery.
+
+    `send_at` in the future (quiet hours for under-18s) leaves it for the `send_emails` job, which sends it once it is due."""
+    due = send_at or timezone.now()
+    row = OutboundEmail.objects.create(
+        to_email=to, kind=kind, subject=subject, body=body, headers=headers or {}, member=member, next_attempt_at=due
+    )
+    transaction.on_commit(lambda: deliver(row.pk))  # not due yet: deliver() leaves it pending
     return row
 
 
@@ -76,14 +85,16 @@ def deliver(email_id: int) -> bool:
         with transaction.atomic():
             row = (
                 OutboundEmail.objects.select_for_update(skip_locked=True)
-                .filter(pk=email_id, status=OutboundEmail.Status.PENDING)
+                .filter(pk=email_id, status=OutboundEmail.Status.PENDING, next_attempt_at__lte=timezone.now())
                 .first()
             )
             if row is None:
                 return False
             row.attempts += 1
             try:
-                EmailMessage(row.subject, row.body, settings.EMAIL_FROM, [row.to_email]).send(fail_silently=False)
+                EmailMessage(row.subject, row.body, settings.EMAIL_FROM, [row.to_email], headers=row.headers or None).send(
+                    fail_silently=False
+                )
             except Exception as exc:
                 _record_failure(row, exc)
                 return False

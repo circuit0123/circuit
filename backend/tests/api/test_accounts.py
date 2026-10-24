@@ -58,18 +58,28 @@ def test_admins_cannot_switch_themselves_to_a_normal_role(make_member, make_org,
 def test_minor_cannot_become_founder_or_public(make_member, client_for):
     m = make_member("student", is_minor=True)
     assert client_for(m).patch("/api/me", json.dumps({"role": "founder"})).status_code == 403
-    r = client_for(m).patch("/api/me", json.dumps({"profile_visibility": "public"}))
-    assert r.json()["profile_visibility"] == "members"
+    r = client_for(m).patch("/api/me/privacy", json.dumps({"profile_visibility": "public"}))
+    assert r.status_code == 403 and r.json()["error"]["code"] == "under_18_restricted"
+    m.refresh_from_db()
+    assert m.profile_visibility == "hidden"
 
 
 def test_circuit_opt_in_needs_level_2(make_member, client_for):
     low, ok = make_member("founder", level=1), make_member("founder", level=2)
-    assert client_for(low).patch("/api/me", json.dumps({"circuits_opt_in": True})).status_code == 403
-    assert client_for(ok).patch("/api/me", json.dumps({"circuits_opt_in": True})).json()["circuits_opt_in"] is True
+    assert client_for(low).patch("/api/me/privacy", json.dumps({"circuits_opt_in": True})).status_code == 403
+    assert client_for(ok).patch("/api/me/privacy", json.dumps({"circuits_opt_in": True})).json()["circuits_opt_in"] is True
 
 
 def test_patch_me_rejects_unknown_choice(make_member, client_for):
-    assert client_for(make_member()).patch("/api/me", json.dumps({"profile_visibility": "everyone"})).status_code == 422
+    assert client_for(make_member()).patch("/api/me/privacy", json.dumps({"profile_visibility": "everyone"})).status_code == 422
+
+
+def test_patch_me_no_longer_takes_privacy_fields_and_says_so(make_member, client_for):
+    m = make_member()
+    r = client_for(m).patch("/api/me", json.dumps({"profile_visibility": "public"}))
+    assert r.status_code == 422  # not silently ignored: privacy has its own endpoint
+    m.refresh_from_db()
+    assert m.profile_visibility == "members"
 
 
 # -- needs, offers, skills, traits -----------------------------------------------------

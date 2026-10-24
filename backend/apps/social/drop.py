@@ -130,7 +130,10 @@ def today_drop(member: Member) -> dict:
         people = {
             m.pk: m
             for m in Member.objects.filter(
-                pk__in=[c["member_id"] for c in drop.candidates], suspended_at__isnull=True, is_minor=False
+                pk__in=[c["member_id"] for c in drop.candidates],
+                suspended_at__isnull=True,
+                deleted_at__isnull=True,
+                is_minor=False,
             ).exclude(profile_visibility=Member.Visibility.HIDDEN)
         }
         shown = {pk: p for pk, p in people.items() if pk not in hidden}
@@ -155,7 +158,7 @@ def swipe(member: Member, member_id: int, direction: str) -> dict:
     with transaction.atomic():
         drop = DailyDrop.objects.select_for_update().filter(member=member, date=drop_day(timezone.now())).first()
         card = next((c for c in (drop.candidates if drop else []) if c["member_id"] == member_id), None)
-        if drop is None or card is None:
+        if drop is None or card is None or member_id in blocked_ids(member.pk):
             raise NotFound()
         if card["outcome"] and card["outcome"] != direction:
             raise ApiError(409, "already_answered", "You already answered this card")

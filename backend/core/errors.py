@@ -40,6 +40,16 @@ class AccountSuspended(ApiError):
         super().__init__(403, "account_suspended", "This account is suspended")
 
 
+class AccountDeleted(ApiError):
+    def __init__(self):
+        super().__init__(403, "account_deleted", "This account has been deleted")
+
+
+class ConsentRequired(ApiError):
+    def __init__(self):
+        super().__init__(403, "consent_required", "Please accept the current Privacy Policy and Terms to continue.")
+
+
 class BetaRequired(ApiError):
     def __init__(self):
         super().__init__(403, "beta_required", "Circuit is invite-only for now. Enter an invite code or join the waitlist.")
@@ -113,3 +123,49 @@ def api_not_found(request, *args, **kwargs):
 
     body = {"error": {"code": "not_found", "message": "Not found", "details": None}}
     return JsonResponse(body, status=404)
+
+
+def _json_error(status: int, code: str, message: str):
+    from django.http import JsonResponse
+
+    return JsonResponse({"error": {"code": code, "message": message, "details": None}}, status=status)
+
+
+# Django's own error pages (anything outside the API router: unknown non-API paths, errors in middleware, the admin).
+# Django calls these only when DEBUG is off, which is every environment except dev. They never show a stack trace.
+def handler404(request, exception=None):
+    return _json_error(404, "not_found", "Not found")
+
+
+def handler403(request, exception=None):
+    return _json_error(403, "forbidden", "You do not have permission to do this")
+
+
+def handler400(request, exception=None):
+    return _json_error(400, "bad_request", "Bad request")
+
+
+def handler500(request):
+    return _json_error(500, "internal_error", "Something went wrong")
+
+
+class ApiErrorFormatMiddleware:
+    """Ninja answers a wrong HTTP method on a real route with a bare "Method not allowed". Make it our one error format.
+
+    Innermost on purpose: the response is replaced before CORS and the security headers are added to it."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if (
+            request.path_info.startswith("/api/")
+            and response.status_code == 405
+            and "json" not in response.get("Content-Type", "")
+        ):
+            replacement = _json_error(405, "method_not_allowed", "That method is not allowed on this route")
+            if response.has_header("Allow"):
+                replacement["Allow"] = response["Allow"]
+            return replacement
+        return response

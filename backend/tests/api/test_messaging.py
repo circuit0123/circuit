@@ -132,7 +132,7 @@ def test_one_unread_notification_per_conversation(make_member, connect, client_f
     for t in "23":
         client_for(a).post(f"/api/conversations/{cid}/messages", {"body": t})
     notes = Notification.objects.filter(member=b, kind="message.new")
-    assert notes.count() == 1 and notes[0].payload == {"conversation_id": cid}
+    assert notes.count() == 1 and notes[0].payload == {"conversation_id": cid, "actor_id": a.pk}
     client_for(b).post(f"/api/conversations/{cid}/read")
     assert Notification.objects.get(member=b).read_at is not None
     client_for(a).post(f"/api/conversations/{cid}/messages", {"body": "4"})
@@ -174,7 +174,10 @@ def test_each_message_broadcasts_ids_only_to_the_conversation_channel(
     with django_capture_on_commit_callbacks(execute=True):  # Broadcasts go out after the commit, never before
         r = start(client_for(a), b, "a secret plan")
     cid, mid = r.json()["conversation"]["id"], r.json()["message"]["id"]
-    assert broadcasts == [(f"conversation:{cid}", "message", {"message_id": mid, "conversation_id": cid})]
+    chat = [e for e in broadcasts if e[0].startswith("conversation:")]
+    assert chat == [(f"conversation:{cid}", "message", {"message_id": mid, "conversation_id": cid})]
+    nudges = [e for e in broadcasts if e[0].startswith("member:")]  # and b's notification channel hears a notification id
+    assert [(t, ev, list(p)) for t, ev, p in nudges] == [(f"member:{b.pk}", "notification", ["notification_id"])]
     assert "secret" not in str(broadcasts)
 
 

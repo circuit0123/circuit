@@ -1,4 +1,4 @@
-"""Reports (F12/F15): a member flags a post, reply, message or profile for the moderators in Django admin.
+"""Reports (F12/F15): a member flags a post, reply, message, profile or startup for the moderators in Django admin.
 
 You can only report what you are allowed to see; anything else is a 404. Reporting twice is safe (one open report).
 """
@@ -10,10 +10,12 @@ from apps.messaging.models import Conversation, Message
 from apps.moderation.models import Report
 from apps.social.models import Post, Reply
 from apps.social.relations import can_see_post, is_connected
+from apps.startups.models import Startup
+from apps.startups.services import is_team
 from core.errors import ApiError, Forbidden, NotFound
 from core.ratelimit import check_rate
 
-TARGET_TYPES = ("post", "reply", "message", "member")
+TARGET_TYPES = ("post", "reply", "message", "member", "startup")
 
 
 def _can_report(reporter: Member, target_type: str, target_id: int) -> bool:
@@ -27,19 +29,26 @@ def _can_report(reporter: Member, target_type: str, target_id: int) -> bool:
         msg = Message.objects.select_related("conversation").filter(pk=target_id).first()
         c = msg.conversation if msg else None
         return bool(c and reporter.pk in (c.member_a_id, c.member_b_id) and msg and msg.sender_id != reporter.pk)
-    if target_id == reporter.pk:
-        return False
+    if target_type == "startup":
+        startup = Startup.objects.filter(pk=target_id, hidden_at__isnull=True).first()
+        return startup is not None and not is_team(reporter, startup)
+    return target_id != reporter.pk and can_contact_or_see(reporter, target_id)
+
+
+def can_contact_or_see(member: Member, other_id: int) -> bool:
+    """Someone I may report or block: a profile I can see, or a person who reached me or whom I reached (a message, a
+    connection request, a connection), even when their profile is hidden. Anyone else looks like they do not exist."""
     try:
-        visible_member(reporter, target_id)
+        visible_member(member, other_id)
         return True
     except NotFound:
         pass
-    # People who reached me without a visible profile (a message, a connection request, a connection) can be reported too.
-    x, y = sorted((reporter.pk, target_id))
+    x, y = sorted((member.pk, other_id))
     return (
         Conversation.objects.filter(member_a_id=x, member_b_id=y).exists()
-        or ConnectionRequest.objects.filter(sender_id=target_id, recipient=reporter).exists()
-        or is_connected(reporter.pk, target_id)
+        or ConnectionRequest.objects.filter(sender_id=other_id, recipient=member).exists()
+        or ConnectionRequest.objects.filter(sender=member, recipient_id=other_id).exists()
+        or is_connected(member.pk, other_id)
     )
 
 

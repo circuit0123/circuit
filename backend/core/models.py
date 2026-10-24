@@ -37,6 +37,8 @@ class OutboundEmail(models.Model):
     kind = models.CharField(max_length=40)
     subject = models.CharField(max_length=200)
     body = models.TextField()
+    headers = models.JSONField(default=dict, blank=True)  # extra mail headers, e.g. List-Unsubscribe (notification emails only)
+    member = models.ForeignKey("accounts.Member", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     attempts = models.PositiveSmallIntegerField(default=0)
     next_attempt_at = models.DateTimeField()

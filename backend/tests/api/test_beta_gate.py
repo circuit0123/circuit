@@ -8,11 +8,18 @@ from tests.api.test_access_matrix import MATRIX, PUBLIC, call, operations
 
 pytestmark = pytest.mark.django_db
 
-# The only protected routes a member without access may use: who am I, redeem a code, onboarding helpers.
+# The only protected routes a member without access may use: who am I, redeem a code, onboarding helpers, accept the policy,
+# and the privacy rights (export, delete, write to support), which never depend on holding an invite.
 OPEN_TO_MEMBERS_WITHOUT_ACCESS = {
     ("GET", "/api/me"),
     ("POST", "/api/beta/redeem"),
     ("POST", "/api/onboarding/extract"),
+    ("POST", "/api/me/consent"),
+    ("GET", "/api/me/export"),
+    ("POST", "/api/me/export"),
+    ("GET", "/api/me/export/download"),
+    ("POST", "/api/me/deletion"),
+    ("POST", "/api/support"),
 }
 
 
@@ -22,10 +29,10 @@ def gated(response):
 
 def test_every_other_route_is_gated_and_only_the_exempt_ones_are_not(beta_on, make_member, client_for):
     """Loops over every operation in the OpenAPI schema, so a new endpoint is covered the day it is added."""
-    outsider = make_member("student")
     ops = operations()
     assert ops - PUBLIC == set(MATRIX), "the matrix and the schema disagree; fix tests/api/test_access_matrix.py first"
-    not_gated = {op for op in sorted(ops - PUBLIC) if not gated(call(client_for(outsider), *op))}
+    # a fresh member per route: one of the routes deletes the account, which would lock out every later call
+    not_gated = {op for op in sorted(ops - PUBLIC) if not gated(call(client_for(make_member("student")), *op))}
     assert not_gated == OPEN_TO_MEMBERS_WITHOUT_ACCESS
 
 
@@ -36,7 +43,13 @@ def test_gated_answer_uses_the_standard_error_format(beta_on, make_member, clien
 
 
 def test_public_routes_stay_open_without_a_token(beta_on):
-    for method, path in sorted(PUBLIC - {("POST", "/api/demo/token"), ("POST", "/api/waitlist")}):
+    needs_input = {
+        ("POST", "/api/demo/token"),
+        ("POST", "/api/waitlist"),
+        ("GET", "/api/unsubscribe"),
+        ("POST", "/api/unsubscribe"),
+    }
+    for method, path in sorted(PUBLIC - needs_input):
         assert Client().generic(method, path).status_code in (200, 404), path
 
 

@@ -38,7 +38,7 @@ def _optional_context(request):
     "(anonymous visitors get the `everyone` audience). The app hides screens for features that are off.",
 )
 def get_config(request):
-    from apps.beta import gate
+    from core import gate
 
     ctx = _optional_context(request)
     member = ctx.member if ctx else None

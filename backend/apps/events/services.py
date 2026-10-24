@@ -37,6 +37,11 @@ EVENT_TYPES = frozenset(
         "conversation.started", "conversation.accepted", "conversation.blocked", "message.sent", "report.created",
         # invite-only beta (F18)
         "beta.access_granted", "invite.created", "waitlist.joined",
+        # account basics and privacy (Stages 6-7)
+        "member.privacy_updated", "member.appearance_updated", "member.notification_prefs_updated", "member.blocked",
+        "member.unblocked", "consent.accepted", "export.requested", "export.ready", "export.failed", "export.downloaded",
+        "account.deletion_requested", "account.deleted", "support.requested", "email.unsubscribed", "report.actioned",
+        "retention.cleaned",
     }
 )  # fmt: skip
 

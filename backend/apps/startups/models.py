@@ -24,6 +24,9 @@ class Startup(models.Model):
     source = models.CharField(max_length=10, choices=Source.choices, default=Source.SEED)
     confidence = models.FloatField(default=1.0)
     view_count = models.PositiveIntegerField(default=0)
+    hidden_at = models.DateTimeField(
+        null=True, blank=True
+    )  # set by a moderator after a report: gone from the map, search and roles
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

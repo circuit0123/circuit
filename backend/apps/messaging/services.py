@@ -14,12 +14,11 @@ from apps.accounts.models import Member
 from apps.events.services import record
 from apps.messaging import realtime
 from apps.messaging.models import Conversation, Message
-from apps.moderation.models import Block
 from apps.notifications.models import Notification
 from apps.notifications.services import notify
 from apps.social import media
 from apps.social.models import MediaUpload
-from apps.social.relations import MESSAGING_ROLES, is_connected, may_message
+from apps.social.relations import MESSAGING_ROLES, blocked_ids, is_connected, may_message
 from apps.social.schemas import author
 from core.errors import ApiError, Conflict, Forbidden, NotFound
 from core.ratelimit import check_rate
@@ -99,6 +98,8 @@ def list_conversations(member: Member, folder: str) -> list[dict]:
         .filter(Q(member_a=member) | Q(member_b=member), status=status)
         .exclude(member_a__suspended_at__isnull=False)
         .exclude(member_b__suspended_at__isnull=False)
+        .exclude(member_a_id__in=blocked_ids(member.pk))
+        .exclude(member_b_id__in=blocked_ids(member.pk))
         .order_by("-last_message_at", "-id")[:100]
     )
     return conversation_rows(member, convs)
@@ -160,17 +161,17 @@ def send(member: Member, conversation_id: int, body: str, upload_id: int | None)
         conv.last_message_at = msg.created_at
         conv.save(update_fields=["status", "last_message_at"])
         record("message.sent", actor=member, target_type="conversation", target_id=conv.pk, has_image=image is not None)
-        _notify_once(other, conv)
+        _notify_once(other, conv, member)
         transaction.on_commit(lambda: realtime.broadcast(conv.pk, msg.pk))
     return msg
 
 
-def _notify_once(recipient: Member, conv: Conversation) -> None:
+def _notify_once(recipient: Member, conv: Conversation, sender: Member) -> None:
     """One unread 'new message' notification per conversation, not one per message (no pile-ups, no guilt)."""
     if not Notification.objects.filter(
         member=recipient, kind="message.new", read_at__isnull=True, payload__conversation_id=conv.pk
     ).exists():
-        notify(recipient, "message.new", conversation_id=conv.pk)
+        notify(recipient, "message.new", actor=sender, conversation_id=conv.pk)
 
 
 def messages(member: Member, conversation_id: int, before: int | None, limit: int) -> tuple[list[dict], int | None]:
@@ -211,12 +212,12 @@ def accept(member: Member, conversation_id: int) -> Conversation:
 
 
 def block(member: Member, conversation_id: int) -> None:
+    """Block from the chat menu: the same block as from a profile (apps/moderation/blocks.py), plus the chat event."""
+    from apps.moderation import blocks
+
     conv = get_conversation(member, conversation_id)
-    other = _other(conv, member)
     with transaction.atomic():
-        conv.status = C.BLOCKED
-        conv.save(update_fields=["status"])
-        Block.objects.get_or_create(blocker=member, blocked=other)
+        blocks.block(member, _other(conv, member).pk)
         record("conversation.blocked", actor=member, target_type="conversation", target_id=conv.pk)
 
 

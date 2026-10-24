@@ -13,7 +13,17 @@ class Report(models.Model):
     target_id = models.BigIntegerField()
     reason = models.CharField(max_length=500)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.OPEN)
+
+    class Action(models.TextChoices):
+        HIDE = "hide"
+        REMOVE = "remove"
+        WARN = "warn"
+        SUSPEND = "suspend"
+        DISMISS = "dismiss"
+
     handled_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    action = models.CharField(max_length=10, choices=Action.choices, blank=True)  # what the moderator did; blank while open
+    handled_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -37,16 +37,31 @@ def update_profile(member: Member, changes: dict) -> Member:
             raise Forbidden("Members under 18 can only be students")
         record("member.role_changed", actor=member, target_type="member", target_id=member.pk, old=member.role, new=role)
         member.role = role
-    if changes.get("circuits_opt_in") and member.verification_level < 2:
-        raise Forbidden("Joining circuits needs verification level 2")
     if lat is not None and lng is not None:
         member.location = Point(lng, lat, srid=4326)
     for field, value in changes.items():
         setattr(member, field, value)
-    if member.is_minor and member.profile_visibility == Member.Visibility.PUBLIC:
-        member.profile_visibility = Member.Visibility.MEMBERS  # minors are never public
     member.save()
     record("member.profile_updated", actor=member, target_type="member", target_id=member.pk, fields=sorted(changes))
+    return member
+
+
+def update_privacy(member: Member, changes: dict) -> Member:
+    """Apply a PATCH /me/privacy. The under-18 rules are enforced here, whatever the client sends (CLAUDE.md privacy rules)."""
+    if any(value is None for value in changes.values()):
+        raise ApiError(422, "validation_error", "Privacy settings cannot be null")
+    if member.is_minor and (
+        changes.get("profile_visibility") == Member.Visibility.PUBLIC or changes.get("allow_requests") is True
+    ):
+        raise ApiError(
+            403, "under_18_restricted", "Members under 18 keep a private profile and cannot open requests to strangers"
+        )
+    if changes.get("circuits_opt_in") and member.verification_level < 2:
+        raise Forbidden("Joining circuits needs verification level 2")
+    for field, value in changes.items():
+        setattr(member, field, value)
+    member.save(update_fields=[*changes, "updated_at"])
+    record("member.privacy_updated", actor=member, target_type="member", target_id=member.pk, fields=sorted(changes))
     return member
 
 
@@ -61,6 +76,7 @@ def visible_member(viewer: Member, member_id: int) -> Member:
         return target
     hidden = (
         target.suspended_at is not None
+        or target.deleted_at is not None
         or target.is_minor
         or target.profile_visibility == Member.Visibility.HIDDEN
         or target.role in (Role.SUPER_ADMIN, Role.PARTNER_ADMIN)

@@ -3,6 +3,7 @@
 import random
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.db import connection, transaction
 from django.utils import timezone
@@ -462,7 +463,9 @@ class Seeder:
 
     def build_consents(self) -> None:
         now = timezone.now()
-        Consent.objects.bulk_create([Consent(member=m, policy_version="2026-01", accepted_at=now) for m in Member.objects.all()])
+        Consent.objects.bulk_create(
+            [Consent(member=m, policy_version=settings.POLICY_VERSION, accepted_at=now) for m in Member.objects.all()]
+        )
 
     # -- social (F15-F17): build logs with drawn project screenshots, replies, follows, requests, chats -------------
     def _image(self, owner: Member, n: int, scene: str) -> MediaUpload:

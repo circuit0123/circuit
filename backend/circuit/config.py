@@ -74,6 +74,14 @@ class Config(BaseSettings):
     invites_per_member: int = Field(3, ge=0, le=50)  # beta invite codes each member can hand out (super admins change it here)
     trusted_proxy_hops: int = Field(0, ge=0, le=5)  # proxies in front of the API that append to X-Forwarded-For (Cloud Run: 1)
     razorpay_key_id: str = ""
+    policy_version: str = Field(
+        "2026-01", min_length=1, max_length=20
+    )  # bump when the privacy policy or terms change: everyone re-accepts
+    grievance_officer_name: str = (
+        "<GRIEVANCE_OFFICER>"  # DPDP grievance contact; shown on the public contact endpoint and legal pages
+    )
+    grievance_email: str = "grievance@example.com"
+    grievance_address: str = "<ADDRESS>"
 
     @model_validator(mode="after")
     def _check_env_rules(self) -> "Config":

@@ -27,7 +27,7 @@ from django.http import HttpRequest
 from ninja.security import HttpBearer
 
 from core.codes import plain_email
-from core.errors import AccountSuspended, ServiceUnavailable
+from core.errors import AccountDeleted, AccountSuspended, ServiceUnavailable
 
 log = structlog.get_logger("auth")
 
@@ -262,20 +262,21 @@ def _member_for_demo(auth_user_id: uuid.UUID):
 class SupabaseAuth(HttpBearer):
     """API-wide default auth. Returns None (401) for anything that is not a valid token for a known member.
 
-    The invite-only beta gate (F18) lives here and nowhere else: every protected endpoint passes through `authenticate`,
-    so a new endpoint is gated without its author doing anything. Public endpoints that peek at the caller use `identify`.
+    The access gates (consent, and the invite-only beta F18) live in core/gate.py and are called here and nowhere else: every
+    protected endpoint passes through `authenticate`, so a new endpoint is gated without its author doing anything.
+    Public endpoints that peek at the caller use `identify`.
     """
 
     def authenticate(self, request: HttpRequest, token: str) -> AuthContext | None:
         ctx = self.identify(request, token)
-        if ctx is not None and settings.BETA_MODE:
-            from apps.beta import gate
+        if ctx is not None:
+            from core import gate
 
             gate.enforce(request, ctx)
         return ctx
 
     def identify(self, request: HttpRequest, token: str) -> AuthContext | None:
-        """Who is calling, with no access gate. Raises AccountSuspended for a suspended member."""
+        """Who is calling, with no access gate. Raises AccountSuspended / AccountDeleted for those members."""
         try:
             alg = jwt.get_unverified_header(token).get("alg")
         except jwt.PyJWTError:
@@ -303,6 +304,12 @@ class SupabaseAuth(HttpBearer):
         if member.suspended_at is not None:
             # Checked on every request against the database, so a suspension bites at once, not when the token expires.
             raise AccountSuspended()
+        if member.deletion_requested_at is not None or member.deleted_at is not None:
+            # Same reason: the delete_accounts job may not have run yet, and a deleted member's token must not make a new account.
+            raise AccountDeleted()
+        if email and member.email != email:
+            type(member).objects.filter(pk=member.pk).update(email=email)  # kept only to send mail; cleared on deletion
+            member.email = email
         request.member_id = member.pk  # type: ignore[attr-defined]  # picked up by the request log line
         return AuthContext(member=member, verified_email=email, kind=kind)  # type: ignore[arg-type]
 

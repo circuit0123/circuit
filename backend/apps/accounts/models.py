@@ -37,6 +37,20 @@ class Member(models.Model):
     visible_to_org = models.BooleanField(default=False)
     suspended_at = models.DateTimeField(null=True, blank=True)  # set = locked out of the API (moderation, takedowns)
     pulse_seen_at = models.DateTimeField(null=True, blank=True)  # Pulse shows what is newer than this, then "You're caught up"
+    email = models.EmailField(blank=True)  # copied from the verified sign-in email; only used to send mail. Cleared on deletion
+    appearance = models.JSONField(
+        default=dict, blank=True
+    )  # theme, accent, swipe_tabs; missing keys mean the defaults (appearance.py)
+    notification_prefs = models.JSONField(
+        default=dict, blank=True
+    )  # type -> {in_app, email}; missing keys mean the defaults (prefs.py)
+    allow_requests = models.BooleanField(default=True)  # False: strangers cannot send message requests or connection requests
+    deletion_requested_at = models.DateTimeField(
+        null=True, blank=True
+    )  # set = locked out; the delete_accounts job finishes the job
+    deleted_at = models.DateTimeField(
+        null=True, blank=True
+    )  # set = anonymised "Deleted member" tombstone that old content points at
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -53,6 +67,8 @@ class Member(models.Model):
         # Under-18 members are hidden by default (CLAUDE.md privacy rules).
         if self._state.adding and self.is_minor and self.profile_visibility == self.Visibility.MEMBERS:
             self.profile_visibility = self.Visibility.HIDDEN
+        if self._state.adding and self.is_minor:
+            self.allow_requests = False  # no Requests from strangers for under-18s (DESIGN.md §4 Inbox)
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -107,6 +123,34 @@ class Consent(models.Model):
     policy_version = models.CharField(max_length=20)
     accepted_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class DataExport(models.Model):
+    """One request for 'all my data' (DPDP). A job builds the zip; the member downloads it with a signed, expiring link."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending"
+        BUILDING = "building"
+        READY = "ready"
+        FAILED = "failed"
+        EXPIRED = "expired"
+
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="exports")
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    path = models.CharField(max_length=200, blank=True)  # object path in the private bucket
+    size_bytes = models.PositiveBigIntegerField(default=0)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    requested_at = models.DateTimeField(auto_now_add=True)
+    ready_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["member", "status"]), models.Index(fields=["status", "expires_at"])]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["member"], condition=Q(status__in=["pending", "building"]), name="dataexport_one_open_per_member"
+            )
+        ]
 
 
 class WorkEmailVerification(models.Model):

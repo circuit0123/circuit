@@ -88,6 +88,11 @@ def can_see_post(viewer: Member, post) -> bool:
 
 
 # -- contact rules (messages, connection requests) ----------------------------------------------------------
+def _open_to_strangers(recipient: Member) -> bool:
+    """A stranger (not connected, not in the same organisation) may reach someone with a findable profile who allows requests."""
+    return recipient.profile_visibility != Member.Visibility.HIDDEN and recipient.allow_requests
+
+
 def may_message(sender: Member, recipient: Member) -> bool:
     """Under-18 rule for messages: a minor can only talk with their connections and with staff of their own organisation."""
     if sender.suspended_at or recipient.suspended_at or is_blocked(sender.pk, recipient.pk):
@@ -99,7 +104,7 @@ def may_message(sender: Member, recipient: Member) -> bool:
     connected = is_connected(sender.pk, recipient.pk)
     if sender.is_minor or recipient.is_minor:
         return connected
-    return connected or recipient.profile_visibility != Member.Visibility.HIDDEN or same_org(sender, recipient)
+    return connected or same_org(sender, recipient) or _open_to_strangers(recipient)
 
 
 def may_request_connection(sender: Member, recipient: Member) -> bool:
@@ -110,4 +115,4 @@ def may_request_connection(sender: Member, recipient: Member) -> bool:
         return False
     if sender.is_minor or recipient.is_minor:
         return same_org(sender, recipient)
-    return recipient.profile_visibility != Member.Visibility.HIDDEN or same_org(sender, recipient)
+    return same_org(sender, recipient) or _open_to_strangers(recipient)

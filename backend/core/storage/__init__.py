@@ -26,7 +26,7 @@ class StorageProvider(Protocol):
     def get(self, bucket: str, path: str) -> bytes: ...
     def put(self, bucket: str, path: str, data: bytes, content_type: str) -> None: ...
     def delete(self, bucket: str, paths: list[str]) -> None: ...
-    def signed_urls(self, bucket: str, paths: list[str]) -> dict[str, str]: ...
+    def signed_urls(self, bucket: str, paths: list[str], expires_in: int = SIGNED_READ_SECONDS) -> dict[str, str]: ...
 
 
 class MemoryStorage:
@@ -51,7 +51,7 @@ class MemoryStorage:
         for p in paths:
             self.files.pop((bucket, p), None)
 
-    def signed_urls(self, bucket: str, paths: list[str]) -> dict[str, str]:
+    def signed_urls(self, bucket: str, paths: list[str], expires_in: int = SIGNED_READ_SECONDS) -> dict[str, str]:
         return {p: f"https://storage.test/read/{bucket}/{p}?token=t" for p in paths}
 
 
@@ -80,7 +80,7 @@ class LocalStorage:
         for p in paths:
             self._file(bucket, p).unlink(missing_ok=True)
 
-    def signed_urls(self, bucket: str, paths: list[str]) -> dict[str, str]:
+    def signed_urls(self, bucket: str, paths: list[str], expires_in: int = SIGNED_READ_SECONDS) -> dict[str, str]:
         return {p: f"{settings.API_URL}/api/media/dev/{bucket}/{p}" for p in paths}
 
 
@@ -124,10 +124,10 @@ class SupabaseStorage:
         if paths:
             self._call("DELETE", f"/object/{bucket}", json={"prefixes": paths}).raise_for_status()
 
-    def signed_urls(self, bucket: str, paths: list[str]) -> dict[str, str]:
+    def signed_urls(self, bucket: str, paths: list[str], expires_in: int = SIGNED_READ_SECONDS) -> dict[str, str]:
         if not paths:
             return {}
-        r = self._call("POST", f"/object/sign/{bucket}", json={"expiresIn": SIGNED_READ_SECONDS, "paths": paths})
+        r = self._call("POST", f"/object/sign/{bucket}", json={"expiresIn": expires_in, "paths": paths})
         r.raise_for_status()
         base = f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1"
         return {row["path"]: f"{base}{row['signedURL']}" for row in r.json() if row.get("signedURL")}

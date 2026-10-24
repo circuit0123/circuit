@@ -52,7 +52,7 @@ def get_job_for_team(member: Member, job_id: int) -> Job:
 def get_visible_job(member: Member, job_id: int) -> Job:
     """Open jobs are public to signed-in members; a closed job is visible to its team only."""
     job = Job.objects.select_related("startup").prefetch_related("capabilities__capability").filter(pk=job_id).first()
-    if job is None or (not job.is_open and not is_team(member, job.startup)):
+    if job is None or ((not job.is_open or job.startup.hidden_at is not None) and not is_team(member, job.startup)):
         raise NotFound()
     return job
 
@@ -79,7 +79,11 @@ def _check_stipend(lo, hi) -> None:
 # -- listing ---------------------------------------------------------------------------------
 def list_jobs(member: Member, f: dict) -> list[dict]:
     """Open jobs, filtered. Students get a match score and the best match first; everyone else gets newest first."""
-    qs: QuerySet[Job] = Job.objects.filter(is_open=True).select_related("startup").prefetch_related("capabilities__capability")
+    qs: QuerySet[Job] = (
+        Job.objects.filter(is_open=True, startup__hidden_at__isnull=True)
+        .select_related("startup")
+        .prefetch_related("capabilities__capability")
+    )
     if f.get("kind"):
         qs = qs.filter(kind=f["kind"])
     if f.get("startup_id"):
@@ -215,7 +219,12 @@ def apply(member: Member, job_id: int) -> tuple[Application, bool]:
             reapplied=existing is not None,
         )
         notify_many(
-            team_member_ids(job.startup), "application.received", application_id=app.pk, job_id=job.pk, startup_id=job.startup_id
+            team_member_ids(job.startup),
+            "application.received",
+            actor=member,
+            application_id=app.pk,
+            job_id=job.pk,
+            startup_id=job.startup_id,
         )
     return app, True
 
@@ -261,5 +270,5 @@ def set_status(member: Member, application_id: int, new_status: str) -> Applicat
     app.status = new_status
     app.save(update_fields=["status", "updated_at"])
     record("application.status_changed", actor=member, target_type="application", target_id=app.pk, old=old, new=new_status)
-    notify(app.student_id, "application.status", application_id=app.pk, job_id=app.job_id, status=new_status)
+    notify(app.student_id, "application.status", actor=member, application_id=app.pk, job_id=app.job_id, status=new_status)
     return app

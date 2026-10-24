@@ -175,7 +175,7 @@ def reply_to(member: Member, post_id: int, body: str, parent_id: int | None) -> 
     reply = Reply.objects.create(post=post, author=member, body=body, parent=parent)
     record("reply.created", actor=member, target_type="post", target_id=post.pk, reply_id=reply.pk)
     if post.author_id != member.pk:
-        notify(post.author_id, "post.reply", post_id=post.pk, reply_id=reply.pk)
+        notify(post.author_id, "post.reply", actor=member, post_id=post.pk, reply_id=reply.pk)
     return reply
 
 
