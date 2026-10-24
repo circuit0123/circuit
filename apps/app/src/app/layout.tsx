@@ -11,6 +11,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   viewportFit: "cover",
+  // The on-screen keyboard shrinks the page, so the pinned primary button rides above it.
+  interactiveWidget: "resizes-content",
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
     { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },

@@ -42,3 +42,43 @@ export async function inBothThemes(page: Page, fn: (theme: "dark" | "light") => 
     await fn(theme);
   }
 }
+
+export const STAGING = "http://localhost:3100";
+export const SUPABASE = "http://127.0.0.1:54321";
+
+/**
+ * For the staging-like server on :3100. The API only allows :3000 (CORS), so API calls go through the test runner, which adds the
+ * headers; and every Supabase call is answered here. Returns what the page asked Supabase for.
+ */
+export async function stubBackends(page: Page, opts: { verify?: "ok" | "bad"; personaToken?: string } = {}) {
+  const seen = { otp: [] as unknown[], verify: [] as unknown[], authorize: [] as string[] };
+  const cors = { "access-control-allow-origin": "*", "access-control-allow-headers": "authorization,content-type,x-request-id", "access-control-allow-methods": "GET,POST,PATCH,PUT,DELETE" };
+  await page.route("http://localhost:8000/**", async (route) => {
+    if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
+    const res = await route.fetch();
+    await route.fulfill({ response: res, headers: { ...res.headers(), ...cors } });
+  });
+  await page.route(`${SUPABASE}/auth/v1/otp**`, async (route) => {
+    seen.otp.push(route.request().postDataJSON());
+    await route.fulfill({ status: 200, json: {}, headers: cors });
+  });
+  await page.route(`${SUPABASE}/auth/v1/verify**`, async (route) => {
+    seen.verify.push(route.request().postDataJSON());
+    if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
+    if (opts.verify === "bad") return route.fulfill({ status: 403, json: { code: 403, error_code: "otp_expired", msg: "Token has expired or is invalid" }, headers: cors });
+    const now = Math.floor(Date.now() / 1000);
+    await route.fulfill({
+      status: 200,
+      headers: cors,
+      json: {
+        access_token: opts.personaToken, token_type: "bearer", expires_in: 3600, expires_at: now + 3600, refresh_token: "e2e-refresh",
+        user: { id: "00000000-0000-0000-0000-000000000001", aud: "authenticated", role: "authenticated", email: "someone@example.com", app_metadata: { provider: "email" }, user_metadata: {}, created_at: new Date().toISOString() },
+      },
+    });
+  });
+  await page.route(`${SUPABASE}/auth/v1/authorize**`, async (route) => {
+    seen.authorize.push(route.request().url());
+    await route.fulfill({ status: 200, contentType: "text/html", body: "<html><body>Google</body></html>" });
+  });
+  return seen;
+}

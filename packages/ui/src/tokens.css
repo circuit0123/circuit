@@ -33,7 +33,7 @@
     --separator: rgba(0, 0, 0, 0.1);
     --text: #1d1d1f;
     --text-muted: #6e6e73;
-    --text-subtle: #8e8e93;
+    --text-subtle: #747479;
     --primary: #1d1d1f;
     --on-primary: #ffffff;
     --current: #0a8a69;
@@ -54,7 +54,7 @@
   --separator: rgba(0, 0, 0, 0.1);
   --text: #1d1d1f;
   --text-muted: #6e6e73;
-  --text-subtle: #8e8e93;
+  --text-subtle: #747479;
   --primary: #1d1d1f;
   --on-primary: #ffffff;
   --current: #0a8a69;
