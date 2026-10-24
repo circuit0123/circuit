@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "apps.dashboard",
     "apps.social",
     "apps.messaging",
+    "apps.beta",
 ]
 
 MIDDLEWARE = [
@@ -121,6 +122,9 @@ EMAIL_FROM = cfg.email_from
 SUPPORT_EMAIL = cfg.support_email
 FEATURES = cfg.features
 BETA_MODE = cfg.beta_mode
+INVITES_PER_MEMBER = cfg.invites_per_member
+TRUSTED_PROXY_HOPS = cfg.trusted_proxy_hops
+RESEND_API_KEY = cfg.resend_api_key
 SEED_CITY = {"name": cfg.seed_city_name, "lat": cfg.seed_city_lat, "lng": cfg.seed_city_lng}
 CSRF_TRUSTED_ORIGINS = cfg.csv(cfg.csrf_trusted_origins)
 
@@ -168,7 +172,16 @@ RATE_LIMITS = {
     "message": (300, 86400),
     "conversation_start": (10, 86400),
     "connection_request": (20, 86400),
+    "redeem": (10, 3600),  # per member
+    "redeem_ip": (30, 3600),  # per client address, so one network cannot grind through codes with many accounts
+    "waitlist": (5, 3600),  # per client address; public endpoint
 }
+
+# Invite-only beta (F18)
+INVITE_EXPIRY_DAYS_WAITLIST = 30  # the single-use code emailed when a waitlist entry is approved
+EMAIL_RETRY_BACKOFF_MINUTES = (1, 5, 30, 120, 720)  # wait before attempt 2, 3, ... ; the outbox gives up after the last one fails
+EMAIL_TIMEOUT_SECONDS = 5
+EMAIL_KEEP_DAYS = 30
 
 # Social (F15-F17)
 PULSE_WINDOW_DAYS = 7
@@ -183,7 +196,7 @@ DROP_TZ = "Asia/Kolkata"  # drops are built for the IST calendar day, ready at 0
 EMAIL_BACKEND = {
     "console": "django.core.mail.backends.console.EmailBackend",
     "disabled": "django.core.mail.backends.dummy.EmailBackend",
-    "resend": "django.core.mail.backends.smtp.EmailBackend",
+    "resend": "core.email.ResendBackend",
 }[cfg.email_backend]
 
 # Matching weights (CLAUDE.md: weights live in settings)

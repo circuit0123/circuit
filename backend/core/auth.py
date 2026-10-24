@@ -12,7 +12,6 @@ unless it opts out with `auth=None`. The result is an `AuthContext` on `request.
 
 import hashlib
 import hmac
-import re
 import threading
 import time
 import uuid
@@ -27,6 +26,7 @@ from django.db import IntegrityError, transaction
 from django.http import HttpRequest
 from ninja.security import HttpBearer
 
+from core.codes import plain_email
 from core.errors import AccountSuspended, ServiceUnavailable
 
 log = structlog.get_logger("auth")
@@ -222,19 +222,12 @@ def _decode_supabase(token: str) -> dict | None:
     return claims
 
 
-# Deliberately narrow. The domain decides which organisation someone joins, so we accept only plain ASCII
-# addresses. Quoted strings, comments, encoded words, Unicode (the Kelvin sign lower-cases to a plain "k") and
-# similar tricks are the ones mail systems read differently from us. Rejecting them only costs auto-join.
-_SIMPLE_EMAIL = re.compile(r"[a-z0-9][a-z0-9._+-]{0,63}@[a-z0-9-]+(?:\.[a-z0-9-]+)+")
-
-
 def _verified_email(claims: dict) -> str | None:
     email = claims.get("email")
     provider = (claims.get("app_metadata") or {}).get("provider")
-    if not isinstance(email, str) or provider not in VERIFIED_EMAIL_PROVIDERS or not email.isascii():
+    if not isinstance(email, str) or provider not in VERIFIED_EMAIL_PROVIDERS:
         return None
-    email = email.lower()
-    return email if _SIMPLE_EMAIL.fullmatch(email) else None
+    return plain_email(email)
 
 
 # --- members -------------------------------------------------------------------------------------
@@ -267,9 +260,22 @@ def _member_for_demo(auth_user_id: uuid.UUID):
 
 
 class SupabaseAuth(HttpBearer):
-    """API-wide default auth. Returns None (401) for anything that is not a valid token for a known member."""
+    """API-wide default auth. Returns None (401) for anything that is not a valid token for a known member.
+
+    The invite-only beta gate (F18) lives here and nowhere else: every protected endpoint passes through `authenticate`,
+    so a new endpoint is gated without its author doing anything. Public endpoints that peek at the caller use `identify`.
+    """
 
     def authenticate(self, request: HttpRequest, token: str) -> AuthContext | None:
+        ctx = self.identify(request, token)
+        if ctx is not None and settings.BETA_MODE:
+            from apps.beta import gate
+
+            gate.enforce(request, ctx)
+        return ctx
+
+    def identify(self, request: HttpRequest, token: str) -> AuthContext | None:
+        """Who is calling, with no access gate. Raises AccountSuspended for a suspended member."""
         try:
             alg = jwt.get_unverified_header(token).get("alg")
         except jwt.PyJWTError:

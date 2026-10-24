@@ -59,6 +59,8 @@ Stop everything with Ctrl+C, then `make down`.
 | `make reset-demo ENV=demo` | Same on the demo environment (not available until Stage 5; asks for confirmation) |
 | `make admin-user USER_NAME=asha` | Create a Django admin user (asks for a password) and print the 2FA setup link (`otpauth://…`) to add to an authenticator app. Run again to reset someone's 2FA |
 
+| `make invite-codes N=10` | Create invite codes for the beta and print each with its one-tap link (`APP_URL/join?code=…&src=invite`). Optional: `USES=5` (people per code, default 1), `DAYS=30` (expiry), `ORG=3` (whoever redeems joins organisation 3), `NOTE="pilot cohort"`. Audit-logged |
+
 `make reset-demo` refuses to run when ENV is staging or production.
 
 ## 4. Feature flags
@@ -78,6 +80,7 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 | `make jobs` | List all jobs and their cloud schedules |
 | `make daily` | Run the 08:00 set: compute_matches, then the Daily Drop (investor picks join in Stage 4f) |
 | `make circuit-round` | Run an exchange circuit round now |
+| `make job NAME=send_emails` | Send queued emails that are due (invite emails retry here when the provider was down). Scheduled every 5 minutes in the cloud |
 | `make eval` | `eval_matching` against tests/eval/pairs.json |
 
 ## 6. Tests and quality
@@ -130,3 +133,4 @@ manual approval. Every deploy target shows what it will do and asks before runni
 | Docker permission denied | You skipped the `usermod` step or didn't log out and back in |
 | App refuses to start | Read the first error line: it names the missing or invalid .env variable |
 | A feature is missing in the app | `make flags`: it may be switched off |
+| Everything answers 403 `beta_required` | `BETA_MODE=true` and the member has no access: `make invite-codes N=1`, redeem it, or add them in Django admin (Beta → Beta access) |

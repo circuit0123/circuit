@@ -18,6 +18,8 @@ VALID = {
     "CORS_PREVIEW_REGEX": "",
     "FEATURES": "pulse:everyone,daily_drop:everyone,circuits:testers",  # the dev .env turns payments on, which production refuses
     "RAZORPAY_KEY_ID": "",
+    "TRUSTED_PROXY_HOPS": "1",  # deployed envs refuse 0
+    "EMAIL_FROM": "Circuit <hello@example.com>",  # production refuses Resend's test sender
 }
 
 

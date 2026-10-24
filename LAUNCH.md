@@ -131,11 +131,11 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Playwright tests for the five demo stories at both widths; axe checks
 
 ## Stage 4b — Invite-only beta (F18)
-- [ ] invite_codes, beta_access, waitlist models; Django admin to create codes, approve waitlist, revoke access
-- [ ] Access gate on every member endpoint when BETA_MODE is on (except onboarding, waitlist and redeem-code); tests prove a non-beta member gets 403 everywhere else
+- [x] invite_codes, beta_access, waitlist models (+ allowlist, email outbox); Django admin to create codes, approve waitlist, revoke access
+- [x] Access gate on every member endpoint when BETA_MODE is on (except onboarding, waitlist and redeem-code); tests prove a non-beta member gets 403 everywhere else
 - [ ] App: "Enter invite code" + waitlist screen after sign-in; landing: waitlist form (rate-limited, no account needed)
-- [ ] Invite emails (Resend) with a one-tap link containing the code
-- [ ] Each beta member can invite 3 others (codes tied to the inviter, logged)
+- [x] Invite emails (Resend) with a one-tap link containing the code
+- [x] Each beta member can invite 3 others (codes tied to the inviter, logged)
 
 ## Stage 4c — Matching ML pipeline (backend)
 - [ ] Ranker interface: RuleRanker (v1) + ModelRanker (LightGBM LambdaRank); RuleRanker fallback on any error

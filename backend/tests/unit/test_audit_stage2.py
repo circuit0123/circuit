@@ -32,6 +32,7 @@ BASE = dict(
     env="dev", secret_key="aB3dE5fG7hJ9kL1mN3pQ5rS7tU9vW1xY3zA5", database_url="postgres://u:p@h/d", redis_url="redis://h",
     allowed_hosts="h", cors_allowed_origins="https://app.example", app_url="http://a", landing_url="http://l",
     api_url="http://api", seed_city_name="C", seed_city_lat=1.0, seed_city_lng=2.0, supabase_url="https://x.supabase.co", storage_provider="supabase", supabase_service_role_key="k",
+    trusted_proxy_hops=1, email_from="Circuit <hello@example.com>",
 )  # fmt: skip
 
 

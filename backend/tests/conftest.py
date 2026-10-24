@@ -40,6 +40,37 @@ def all_flags_on(settings):
     settings.FEATURES = ",".join(f"{name}:everyone" for name in flags.FLAGS)
 
 
+@pytest.fixture(autouse=True)
+def beta_off(settings):
+    """The invite-only beta is off unless a test switches it on (the `beta_on` fixture); the dev .env must not leak in."""
+    settings.BETA_MODE = False
+    settings.TRUSTED_PROXY_HOPS = 0
+    settings.INVITES_PER_MEMBER = 3
+
+
+@pytest.fixture
+def beta_on(settings):
+    settings.BETA_MODE = True
+
+
+@pytest.fixture
+def let_in(db):
+    """Give a member beta access the way a redeemed code would."""
+    from apps.beta.models import BetaAccess
+
+    return lambda member, source="code": BetaAccess.objects.create(member=member, source=source)
+
+
+@pytest.fixture
+def make_code(db):
+    from apps.beta import services
+
+    def _make(**kw):
+        return services.create_code(**kw)
+
+    return _make
+
+
 @pytest.fixture
 def fake_llm(fakes):
     return fakes

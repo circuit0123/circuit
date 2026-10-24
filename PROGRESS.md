@@ -3,6 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
+- B2 — invite-only beta, backend (Stage 4b): **done on `backend-b2` (branched from `backend-b0`), waiting for your OK** (details in "B2" below)
 - B0 — feature flags + commands: **done on `backend-b0`, waiting for your OK** (details in "B0" below)
 - Stage 1 — Backend foundation: **done and merged**
 - Stage 2 — Auth and security: **done and merged** (make check green: ruff, mypy, 321 tests; finecomb audit done, findings fixed)
@@ -37,6 +38,44 @@ Not exercised: `admin-user` interactively (unit-tested with a mocked password pr
 
 ### Frontend remaining (from B0)
 `useFeatures()` hook over `GET /api/config`; hide tabs, entry points and routes for off flags (DESIGN.md §3); 404 screen for off-flag URLs; mock-mode "features off" scenario.
+
+## B2 — Invite-only beta, backend (branch `backend-b2`): done, waiting for your OK
+`make check` is green: ruff, mypy, 1,848 backend tests (Stories 1–5 PASS), frontend type check. The branch starts from `backend-b0` (B0 is not merged into `main` yet and B2 needs its flags and config), so merge B0 first.
+
+**What it does (plain language).** With `BETA_MODE=true`, a signed-in person who has not been let in gets `403 beta_required` on every endpoint except `GET /api/me`, `POST /api/beta/redeem` and `/api/onboarding/*`. Public routes (`/api/health*`, `/api/config`, `/api/waitlist`) never needed a login. There are three ways in: an invite code, an email on the allowlist, or a waitlist entry a super admin approved. `/api/me` and `/api/config` carry `beta_access: bool` so the app knows whether to show the "Got an invite code?" screen.
+
+- **One gate, one place:** `SupabaseAuth.authenticate` (`core/auth.py`) calls `apps/beta/gate.py`. Every protected route goes through it, so a new endpoint is gated without its author doing anything. A test loops over **every operation in the OpenAPI schema** and proves that exactly the three exempt routes are open. `/api/config` uses a new `identify()` (same sign-in check, no gate), which is how the app learns it is gated.
+- **Redeem** (`POST /api/beta/redeem`): unknown, expired, used-up and revoked codes, and a revoked member, all get the identical `400 invalid_code` (a test compares the raw response bytes). The code row is locked inside a transaction, so two people racing for the last use give exactly one success (threaded test). Limits: 10/hour per member and 30/hour per address. An org code also joins the organisation (unless the member already has one). Someone already in gets 200 and nothing is used up.
+- **Allowlist and approved waitlist** are matched against the Supabase-verified sign-in email only (`core/codes.plain_email`, the same strict ASCII check as organisation auto-join). Tests: an unverified provider, `user_metadata`, an email sent by the client, a demo token and a Unicode look-alike all fail. A match writes a `beta_access` row, so access does not depend on the list afterwards.
+- **Waitlist** (`POST /api/waitlist`, public): always `202 {"status":"ok"}`, also for an email already on the list; 5 per hour per address (repeats count too, so it is not a free probe). The landing origin (`LANDING_URL`) is allowed by CORS for this one path only. A test asserts no email, note, college or IP appears in the captured logs.
+- **Member invites** (`GET /api/invites`): 3 single-use codes per member, created on first call, tied to the inviter, logged as `invite.created`; the redeemer's `beta.access_granted` event records the inviter. The count is the env setting `INVITES_PER_MEMBER` (your choice); raising it tops everyone up. Members share **links only** (your choice): there is no "email a friend".
+- **Email** (`core/email.py`): an email is written to an outbox table and sent after the transaction commits. If Resend is down or slow the request still succeeds, the row stays pending, and the `send_emails` job retries (1 min, 5 min, 30 min, 2 h, 12 h, then gives up). `EMAIL_BACKEND=resend` is now a real backend (5 s timeout, one quick retry); dev prints to the console, demo drops mail, tests use the in-memory outbox. The invite email links to `APP_URL/join?code=…&src=invite`.
+- **Django admin:** invite codes (create, revoke, who used them; never deleted), waitlist (approve and send invite / reject), allowlist (normalised emails), beta access (grant, revoke, restore). Every action writes an audit_log row with ids only.
+- **Commands:** `make invite-codes N=10 [USES=] [DAYS=] [ORG=] [NOTE=]`; `make job NAME=send_emails`. COMMANDS.md updated.
+- **Migrations (all new tables):** `beta.0001` (invite codes, beta access, waitlist, allowlist), `core.0005` (email outbox). No existing table changed. Event types added: `beta.access_granted`, `invite.created`, `waitlist.joined`.
+- **Seed:** `reset_demo` gives every seeded member access, so turning `BETA_MODE` on locally does not lock the personas out.
+
+### Things for you to decide or know (B2)
+1. **Exempt routes.** `GET /api/me` only (not PATCH): DESIGN.md puts the invite screen (step 3) before name and role (steps 4–5), so profile edits happen after access. `/api/onboarding/*` is exempt as you asked, which today means one route, the LLM bio extraction. That lets any signed-in person without an invite use up LLM calls (10/hour each, Google sign-up is free). If you would rather not pay for that before someone is invited, remove it from `EXEMPT_PREFIXES` in `apps/beta/gate.py`; the frontend is unaffected because extraction comes after the invite step.
+2. **Admins skip the gate.** `partner_admin` and `super_admin` members pass without an access row, because a super admin appointed them. A revoked row still locks them out.
+3. **Revoking sticks.** A revoked member is not re-granted by a code, the allowlist or an approved waitlist entry; use "Restore" in admin (Beta → Beta access). Revoking a code stops new uses only; people who already got in stay in.
+4. **Approving a waitlist entry does two things:** sign-in with that verified email passes the gate, and a single-use code (30 days) is emailed. The code matters because it carries the `src=invite` link and skips the invite screen.
+5. **Allowlist matching is exact after lower-casing.** `a.b@gmail.com` and `ab@gmail.com` are different entries; plus-addresses too.
+6. **New env settings:** `INVITES_PER_MEMBER` (3) and `TRUSTED_PROXY_HOPS`. Per-address limits read `X-Forwarded-For`; with 0 hops only the socket address counts. **Staging and production refuse to start with 0**, otherwise everyone behind Cloud Run would share one bucket. Cloud Run should be 1; confirm with a real request at the Stage 5 smoke. Addresses are hashed before they reach Redis or the Postgres fallback.
+7. **New startup rules:** `EMAIL_BACKEND=resend` needs `RESEND_API_KEY`; production refuses an `EMAIL_FROM` at `@resend.dev` (staging keeps the test sender, PRODUCTION.md §2). I edited the config builders in `test_config.py`, `test_audit_stage2.py` and `test_startup_refusal.py` to pass these, and `test_suspension.py` to skip `/api/waitlist` in its "public routes with no body" loop.
+8. **Not tested against real Resend** (no API key here): the HTTP call is tested with a mocked client only. The Stage 5 smoke must send one real invite email.
+9. **Schedule `send_emails` every 5 minutes in Stage 5** (added to `make jobs`). It uses row locks, so two overlapping runs do not double-send.
+10. **Work-email codes still send directly.** `core/codes.send_code` (work-email and startup-claim verification) was not moved to the outbox, so with `EMAIL_BACKEND=resend` a Resend outage would make those two endpoints fail. Suggest moving them in B3 with the email notifications.
+11. **`/api/me` change:** `beta_access` added to the response (PATCH `/api/me` and work-email confirm return `true`, since they were let through). Also on `/api/config`: `true` when `BETA_MODE` is off, `false` for anonymous visitors while it is on.
+12. **Dev database:** I ran `make migrate` on it and exercised the live API with `BETA_MODE=true` on port 8011 (gate, redeem, invites, waitlist, the console invite email), then deleted the rows that check created. Your dev members have no access rows: run `make reset-demo` before you set `BETA_MODE=true` locally.
+13. **Landing waitlist form and the app's invite screen are the same endpoint.** `src` accepts lower-case letters, digits, `-` and `_` (max 40), for example `landing-students`.
+
+### Frontend remaining (from B2)
+- **Invite code screen** (DESIGN.md §4 step 3): shown when `beta_mode && !beta_access` (from `/api/me` or `/api/config`); "Got an invite code?" field → `POST /api/beta/redeem`; `/join?code=…&src=invite` prefills it and skips the screen; on `invalid_code` show one inline sentence; handle `rate_limited`.
+- **Waitlist screen** (secondary action on step 3): email, role, city, college, note → `POST /api/waitlist`, then the one-screen confirmation (same answer whether or not the email was already listed, so never say "already on the list").
+- **Landing waitlist form** (all five audience pages and the investors fallback): same endpoint, `src` = the page (`landing-students` …). It calls the API from the landing origin, so the API's `LANDING_URL` must match the deployed landing site.
+- **"Invite friends" screen** (no DESIGN.md screen yet; needs one): shows `GET /api/invites` (code, link, available/used) with a share button.
+- App-wide: treat `403 beta_required` from any call as "send to the invite screen", and `useFeatures()`/config should expose `beta_access`.
 
 ## Stage 4 — Frontends (branch `frontend-v2`): round 2 of Home done, waiting for your OK
 Round 2 redoes Home for the new DESIGN.md (taken from `main`; CLAUDE.md F16 and LAUNCH.md Stage 3b/Home lines updated to match).
@@ -186,7 +225,7 @@ _Update: B0 has since been built; rows marked FIXED below are resolved by it. Ev
 | Stages 1–3 (foundation, auth, core API) | DONE (boxes in LAUNCH.md are unticked) | Tick Stages 1, 2, 3. Gaps inside Stage 3: no `members.onboarding` (resumable state), no `signup_source`, no LinkedIn level-2 proof | S |
 | B0 Stage 1b flags + commands | MISSING at check time; **FIXED in B0 (branch `backend-b0`)** | No `core/flags.py`, `feature_flags` model/admin, `members.is_tester`, `@require_flag`, `/api/config`, `manage.py flags`. Makefile has 9 targets (up, down, migrate, run, test, check, reset-demo, openapi, lint); no `make help` and about 25 COMMANDS.md targets are absent | M |
 | B1 Stage 3b social API | WRONG at check time; **flags and Today-strip removal FIXED in B0** (boxes ticked, code and tests exist) | Pulse, Daily Drop, Live wire and circuits are not behind flags. Legacy `/api/today`, `StoryView` still present (replaced by Live wire) | S |
-| B2 Stage 4b beta gate | MISSING | No invite_codes, beta_access, waitlist, `BETA_MODE`, gate, waitlist endpoint, invite emails (no resend) | M |
+| B2 Stage 4b beta gate | MISSING at check time; **FIXED in B2 (branch `backend-b2`)** | No invite_codes, beta_access, waitlist, `BETA_MODE`, gate, waitlist endpoint, invite emails (no resend) | M |
 | B3 Stage 6+7 backend | PARTIAL | Only `Consent` and in-app notifications exist. Missing: settings and appearance endpoint, notification prefs, export, delete, email notifications, block from profile, data requests, retention job, `docs/legal/` | L |
 | B3b Stage 4d promotions | MISSING | Nothing built | L |
 | B3c Stage 4e payments | MISSING | No razorpay dependency, models, webhook, live-key startup check | L |

@@ -12,7 +12,7 @@ endef
 
 .DEFAULT_GOAL := help
 .PHONY: help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
-	reset-demo admin-user flags flag job jobs daily circuit-round eval test test-web lint fmt check \
+	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round eval test test-web lint fmt check \
 	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback
 
 help: ## List every command
@@ -83,6 +83,10 @@ admin-user: ## Create a Django admin user (USER_NAME=name); prints the 2FA setup
 	@test -n "$(USER_NAME)" || { echo "usage: make admin-user USER_NAME=asha"; exit 1; }
 	$(MANAGE) admin_user $(USER_NAME)
 
+invite-codes: ## Create beta invite codes: make invite-codes N=10 [USES=1] [DAYS=30] [ORG=id] [NOTE=text]
+	@test -n "$(N)" || { echo "usage: make invite-codes N=10 [USES=1] [DAYS=30] [ORG=<organisation id>] [NOTE=text]"; exit 1; }
+	$(MANAGE) invite_codes --count $(N) --uses $(or $(USES),1) $(if $(DAYS),--days $(DAYS)) $(if $(ORG),--org $(ORG)) $(if $(NOTE),--note "$(NOTE)")
+
 # -- feature flags -------------------------------------------------------------------------
 flags: ## List every flag and its audience
 	$(MANAGE) flags
@@ -106,6 +110,7 @@ jobs: ## List the jobs and when they should run in the cloud
 	  'build_daily_drops    08:00 IST, after compute_matches' \
 	  'run_circuit_round    weekly' \
 	  'expire_items         every 15 minutes' \
+	  'send_emails          every 5 minutes (retries emails the provider refused)' \
 	  '(build_investor_picks, reconcile_payments, train_ranker: added by their stages)' \
 	  'Cloud schedules are created in Stage 5.'
 

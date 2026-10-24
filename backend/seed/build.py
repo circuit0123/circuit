@@ -8,6 +8,7 @@ from django.db import connection, transaction
 from django.utils import timezone
 
 from apps.accounts.models import Connection, ConnectionRequest, Consent, Member
+from apps.beta.models import BetaAccess
 from apps.events.services import record
 from apps.jobs.models import Application, Job, JobCapability
 from apps.matching.lists import sync_lists
@@ -36,6 +37,7 @@ APP_LABELS = [
     "events",
     "social",
     "messaging",
+    "beta",
 ]
 KEEP_TABLES = {"matching_capability", "matching_trait"}  # fixed lists survive a reset
 
@@ -137,7 +139,12 @@ class Seeder:
         self.build_connections()
         self.build_consents()
         self.build_social()
+        self.build_beta_access()
         return {"members": Member.objects.count(), "startups": Startup.objects.count(), "jobs": Job.objects.count()}
+
+    def build_beta_access(self) -> None:
+        """Every seeded member is already in, so switching BETA_MODE on in dev or demo does not lock the personas out."""
+        BetaAccess.objects.bulk_create([BetaAccess(member=m, source=BetaAccess.Source.APPROVED) for m in Member.objects.all()])
 
     def build_org(self) -> None:
         self.org = Organisation.objects.create(

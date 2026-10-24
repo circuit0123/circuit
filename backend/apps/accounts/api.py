@@ -5,8 +5,9 @@ from pydantic import Field
 
 from apps.accounts import services
 from apps.accounts.models import Member
+from apps.beta import gate
 from apps.matching.models import Capability, MemberSkill, MemberTrait, Need, Offer, Trait
-from core.auth import current_member
+from core.auth import current_context, current_member
 from core.ratelimit import check_rate
 
 router = Router()
@@ -29,6 +30,7 @@ class MeOut(Schema):
     visible_to_org: bool
     circuits_opt_in: bool
     open_intro_slots: int
+    beta_access: bool  # false while BETA_MODE is on and the member has not got in: show the invite-code screen
 
 
 class MePatch(Schema):
@@ -45,19 +47,25 @@ class MePatch(Schema):
     open_intro_slots: int | None = Field(None, ge=0, le=10)
 
 
-def _me(m: Member) -> dict:
+def _me(m: Member, beta_access: bool) -> dict:
     return {
         "id": m.pk, "role": m.role, "display_name": m.display_name, "bio": m.bio, "city": m.city, "college": m.college,
         "lat": m.location.y if m.location else None, "lng": m.location.x if m.location else None,
         "verification_level": m.verification_level, "organisation_id": m.organisation_id, "is_minor": m.is_minor,
         "profile_visibility": m.profile_visibility, "visible_to_org": m.visible_to_org, "circuits_opt_in": m.circuits_opt_in,
-        "open_intro_slots": m.open_intro_slots,
+        "open_intro_slots": m.open_intro_slots, "beta_access": beta_access,
     }  # fmt: skip
 
 
-@router.get("/me", response=MeOut, summary="Current member", description="The signed-in member's own profile and settings.")
+@router.get(
+    "/me",
+    response=MeOut,
+    summary="Current member",
+    description="The signed-in member's own profile and settings. `beta_access` is false while the invite-only beta is on and "
+    "the member has not got in yet: show the invite-code screen (everything else answers 403 `beta_required`).",
+)
 def me(request):
-    return _me(current_member(request))
+    return _me(current_member(request), gate.passes(current_context(request)))
 
 
 @router.patch(
@@ -69,7 +77,7 @@ def me(request):
 )
 def update_me(request, body: MePatch):
     member = current_member(request)
-    return _me(services.update_profile(member, body.dict(exclude_unset=True)))
+    return _me(services.update_profile(member, body.dict(exclude_unset=True)), beta_access=True)  # the gate let this call in
 
 
 # -- lists -------------------------------------------------------------------
@@ -289,4 +297,6 @@ def verify_work_email(request, body: WorkEmailIn):
     description="Enter the code from the email. On success you reach verification level 2.",
 )
 def verify_work_email_confirm(request, body: CodeIn):
-    return _me(services.confirm_work_email(current_member(request), body.code))  # guessing is capped per code, not per day
+    return _me(
+        services.confirm_work_email(current_member(request), body.code), beta_access=True
+    )  # guessing is capped per code, not per day

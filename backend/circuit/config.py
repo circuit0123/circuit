@@ -71,6 +71,8 @@ class Config(BaseSettings):
     log_level: str = "INFO"
     features: str = ""  # default audience per flag, e.g. "pulse:everyone,circuits:testers" (PRODUCTION.md §2b)
     beta_mode: bool = False
+    invites_per_member: int = Field(3, ge=0, le=50)  # beta invite codes each member can hand out (super admins change it here)
+    trusted_proxy_hops: int = Field(0, ge=0, le=5)  # proxies in front of the API that append to X-Forwarded-For (Cloud Run: 1)
     razorpay_key_id: str = ""
 
     @model_validator(mode="after")
@@ -108,6 +110,7 @@ class Config(BaseSettings):
                 raise ValueError("CORS_PREVIEW_REGEX is for staging only and must be empty elsewhere")
             _check_preview_regex(self.cors_preview_regex)
         self._check_flags()
+        self._check_beta_and_email()
         return self
 
     def _check_flags(self) -> None:
@@ -120,6 +123,16 @@ class Config(BaseSettings):
             raise ValueError("Razorpay live keys are only allowed when ENV is production")
         if self.env == "production" and audiences["payments"] != "off" and not live_key:
             raise ValueError("payments is on in production: RAZORPAY_KEY_ID must be a live key (rzp_live_...)")
+
+    def _check_beta_and_email(self) -> None:
+        if self.env in ("staging", "production") and self.trusted_proxy_hops < 1:
+            # Per-IP limits (waitlist, redeem) read the client address from X-Forwarded-For. With no trusted proxy configured
+            # every visitor would share the load balancer's address and one abuser would lock everyone out.
+            raise ValueError("TRUSTED_PROXY_HOPS must be at least 1 in staging and production (Cloud Run is one hop)")
+        if self.email_backend == "resend" and not self.resend_api_key:
+            raise ValueError("EMAIL_BACKEND=resend needs RESEND_API_KEY")
+        if self.env == "production" and "@resend.dev" in self.email_from:
+            raise ValueError("EMAIL_FROM is still Resend's test sender; verify the domain and set EMAIL_FROM in production")
 
     def csv(self, value: str) -> list[str]:
         return [v.strip() for v in value.split(",") if v.strip()]

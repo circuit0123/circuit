@@ -44,6 +44,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/beta/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Use an invite code
+         * @description Gives the signed-in member beta access, and joins the code's organisation if it has one and they have none. A code that is unknown, expired, used up or revoked all get the same 400 `invalid_code` so the answer never helps guessing. Someone who already has access gets 200 and no code is used. Rate limited per member and per address.
+         */
+        post: operations["apps_beta_api_redeem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/capabilities": {
         parameters: {
             query?: never;
@@ -173,7 +193,7 @@ export interface paths {
         };
         /**
          * App config
-         * @description Public. Environment, whether the invite-only beta is on, and which features are on for the caller (anonymous visitors get the `everyone` audience). The app hides screens for features that are off.
+         * @description Public. Environment, whether the invite-only beta is on, whether the caller may get past the beta gate (`beta_access`; false for anonymous visitors while the beta is on) and which features are on for the caller (anonymous visitors get the `everyone` audience). The app hides screens for features that are off.
          */
         get: operations["core_config_api_get_config"];
         put?: never;
@@ -700,6 +720,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My invite codes
+         * @description The member's own single-use invite codes with one-tap links to share. Missing codes are created on the way, up to the beta limit (3 by default), so this is safe to call repeatedly.
+         */
+        get: operations["apps_beta_api_my_invites"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/jobs": {
         parameters: {
             query?: never;
@@ -857,7 +897,7 @@ export interface paths {
         };
         /**
          * Current member
-         * @description The signed-in member's own profile and settings.
+         * @description The signed-in member's own profile and settings. `beta_access` is false while the invite-only beta is on and the member has not got in yet: show the invite-code screen (everything else answers 403 `beta_required`).
          */
         get: operations["apps_accounts_api_me"];
         put?: never;
@@ -1692,6 +1732,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Join the waitlist
+         * @description Public, for the landing site. No account needed. Always answers 202 `ok` for a valid request, including when the email is already on the list, so it never reveals who has signed up. Rate limited per address. The app calls this too, from the invite-code screen.
+         */
+        post: operations["apps_beta_api_join_waitlist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1878,6 +1938,8 @@ export interface components {
         };
         /** ConfigOut */
         ConfigOut: {
+            /** Beta Access */
+            beta_access: boolean;
             /** Beta Mode */
             beta_mode: boolean;
             /** Env */
@@ -2128,6 +2190,23 @@ export interface components {
              */
             offset: number;
         };
+        /** InviteOut */
+        InviteOut: {
+            /** Code */
+            code: string;
+            /** Link */
+            link: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "used" | "expired" | "revoked";
+        };
+        /** InvitesOut */
+        InvitesOut: {
+            /** Items */
+            items: components["schemas"]["InviteOut"][];
+        };
         /** JobCapabilityIn */
         JobCapabilityIn: {
             /** Capability */
@@ -2324,6 +2403,8 @@ export interface components {
         };
         /** MeOut */
         MeOut: {
+            /** Beta Access */
+            beta_access: boolean;
             /** Bio */
             bio: string;
             /** Circuits Opt In */
@@ -2828,6 +2909,18 @@ export interface components {
             /** Rating */
             rating: number;
         };
+        /** RedeemIn */
+        RedeemIn: {
+            /** Code */
+            code: string;
+        };
+        /** RedeemOut */
+        RedeemOut: {
+            /** Beta Access */
+            beta_access: boolean;
+            /** Organisation Id */
+            organisation_id: number | null;
+        };
         /** ReplyIn */
         ReplyIn: {
             /** Body */
@@ -3095,6 +3188,44 @@ export interface components {
             /** Upload Url */
             upload_url: string;
         };
+        /** WaitlistIn */
+        WaitlistIn: {
+            /**
+             * City
+             * @default
+             */
+            city: string;
+            /**
+             * College
+             * @default
+             */
+            college: string;
+            /** Email */
+            email: string;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "student" | "founder" | "mentor" | "investor" | "partner";
+            /**
+             * Src
+             * @default
+             */
+            src: string;
+        };
+        /** WaitlistOut */
+        WaitlistOut: {
+            /**
+             * Status
+             * @constant
+             */
+            status: "ok";
+        };
         /** WireActionOut */
         WireActionOut: {
             /**
@@ -3216,6 +3347,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApplicationOut"];
+                };
+            };
+        };
+    };
+    apps_beta_api_redeem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedeemIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedeemOut"];
                 };
             };
         };
@@ -4047,6 +4202,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IntroOut"];
+                };
+            };
+        };
+    };
+    apps_beta_api_my_invites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitesOut"];
                 };
             };
         };
@@ -5401,6 +5576,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TraitOut"][];
+                };
+            };
+        };
+    };
+    apps_beta_api_join_waitlist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WaitlistIn"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitlistOut"];
                 };
             };
         };
