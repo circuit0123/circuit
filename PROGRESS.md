@@ -3,9 +3,9 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
-- B3 — settings, notifications, report/block, export/delete, consent, legal drafts, backend (Stages 6 + 7): **done on `backend-b3` (branched from `main` after B0 and B2 merged), waiting for your OK** (details in "B3" below)
-- B2 — invite-only beta, backend (Stage 4b): **done on `backend-b2` (branched from `backend-b0`), waiting for your OK** (details in "B2" below)
-- B0 — feature flags + commands: **done on `backend-b0`, waiting for your OK** (details in "B0" below)
+- B3 — settings, notifications, report/block, export/delete, consent, legal drafts, backend (Stages 6 + 7): **done and merged** (PR #12, `backend-b3`) (details in "B3" below)
+- B2 — invite-only beta, backend (Stage 4b): **done and merged** (PR #11, `backend-b2`) (details in "B2" below)
+- B0 — feature flags + commands: **done and merged** (PR #9, #10, `backend-b0`) (details in "B0" below)
 - Stage 1 — Backend foundation: **done and merged**
 - Stage 2 — Auth and security: **done and merged** (make check green: ruff, mypy, 321 tests; finecomb audit done, findings fixed)
   - One box stays open on purpose: rate limits on extraction/intros/applications/reports/claims. Extraction, intros, applications, claims and org join now use `check_rate`. Reports now exist too (Stage 3b, `POST /api/reports`, limited to 10 a day), so that box can be ticked.
@@ -338,3 +338,50 @@ Then B3b, B3c (use the "Payments" prompt), B3d, B3e, B4–B7.
 - Partner mode (F22): organisation verification, cohorts, calls, events, announcements.
 - Invite-only beta (F18), promotions (F19), Razorpay payments (F20).
 - Under-18 members see only promoted roles from verified startups.
+
+---
+
+## Status check 2026-10-24 (after B3)
+
+Read-only check against CLAUDE.md, LAUNCH.md, PRODUCTION.md and COMMANDS.md, judged by code and tests, not ticked boxes. Run on branch `backend-b3` (tree clean). B3b–B3e are intentionally not built and are not counted as missing.
+
+### 1. Sessions
+| Session | Status | Branch / merged? | What's missing or wrong | Size |
+|---|---|---|---|---|
+| B0 Stage 1b flags + commands | DONE | `backend-b0`, PR #9 + #10, merged | `core/flags.py` (7 flags, dependency check, Redis→Postgres), `@require_flag` on every pulse / daily_drop / circuits operation, `/api/config`, `manage.py flags`, 43 Makefile targets, on/off/testers tests. Small: the box "blocks switching off promotions/payments while money is in flight" is ticked, but only a comment exists in `set_audience` (the tables arrive in 4d/4e; B3b/B3c must build it and have no box for it yet). The `/api/config` "contract test" is a shape test in `tests/api/test_flags_api.py`; there is no `tests/contract/` yet (B7) | S |
+| B1 Stage 3b social API | DONE | `backend-core` / `stage-3b` / `stage-3c-livewire`, PRs #4, #6, #8, merged (flags wrapped in B0) | Posts, Pulse, Live wire, Daily Drop (strength in words), messaging, Realtime RLS, reports, rate limits, minors' rules all have code and tests. Today strip retired on purpose | S |
+| B2 Stage 4b beta gate | DONE (backend) | `backend-b2`, PR #11, merged | Gate in `core/gate.py` called only from `SupabaseAuth.authenticate`, redeem, waitlist, allowlist, member invites, outbox email, admin. The two frontend boxes stay unticked correctly | S |
+| B3 Stage 6 + 7 backend | DONE (backend) | `backend-b3`, PR #12, merged on GitHub (local `main` not fetched yet) | Settings, appearance, notification prefs, unsubscribe, Realtime policies, report/block, export, deletion, consent, support, retention, `docs/legal/`. Open on purpose: Help/FAQ, 404/500 screens, circuit moment (frontend), lawyer review [YOU] | S |
+| B4 Stage 4c ML | NOT STARTED | – | No Ranker interface, `feature_snapshots`, `model_versions`, lightgbm, `simulate_network`, `build_training_set`, `train_ranker`, banned-features test | L |
+| B5 Stage 5 deploy | NOT STARTED | – | `docker/backend/Dockerfile` is a placeholder (CMD `manage.py check`; gunicorn is not approved yet, ask first). `make smoke`, `build*`, `deploy`, `rollback` print "not available". No scheduler, no job locks | M |
+| B6 Stage 8 + 9 | NOT STARTED | – | No `.github/`, no CI. `sentry-sdk` is in `pyproject.toml` but never imported. No backups, no restore drill | M |
+| B7 Stage 10 + 11 + handoff | NOT STARTED | – | No `FRONTEND_HANDOFF.md`, no `tests/contract/`, no versioned openapi, no funnel query. RUNBOOK.md exists but only has Retention and Data requests | L |
+
+Gaps outside B0–B7 that will block B7:
+- **Stage 3 box still open:** `members.onboarding` (resumable state) and `members.signup_source` do not exist on the Member model. The B7 per-source funnel query and the frontend `/join` flow need them. Do this before B7, in B4 or as a small fix.
+- Boxes ticked without full code: only the "money in flight" block in B0 (above). Nothing else found.
+- Ticked boxes that match code and tests: all other B0–B3 boxes.
+
+### 2. Tests
+`make check` (ruff, mypy, pytest, frontend type check): **2,252 passed, 0 failed, 0 skipped** (3 min 19 s). Stories 1–5 all PASS. `pnpm typecheck` passes for api-client, ui, app and landing. `packages/api-client/openapi.json` matches a fresh export (no drift). Not run (not set up yet): Playwright, axe.
+
+### 3. Safety items
+| Item | Result | Evidence |
+|---|---|---|
+| Beta gate on every non-exempt endpoint | **tested** | `tests/api/test_beta_gate.py` loops over every operation in the OpenAPI schema and asserts exactly the exempt routes are open |
+| Consent gate | **tested** | `tests/api/test_consent_gate.py` (same loop, version change, ordering before the beta gate, privacy rights stay open) |
+| DEMO_AUTH refused in staging / production | **tested** | `tests/unit/test_startup_refusal.py` (config check and the second guard in `core/apps.py`) |
+| RLS on every table | **tested** | `tests/unit/test_core.py` (no public table without RLS), `tests/unit/test_rls.py`, `tests/unit/test_realtime_rls.py`; `migrate` fails outside dev if a table is open |
+| Export and delete touch only the member's own data | **tested** | `tests/api/test_export.py` (zip holds only the requester's rows, others as ids, foreign link = 404), `tests/api/test_delete_account.py` (other people's data untouched), `tests/api/test_account_idor.py` |
+| Block hides both ways | **tested** | `tests/api/test_blocks.py` (every surface checked before and after, both directions), plus `test_posts`, `test_social_idor`, `test_notification_service` |
+| No names / emails / tokens in logs | **tested** | `tests/api/test_logging_pii.py`, `test_logging_pii_b3.py` (new endpoints and jobs, export zip) |
+| Feature flags off → 404 | **tested for the 3 flags that have code** | `tests/api/test_flags_api.py` (pulse, daily_drop, circuits; on, off and testers). The endpoint list in that test is a hand-written sample, not every operation. Flags `investor_mode`, `partner_mode`, `promotions`, `payments` have no code yet, so nothing to test |
+
+Nothing is broken. Weak spots to remember: (a) none of the Supabase / Resend / storage calls were tested against the real services (stand-ins only; Stage 5 smoke must do it); (b) the flag-off test could miss a new flagged endpoint that is not added to its sample list.
+
+### 4. What to run next
+1. **Housekeeping first (5 minutes):** `git fetch && git checkout main && git pull` (local `main` is behind PR #12), then open a small PR for this PROGRESS.md commit (it sits on the already-merged `backend-b3`). Branch `backend-b4` from the updated `main`.
+2. **Next session: B4** (Stage 4c, ML pipeline), PROMPTS.md "Backend sessions" template with `<SESSION>` = B4, `<STAGES>` = Stage 4c and the B4 extra line ("Use /effort high. Prove with a test that a simulation-only model can never be promoted in production.").
+3. **Fix before B7 (can ride in B4):** add `members.onboarding` and `members.signup_source` (additive migration).
+4. **Add two boxes** so they are not forgotten: in Stage 4d and 4e, "block switching off `promotions` / `payments` while a paid campaign or an open order exists" (B0 left only a comment).
+5. After B4: B3b–B3e (when you want them), then B5, B6, B7.
