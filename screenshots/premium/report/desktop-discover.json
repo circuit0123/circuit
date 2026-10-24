@@ -1,0 +1,18 @@
+[
+  {
+    "screen": "discover",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "title-gap",
+    "element": "div.flex.flex-col.items-start \"Jobs and the map arrive in t\"",
+    "detail": "42px under the title (8px expected, 16px allowed)"
+  },
+  {
+    "screen": "discover",
+    "width": 1280,
+    "theme": "light",
+    "rule": "title-gap",
+    "element": "div.flex.flex-col.items-start \"Jobs and the map arrive in t\"",
+    "detail": "42px under the title (8px expected, 16px allowed)"
+  }
+]

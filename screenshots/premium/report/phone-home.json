@@ -1,0 +1,290 @@
+[
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "article.flex.flex-col.gap-3 \"You offer frontend developme\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "article.flex.flex-col.gap-3 \"You can help each other: the\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youTrainee – Bac\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "truncated",
+    "element": "p.t-body.line-clamp-2 \"You both deal with student-f\"",
+    "detail": "clamped to 2 lines and cut (15 words)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "truncated",
+    "element": "p.t-body.whitespace-pre-line.line-clamp-2 \"Finished the sensor wiring f\"",
+    "detail": "clamped to 2 lines and cut (15 words)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "truncated",
+    "element": "p.t-body.whitespace-pre-line.line-clamp-2 \"We are hiring a frontend int\"",
+    "detail": "clamped to 2 lines and cut (19 words)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "accent-on-button",
+    "element": "span.inline-flex.shrink-0.align-middle[Verified by Circuit]",
+    "detail": "accent class inside button.min-w-0.flex-1.text-left \"Jayanth NatarajanMentor · Ch\""
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "large-title",
+    "element": "div \"CircuitHomehiringTatvagridTa\"",
+    "detail": "no visible Large title (h1)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "section-gap",
+    "element": "div.px-4.pb-6.pt-2 \"1 of 3 todayYou offer fronte\"",
+    "detail": "21px above this block (need 40px)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "section-gap",
+    "element": "section.px-4.pb-6.pt-2[Worth meeting] \"Worth meetingYou offer front\"",
+    "detail": "31px above this block (need 40px)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "section-gap",
+    "element": "section[Pulse] \"PulseIImran Shaikh Student, \"",
+    "detail": "24px above this block (need 40px)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "above-the-fold",
+    "element": "(page)",
+    "detail": "4 blocks before the first scroll (max 3)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youAssociate – F\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youIntern – Fron\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Skills in demand near youBac\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "truncated",
+    "element": "p.t-body.whitespace-pre-line.line-clamp-2 \"Office hours this Thursday a\"",
+    "detail": "clamped to 2 lines and cut (18 words)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "accent-on-button",
+    "element": "span.inline-flex.shrink-0.align-middle[Verified by Circuit]",
+    "detail": "accent class inside button.flex.min-w-0.flex-1 \"LDr. Lakshmi Narayanan Mento\""
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "dark",
+    "rule": "font-sizes",
+    "element": "(screen)",
+    "detail": "6 sizes: 12, 13, 16, 17, 20, 22px (max 4)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "article.flex.flex-col.gap-3 \"You offer frontend developme\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "article.flex.flex-col.gap-3 \"You can help each other: the\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youTrainee – Bac\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "truncated",
+    "element": "p.t-body.line-clamp-2 \"You both deal with student-f\"",
+    "detail": "clamped to 2 lines and cut (15 words)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "truncated",
+    "element": "p.t-body.whitespace-pre-line.line-clamp-2 \"Finished the sensor wiring f\"",
+    "detail": "clamped to 2 lines and cut (15 words)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "truncated",
+    "element": "p.t-body.whitespace-pre-line.line-clamp-2 \"We are hiring a frontend int\"",
+    "detail": "clamped to 2 lines and cut (19 words)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "accent-on-button",
+    "element": "span.inline-flex.shrink-0.align-middle[Verified by Circuit]",
+    "detail": "accent class inside button.min-w-0.flex-1.text-left \"Jayanth NatarajanMentor · Ch\""
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "large-title",
+    "element": "div \"CircuitHomehiringTatvagridTa\"",
+    "detail": "no visible Large title (h1)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "section-gap",
+    "element": "div.px-4.pb-6.pt-2 \"1 of 3 todayYou offer fronte\"",
+    "detail": "21px above this block (need 40px)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "section-gap",
+    "element": "section.px-4.pb-6.pt-2[Worth meeting] \"Worth meetingYou offer front\"",
+    "detail": "31px above this block (need 40px)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "section-gap",
+    "element": "section[Pulse] \"PulseIImran Shaikh Student, \"",
+    "detail": "24px above this block (need 40px)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "above-the-fold",
+    "element": "(page)",
+    "detail": "4 blocks before the first scroll (max 3)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youAssociate – F\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youIntern – Fron\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Skills in demand near youBac\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "truncated",
+    "element": "p.t-body.whitespace-pre-line.line-clamp-2 \"Office hours this Thursday a\"",
+    "detail": "clamped to 2 lines and cut (18 words)"
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "accent-on-button",
+    "element": "span.inline-flex.shrink-0.align-middle[Verified by Circuit]",
+    "detail": "accent class inside button.flex.min-w-0.flex-1 \"LDr. Lakshmi Narayanan Mento\""
+  },
+  {
+    "screen": "home",
+    "width": 375,
+    "theme": "light",
+    "rule": "font-sizes",
+    "element": "(screen)",
+    "detail": "6 sizes: 12, 13, 16, 17, 20, 22px (max 4)"
+  }
+]

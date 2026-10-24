@@ -1,0 +1,194 @@
+[
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youTrainee – Bac\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "article.flex.flex-col.gap-3 \"You can help each other: the\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "truncated",
+    "element": "p.t-body.line-clamp-2 \"You both deal with student-f\"",
+    "detail": "clamped to 2 lines and cut (15 words)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "large-title",
+    "element": "div \"CircuitHomehiringTatvagridTa\"",
+    "detail": "no visible Large title (h1)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "section-gap",
+    "element": "section[Pulse] \"PulseIImran Shaikh Student, \"",
+    "detail": "13px above this block (need 56px)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "section-gap",
+    "element": "section[People you may know] \"People you may knowYou can h\"",
+    "detail": "31px above this block (need 56px)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "desktop-columns",
+    "element": "aside.sticky.hidden.w-80[For you] \"1 of 3 todayYou offer fronte\"",
+    "detail": "40px between column and rail (48 needed)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youAssociate – F\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youIntern – Fron\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Skills in demand near youBac\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "accent-on-button",
+    "element": "span.inline-flex.shrink-0.align-middle[Verified by Circuit]",
+    "detail": "accent class inside button.flex.min-w-0.flex-1 \"LDr. Lakshmi Narayanan Mento\""
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "dark",
+    "rule": "font-sizes",
+    "element": "(screen)",
+    "detail": "6 sizes: 12, 13, 16, 17, 20, 22px (max 4)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youTrainee – Bac\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "article.flex.flex-col.gap-3 \"You can help each other: the\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "truncated",
+    "element": "p.t-body.line-clamp-2 \"You both deal with student-f\"",
+    "detail": "clamped to 2 lines and cut (15 words)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "large-title",
+    "element": "div \"CircuitHomehiringTatvagridTa\"",
+    "detail": "no visible Large title (h1)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "section-gap",
+    "element": "section[Pulse] \"PulseIImran Shaikh Student, \"",
+    "detail": "13px above this block (need 56px)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "section-gap",
+    "element": "section[People you may know] \"People you may knowYou can h\"",
+    "detail": "31px above this block (need 56px)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "desktop-columns",
+    "element": "aside.sticky.hidden.w-80[For you] \"1 of 3 todayYou offer fronte\"",
+    "detail": "40px between column and rail (48 needed)"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youAssociate – F\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Hiring near youIntern – Fron\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "feed-border+bg",
+    "element": "div.rounded-card.border.border-separator \"Skills in demand near youBac\"",
+    "detail": "border and background together"
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "accent-on-button",
+    "element": "span.inline-flex.shrink-0.align-middle[Verified by Circuit]",
+    "detail": "accent class inside button.flex.min-w-0.flex-1 \"LDr. Lakshmi Narayanan Mento\""
+  },
+  {
+    "screen": "home",
+    "width": 1280,
+    "theme": "light",
+    "rule": "font-sizes",
+    "element": "(screen)",
+    "detail": "6 sizes: 12, 13, 16, 17, 20, 22px (max 4)"
+  }
+]
