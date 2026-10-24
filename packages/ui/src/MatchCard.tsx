@@ -25,24 +25,19 @@ export function MatchCard({ match, onOpen, onIntro, asked, className }: Props) {
       <div className="flex min-h-row-sub items-center gap-4">
         <Avatar id={p.id} name={p.name} size={44} />
         <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left">
-          <span className="t-headline flex items-center gap-1">
-            <span>{p.name}</span>
-            <VerifiedBadge level={p.level} />
-          </span>
+          <span className="t-headline block">{p.name} <VerifiedBadge level={p.level} /></span>
           <span className="t-footnote block text-text-muted">{[p.role, p.place].filter(Boolean).join(" · ")}</span>
         </button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <MatchStrength strength={match.strength} />
+        {match.bridge && <BridgeBadge />}
         {onIntro && (
-          <Button className="min-h-11 px-4" disabled={asked} onClick={onIntro}>
+          <Button className="ml-auto min-h-11 px-4" disabled={asked} onClick={onIntro}>
             {asked ? "Intro asked" : "Intro me"}
           </Button>
         )}
       </div>
-      {(match.strength || match.bridge) && (
-        <div className="flex flex-wrap items-center gap-2">
-          <MatchStrength strength={match.strength} />
-          {match.bridge && <BridgeBadge />}
-        </div>
-      )}
     </article>
   );
 }
