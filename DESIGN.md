@@ -21,6 +21,33 @@ North-star moment: you open Circuit in the morning, see three new people worth
 meeting with a reason for each, a classmate's build log, and a startup 4 km away
 hiring for exactly your skills. You tap "Intro me" and close the app feeling ahead.
 
+## 1a. Design philosophy (how we decide)
+
+We follow the principles Steve Jobs held Apple to, turned into rules we can check.
+
+| Principle | What it means for Circuit | The rule |
+|---|---|---|
+| "Simplicity is the ultimate sophistication." | Remove until it breaks, then add back one thing. | Every screen has ONE job and ONE primary action. If a screen needs explaining, redesign it. |
+| Focus is saying no. | Most ideas are good; most don't belong on this screen. | Before adding an element, name what it replaces. A new feature goes to BACKLOG.md unless a screen genuinely needs it. |
+| "Design is how it works." | Looks follow behaviour, never the reverse. | Prototype the interaction (tap, swipe, wait, fail) before polishing pixels. |
+| Care about the back of the fence. | The parts nobody screenshots are what make it feel premium. | Loading, empty, error, offline, 404, emails, push copy and the 1,000th row get the same care as Home. |
+| It just works. | Smart defaults instead of settings. | No setting is added if a good default exists. Nothing asks the user for information we can infer. |
+| The whole widget. | Landing, app, emails and notifications feel like one product. | One token set, one voice, one icon style, one motion language everywhere. |
+| Delight in the details. | Small moments, earned. | One signature moment (circuit closing); micro-interactions only where they confirm an action. |
+
+From Apple's Human Interface Guidelines we also take three qualities:
+- **Clarity:** text is legible at every size, icons are precise, every element has a purpose.
+- **Deference:** the UI steps back so people's work and faces are the content. Chrome is
+  neutral; colour is reserved for meaning.
+- **Depth:** layers, translucent bars and physical motion show where you are and where
+  you came from.
+
+**Craftsmanship checklist (every screen, before it's "done"):** one job, one primary
+action · aligned to the 4px grid · type only from the scale · colour only from tokens ·
+all five states designed (loading, empty, error, offline, success) · works one-handed
+at 375px · works with VoiceOver/TalkBack · tested on a real mid-range Android and an
+iPhone · nothing on screen you could remove without losing meaning.
+
 ## 2. What we borrow, and what we refuse
 
 | From | Borrow | Refuse |
@@ -43,11 +70,128 @@ Mobile bottom bar (5 destinations, icons with labels):
 - Desktop (≥1024px): left rail with the same five destinations + create button; centre
   column max 600px for Home and Profile; right rail with the Daily Drop, nearby roles and
   "people you may know". Discover's map and the partner dashboard may use full width.
-- Partner admins get a sixth destination, `Dashboard`, replacing `Circuits` in the bar
-  (Circuits moves into Profile → Activity). Students under 18 see the same bar; Inbox
+- **Swipe between tabs (mobile):** a horizontal swipe anywhere on the content area moves
+  to the neighbouring tab in bar order (Home ↔ Discover ↔ Circuits ↔ Inbox ↔ Profile).
+  The screen follows the finger 1:1 and the tab bar's selection indicator slides with it;
+  release past 35% of the width or above 600px/s to commit, otherwise it snaps back.
+  Rules so it never fights other gestures:
+  - It only starts when the gesture begins outside a horizontally scrollable or swipeable
+    element (Live wire, Daily Drop stack, media pager, chips rows, map, segmented
+    controls). Those keep their own swipe.
+  - Disabled on pushed (non-tab) screens, where a swipe from the left edge means Back,
+    and whenever a sheet, menu or keyboard is open.
+  - Disabled on Discover's Map segment (the map owns all gestures there).
+  - The gesture must be clearly horizontal (angle under 30°) before it captures; vertical
+    scrolling always wins otherwise.
+  - Each tab keeps its scroll position and state when you swipe away and back.
+  - Off when `prefers-reduced-motion` is set (tabs switch with a fade instead), and a
+    "Swipe between tabs" toggle in Settings → Appearance can turn it off.
+  - Tapping a tab still works; tapping the current tab scrolls it to the top.
+- Partner admins get `Dashboard` in place of `Circuits` in the bar (Circuits moves into
+  Profile → Activity); see "Partner home" in §4. Students under 18 see the same bar; Inbox
   only shows connections and organisation staff.
+- **Feature flags change the bar, never grey it out.** A feature that is off for this
+  member simply isn't there (no "coming soon", no disabled icons):
+  - `circuits` off → four tabs: `Home` · `Discover` · `Inbox` · `Profile`; swipe order
+    follows the visible tabs.
+  - `pulse` off → no `+` in the top bar, no Live wire, no Pulse; Home is the Daily Drop
+    followed by matches and nearby roles. `daily_drop` off → Home starts with matches.
+  - `investor_mode` off → no investor role in onboarding or on the landing CTA (the
+    /investors page shows the waitlist form instead; the landing site reads
+    `/api/config` at build time). `partner_mode` off → partner home
+    shows only the dashboard (F8).
+  - `promotions` off → promoted slots don't exist; layouts must look complete without them.
+  - A deep link to an off feature shows the normal 404 screen.
 
 ## 4. Core screens
+
+### Landing site (one home, five front doors)
+Same visual system as the app (default Mint, Graphite neutrals, Geist). Each page has
+one job: get that audience into the app with their role pre-set.
+
+| Page | Headline | Proof shown | Call to action |
+|---|---|---|---|
+| `/` | "Build with people near you." | Live counts for the pilot city (startups, open roles, circuits closed) — real numbers only, hidden until meaningful | Five audience tiles |
+| `/students` | "Startups near you want your skills, not your college name." | Real roles near the pilot college with stipends in ₹ | "Find work near you" |
+| `/founders` | "Find people who can help you — and students who want to work with you." | "Claim your startup" example card with student-interest count | "Claim your startup" |
+| `/mentors` | "Help founders who need exactly what you know." | An example circuit (anonymised) | "Start mentoring" |
+| `/investors` | "Three startups a day that fit your thesis. No noise." | An example "Today's picks" card | "Set your focus" |
+| `/partners` | "See what your ecosystem is missing — and fix it." | A sample gap-map screenshot (demo data, labelled) | "Bring Circuit to your campus" (contact form + demo link) |
+
+Layout per page: hero (headline, one subhead, one primary button), three short
+"how it works" steps with real UI screenshots, one proof section, an FAQ of 4–6 honest
+answers (including privacy and minors where relevant), footer. No stock photos, no
+fake testimonials, no fake numbers. Mobile-first; Lighthouse ≥ 95.
+
+### Sign-up and onboarding (one thing per screen)
+The first two minutes decide whether someone stays. Every screen asks ONE thing, has
+ONE primary button pinned at the bottom (50px, full width), and nothing else competing
+for attention. Tone: minimalist meets professional Gen Z — short, confident, warm, no
+corporate filler, no slang that will age.
+
+Layout of every step: thin progress bar at the very top (no step numbers), a back
+chevron top-left, a Large title question, one short subhead, the single input or
+choice, then the primary button at the bottom above the keyboard. "Skip" appears as a
+text button top-right only on optional steps. Pushed screens slide in from the right;
+swipe from the left edge goes back. Answers save on every step, so closing the app
+resumes exactly where you left off.
+
+| # | Screen | Large title | The one thing | Notes |
+|---|---|---|---|---|
+| 1 | Welcome | "Build with people near you." | `Continue with Google` | Subhead: "Find work, collaborators and mentors who need what you're good at." Secondary text button: "Use email instead" (OTP). Legal line in Footnote: "By continuing you agree to the Terms and Privacy Policy." |
+| 2 | Email code (only if email) | "Check your inbox." | 6-digit code field, auto-advance, paste supported | "Resend in 30s" text button. |
+| 3 | Invite (only if BETA_MODE and no access) | "Got an invite code?" | Code field | Secondary: "Join the waitlist" → one-screen waitlist confirmation. Invite links prefill and skip this screen. |
+| 4 | Name | "What should we call you?" | First and last name (prefilled from Google) | Most people just tap Continue. |
+| 5 | Role | "What brings you here?" | Five large tappable rows: "Find work and internships" · "Build a startup" · "Mentor people" · "Invest" · "Run a college or incubator programme" | Choosing a row advances immediately (no extra Continue). Maps to role. |
+| 6 | Age | "Are you 18 or older?" | Two large buttons: "Yes" / "Not yet" | "Not yet" sets is_minor, private profile and safety defaults; one Footnote line explains why we ask. |
+| 7 | Where | "Where are you based?" | `Use my location` primary; "Choose a city" secondary | Stores a coarse location only; explains in one line. |
+| 8 | Your work | "What are you working on?" | One large text field: "Paste your bio, LinkedIn About, or just tell us in a few lines." | The LLM turns it into chips on the next screen. Skip allowed (goes to manual pickers). |
+| 9 | You offer | "Here's what you can offer." | Suggested capability chips, pre-selected, tap to remove; "+ Add" opens search | Max 5. If the LLM fails: a searchable chip list, no error shown. |
+| 10 | You need | "And what you need right now." | Same chip pattern for needs | Max 3. |
+| 11 | Organisation (students, partners; skipped if detected) | "Where do you study?" (or "Which programme?") | Search field with college/organisation results | Auto-filled and skipped when the verified email domain matches an organisation. "Not listed" is fine. |
+| 12 | Photo (optional) | "Add a photo." | Large circle; tap to choose; `Continue` | Skip allowed; re-prompted once later. Shows the circuit-pattern avatar as the placeholder. |
+| 13 | Make it yours (optional) | "Pick your colour." | The six accent swatches with a live preview | Skip keeps Mint. |
+| 14 | Ready | "You're on the circuit." | `See today's drop` | Short reveal of the first Daily Drop card (matches computed on the spot for new members, from precomputed candidates). |
+
+**Investor branch.** Choosing "Invest" at step 5 replaces steps 8–11 with:
+
+| # | Screen | Large title | The one thing | Notes |
+|---|---|---|---|---|
+| 8i | Focus | "What do you invest in?" | Sector chips from our fixed sector list (pick up to 5) | Popular sectors for the city shown first; search for the rest. |
+| 9i | Stage | "Which stages?" | Multi-select rows: Idea · Pre-seed · Seed · Series A+ | One tap each, `Continue` at the bottom. |
+| 10i | Cheque (optional) | "Typical cheque size?" | Ranges in ₹: under ₹5L · ₹5–25L · ₹25L–1Cr · ₹1Cr+ | Skip allowed. Never shown publicly. |
+| 11i | Verify | "Help founders trust you." | One link field: LinkedIn, AngelList or fund website | Reviewed by a super admin for verification level 3. Until verified, investors can browse picks but can't request intros. |
+
+Then photo, colour, and step 14 becomes "Your first picks are ready." → `See today's picks`.
+Investors are never asked for a bio, offers or needs; their offers are set to
+"Funding" and "Investor network" automatically and editable later.
+
+**Partner branch.** Choosing "Run a college or incubator programme" at step 5 replaces
+steps 8–11 with:
+
+| # | Screen | Large title | The one thing | Notes |
+|---|---|---|---|---|
+| 8p | Type | "What do you run?" | Rows: College · Incubator · Accelerator · Coworking space · Government programme · Corporate programme | Advances on tap. |
+| 9p | Organisation | "Which organisation?" | Search existing organisations; "Add a new one" (name + website) | Joining an existing org sends a request to its current admin. |
+| 10p | Verify | "Confirm you're from {org}." | Work email on the org's domain (OTP) | If no matching domain: website link + "We'll check within 1 working day." Admin powers unlock after verification. |
+| 11p | Goal | "What do you want to do first?" | Rows: Invite my startups · Invite my students · Post a call for applications · See my ecosystem's gaps | Lands them on that action after onboarding. |
+
+Then photo (org logo), colour, and step 14 becomes "{Org} is on the circuit." → the
+chosen first action. Partners are never asked for a bio, offers or needs.
+
+Rules:
+- Links that carry `role` skip step 5; invite links that carry an organisation skip
+  step 11 / 9p; invite codes skip step 3.
+- Target: Welcome to first Daily Drop card in under 2 minutes; most screens take one tap.
+- Never ask for anything we can infer (name from Google, organisation from email domain,
+  city from location).
+- No account details beyond these steps during onboarding: headline, highlights,
+  GitHub and proof of work are invited later from Profile (profile strength meter).
+- Consent: the legal line on Welcome plus a stored consent record; under-18 students
+  also see one plain-language screen about safety defaults before step 7.
+- Errors are inline, one sentence, and never clear what the person typed.
+- Every step works with VoiceOver/TalkBack and with the keyboard on desktop.
+- Desktop: the same steps in a centred 440px column; Enter submits.
 
 ### Home
 1. **Live wire** (top of Home; replaces any "stories" pattern). This is Circuit's own
@@ -58,7 +202,7 @@ Mobile bottom bar (5 destinations, icons with labels):
    - The node image is the most relevant visual of the update (a build log's first image,
      a startup logo, a circuit mini-ring), with the person's 20px avatar overlapping its
      bottom-right corner. Never a big initials circle.
-   - Unseen nodes are "powered": the node gets a 2px `accent` outline and a small dot of
+   - Unseen nodes are "powered": the node gets a 2px `current` outline and a small dot of
      current travels along the trace into it (§7). Seen nodes are dimmed to 60% opacity.
    - Order: updates most relevant to you first (shared capabilities, mutuals, distance),
      max 12 nodes; if none: the trace line shows "Quiet on the wire today" and one action.
@@ -68,7 +212,7 @@ Mobile bottom bar (5 destinations, icons with labels):
 2. **Daily Drop** (card stack, 3 cards per day, refreshed at 8:00 local time). The card
    leads with the REASON, not a giant avatar:
    - Top: "Sakthi can help you with **mentoring**" in Title size, with the capability in
-     `accent`. Below: the mutual connection ("via Meera, mentor") with both tiny avatars.
+     semibold `text`. Below: the mutual connection ("via Meera, mentor") with both tiny avatars.
    - Middle: their photo (or their best build log image) at 4:3, then name, verification
      badge, headline, place.
    - Chips: up to 3 of what they offer that you need.
@@ -86,6 +230,55 @@ Mobile bottom bar (5 destinations, icons with labels):
    Pulse is chronological within the last 7 days, not engagement-ranked. When you reach
    content you've seen: "You're caught up." with a suggestion (explore Discover). No
    infinite scroll beyond that.
+
+### Investor home (calm by design)
+Investors want signal, not noise. Their Home is the same structure with a quieter,
+fixed rhythm:
+1. **Today's picks** (replaces the Daily Drop): 3 startups per day at 08:00 IST that fit
+   their focus, stage and city. Each card leads with the fit ("Seed-stage healthtech in
+   Coimbatore, shipping weekly"), then the startup's best build log image, name,
+   verification, stage, team size, and up to 3 traction signals (recent build logs,
+   roles posted, verified founders). Actions: `Request intro` and `Pass`. After 3:
+   "That's today's picks. New ones tomorrow at 8."
+2. **Pulse, filtered:** only build logs and updates from startups in their focus that are
+   open to investors, plus startups they follow. No student posts, no job ads, no
+   promotions in an investor's Pulse.
+3. **Live wire, filtered:** startups in focus that shipped, hired or closed a circuit.
+- A pick never repeats within 30 days unless the startup posts a meaningful update.
+- Founders control this completely: a startup only appears to investors if its founder
+  turned on "Open to investor conversations" (off by default), and can turn it off any
+  time. Fundraising status is shown only if the founder sets it.
+- Intro requests from investors go to the founder, who accepts or declines; contact
+  details are never shown before acceptance. Warm paths ("via Meera, mentor") are
+  suggested first.
+- Investors can change their focus any time in Profile → Investing; picks update the
+  next morning (never mid-day, so the feed stays stable).
+
+### Partner home (colleges, incubators, programmes)
+Partners use Circuit to run their ecosystem. Their tab bar is Home · Discover ·
+Dashboard · Inbox · Profile (Dashboard replaces Circuits). Home shows, in order:
+1. **Needs your attention:** applications to review, RSVPs nearing capacity, cohort
+   invites pending — each a row with one action.
+2. **Cohort health:** three numbers (active members this week, intros accepted,
+   placements/hires) with a small trend, aggregates only.
+3. **Open calls and upcoming events** as cards.
+4. **Pulse filtered to their cohort and members** (build logs from cohort startups first).
+Primary action on Home: `New` (opens a sheet: Call · Event · Announcement · Invite).
+
+### Organisation page
+Public profile for each organisation: logo, name, kind, city, verification badge, about,
+open calls, upcoming events, cohort startups (only those who agreed to be listed), and
+`Follow`. Members of the org see a "Your organisation" badge.
+
+### Calls and events (cards and pages)
+- **Call card:** organisation, kind (Programme / Internship drive / Challenge), title,
+  deadline in plain words ("Closes in 5 days"), sectors, `Apply`. Applying is a short
+  one-thing-per-screen form (max 5 questions set by the partner).
+- **Event card:** date block (day + month in Geist Mono), title, venue or "Online",
+  going count shown only to the organiser, `RSVP`. Event page adds the agenda and a
+  calendar add.
+- Partner items in Pulse carry "From {org}" in Footnote `text-muted` and are capped at
+  1 per 10 items. They are not promotions and are never paid placements.
 
 ### Build log (post)
 - Media: up to 4 photos or screenshots (portrait 4:5 or square 1:1), shown full-bleed
@@ -145,43 +338,122 @@ proposals and status changes, application status changes, replies to your build 
 someone you know posted for the first time this week (max one per day). Never "X people
 viewed your profile" more than once a week.
 
+### Promoted items (F19)
+- Look like the normal card of their type (startup, role, build log) so they feel native,
+  but always carry a "Promoted" label in Footnote size, `text-muted`, top-left, plus the
+  startup name. Never styled to look like a match, a Daily Drop card or a Live wire node.
+- The "…" menu on a promoted item has `Why am I seeing this?` (one sentence: "Promoted to
+  people in Coimbatore interested in Android development") and `Hide this`.
+- Placement: Pulse (never first, max 1 per 8 items), top of Discover → Startups and
+  Jobs (one slot, below the search field). Never in the Daily Drop, Live wire, Circuits,
+  Inbox, Profile, applicant lists or the partner dashboard.
+- Founders get a simple "Promotion results" card on their startup page: impressions,
+  taps and applications per day, as plain numbers.
+
 ## 5. Visual system
 
-### Colour (dark-first, light supported)
+### Colour: "Graphite & Current" (dark-first, light supported)
+The interface is monochrome, like Apple's own apps: people's photos and work provide the
+colour. Colour appears only when it MEANS something. Primary buttons are solid
+graphite/white, not coloured. One functional colour, **Current**, marks anything live or
+active (it's the electricity in the circuit); **Bridge** marks cross-sector matches.
+
 | Token | Dark | Light | Use |
 |---|---|---|---|
-| `bg` | `#0B0B0E` | `#FAFAF7` | App background |
-| `surface` | `#15151A` | `#FFFFFF` | Cards, sheets |
-| `surface-2` | `#1E1E25` | `#F1F0EC` | Inputs, chips |
-| `border` | `#2A2A33` | `#E3E1DB` | Hairlines (1px) |
-| `text` | `#F5F4F0` | `#121215` | Primary text |
-| `text-muted` | `#A3A1A8` | `#5E5C63` | Secondary text |
-| `accent` | `#FF5A36` | `#E8431F` | Primary action only (one per screen) |
-| `bridge` | `#7C5CFF` | `#5B3DF0` | Bridge match badge and bridge-related UI only |
-| `success` | `#2ECC8F` | `#14A36B` | Accepted, hired, completed |
-| `warning` | `#FFB020` | `#C98200` | Expiring soon |
-| `danger` | `#FF4D5E` | `#D92D3E` | Destructive, errors |
+| `bg` | `#000000` | `#FFFFFF` | App background (true black on OLED) |
+| `bg-grouped` | `#000000` | `#F2F2F7` | Behind grouped lists and settings |
+| `surface` | `#111113` | `#FFFFFF` | Cards, sheets |
+| `surface-2` | `#1C1C1F` | `#F2F2F5` | Inputs, chips, grouped rows (dark) |
+| `surface-3` | `#2A2A2E` | `#E5E5EA` | Pressed states, elevated controls |
+| `separator` | `rgba(255,255,255,0.10)` | `rgba(0,0,0,0.10)` | Hairlines (0.5px on retina, 1px otherwise) |
+| `text` | `#F5F5F7` | `#1D1D1F` | Primary text |
+| `text-muted` | `#98989F` | `#6E6E73` | Secondary text |
+| `text-subtle` | `#6E6E73` | `#8E8E93` | Tertiary text, placeholders |
+| `primary` | `#F5F5F7` | `#1D1D1F` | Primary button fill (one per screen) |
+| `on-primary` | `#000000` | `#FFFFFF` | Text/icon on primary buttons |
+| `current` | `#3DDBB0` | `#0A8A69` | Live and active: powered Live wire nodes, unread dots, focus rings, accepted/completed states, links |
+| `bridge` | `#8E8CFF` | `#5856D6` | Bridge match badge and bridge UI only |
+| `warning` | `#FFB340` | `#B25E00` | Expiring soon |
+| `danger` | `#FF453A` | `#D70015` | Destructive actions, errors |
 
-**Signature gradient (the only gradient allowed):** `#FF5A36 → #FF2E93 → #7C5CFF`
-at 135°. Used ONLY for: the circuit ring and its closing animation, and the app icon. Never on buttons, backgrounds or text.
+### Personal accent (members choose their Current colour)
+Members can choose the colour that plays the `current` role for them. It's personal
+expression with guardrails: it only changes `current` (live states, unread dots, focus
+rings, links, powered Live wire nodes) and the signature gradient. Primary buttons stay
+graphite/white and status colours never change, so the app stays coherent.
 
-Contrast: all text meets WCAG AA on its background in both themes.
+| Accent | Dark | Light | Bridge colour while selected |
+|---|---|---|---|
+| Mint (default) | `#3DDBB0` | `#0A8A69` | Indigo `#8E8CFF` / `#5856D6` |
+| Sky | `#5AC8FA` | `#0071C2` | Indigo |
+| Indigo | `#8E8CFF` | `#5856D6` | Mint `#3DDBB0` / `#0A8A69` (swapped so Bridge stays distinct) |
+| Rose | `#FF6482` | `#C7254E` | Indigo |
+| Lime | `#B6E85A` | `#4D7C0F` | Indigo |
+| Mono | `#F5F5F7` | `#1D1D1F` | Indigo |
+
+- Only these six; no free colour picker (every option is pre-checked for WCAG AA in both
+  themes; recheck if any value changes).
+- Chosen in Settings → Appearance (with a live preview of a Live wire node, a Bridge
+  badge and a link) and offered once, optionally, at the end of onboarding.
+- Stored on the member (`appearance.accent`) so it follows them across devices; applied
+  before first paint (no flash of the default colour).
+- Mono: live states also use shape and weight (filled dot, semibold) so nothing relies on
+  colour alone.
+- Danger and warning are fixed and never selectable.
+- The landing site and emails always use the default Mint.
+
+**Signature gradient (the only gradient allowed):** `current → bridge`, using the
+member's accent and its paired Bridge colour (default `#3DDBB0 → #8E8CFF` dark,
+`#0A8A69 → #5856D6` light) at 135°. Used ONLY for the circuit
+ring, its closing animation, and the app icon.
+
+Contrast: all text meets WCAG AA on its background in both themes (verify `current` and
+`text-subtle` with a contrast checker; darken in light mode if any pair fails).
+
+### Materials (iOS-style translucency, used systematically)
+- Top bars, tab bar and sheet headers use a translucent material: `bg` at 72% opacity
+  + `backdrop-filter: blur(20px) saturate(180%)`, with a `separator` hairline.
+- Fall back to solid `bg` when `backdrop-filter` is unsupported, when
+  `prefers-reduced-transparency` is set, or when the device reports data-saver /
+  low memory. Never use translucency on cards or content.
 
 ### Typography
-- Family: **Geist** (open source) for everything; **Geist Mono** only for numbers that
-  matter (match %, stipend, distance, dashboard figures). Self-hosted, subset, 2 weights
-  (400, 600).
-- Scale (mobile / desktop): Display 32/40, Title 22/24, Headline 17/18, Body 15/16,
-  Caption 13/13, Micro 11/11. Line height 1.35 for body, 1.15 for display.
+- Family: **Geist** for everything (one brand voice on iPhone, Android and desktop);
+  **Geist Mono** only for numbers that matter (stipend, distance, dashboard figures).
+  Self-hosted, subset, 3 weights (400 regular, 500 medium, 600 semibold).
+- Scale (iOS-style, px, mobile; desktop +2 on Large title and Title 1 only):
+  Large title 34/600 · Title 1 28/600 · Title 2 22/600 · Title 3 20/500 ·
+  Headline 17/600 · Body 17/400 · Callout 16/400 · Subhead 15/400 · Footnote 13/400 ·
+  Caption 12/400.
+- Tracking: −0.022em at 28px and up, −0.012em for 20–22px, 0 for body, +0.01em for
+  12–13px. Line height 1.2 for titles, 1.4 for body.
 - Sentence case everywhere. Left-aligned text. Names and numbers are the loudest things
   on a card.
 
 ### Space, shape, depth
 - 4px base grid; common steps 4, 8, 12, 16, 24, 32, 48.
 - Screen side padding: 16px mobile, 24px desktop.
-- Radius: 12px cards, 20px sheets, 999px chips and avatars, 0 for full-bleed media.
-- Depth comes from layering and light, not heavy shadows: one soft shadow for sheets
-  and the Daily Drop stack only (`0 8px 32px rgba(0,0,0,.35)` dark, `.12` light).
+- Radius: 14px cards, 12px buttons and inputs, 10px grouped-list sections, 22px sheet
+  top corners, 999px chips and avatars, 0 for full-bleed media.
+- Primary and secondary buttons are 50px tall on mobile, full width at the bottom of
+  forms and sheets; text buttons for tertiary actions.
+- Depth comes from layering, translucency and motion, not heavy shadows: one soft shadow
+  for sheets and the Daily Drop stack only (`0 12px 40px rgba(0,0,0,.45)` dark, `.10` light).
+
+### iOS-quality patterns (mobile)
+- **Large titles** on top-level screens (Home excepted) that collapse into a centred
+  inline title on scroll, with the translucent bar appearing as content passes under it.
+- **Grouped inset lists** for settings, profile About and account screens.
+- **Sheets with detents** (medium and large), a grabber, drag-to-dismiss and the page
+  behind scaling to 0.94 with a dimmed backdrop.
+- **Edge swipe back** on pushed screens; pull-to-refresh on feeds.
+- **Long-press context menus** on posts, people and messages, always mirrored by a
+  visible "…" button.
+- **Segmented controls** instead of tabs inside a screen.
+- **Press states:** scale 0.97 and 80% opacity within 100ms; no colour flash.
+- **Safe areas** respected everywhere; content never sits under the home indicator.
+- Haptics via the Vibration API where supported (Android); iOS web has none, so every
+  confirmation must also be visual.
 
 ### Imagery
 - Real people and real work, full-bleed. No stock photos, no 3D blobs, no AI art.
@@ -202,6 +474,8 @@ Contrast: all text meets WCAG AA on its background in both themes.
 - Icons always paired with a label in navigation and primary actions.
 
 ## 6. Components (packages/ui)
+TabPager (swipeable tabs with gesture rules from §3), AccentPicker (six swatches with
+live preview), ThemeProvider (theme + accent as CSS variables, set before first paint),
 Avatar (photo or circuit pattern), Badge (verification 1–3, Bridge, Hiring, Under-18
 private), Button (primary, secondary, ghost, destructive; 48px tall on mobile), Chip
 (selectable, removable), Card (person, startup, job, build log, match, circuit),
@@ -216,12 +490,16 @@ staggered, movement follows physics, and the UI layers like paper in light.
 
 | Interaction | Spec |
 |---|---|
-| Default spring | stiffness 380, damping 32, mass 1 (snappy, no wobble) |
-| Sheets, modals | stiffness 300, damping 30; drag-to-dismiss with velocity |
+| Default spring (iOS feel) | `{ type: "spring", duration: 0.35, bounce: 0 }` — fast, no overshoot |
+| Push / pop between screens | slide 100% from the right with the previous screen moving −30% and dimming; `duration: 0.4, bounce: 0` |
+| Sheets | `duration: 0.45, bounce: 0.1`; page behind scales to 0.94; drag-to-dismiss with velocity |
+| Large title collapse | tied to scroll position (no time-based animation) |
 | Card stack swipe | follows finger 1:1; rotates up to 8°; throw threshold 30% width or 800px/s |
 | List entrance | fade + rise 12px, 40ms stagger, first 8 items only |
-| Tab switch | 150ms crossfade; no slide between tabs |
-| Live wire current | on load, a 6px `accent` dot travels along the trace from left to each unseen node (600ms, ease-out, 80ms stagger), then the node outline lights; plays once per session, not on every scroll |
+| Tab switch (tap) | content slides 24px + fades in the direction of the tab, `duration: 0.3, bounce: 0`; indicator slides with the same spring |
+| Tab swipe (mobile) | 1:1 with finger; commit at 35% width or 600px/s; settle `duration: 0.35, bounce: 0`; neighbouring screen is pre-rendered so there's no blank frame |
+| Accent change | all `current` uses crossfade to the new colour over 250ms |
+| Live wire current | on load, a 6px `current` dot travels along the trace from left to each unseen node (600ms, ease-out, 80ms stagger), then the node outline lights; plays once per session, not on every scroll |
 | Node "seen" | outline fades out and node dims to 60% over 300ms after the Update view closes |
 | Reaction tap | icon scales 1 → 1.25 → 1 in 220ms; light haptic where supported |
 | **Circuit closing (signature)** | the three ring segments draw in sequence (3 × 300ms), the gradient sweeps once around (600ms), avatars pulse once; total ≤ 1.6s; plays once per circuit |
@@ -240,6 +518,8 @@ staggered, movement follows physics, and the UI layers like paper in light.
 - Under-18: private by default, organisation-only posting, no Requests from strangers,
   no appearance in public Discover until age is verified and the student opts in.
 - Every post and profile has Report and Block within two taps.
+- Promotions never pretend to be recommendations, never interrupt (no pop-ups or
+  full-screen ads), and are capped per §4 "Promoted items".
 
 ## 9. Voice and copy
 - Plain, warm, specific. Write like a helpful senior from your college, not a brand.
@@ -257,7 +537,7 @@ staggered, movement follows physics, and the UI layers like paper in light.
 - WCAG AA contrast in both themes; tap targets ≥ 44px.
 - Every swipe has a button alternative; every icon-only control has a label.
 - Images in build logs require alt text (composer suggests it; author can edit).
-- Full keyboard support on desktop; visible focus rings (2px `accent`).
+- Full keyboard support on desktop; visible focus rings (2px `current`).
 - Screen reader order matches visual order; the Live wire is a labelled list
   ("Harini shipped a build log, 4 hours ago").
 
@@ -277,7 +557,8 @@ staggered, movement follows physics, and the UI layers like paper in light.
 - Initials-only avatars as the main visual of a card (Daily Drop, Live wire, Discover)
 - Grey skeleton bars used as content inside images or cards (skeletons are for loading only)
 - Raw match percentages below 55%, or any number that makes a recommendation look weak
-- Glassmorphism, neon glows, blurred blobs, aurora backgrounds
+- Glassmorphism on cards or content, neon glows, blurred blobs, aurora backgrounds (translucent system bars per "Materials" are the only blur allowed)
+- Coloured primary buttons (primary actions are graphite/white per the palette); orange or warm accent colours
 - Emoji as icons; sparkle icons; "AI-powered" labels
 - Stock photos, lorem ipsum, "John Doe", fake stats, placeholder logos
 - Public follower/like counts; infinite feeds without an end; streaks

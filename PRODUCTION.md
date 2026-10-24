@@ -27,6 +27,7 @@ infrastructure, this file wins.
 | Logs | Cloud Logging (structlog JSON) | Request IDs end to end |
 | Uptime | Better Stack or UptimeRobot | Alerts reach a phone |
 | Email | Resend (or Postmark) | Test sender until the domain is verified |
+| Payments | Razorpay (Orders, Checkout, webhooks, refunds) | Test keys outside production; live keys + webhook secret in Secret Manager |
 | LLM | core/llm, LLM_PROVIDER = gemini, groq or anthropic | Free tier in dev/demo/staging; paid, no-training tier in production; monthly cap |
 
 Request path: browser → Vercel (app) → API (Cloud Run) → Redis → Postgres (Supabase).
@@ -50,7 +51,9 @@ The landing site only links to the app; it never calls private API endpoints.
 | Email | Console | Disabled | Test sender to team inboxes | Real sender |
 | Search engines | n/a | noindex | noindex | Landing indexed; app noindex except public pages |
 | Deploy | Manual | Manual, from a release tag | Auto on merge to main | Manual approval after staging passes |
-| Banner | "Dev" | "Demo — sample data" | "Staging" | none |
+| Banner | "Dev" | "Demo — sample data" | "Staging" | "Beta" while BETA_MODE is on |
+| BETA_MODE | off | off | on (to test the gate) | on until public launch |
+| FEATURES | all everyone | all everyone | all everyone | see §2b |
 
 Rules:
 - Each environment has its own keys, database, Redis, buckets and OAuth redirect URLs.
@@ -77,6 +80,8 @@ platform default URL (`*.vercel.app`, `*.run.app`).
 | `EMAIL_FROM` | Sender | Provider test sender | `Circuit <hello@<domain>>` |
 | `SUPPORT_EMAIL` | Footer, legal pages | Team inbox | `support@<domain>` |
 | `SUPABASE_URL` | Auth, storage, realtime | Per-env project URL | Production project URL |
+| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` | Orders, payment signature | Test keys | Live keys |
+| `RAZORPAY_WEBHOOK_SECRET` | Webhook signature | Test webhook secret | Live webhook secret |
 
 Frontend build-time variables (set per Vercel project): `NEXT_PUBLIC_APP_URL`,
 `NEXT_PUBLIC_LANDING_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
@@ -93,6 +98,36 @@ Switching to the real domain (config only, ~1 hour plus DNS wait):
 5. Google OAuth client: add `APP_URL` to authorised JavaScript origins.
 6. Email: verify the domain (SPF, DKIM, DMARC), then switch `EMAIL_FROM`.
 7. Redeploy; run `make smoke URL=<APP_URL>`.
+
+## 2b. Feature flags per environment
+`FEATURES` sets the default audience per flag, e.g.
+`FEATURES=pulse:everyone,daily_drop:everyone,circuits:testers`. Flags not listed are
+`off`. Super admins override in Django admin (CLAUDE.md "Feature flags").
+
+| Flag | dev | demo | staging | production (beta start) |
+|---|---|---|---|---|
+| pulse | everyone | everyone | everyone | everyone |
+| daily_drop | everyone | everyone | everyone | everyone |
+| circuits | everyone | everyone | everyone | testers |
+| investor_mode | everyone | everyone | everyone | off |
+| partner_mode | everyone | everyone | everyone | off (testers once the partner is verified) |
+| promotions | everyone | everyone | everyone | off |
+| payments | everyone (test keys) | everyone (test keys) | everyone (test keys) | off |
+
+When to switch on in production (check the numbers in the metrics view first):
+- `circuits` → everyone: ≥ 30 members opted in with at least one need and one offer, and
+  a tester round produced at least 3 circuits that were accepted.
+- `partner_mode` → everyone: the first partner organisation is verified and its admin has
+  used it with testers for a week.
+- `investor_mode` → everyone: ≥ 15 startups are open to investors and ≥ 5 investors are
+  verified (otherwise picks are empty).
+- `promotions` → everyone: ≥ 300 weekly active students and ≥ 30 claimed startups, so a
+  promotion is worth paying for.
+- `payments` → everyone: promotions on, GST registration done, live Razorpay account
+  activated, refund policy page live, one real ₹1-scale test payment and refund done
+  end to end.
+- Switching any flag on or off is a one-line change in Django admin; record the date and
+  reason in PROGRESS.md.
 
 ## 3. Security baseline
 - Supabase JWT verified on every request (signature, expiry, audience, pinned algorithm).
@@ -124,7 +159,10 @@ Aggregates hide counts under 5. Heatmaps use neighbourhood-sized cells.
 - Data requests: export, correction, deletion (deletes or anonymises).
 - Retention: events (pseudonymous, kept), request logs (30 days), unverified accounts
   (purged after 30 days).
-- Processors listed: Supabase, Google Cloud, Vercel, the active LLM provider, Resend, Sentry, Upstash.
+- Processors listed: Supabase, Google Cloud, Vercel, the active LLM provider, Resend, Sentry, Upstash, Razorpay.
+- Payments: refund and cancellation policy page; GST on invoices (accountant confirms
+  GSTIN, rates and invoice format before live payments); Razorpay live activation
+  (KYC) done by the founder.
 
 ## 6. Data safety
 - Production: Supabase daily backups + point-in-time recovery; restore drill to staging
@@ -168,7 +206,10 @@ Aggregates hide counts under 5. Heatmaps use neighbourhood-sized cells.
 - Budget alerts on every paid service from day one.
 
 ## 12. Launch stages
-1. Closed beta: 10–20 known students and founders (LAUNCH.md Stages 1–6).
+1. Closed beta: invite-only (F18, BETA_MODE=true) in the PRODUCTION environment, because
+   beta users are real people with real data. Requires LAUNCH.md Stages 1–8 (legal
+   reviewed, production database with backups, monitoring). Start with 20–50 invited
+   users; grow by invite codes. Staging and demo never hold beta users' data.
 2. Pilot college: one partner, ~150 verified local startups, 30–50 claimed.
 3. Public launch: after pilot metrics are healthy and the load test passes.
 
@@ -177,3 +218,34 @@ Aggregates hide counts under 5. Heatmaps use neighbourhood-sized cells.
 - Intro acceptance (local vs bridge); circuits proposed / activated / completed
 - Startups claimed, roles posted, applications, shortlists
 - Weekly active users; 4-week retention
+
+## 14. What breaks in production, and the test for each
+
+Every row must have an automated test or a manual check that has passed on staging
+before production. `make check` covers the automated ones; RUNBOOK.md lists the manual
+ones with the date they last passed.
+
+| # | What breaks | Why it only shows up in production | Test condition |
+|---|---|---|---|
+| 1 | Sign-in fails after deploy | Redirect URLs, CORS origins or JWT audience differ per environment | `make smoke` signs in on each env; CORS preflight from APP_URL passes; a token from another env's Supabase is rejected |
+| 2 | Users logged out at random | Clock skew, JWKS key rotation | JWT check allows ≤60s skew; JWKS cache refreshes on unknown key id (test with a rotated key) |
+| 3 | Migration locks the database | Real tables are big; dev tables are tiny | Migrations are expand/contract; run on a staging copy with production-sized seed (≥50k members, ≥500k events) and time them |
+| 4 | "Too many connections" | Cloud Run scales to many instances | Load test at target users; pool size × max instances < Supabase limit; pooler URL used |
+| 5 | Slow pages | N+1 queries, missing indexes on real data volume | Query-count assertions on list endpoints; `EXPLAIN` on Pulse, Discover, matches with production-sized data; p95 within §9 targets |
+| 6 | Cold starts | Scale-to-zero | Min instances ≥ 1 in production; first-request latency measured after idle |
+| 7 | An external service is down or slow | LLM, Resend, Razorpay, Supabase Storage outages | Tests with mocked timeouts/5xx for each: onboarding falls back to manual chips, email queues and retries, payment shows "processing" and reconciles later |
+| 8 | Duplicate or missed payment events | Webhooks retry, arrive out of order, or don't arrive | Same webhook twice → one state change; `captured` before checkout callback → still correct; no webhook → `reconcile_payments` fixes it; tampered body → 400 |
+| 9 | Charged but campaign not live / live but not paid | Partial failures between steps | Campaign activates only in the webhook handler inside one transaction; test kill-mid-way cases |
+| 10 | Jobs run twice at once | Scheduler retries, overlapping runs | Every job takes a Postgres advisory lock and is idempotent; test two concurrent runs → same result |
+| 11 | Daily Drop arrives at the wrong time | Servers run in UTC, users in IST | All scheduling in Asia/Kolkata; test 07:59/08:00/08:01 IST and the day boundary |
+| 12 | Image uploads fail | iPhone HEIC, huge files, slow networks | Upload tests with HEIC, 12MB, 0-byte, wrong MIME, interrupted upload; client resize to 1440px |
+| 13 | Broken names and text | Indic scripts, emoji, very long names | Fixtures with Tamil, Hindi, Kannada, Bengali names, emoji, 80-char names; layout snapshots at 375px |
+| 14 | Realtime messages stop | Mobile networks drop sockets | Reconnect with backoff; missed messages fetched on reconnect (test by cutting the connection) |
+| 15 | Stale data after edits | Redis cache not invalidated | Tests: edit profile/needs/job → matches and Pulse reflect it within the TTL rule; Redis down → Postgres fallback |
+| 16 | Someone sees data they shouldn't | Real users try IDs, roles and minors' edges | IDOR tests on every ID; role matrix tests; under-18 tests (no stranger Requests, hidden profile, verified-startup promotions only) |
+| 17 | Abuse and spam | Real users and bots | Rate-limit tests on every write; report → hide flow tested end to end |
+| 18 | Wrong secrets in an environment | Copy-paste between envs | Startup check: refuses live Razorpay keys outside production, DEMO_AUTH in staging/production, missing variables anywhere |
+| 19 | Emails land in spam or not at all | Domain not verified | SPF/DKIM/DMARC verified; test sends to Gmail and Outlook before launch |
+| 20 | Bill shock | Runaway jobs, LLM loops, crawler | Budget alerts at 50/80/100%; LLM monthly cap enforced in code; job timeouts |
+| 21 | Can't recover from a mistake | Bad deploy or data loss | Rollback tried once; backup restored to staging (restore drill) and timed |
+| 22 | Works on a laptop, not on a ₹10k phone | Slow CPU and network | Lighthouse mobile ≥ 90; manual test on a real budget Android over throttled 4G |

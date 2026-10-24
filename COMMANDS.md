@@ -1,0 +1,128 @@
+# Circuit — commands
+
+Every command you run is a `make` target. Run them from the repo root. `make help` lists
+them all. If a target here doesn't exist yet in the repo, ask Claude Code to build it
+(LAUNCH.md Stage 1b), never work around it by hand.
+
+## 0. One-time laptop setup (Omarchy / Arch Linux)
+```bash
+sudo pacman -S --needed git make docker docker-compose docker-buildx nodejs
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER            # then log out and back in
+curl -LsSf https://astral.sh/uv/install.sh | sh   # Python manager (installs Python 3.12 for you)
+corepack enable && corepack prepare pnpm@latest --activate
+```
+Optional, only when deploying from the laptop: `yay -S google-cloud-cli`, then
+`gcloud auth login`.
+
+Check everything is installed: `make doctor` (prints OK/MISSING per tool and per .env
+variable, never the values).
+
+## 1. First run (fresh clone)
+```bash
+cp .env.example .env      # then fill values from your password manager
+make setup                # installs Python + JS deps, starts Postgres/Redis, migrates, seeds demo data
+make dev                  # starts API + app + landing together
+```
+Then open:
+| What | URL |
+|---|---|
+| App | http://localhost:3000 |
+| Landing site | http://localhost:3001 |
+| API | http://localhost:8000/api/health |
+| API docs (OpenAPI) | http://localhost:8000/api/docs |
+| Django admin | http://localhost:8000/<ADMIN_PATH>/ (create a user with `make admin-user`) |
+| Component gallery | http://localhost:3000/design |
+
+In dev you sign in with the persona switcher (DEMO_AUTH), so no Google login needed.
+Stop everything with Ctrl+C, then `make down`.
+
+## 2. Everyday commands
+| Command | What it does |
+|---|---|
+| `make dev` | API + app + landing with live reload (one terminal, coloured output) |
+| `make api` | Only the Django API on :8000 |
+| `make app` | Only the product app on :3000 |
+| `make landing` | Only the landing site on :3001 |
+| `make mock` | App on :3000 against mock data (no backend, no login). Same as `pnpm dev:mock` |
+| `make up` / `make down` | Start / stop Postgres + Redis containers |
+| `make logs` | Follow container logs |
+| `make shell` | Django shell (`manage.py shell`) |
+| `make dbshell` | psql into the local database |
+
+## 3. Database and data
+| Command | What it does |
+|---|---|
+| `make migrate` | Apply migrations |
+| `make migrations` | Create migrations after a model change (review them before committing) |
+| `make reset-demo` | Wipe local data and reload seed + the five demo stories (idempotent) |
+| `make reset-demo ENV=demo` | Same on the demo environment (asks for confirmation) |
+| `make admin-user` | Create a Django staff user; prints the TOTP setup QR in the terminal |
+
+`make reset-demo` refuses to run when ENV is staging or production.
+
+## 4. Feature flags
+| Command | What it does |
+|---|---|
+| `make flags` | List every flag and its audience (off / testers / everyone) |
+| `make flag NAME=circuits TO=testers` | Change one flag locally |
+| `make flag NAME=circuits TO=everyone ENV=staging` | Change it on staging (asks for confirmation; runs as a Cloud Run Job) |
+
+In production, change flags in Django admin only (audit-logged), not from the laptop.
+Defaults per environment and when to switch each on: PRODUCTION.md §2b.
+
+## 5. Background jobs (run by hand locally; scheduled in the cloud)
+| Command | What it does |
+|---|---|
+| `make job NAME=compute_matches` | Run any management command as the scheduler would |
+| `make jobs` | List all jobs and their cloud schedules |
+| `make daily` | Run the 08:00 set: compute_matches, daily drop, investor picks |
+| `make circuit-round` | Run an exchange circuit round now |
+| `make eval` | `eval_matching` against tests/eval/pairs.json |
+
+## 6. Tests and quality
+| Command | What it does |
+|---|---|
+| `make test` | Backend tests (pytest) |
+| `make test-web` | Frontend type check + Playwright + axe |
+| `make lint` | ruff, mypy, ESLint, prettier check |
+| `make fmt` | Auto-format Python and TypeScript |
+| `make check` | Everything above + demo stories PASS/FAIL. Must be green before any push |
+| `make smoke URL=https://...` | Check a deployed environment (sign-in page, CORS, one read, one write, test email) |
+
+## 7. API client
+| Command | What it does |
+|---|---|
+| `make api-client` | Export openapi.json from Django and regenerate packages/api-client |
+
+Run it after any endpoint change; commit openapi.json, the client, the handoff and the
+contract test together.
+
+## 8. Build
+| Command | What it does |
+|---|---|
+| `make build` | Production builds of everything: backend image + app + landing |
+| `make build-api` | Backend Docker image for your machine's architecture |
+| `make build-api-multiarch` | Backend image for ARM64 + x86_64 (what CI pushes) |
+| `make build-web` | `pnpm build` for apps/app and apps/landing |
+| `make run-prod-local` | Run the built image + built apps locally with ENV=dev, to check a production build before pushing |
+
+## 9. Deploy (normally done by CI, PRODUCTION.md §10)
+| Command | What it does |
+|---|---|
+| `make deploy ENV=staging` | Build, push, migrate and deploy staging, then `make smoke` |
+| `make deploy ENV=demo` | Deploy the latest release tag to demo, then reset demo data |
+| `make rollback ENV=staging` | Route traffic back to the previous Cloud Run revision |
+
+There is no `make deploy ENV=production`: production deploys only through CI with a
+manual approval. Every deploy target shows what it will do and asks before running.
+
+## When something goes wrong
+| Problem | Try |
+|---|---|
+| "port already in use" | `make down`, then check nothing else uses 3000/3001/8000/5432/6379 |
+| Database errors after pulling | `make migrate`; if still broken, `make reset-demo` (local only) |
+| App shows a blank screen | `make api-client` (client out of date), then restart `make dev` |
+| Docker permission denied | You skipped the `usermod` step or didn't log out and back in |
+| App refuses to start | Read the first error line: it names the missing or invalid .env variable |
+| A feature is missing in the app | `make flags`: it may be switched off |

@@ -38,17 +38,22 @@ Priority: P1 = during pilot · P2 = after pilot · Later = only when data says s
 - [ ] Grow eval set to a few hundred labelled pairs from real outcomes
 - [ ] Gap map export for partners (PDF/CSV)
 
+### Revenue
+- [ ] Promotions v2: custom budgets with pacing, simple targeting UI, automated GST invoices
+- [ ] Partner subscriptions (colleges/incubators): free tier (org page, calls, events) + paid tier (full dashboard, cohort analytics, exports, multiple admins)
+- [ ] Office hours booking (mentors and partners publish slots; members book)
+- [ ] Demo day showcase pages that investors who opted in can browse
+
 ## P2 — after the pilot
-- [ ] Matching v2: learned weights (logistic regression) after a few hundred rated outcomes
+- [ ] First real ModelRanker promotion: after ~300–500 labelled outcomes, shadow → A/B → active (pipeline built in LAUNCH Stage 4c)
 - [ ] Mentor chains; peer circles; reputation score (PageRank over "helped" edges)
 - [ ] Need decomposition (goal → sub-needs)
 - [ ] Level 4 community vouching
 - [ ] Regional language support
-- [ ] Partner self-serve onboarding
 - [ ] Investor tier; corporate innovation needs; services marketplace and perks
 
 ## Later — only when measurements justify it
-- [ ] Matching v3: learning-to-rank (LightGBM) after thousands of outcomes
+- [ ] Richer models (fine-tuned embeddings on our capability text, two-tower retrieval) after thousands of outcomes
 - [ ] Bandit-learned bridge share per user; circuit scoring with predicted acceptance
 - [ ] Neo4j behind core/graph. Trigger: warm-path or circuit queries > ~500ms p95, circuit round > 10 minutes, or multi-hop features SQL can't express cleanly
 - [ ] Rust (PyO3) or Go for one hot path, only if profiling shows Python is the bottleneck

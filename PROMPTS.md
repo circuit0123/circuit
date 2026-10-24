@@ -1,0 +1,181 @@
+# Circuit — session prompts
+
+Use plan mode (Shift+Tab) for every prompt below. One session per prompt; `/clear`
+between them. Each runs on its own branch and is merged via PR before the next.
+
+## 0. Repo audit (run first, read-only)
+See "Prompt A" at the bottom.
+
+## B0 — feature flags + commands (before B1)
+```
+Read CLAUDE.md (especially "Feature flags"), PRODUCTION.md §2b, COMMANDS.md, LAUNCH.md
+Stage 1b and PROGRESS.md. Do Stage 1b on branch backend-b0. Plan first.
+1. Feature flags exactly as CLAUDE.md describes: core/flags.py, feature_flags model +
+   Django admin, members.is_tester, @require_flag, /api/config, manage.py flags,
+   FEATURES env parsing with dependency validation. Wrap every feature that already
+   has code in its flag, with an on and an off test each.
+2. A Makefile with every target in COMMANDS.md and `make help`. Where a target needs
+   something not built yet (e.g. deploy before Stage 5), make it print "not available
+   until Stage N" and exit 1 instead of faking it. Deploy targets must confirm first;
+   there is no production deploy target.
+3. Run every local target from COMMANDS.md sections 1–8 once and paste the result
+   summary into PROGRESS.md. Fix COMMANDS.md if anything differs.
+Ask before any migration that changes existing tables. At the end: make check green,
+tick Stage 1b, update PROGRESS.md, commit, push the branch and stop.
+```
+
+## Backend sessions (B1–B7)
+Template — replace <SESSION> and <STAGES>:
+```
+Read CLAUDE.md, PRODUCTION.md, LAUNCH.md, DESIGN.md and PROGRESS.md. Do the BACKEND
+parts only of <STAGES> (LAUNCH.md "Build order", session <SESSION>). Branch:
+backend-<SESSION>. Design every endpoint from the DESIGN.md screen it serves. Skip
+frontend/Vercel items and list them in PROGRESS.md under "Frontend remaining".
+Plan first. Tests for every endpoint (success, failure, IDOR) and every job.
+Regenerate packages/api-client/openapi.json. Ask before any command on cloud
+resources. At the end: make check green, tick only backend boxes in LAUNCH.md,
+update PROGRESS.md, commit, push the branch and stop.
+```
+Extra lines:
+- B1: "After merging, I'll wire only the Home screen to check the API shape."
+- B3: "Write legal drafts to docs/legal/ clearly marked as drafts for lawyer review;
+  store consent with policy_version so text can change without code changes."
+- B4: "Use /effort high. Prove with a test that a simulation-only model can never be
+  promoted in production."
+- B5: "Deploy only the API, jobs and scheduler. Put the API URLs in PROGRESS.md."
+- B6: "Ask me before creating anything in production. Run the restore drill to staging
+  and document it in RUNBOOK.md."
+- B7: "Write FRONTEND_HANDOFF.md per CLAUDE.md 'API contract rules', add contract
+  tests in tests/contract/, and freeze openapi.json with a version."
+
+## Bug fixes (any time)
+```
+Here are bugs found while testing <env>: <list with steps>. For each: write a failing
+test first, fix, run make check. Then redeploy <env> and run make smoke.
+```
+
+## Frontend (after B7)
+```
+Read CLAUDE.md, DESIGN.md, FRONTEND_HANDOFF.md, LAUNCH.md and PROGRESS.md. The backend
+is complete and openapi.json is frozen. Regenerate packages/api-client. Build the
+"Frontend remaining" items in PROGRESS.md, one screen at a time, following DESIGN.md
+exactly with the frontend-design skill. If a screen needs something the API doesn't
+provide, stop and tell me instead of working around it. Show screenshots at 375px
+(dark and light) and 1280px after each screen and wait for my OK.
+```
+
+## Prompt A — full repo audit (read-only)
+```
+Read CLAUDE.md, PRODUCTION.md, LAUNCH.md, BACKLOG.md, DESIGN.md and PROGRESS.md. Audit
+the whole repo against them. Do NOT change any code. Use the test-runner agent to run
+make check. Report, in PROGRESS.md under "Audit <date>":
+1. Status of every LAUNCH.md item: Done / Partial / Missing, with evidence (file paths,
+   test names). Fix any box that is ticked but not actually done, or done but unticked.
+2. Every feature F1–F18: which backend endpoints, models, jobs, tests and frontend
+   screens exist for it.
+3. Anything in the code that contradicts the docs (old stack pieces, Neo4j, Today
+   strip/story rings, raw low match %, initials-only avatars, hard-coded URLs,
+   unapproved dependencies, missing permission checks, PII in logs).
+4. Test results: pass/fail per demo story, failing tests and why, untested endpoints.
+5. Security quick check: every endpoint has auth + permission + IDOR test; DEMO_AUTH
+   blocked in staging/production; RLS on every table; no secrets in git history.
+6. The 10 most important things to fix, in order.
+Stop after writing the report.
+```
+
+## Prompt B — where things need updating (plan only)
+```
+Read the "Audit" section in PROGRESS.md plus CLAUDE.md, DESIGN.md and LAUNCH.md. Make a
+plan, no code changes yet, listing every place that needs updating, grouped as:
+1. Docs out of date (which file, which section, what it should say) — propose exact
+   edits to CLAUDE.md / PRODUCTION.md / LAUNCH.md / DESIGN.md / PROGRESS.md.
+2. Backend code to change (file, what and why), mapped to a backend session B1–B7.
+3. Frontend code to change or delete (old design pieces, mock data, hand-written fetch
+   calls), mapped to screens in DESIGN.md.
+4. Tests to add or fix.
+5. Things only I can do ([YOU] items: accounts, URLs, approvals, lawyer).
+For each item give effort (S/M/L) and the branch it belongs on. Then wait for my OK;
+I'll approve which groups to do and in which session.
+```
+
+## Design refinement pass (keep the existing frontend)
+```
+Read DESIGN.md (§1a philosophy, §3 swipe between tabs, §5 "Graphite & Current" palette,
+personal accent, materials and iOS patterns, §7 motion). Keep the existing frontend and
+refine it in place; don't rebuild. Plan first, stopping after each step with screenshots
+at 375px (dark and light) and 1280px:
+1. Tokens + ThemeProvider: replace colour, type, radius and motion tokens in packages/ui;
+   theme and accent as CSS variables applied before first paint; remove every old accent
+   and orange; grep for hard-coded colours, sizes and radii and replace them with tokens.
+2. Components: Button, Card, Chip, Avatar, Sheet (detents), SegmentedControl, Toast,
+   inputs, LargeTitleHeader, GroupedList, translucent TopBar/TabBar with fallbacks,
+   context menus with "…" buttons, press states, AccentPicker.
+3. TabPager: swipe between tabs with every gesture rule in §3; Playwright touch tests.
+4. Screens one at a time (Home, Discover, Circuits, Inbox, Profile, Settings → Appearance,
+   then the rest): apply iOS patterns and the §1a craftsmanship checklist; each screen
+   has one job and one primary action — list anything you removed and why.
+If the backend has no appearance endpoint yet, store the choice locally for now and list
+the endpoint under "Backend remaining" in PROGRESS.md.
+Keep all Playwright tests passing; update snapshots only for intended visual changes.
+```
+
+## Quick audit after pushing (read-only)
+```
+Pull the latest from all branches. Read CLAUDE.md, DESIGN.md, LAUNCH.md and
+PROGRESS.md. Audit backend AND frontend against them without changing code: run make
+check with the test-runner agent, then write "Quick audit <date>" in PROGRESS.md with:
+(1) LAUNCH.md items Done / Partial / Missing with evidence, fixing wrong ticks;
+(2) features F1–F19: backend endpoints + tests and frontend screens that exist;
+(3) anything contradicting the docs (old accent/orange, story rings, raw low %,
+hard-coded URLs or colours, mock data still in use, unapproved dependencies, promotions
+affecting rankings, missing permission/IDOR tests, PII in logs);
+(4) failing tests and why; (5) top 10 fixes in order, each tagged backend or frontend
+with effort S/M/L. Stop after the report.
+```
+
+## Fix from the audit
+```
+Read the latest "Quick audit" in PROGRESS.md. Fix items <numbers> only, on branch
+fix-<short-name>. For each: failing test first, then the fix, then make check. Update
+the audit item to Fixed with the commit, commit, push and stop.
+```
+
+## Payments (Stage 4e backend, session B3c)
+```
+Read CLAUDE.md (F20, "Payment rules"), PRODUCTION.md §2a and §14, LAUNCH.md Stage 4e and
+PROGRESS.md. Do the BACKEND parts of Stage 4e on branch backend-b3c, in Razorpay TEST
+mode only. Plan first, /effort high. Use the official razorpay SDK. Verify payment
+signatures with the key secret and webhook signatures on the RAW body with the webhook
+secret, constant-time compare. Webhooks are the only thing that marks an order paid.
+Write tests for every case in LAUNCH.md Stage 4e and PRODUCTION.md §14 rows 7–9 and 18.
+Update FRONTEND_HANDOFF.md, openapi.json and contract tests. Commit, push, update
+PROGRESS.md and stop.
+```
+
+## Production failure test pass (before going live)
+```
+Read PRODUCTION.md §14. For every row: find the automated test that covers it or write
+it; for rows that need a manual check, write step-by-step instructions in RUNBOOK.md
+under "Pre-production checks". Run everything on staging with production-sized seed
+data (≥50k members). Report each row as Pass / Fail / Needs manual check, fix failures
+one at a time (failing test first), and stop with the report in PROGRESS.md.
+```
+
+## Frontend data layer + mock mode (do once, before heavy UI work)
+```
+Read CLAUDE.md "Frontend architecture" and FRONTEND_HANDOFF.md. Create apps/app/src/data
+with one TanStack Query hook per screen/action listed in the handoff, returning
+UI-ready objects. Move every existing API, Supabase or fetch call out of screens and
+components into these hooks; add an ESLint rule that blocks such imports elsewhere.
+Add `pnpm dev:mock` using MSW handlers generated from the backend contract fixtures,
+with a scenario switcher (empty, loading, error, slow 3G, under-18, partner, investor).
+Keep all Playwright tests passing. Commit, push and stop.
+```
+
+## Pure UI tinkering session (any time after the above)
+```
+Read DESIGN.md. UI-only session: change only files under apps/app/src/app, apps/landing
+and packages/ui. Do not edit src/data, packages/api-client or the backend. If a screen
+needs data the hook doesn't return, stop and tell me. Run in mock mode, show
+screenshots at 375px and 1280px after each change.
+```
