@@ -119,6 +119,26 @@ the endpoint under "Backend remaining" in PROGRESS.md.
 Keep all Playwright tests passing; update snapshots only for intended visual changes.
 ```
 
+## Premium pass (when the UI feels cramped or "not Apple")
+```
+Read DESIGN.md §1a, §3, §4 "Home", §5 (especially "Breathing room"), §12 and §13. The UI
+feels cramped and not premium. Don't change colours or features; fix space, restraint
+and hierarchy. Branch: frontend-premium. Plan first.
+1. Write apps/app/tests/premium.spec.ts exactly as DESIGN.md §13 item 5 describes and run
+   it on every tab screen. Show me the failures as a table (screen, width, rule, element).
+2. Fix packages/ui first: spacing tokens for section gaps, surface padding and row
+   heights; feed items without borders; Daily Drop actions (primary `Intro me`, text
+   `Skip`); neutral grey placeholder art; LargeTitleHeader with collapse on scroll;
+   edge fade for horizontal rows.
+3. Then screens one at a time, starting with Home: desktop = centre column + one rail
+   with only the Daily Drop; move "People you may know" and nearby roles to Discover and
+   "Skills in demand" to Discover → Jobs. For each screen, list what you removed or moved
+   and why, and show before/after screenshots at 375px (dark and light) and 1280px. Wait
+   for my OK before the next screen.
+Done when premium.spec.ts passes on every screen and all other Playwright tests pass.
+Commit after each screen, push the branch and stop.
+```
+
 ## Quick audit after pushing (read-only)
 ```
 Pull the latest from all branches. Read CLAUDE.md, DESIGN.md, LAUNCH.md and
