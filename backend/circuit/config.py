@@ -69,6 +69,9 @@ class Config(BaseSettings):
     seed_city_lat: float
     seed_city_lng: float
     log_level: str = "INFO"
+    features: str = ""  # default audience per flag, e.g. "pulse:everyone,circuits:testers" (PRODUCTION.md §2b)
+    beta_mode: bool = False
+    razorpay_key_id: str = ""
 
     @model_validator(mode="after")
     def _check_env_rules(self) -> "Config":
@@ -104,7 +107,19 @@ class Config(BaseSettings):
             if self.env not in ("dev", "staging"):
                 raise ValueError("CORS_PREVIEW_REGEX is for staging only and must be empty elsewhere")
             _check_preview_regex(self.cors_preview_regex)
+        self._check_flags()
         return self
+
+    def _check_flags(self) -> None:
+        from core.flags import check_dependencies, parse_features
+
+        audiences = parse_features(self.features)
+        check_dependencies(audiences)
+        live_key = self.razorpay_key_id.startswith("rzp_live_")
+        if live_key and self.env != "production":
+            raise ValueError("Razorpay live keys are only allowed when ENV is production")
+        if self.env == "production" and audiences["payments"] != "off" and not live_key:
+            raise ValueError("payments is on in production: RAZORPAY_KEY_ID must be a live key (rzp_live_...)")
 
     def csv(self, value: str) -> list[str]:
         return [v.strip() for v in value.split(",") if v.strip()]

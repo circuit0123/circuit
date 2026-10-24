@@ -37,7 +37,7 @@ def _out(n: Notification) -> dict:
     description="Newest first. Add unread=true for unread only. Payloads hold ids only; look details up with the other endpoints.",
 )
 def list_notifications(request, params: NotificationParams = Query(...)):
-    qs = Notification.objects.filter(member=current_member(request)).order_by("-created_at", "-id")
+    qs = services.visible(current_member(request)).order_by("-created_at", "-id")
     if params.unread:
         qs = qs.filter(read_at__isnull=True)
     return paginate(qs, params, _out)
@@ -45,7 +45,7 @@ def list_notifications(request, params: NotificationParams = Query(...)):
 
 @router.get("/unread-count", response=CountOut, summary="Unread count", description="How many notifications I have not read.")
 def unread_count(request):
-    return {"count": Notification.objects.filter(member=current_member(request), read_at__isnull=True).count()}
+    return {"count": services.visible(current_member(request)).filter(read_at__isnull=True).count()}
 
 
 @router.post(

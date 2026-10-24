@@ -11,7 +11,13 @@ ROLES = ["student", "founder", "mentor", "investor", "partner_admin", "super_adm
 JOINABLE = ["student", "founder", "mentor", "investor"]
 
 # Routes that need no token. Anything else must answer 401 to an anonymous caller.
-PUBLIC = {("GET", "/api/health"), ("GET", "/api/health/deps"), ("GET", "/api/demo/personas"), ("POST", "/api/demo/token")}
+PUBLIC = {
+    ("GET", "/api/config"),
+    ("GET", "/api/health"),
+    ("GET", "/api/health/deps"),
+    ("GET", "/api/demo/personas"),
+    ("POST", "/api/demo/token"),
+}
 
 
 def by_role(default=403, **over):
@@ -105,8 +111,6 @@ MATRIX = {
     ("DELETE", "/api/replies/{reply_id}"): by_role(404),
     ("GET", "/api/pulse"): social(200),
     ("POST", "/api/pulse/seen"): social(204),
-    ("GET", "/api/today"): social(200),
-    ("POST", "/api/today/seen"): social(404),
     ("GET", "/api/livewire"): social(200),
     ("POST", "/api/livewire/seen"): social(404),
     ("GET", "/api/drop/today"): social(200),
@@ -155,7 +159,6 @@ BODIES = {
     ("POST", "/api/media/uploads"): '{"purpose": "post", "content_type": "image/png", "size": 1000}',
     ("POST", "/api/posts"): '{"body": "Shipped the first version", "visibility": "organisation"}',
     ("POST", "/api/posts/{post_id}/replies"): '{"body": "Nice work"}',
-    ("POST", "/api/today/seen"): '{"kind": "member", "id": 999999}',
     ("POST", "/api/livewire/seen"): '{"key": "post:999999"}',
     ("POST", "/api/drop/today/{member_id}/swipe"): '{"direction": "skip"}',
     ("POST", "/api/connections/requests"): '{"member_id": 999999, "note": ""}',

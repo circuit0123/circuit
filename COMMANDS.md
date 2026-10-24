@@ -15,8 +15,8 @@ corepack enable && corepack prepare pnpm@latest --activate
 Optional, only when deploying from the laptop: `yay -S google-cloud-cli`, then
 `gcloud auth login`.
 
-Check everything is installed: `make doctor` (prints OK/MISSING per tool and per .env
-variable, never the values).
+Check everything is installed: `make doctor` (prints OK/MISSING per tool, and OK/MISSING/DEFAULT per .env
+variable; never the values).
 
 ## 1. First run (fresh clone)
 ```bash
@@ -44,7 +44,7 @@ Stop everything with Ctrl+C, then `make down`.
 | `make api` | Only the Django API on :8000 |
 | `make app` | Only the product app on :3000 |
 | `make landing` | Only the landing site on :3001 |
-| `make mock` | App on :3000 against mock data (no backend, no login). Same as `pnpm dev:mock` |
+| `make mock` | App on :3000 against mock data (no backend, no login). Not available until the frontend data-layer session |
 | `make up` / `make down` | Start / stop Postgres + Redis containers |
 | `make logs` | Follow container logs |
 | `make shell` | Django shell (`manage.py shell`) |
@@ -56,8 +56,8 @@ Stop everything with Ctrl+C, then `make down`.
 | `make migrate` | Apply migrations |
 | `make migrations` | Create migrations after a model change (review them before committing) |
 | `make reset-demo` | Wipe local data and reload seed + the five demo stories (idempotent) |
-| `make reset-demo ENV=demo` | Same on the demo environment (asks for confirmation) |
-| `make admin-user` | Create a Django staff user; prints the TOTP setup QR in the terminal |
+| `make reset-demo ENV=demo` | Same on the demo environment (not available until Stage 5; asks for confirmation) |
+| `make admin-user USER_NAME=asha` | Create a Django admin user (asks for a password) and print the 2FA setup link (`otpauth://…`) to add to an authenticator app. Run again to reset someone's 2FA |
 
 `make reset-demo` refuses to run when ENV is staging or production.
 
@@ -66,7 +66,7 @@ Stop everything with Ctrl+C, then `make down`.
 |---|---|
 | `make flags` | List every flag and its audience (off / testers / everyone) |
 | `make flag NAME=circuits TO=testers` | Change one flag locally |
-| `make flag NAME=circuits TO=everyone ENV=staging` | Change it on staging (asks for confirmation; runs as a Cloud Run Job) |
+| `make flag NAME=circuits TO=everyone ENV=staging` | Change it on staging (not available until Stage 5; asks for confirmation; runs as a Cloud Run Job) |
 
 In production, change flags in Django admin only (audit-logged), not from the laptop.
 Defaults per environment and when to switch each on: PRODUCTION.md §2b.
@@ -76,7 +76,7 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 |---|---|
 | `make job NAME=compute_matches` | Run any management command as the scheduler would |
 | `make jobs` | List all jobs and their cloud schedules |
-| `make daily` | Run the 08:00 set: compute_matches, daily drop, investor picks |
+| `make daily` | Run the 08:00 set: compute_matches, then the Daily Drop (investor picks join in Stage 4f) |
 | `make circuit-round` | Run an exchange circuit round now |
 | `make eval` | `eval_matching` against tests/eval/pairs.json |
 
@@ -84,21 +84,23 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 | Command | What it does |
 |---|---|
 | `make test` | Backend tests (pytest) |
-| `make test-web` | Frontend type check + Playwright + axe |
-| `make lint` | ruff, mypy, ESLint, prettier check |
-| `make fmt` | Auto-format Python and TypeScript |
-| `make check` | Everything above + demo stories PASS/FAIL. Must be green before any push |
-| `make smoke URL=https://...` | Check a deployed environment (sign-in page, CORS, one read, one write, test email) |
+| `make test-web` | Frontend type check (Playwright + axe arrive with Stage 4) |
+| `make lint` | ruff (check + format check), mypy, ESLint (prettier is not installed yet) |
+| `make fmt` | Auto-format Python with ruff (TypeScript formatting arrives with prettier) |
+| `make check` | lint + backend tests with demo stories PASS/FAIL + frontend type check. Must be green before any push |
+| `make smoke URL=https://...` (Stage 5) | Check a deployed environment (sign-in page, CORS, one read, one write, test email) |
 
 ## 7. API client
 | Command | What it does |
 |---|---|
-| `make api-client` | Export openapi.json from Django and regenerate packages/api-client |
+| `make api-client` | Export openapi.json from Django and regenerate packages/api-client (`make openapi` is an alias) |
 
 Run it after any endpoint change; commit openapi.json, the client, the handoff and the
 contract test together.
 
 ## 8. Build
+Only `make build-web` works today. The others print "not available until Stage 5" (the backend image is a placeholder).
+
 | Command | What it does |
 |---|---|
 | `make build` | Production builds of everything: backend image + app + landing |
@@ -108,6 +110,8 @@ contract test together.
 | `make run-prod-local` | Run the built image + built apps locally with ENV=dev, to check a production build before pushing |
 
 ## 9. Deploy (normally done by CI, PRODUCTION.md §10)
+Not built yet: these print "not available until Stage 5" and exit 1.
+
 | Command | What it does |
 |---|---|
 | `make deploy ENV=staging` | Build, push, migrate and deploy staging, then `make smoke` |

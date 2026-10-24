@@ -8,7 +8,7 @@ import pytest
 from cryptography.hazmat.primitives.asymmetric import ec
 from django.test import Client
 
-from core import auth, cache, embeddings, llm, storage
+from core import auth, cache, embeddings, flags, llm, storage
 
 SUPABASE_URL = "https://test.supabase.co"
 ISSUER = f"{SUPABASE_URL}/auth/v1"
@@ -32,6 +32,12 @@ def fakes():
     cache.set_cache(None)
     embeddings.set_embedder(None)
     llm.set_llm(None)
+
+
+@pytest.fixture(autouse=True)
+def all_flags_on(settings):
+    """Every feature is on unless a test switches one off. Flag tests set settings.FEATURES themselves."""
+    settings.FEATURES = ",".join(f"{name}:everyone" for name in flags.FLAGS)
 
 
 @pytest.fixture

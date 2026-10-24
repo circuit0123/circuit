@@ -164,6 +164,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * App config
+         * @description Public. Environment, whether the invite-only beta is on, and which features are on for the caller (anonymous visitors get the `everyone` audience). The app hides screens for features that are off.
+         */
+        get: operations["core_config_api_get_config"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/connections": {
         parameters: {
             query?: never;
@@ -1652,46 +1672,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/today": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Today strip
-         * @description Circles for connections, my organisation and startups I follow who posted or opened a role in the last 24 hours. Unseen first. Items are included, so the story viewer needs no second call.
-         */
-        get: operations["apps_social_api_get_today"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/today/seen": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Mark a circle as viewed
-         * @description Call when a circle is opened. A circle that is not in my strip is a 404.
-         */
-        post: operations["apps_social_api_today_seen"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/traits": {
         parameters: {
             query?: never;
@@ -1856,30 +1836,6 @@ export interface components {
             /** Lng */
             lng: number;
         };
-        /** CircleOut */
-        CircleOut: {
-            author: components["schemas"]["AuthorOut"] | null;
-            /** Id */
-            id: number;
-            /**
-             * Kind
-             * @enum {string}
-             */
-            kind: "member" | "startup";
-            /**
-             * Latest At
-             * Format: date-time
-             */
-            latest_at: string;
-            /** Name */
-            name: string;
-            /** Posts */
-            posts: components["schemas"]["PostOut"][];
-            /** Roles */
-            roles: components["schemas"]["StoryRoleOut"][];
-            /** Seen */
-            seen: boolean;
-        };
         /** CircuitOut */
         CircuitOut: {
             /**
@@ -1919,6 +1875,17 @@ export interface components {
         CodeIn: {
             /** Code */
             code: string;
+        };
+        /** ConfigOut */
+        ConfigOut: {
+            /** Beta Mode */
+            beta_mode: boolean;
+            /** Env */
+            env: string;
+            /** Features */
+            features: {
+                [key: string]: boolean;
+            };
         };
         /** ConnectionRequestIn */
         ConnectionRequestIn: {
@@ -3062,22 +3029,6 @@ export interface components {
              */
             status: "shortlisted" | "rejected" | "hired";
         };
-        /** StoryRoleOut */
-        StoryRoleOut: {
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Id */
-            id: number;
-            /** Kind */
-            kind: string;
-            /** Startup Id */
-            startup_id: number;
-            /** Title */
-            title: string;
-        };
         /** Suggestions */
         Suggestions: {
             /** Needs */
@@ -3143,16 +3094,6 @@ export interface components {
             status: string;
             /** Upload Url */
             upload_url: string;
-        };
-        /** ViewedIn */
-        ViewedIn: {
-            /** Id */
-            id: number;
-            /**
-             * Kind
-             * @enum {string}
-             */
-            kind: "member" | "startup";
         };
         /** WireActionOut */
         WireActionOut: {
@@ -3416,6 +3357,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CircuitOut"];
+                };
+            };
+        };
+    };
+    core_config_api_get_config: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfigOut"];
                 };
             };
         };
@@ -5414,48 +5375,6 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    apps_social_api_get_today: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CircleOut"][];
-                };
-            };
-        };
-    };
-    apps_social_api_today_seen: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ViewedIn"];
-            };
-        };
         responses: {
             /** @description No Content */
             204: {

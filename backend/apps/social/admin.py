@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 
-from apps.social.models import DailyDrop, Follow, MediaUpload, Post, PostMedia, Reaction, Reply, StoryView
+from apps.social.models import DailyDrop, Follow, MediaUpload, Post, PostMedia, Reaction, Reply
 from core.adminbase import AuditedAdmin, ReadOnlyAdmin, audit
 
 
@@ -53,4 +53,4 @@ class ReplyAdmin(TakedownActions):
         return False
 
 
-admin.site.register([Follow, Reaction, DailyDrop, StoryView, MediaUpload, PostMedia], ReadOnlyAdmin)
+admin.site.register([Follow, Reaction, DailyDrop, MediaUpload, PostMedia], ReadOnlyAdmin)

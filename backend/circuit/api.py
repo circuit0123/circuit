@@ -14,6 +14,7 @@ from apps.organisations.api import router as organisations_router
 from apps.social.api import router as social_router
 from apps.startups.api import router as startups_router
 from core.auth import SupabaseAuth
+from core.config_api import router as config_router
 from core.demo import router as demo_router
 from core.errors import install_handlers
 from core.health import router as health_router
@@ -27,6 +28,7 @@ api = NinjaAPI(
     auth=SupabaseAuth(),  # default for every endpoint; public ones opt out with auth=None
 )
 install_handlers(api)
+api.add_router("/config", config_router, tags=["config"])
 api.add_router("/health", health_router, tags=["health"])
 api.add_router("/demo", demo_router, tags=["demo"])
 api.add_router("", accounts_router, tags=["accounts"])

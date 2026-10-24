@@ -181,7 +181,7 @@ def test_removing_a_connection_needs_to_be_in_it(make_member, connect, client_fo
     assert client_for(a).delete(f"/api/connections/{b.pk}").status_code == 204
 
 
-# -- daily drop and today ---------------------------------------------------------------------------
+# -- daily drop ---------------------------------------------------------------------------
 def test_only_people_in_my_own_drop_can_be_swiped(make_member, client_for):
     from django.utils import timezone
 
@@ -197,11 +197,6 @@ def test_only_people_in_my_own_drop_can_be_swiped(make_member, client_for):
     assert client_for(a).post(f"/api/drop/today/{c.pk}/swipe", {"direction": "skip"}).status_code == 404
     drop = DailyDrop.objects.get(member=b)
     assert drop.candidates[0]["outcome"] is None
-
-
-def test_a_circle_not_in_my_strip_cannot_be_marked_viewed(make_member, client_for):
-    a, stranger = make_member("student"), make_member("founder")
-    assert client_for(a).post("/api/today/seen", {"kind": "member", "id": stranger.pk}).status_code == 404
 
 
 # -- reports -----------------------------------------------------------------------------------------

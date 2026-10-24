@@ -9,7 +9,7 @@ from core.adminbase import AuditedAdmin, ReadOnlyAdmin, audit
 class MemberForm(forms.ModelForm):
     class Meta:
         model = Member
-        fields = ["role", "verification_level", "organisation", "suspended_at"]
+        fields = ["role", "verification_level", "organisation", "is_tester", "suspended_at"]
 
     def clean(self):
         data = super().clean()
@@ -25,7 +25,7 @@ class MemberAdmin(AuditedAdmin):
     form = MemberForm
 
     list_display = ("id", "display_name", "role", "verification_level", "organisation", "city", "suspended_at")
-    list_filter = ("role", "verification_level", "organisation", "suspended_at")
+    list_filter = ("role", "verification_level", "organisation", "is_tester", "suspended_at")
     search_fields = ("display_name",)
     readonly_fields = [
         "auth_user_id",

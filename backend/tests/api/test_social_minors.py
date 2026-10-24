@@ -63,12 +63,11 @@ def test_a_minors_profile_posts_are_a_404_for_strangers_and_visible_to_the_org(c
     assert len(client_for(cast["mate"]).get(f"/api/members/{cast['minor'].pk}/posts").json()) == 1
 
 
-def test_a_minors_post_does_not_show_in_a_strangers_pulse_or_today(cast, client_for, connect):
+def test_a_minors_post_does_not_show_in_a_strangers_pulse(cast, client_for, connect):
     connect(cast["minor"], cast["stranger"])  # a connection who is outside the organisation
     client_for(cast["minor"]).post("/api/posts", post_body("organisation"))
     for who in ("stranger", "other_student"):
         assert client_for(cast[who]).get("/api/pulse").json()["items"] == []
-        assert client_for(cast[who]).get("/api/today").json() == []
     assert len(client_for(cast["mate"]).get("/api/pulse").json()["items"]) == 1
 
 

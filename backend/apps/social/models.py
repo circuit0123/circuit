@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Q
 
 
 class MediaUpload(models.Model):
@@ -109,32 +108,6 @@ class DailyDrop(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["member", "date"], name="dailydrop_unique")]
-
-
-class StoryView(models.Model):
-    """The viewer opened this circle on this day; `viewed_at` says whether newer items have appeared since."""
-
-    viewer = models.ForeignKey("accounts.Member", on_delete=models.CASCADE, related_name="story_views")
-    author = models.ForeignKey("accounts.Member", null=True, blank=True, on_delete=models.CASCADE, related_name="+")
-    startup = models.ForeignKey("startups.Startup", null=True, blank=True, on_delete=models.CASCADE, related_name="+")
-    date = models.DateField()
-    viewed_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                condition=(Q(author__isnull=False) & Q(startup__isnull=True))
-                | (Q(author__isnull=True) & Q(startup__isnull=False)),
-                name="storyview_one_target",
-            ),
-            models.UniqueConstraint(
-                fields=["viewer", "author", "date"], condition=Q(author__isnull=False), name="storyview_member_day"
-            ),
-            models.UniqueConstraint(
-                fields=["viewer", "startup", "date"], condition=Q(startup__isnull=False), name="storyview_startup_day"
-            ),
-        ]
-        indexes = [models.Index(fields=["author"]), models.Index(fields=["startup"])]
 
 
 class UpdateView(models.Model):

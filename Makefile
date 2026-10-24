@@ -1,30 +1,170 @@
-.PHONY: up down migrate run test check reset-demo openapi lint
-BACKEND = uv run --directory backend
+# Every command a human runs. `make help` lists them; COMMANDS.md explains each one.
+# Targets whose feature is not built yet say so and exit 1 instead of pretending.
 
-up:
+BACKEND = uv run --directory backend
+MANAGE  = $(BACKEND) python manage.py
+ENV    ?= local
+unexport ENV   # ENV here means "which deployment" for these targets; Django's own ENV comes from .env
+
+define not_yet
+	@echo "'$(1)' is not available until $(2)."; exit 1
+endef
+
+.DEFAULT_GOAL := help
+.PHONY: help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
+	reset-demo admin-user flags flag job jobs daily circuit-round eval test test-web lint fmt check \
+	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback
+
+help: ## List every command
+	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  \033[1m%-22s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+# -- setup and running ---------------------------------------------------------------------
+doctor: ## Check tools and .env variables (never prints values)
+	@bash scripts/doctor.sh
+
+setup: ## Install deps, start Postgres/Redis, migrate, load demo data
+	pnpm install
+	uv sync --directory backend
+	docker compose up -d --wait
+	$(MANAGE) migrate
+	$(MANAGE) reset_demo
+
+dev: up ## API + app + landing together (Ctrl+C stops all three)
+	@trap 'kill 0' EXIT INT TERM; \
+	$(MANAGE) runserver 8000 & \
+	pnpm --filter @circuit/app dev & \
+	pnpm --filter @circuit/landing dev & \
+	wait
+
+api: ## Only the Django API on :8000
+	$(MANAGE) runserver 8000
+
+app: ## Only the product app on :3000
+	pnpm --filter @circuit/app dev
+
+landing: ## Only the landing site on :3001
+	pnpm --filter @circuit/landing dev
+
+mock: ## App on mock data, no backend (not built yet)
+	$(call not_yet,mock,the frontend data layer session)
+
+up: ## Start Postgres + Redis containers
 	docker compose up -d --wait
 
-down:
+down: ## Stop Postgres + Redis containers
 	docker compose down
 
-migrate:
-	$(BACKEND) python manage.py migrate
+logs: ## Follow container logs
+	docker compose logs -f
 
-run:
-	$(BACKEND) python manage.py runserver 8000
+shell: ## Django shell
+	$(MANAGE) shell
 
-reset-demo:
-	$(BACKEND) python manage.py reset_demo
+dbshell: ## psql into the local database
+	$(MANAGE) dbshell
 
-openapi:
-	$(BACKEND) python manage.py export_openapi ../packages/api-client/openapi.json
+# -- database and data ---------------------------------------------------------------------
+migrate: ## Apply migrations
+	$(MANAGE) migrate
+
+migrations: ## Create migrations after a model change (review before committing)
+	$(MANAGE) makemigrations
+
+reset-demo: ## Wipe local data and reload the seed + five demo stories
+ifeq ($(ENV),local)
+	$(MANAGE) reset_demo
+else ifeq ($(ENV),demo)
+	$(call not_yet,reset-demo ENV=demo,Stage 5 (deploy staging and demo))
+else
+	@echo "reset-demo refuses to run on ENV=$(ENV)."; exit 1
+endif
+
+admin-user: ## Create a Django admin user (USER_NAME=name); prints the 2FA setup link
+	@test -n "$(USER_NAME)" || { echo "usage: make admin-user USER_NAME=asha"; exit 1; }
+	$(MANAGE) admin_user $(USER_NAME)
+
+# -- feature flags -------------------------------------------------------------------------
+flags: ## List every flag and its audience
+	$(MANAGE) flags
+
+flag: ## Change one flag: make flag NAME=circuits TO=testers
+	@test -n "$(NAME)" -a -n "$(TO)" || { echo "usage: make flag NAME=circuits TO=off|testers|everyone"; exit 1; }
+ifeq ($(ENV),local)
+	$(MANAGE) flags set $(NAME) $(TO)
+else
+	$(call not_yet,flag ENV=$(ENV),Stage 5 (deploy staging and demo))
+endif
+
+# -- background jobs -----------------------------------------------------------------------
+job: ## Run any management command: make job NAME=compute_matches
+	@test -n "$(NAME)" || { echo "usage: make job NAME=compute_matches"; exit 1; }
+	$(MANAGE) $(NAME)
+
+jobs: ## List the jobs and when they should run in the cloud
+	@printf '%s\n' \
+	  'compute_matches      daily' \
+	  'build_daily_drops    08:00 IST, after compute_matches' \
+	  'run_circuit_round    weekly' \
+	  'expire_items         every 15 minutes' \
+	  '(build_investor_picks, reconcile_payments, train_ranker: added by their stages)' \
+	  'Cloud schedules are created in Stage 5.'
+
+daily: ## The 08:00 set: matches, then the Daily Drop (investor picks arrive with Stage 4f)
+	$(MANAGE) compute_matches
+	$(MANAGE) build_daily_drops
+
+circuit-round: ## Run an exchange circuit round now
+	$(MANAGE) run_circuit_round
+
+eval: ## Matching eval set against tests/eval/pairs.json
+	$(MANAGE) eval_matching
+
+# -- tests and quality ---------------------------------------------------------------------
+test: ## Backend tests (pytest)
+	$(BACKEND) pytest -p no:cacheprovider
+
+test-web: ## Frontend type check (Playwright + axe arrive with Stage 4)
+	pnpm typecheck
+	@echo "note: Playwright and axe tests are not set up yet (LAUNCH.md Stage 4)."
+
+lint: ## ruff, mypy, ESLint
+	$(BACKEND) ruff check . && $(BACKEND) ruff format --check . && $(BACKEND) mypy .
+	pnpm lint
+
+fmt: ## Auto-format Python (prettier is not installed yet)
+	$(BACKEND) ruff check . --fix && $(BACKEND) ruff format .
+
+check: lint test test-web ## Everything: lint, tests with demo story PASS/FAIL, frontend types. Green before any push
+
+smoke: ## Check a deployed environment (not built yet)
+	$(call not_yet,smoke,Stage 5 (deploy staging and demo))
+
+# -- API client ----------------------------------------------------------------------------
+api-client: ## Export openapi.json from Django and regenerate packages/api-client
+	$(MANAGE) export_openapi ../packages/api-client/openapi.json
 	pnpm api:generate
 
-lint:
-	$(BACKEND) ruff check . && $(BACKEND) ruff format --check . && $(BACKEND) mypy .
+openapi: api-client ## Same as api-client
 
-test:
-	$(BACKEND) pytest
+# -- build ---------------------------------------------------------------------------------
+build: ## Production builds of everything (not built yet)
+	$(call not_yet,build,Stage 5 (the backend image is a placeholder))
 
-check: lint
-	$(BACKEND) pytest -p no:cacheprovider
+build-api: ## Backend Docker image (not built yet)
+	$(call not_yet,build-api,Stage 5 (the backend image is a placeholder))
+
+build-api-multiarch: ## Backend image for ARM64 + x86_64 (not built yet)
+	$(call not_yet,build-api-multiarch,Stage 5 (the backend image is a placeholder))
+
+build-web: ## pnpm build for the app and the landing site
+	pnpm build
+
+run-prod-local: ## Run the production build locally (not built yet)
+	$(call not_yet,run-prod-local,Stage 5 (the backend image is a placeholder))
+
+# -- deploy (no production target: production deploys only through CI with approval) -------
+deploy: ## Deploy staging or demo (not built yet)
+	$(call not_yet,deploy,Stage 5 (deploy staging and demo))
+
+rollback: ## Route traffic to the previous revision (not built yet)
+	$(call not_yet,rollback,Stage 5 (deploy staging and demo))

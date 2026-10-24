@@ -5,7 +5,20 @@ from django.utils import timezone
 from apps.accounts.models import Member
 from apps.events.services import record
 from apps.notifications.models import Notification
+from core import flags
 from core.errors import NotFound
+
+# A notification kind belongs to a feature flag by its prefix; when the flag is off for me it is left out.
+KIND_FLAGS = {"circuit.": "circuits", "post.": "pulse"}
+
+
+def visible(member: Member):
+    """My notifications, minus those of features switched off for me. Nothing is deleted."""
+    qs = Notification.objects.filter(member=member)
+    for prefix, flag in KIND_FLAGS.items():
+        if not flags.enabled(flag, member):
+            qs = qs.exclude(kind__startswith=prefix)
+    return qs
 
 
 def notify(member: Member | int, kind: str, **payload) -> Notification:
@@ -30,7 +43,7 @@ def mark_read(member: Member, notification_id: int) -> Notification:
 
 
 def mark_all_read(member: Member) -> int:
-    updated = Notification.objects.filter(member=member, read_at__isnull=True).update(read_at=timezone.now())
+    updated = visible(member).filter(read_at__isnull=True).update(read_at=timezone.now())
     if updated:
         record("notification.read_all", actor=member, count=updated)
     return updated
