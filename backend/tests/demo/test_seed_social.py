@@ -69,7 +69,7 @@ def test_ravi_sees_a_living_home_screen(seeded, client_for):
     pulse = c.get("/api/pulse").json()
     kinds = {i["kind"] for i in pulse["items"]}
     assert "post" in kinds and pulse["items"]
-    assert c.get("/api/today").json()  # someone from his college or follows posted in the last day
+    assert c.get("/api/livewire").json()  # someone from his college or follows posted in the last day
     assert c.get("/api/me/follows").json()
     assert [r["note"][:12] for r in c.get("/api/connections/requests").json()] == ["Same departm"]
     assert len(c.get("/api/conversations?folder=requests").json()) == 1  # his own message to Divya, awaiting her answer

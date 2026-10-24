@@ -16,6 +16,8 @@ VALID = {
     "DEBUG": "false",
     "SECRET_KEY": secrets.token_urlsafe(50),
     "CORS_PREVIEW_REGEX": "",
+    "FEATURES": "pulse:everyone,daily_drop:everyone,circuits:testers",  # the dev .env turns payments on, which production refuses
+    "RAZORPAY_KEY_ID": "",
 }
 
 

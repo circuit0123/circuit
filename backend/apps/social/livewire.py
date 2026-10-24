@@ -21,7 +21,6 @@ from apps.social import pulse, services
 from apps.social.models import UpdateView
 from apps.social.relations import blocked_ids, connected_ids, org_mate_ids, visible_posts
 from apps.social.schemas import author
-from apps.social.today import _day
 from core.errors import NotFound
 
 MAX_ITEMS = 12
@@ -245,5 +244,5 @@ def mark_viewed(member: Member, key: str) -> None:
     """Called when an update is opened. An update that is not on my wire is a 404, so keys cannot be probed."""
     if key not in {u["key"] for u in live_wire(member)}:
         raise NotFound()
-    UpdateView.objects.update_or_create(viewer=member, key=key, defaults={"date": _day(timezone.now())})
+    UpdateView.objects.update_or_create(viewer=member, key=key, defaults={"date": pulse.ist_day_start(timezone.now()).date()})
     record("livewire.viewed", actor=member, target_type="update", key=key)

@@ -32,6 +32,7 @@ class Member(models.Model):
     open_intro_slots = models.PositiveSmallIntegerField(default=2)
     circuits_opt_in = models.BooleanField(default=False)
     is_minor = models.BooleanField(default=False)
+    is_tester = models.BooleanField(default=False)  # set by a super admin; the `testers` flag audience
     profile_visibility = models.CharField(max_length=10, choices=Visibility.choices, default=Visibility.MEMBERS)
     visible_to_org = models.BooleanField(default=False)
     suspended_at = models.DateTimeField(null=True, blank=True)  # set = locked out of the API (moderation, takedowns)

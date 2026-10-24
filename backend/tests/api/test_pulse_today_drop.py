@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from apps.events.models import Event
 from apps.social.drop import build_all, drop_day, next_drop_at
-from apps.social.models import DailyDrop, Follow, Post, StoryView
+from apps.social.models import DailyDrop, Follow, Post
 
 pytestmark = pytest.mark.django_db
 
@@ -136,51 +136,6 @@ def test_pulse_includes_a_circuit_closed_by_a_connection_but_not_by_strangers(me
     kinds = [i["activity"]["type"] for i in client_for(me).get("/api/pulse").json()["items"] if i["kind"] == "activity"]
     assert kinds == ["circuit_completed"]
     assert [i for i in client_for(stranger).get("/api/pulse").json()["items"] if i["kind"] == "activity"] == []
-
-
-# -- Today strip -------------------------------------------------------------------------------------
-def test_today_lists_people_who_posted_in_the_last_24_hours_unseen_first(me_and_friends, make_post, client_for):
-    me, friend, mate, stranger = me_and_friends
-    make_post(friend, "everyone", body="f")
-    make_post(mate, "organisation", body="m")
-    make_post(stranger, "everyone", body="s")
-    age(make_post(friend, "everyone", body="stale"), hours=30)
-    strip = client_for(me).get("/api/today").json()
-    assert sorted(c["name"] for c in strip) == ["Friend", "Mate"] and all(not c["seen"] for c in strip)
-    assert [p["body"] for c in strip if c["name"] == "Friend" for p in c["posts"]] == ["f"]
-
-
-def test_viewing_a_circle_marks_it_seen_until_something_newer_arrives(me_and_friends, make_post, client_for):
-    me, friend, *_ = me_and_friends
-    make_post(friend, "everyone", body="one")
-    c = client_for(me)
-    assert c.post("/api/today/seen", {"kind": "member", "id": friend.pk}).status_code == 204
-    assert c.post("/api/today/seen", {"kind": "member", "id": friend.pk}).status_code == 204  # repeat is fine
-    assert StoryView.objects.filter(viewer=me).count() == 1
-    assert c.get("/api/today").json()[0]["seen"] is True
-    make_post(friend, "everyone", body="two")
-    assert c.get("/api/today").json()[0]["seen"] is False
-
-
-def test_today_includes_followed_startups_with_new_roles(make_member, make_startup, client_for):
-    from apps.jobs.models import Job
-
-    me = make_member("student")
-    s = make_startup("Acme", "acme.io", hiring=True)
-    Job.objects.create(startup=s, title="Intern")
-    assert client_for(me).get("/api/today").json() == []
-    Follow.objects.create(member=me, startup=s)
-    strip = client_for(me).get("/api/today").json()
-    assert [(c["kind"], c["name"], [r["title"] for r in c["roles"]]) for c in strip] == [("startup", "Acme", ["Intern"])]
-    assert client_for(me).post("/api/today/seen", {"kind": "startup", "id": s.pk}).status_code == 204
-    assert client_for(me).get("/api/today").json()[0]["seen"] is True
-
-
-def test_today_leaves_out_blocked_people(me_and_friends, make_post, block, client_for):
-    me, friend, *_ = me_and_friends
-    make_post(friend, "everyone")
-    block(me, friend)
-    assert client_for(me).get("/api/today").json() == []
 
 
 # -- Daily Drop --------------------------------------------------------------------------------------

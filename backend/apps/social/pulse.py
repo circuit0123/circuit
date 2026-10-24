@@ -26,6 +26,7 @@ from apps.social.models import Follow
 from apps.social.relations import blocked_ids, connected_ids, org_mate_ids, visible_posts
 from apps.startups.models import Startup
 from apps.startups.services import default_centre, team_member_ids
+from core import flags
 from core.errors import ApiError
 from core.pagination import decode_cursor, encode_cursor
 
@@ -89,9 +90,11 @@ def activity_items(member: Member, since: datetime, upto: datetime) -> list[Item
     """Circuits closed by people I know, my intros that worked, startups newly claimed near me."""
     items: list[Item] = []
     friends = connected_ids(member.pk) | {member.pk}
-    done = Event.objects.filter(type="circuit.completed", created_at__gte=since, created_at__lte=upto).order_by("-created_at")[
-        :50
-    ]
+    done = Event.objects.none()
+    if flags.enabled("circuits", member):  # closed circuits are left out of feeds when the flag is off for me
+        done = Event.objects.filter(type="circuit.completed", created_at__gte=since, created_at__lte=upto).order_by(
+            "-created_at"
+        )[:50]
     circuits = {c.pk: c for c in Circuit.objects.filter(pk__in=[e.target_id for e in done]).prefetch_related("legs__giver")}
     for e in done:
         c = circuits.get(e.target_id or 0)

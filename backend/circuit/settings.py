@@ -119,6 +119,8 @@ ANTHROPIC_API_KEY = cfg.anthropic_api_key
 EMBEDDING_PROVIDER = cfg.embedding_provider
 EMAIL_FROM = cfg.email_from
 SUPPORT_EMAIL = cfg.support_email
+FEATURES = cfg.features
+BETA_MODE = cfg.beta_mode
 SEED_CITY = {"name": cfg.seed_city_name, "lat": cfg.seed_city_lat, "lng": cfg.seed_city_lng}
 CSRF_TRUSTED_ORIGINS = cfg.csv(cfg.csrf_trusted_origins)
 
@@ -171,7 +173,7 @@ RATE_LIMITS = {
 # Social (F15-F17)
 PULSE_WINDOW_DAYS = 7
 PULSE_PAGE_SIZE = 20
-TODAY_WINDOW_HOURS = 24
+TODAY_WINDOW_HOURS = 24  # Live wire looks back this far
 DROP_SIZE = 3
 MATCH_STRONG = 0.75  # at or above: "Strong match" (DESIGN.md §4)
 MATCH_GOOD = 0.55  # at or above: "Good match". Below this a match is not shown to a person as a recommendation

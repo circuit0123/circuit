@@ -3,6 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
+- B0 — feature flags + commands: **done on `backend-b0`, waiting for your OK** (details in "B0" below)
 - Stage 1 — Backend foundation: **done and merged**
 - Stage 2 — Auth and security: **done and merged** (make check green: ruff, mypy, 321 tests; finecomb audit done, findings fixed)
   - One box stays open on purpose: rate limits on extraction/intros/applications/reports/claims. Extraction, intros, applications, claims and org join now use `check_rate`. Reports now exist too (Stage 3b, `POST /api/reports`, limited to 10 a day), so that box can be ticked.
@@ -12,6 +13,30 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 contin
   - Part 2: jobs and applications (F11), in-app notifications, strict list of event types (`EVENT_TYPES`; an unknown type raises).
   - Part 3: matching (F4). `manage.py compute_matches` (1.3 s for the 300-member seed), `GET /api/matches`, `manage.py eval_matching` with 14 hand-labelled pairs, demo story 1 test.
   - Part 4: warm intros (F5), exchange circuits (F6), partner dashboard (F8), verification badge tests (F7), demo stories 2–5, and `make check` printing `Story n: PASS/FAIL` (marker `@pytest.mark.story(n)` plus a summary hook in `tests/conftest.py`).
+
+## B0 — Feature flags and commands (branch `backend-b0`): done, waiting for your OK
+`make check` is green: ruff, mypy, 1,716 backend tests (Stories 1–5 PASS), frontend type check.
+- **Flags:** `core/flags.py` with the seven flags. `FEATURES` sets defaults per environment; a super admin overrides them in Django admin (Core → Feature flags, audit-logged, cached 60 s in Redis, Postgres if Redis is down). `flags.enabled(name, member)` for services, `@require_flag(name)` on each operation of a flagged router (Ninja has no router-wide hook), `flags.enabled(name)` in jobs. Off → 404 `feature_off`. The app refuses to start with a flag on whose dependency is off, with a Razorpay live key outside production, or with `payments` on in production without a live key.
+- **Wrapped today:** `pulse` (posts, reactions, replies, Pulse, Live wire), `daily_drop` (drop + swipe, `build_daily_drops`), `circuits` (all circuit endpoints, `run_circuit_round`, closed-circuit items in Pulse/Live wire, `circuit.*` notifications). Switched-off notifications are hidden, not deleted. `expire_items` still expires in-flight circuits when `circuits` is off (the spec says in-flight work finishes).
+- **New:** `GET /api/config` (public; a bad token counts as anonymous), `manage.py flags [list|set]`, `members.is_tester`, `feature_flags` table, `manage.py admin_user` (for `make admin-user`).
+- **Retired:** the Today strip (`/api/today`, `/api/today/seen`, `today.py`, `StoryView` table, `today.viewed` event). Live wire replaced it.
+- **Makefile:** all COMMANDS.md targets plus `make help`. Not-yet targets (`mock`, `smoke`, `build`, `build-api`, `build-api-multiarch`, `run-prod-local`, `deploy`, `rollback`, and `reset-demo`/`flag` with `ENV=demo|staging`) print "not available until Stage N" and exit 1. `reset-demo ENV=staging|production` refuses. No production deploy target. README.md added.
+- **Migrations (all additive except the dropped view-tracking table):** `accounts.0006`, `core.0004`, `social.0003`.
+
+### Targets run once (local)
+Worked: `help, doctor, setup, up, dev (API, app and landing all answered), api, migrate, migrations, reset-demo, flags, flag, job, jobs, daily, circuit-round, eval, test, lint, fmt, check, api-client, openapi, test-web, build-web`. Guards confirmed: `reset-demo ENV=staging` refuses; `smoke`, `reset-demo ENV=demo` exit 1 with the Stage 5 message. Live check on the dev API: `make flag NAME=circuits TO=off` → `/api/circuits` 404 `feature_off` and `/api/config` shows `circuits: false`; `flag pulse off` was refused because `promotions` needs it; restored to everyone.
+Not exercised: `admin-user` interactively (unit-tested with a mocked password prompt), `logs`, `shell`, `dbshell`, `down`, `mock`.
+
+### Things to know
+1. **Dev `.env` now has `FEATURES` with everything on** (it is gitignored). Production at beta start must use PRODUCTION.md §2b values: copying a dev `.env` to production with `payments` on is refused at startup, on purpose.
+2. **Money-in-flight block** (cannot switch off `promotions`/`payments` with a paid campaign or open order) is not coded: those tables arrive in Stages 4d/4e. It must be added there.
+3. **Make variables:** `make admin-user` takes `USER_NAME=` (not `USER=`, which is your login name). `ENV=` in make means the deployment (local, demo, staging) and is not passed to Django.
+4. **Not done on purpose:** prettier/Playwright are not installed, so `fmt` is Python-only and `test-web` is a type check. `make check` now includes `pnpm typecheck`/`pnpm lint`, so it needs `node_modules`.
+5. I ran `migrate`, `reset-demo`, `compute_matches`, `build_daily_drops` (0 built: already built for today), `run_circuit_round` (one circuit proposed for Asha, Priya, Arjun) and `expire_items` on your dev database. `make reset-demo` clears it.
+6. Frontend: the app does not call the removed Today endpoints; `useFeatures()` (reads `/api/config`) is still to be built (Stage 4). Listed under "Frontend remaining".
+
+### Frontend remaining (from B0)
+`useFeatures()` hook over `GET /api/config`; hide tabs, entry points and routes for off flags (DESIGN.md §3); 404 screen for off-flag URLs; mock-mode "features off" scenario.
 
 ## Stage 4 — Frontends (branch `frontend-v2`): round 2 of Home done, waiting for your OK
 Round 2 redoes Home for the new DESIGN.md (taken from `main`; CLAUDE.md F16 and LAUNCH.md Stage 3b/Home lines updated to match).

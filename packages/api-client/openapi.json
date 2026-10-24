@@ -420,71 +420,6 @@
         "title": "CellOut",
         "type": "object"
       },
-      "CircleOut": {
-        "properties": {
-          "author": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/AuthorOut"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "kind": {
-            "enum": [
-              "member",
-              "startup"
-            ],
-            "title": "Kind",
-            "type": "string"
-          },
-          "latest_at": {
-            "format": "date-time",
-            "title": "Latest At",
-            "type": "string"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "posts": {
-            "items": {
-              "$ref": "#/components/schemas/PostOut"
-            },
-            "title": "Posts",
-            "type": "array"
-          },
-          "roles": {
-            "items": {
-              "$ref": "#/components/schemas/StoryRoleOut"
-            },
-            "title": "Roles",
-            "type": "array"
-          },
-          "seen": {
-            "title": "Seen",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "kind",
-          "id",
-          "name",
-          "latest_at",
-          "seen",
-          "author",
-          "posts",
-          "roles"
-        ],
-        "title": "CircleOut",
-        "type": "object"
-      },
       "CircuitOut": {
         "properties": {
           "consent_deadline": {
@@ -580,6 +515,32 @@
           "code"
         ],
         "title": "CodeIn",
+        "type": "object"
+      },
+      "ConfigOut": {
+        "properties": {
+          "beta_mode": {
+            "title": "Beta Mode",
+            "type": "boolean"
+          },
+          "env": {
+            "title": "Env",
+            "type": "string"
+          },
+          "features": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "Features",
+            "type": "object"
+          }
+        },
+        "required": [
+          "env",
+          "beta_mode",
+          "features"
+        ],
+        "title": "ConfigOut",
         "type": "object"
       },
       "ConnectionRequestIn": {
@@ -3947,40 +3908,6 @@
         "title": "StatusIn",
         "type": "object"
       },
-      "StoryRoleOut": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "kind": {
-            "title": "Kind",
-            "type": "string"
-          },
-          "startup_id": {
-            "title": "Startup Id",
-            "type": "integer"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "kind",
-          "startup_id",
-          "created_at"
-        ],
-        "title": "StoryRoleOut",
-        "type": "object"
-      },
       "Suggestions": {
         "properties": {
           "needs": {
@@ -4165,28 +4092,6 @@
           "status"
         ],
         "title": "UploadOut",
-        "type": "object"
-      },
-      "ViewedIn": {
-        "properties": {
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "kind": {
-            "enum": [
-              "member",
-              "startup"
-            ],
-            "title": "Kind",
-            "type": "string"
-          }
-        },
-        "required": [
-          "kind",
-          "id"
-        ],
-        "title": "ViewedIn",
         "type": "object"
       },
       "WireActionOut": {
@@ -4759,6 +4664,29 @@
         "summary": "Say yes or no to a circuit",
         "tags": [
           "circuits"
+        ]
+      }
+    },
+    "/api/config": {
+      "get": {
+        "description": "Public. Environment, whether the invite-only beta is on, and which features are on for the caller (anonymous visitors get the `everyone` audience). The app hides screens for features that are off.",
+        "operationId": "core_config_api_get_config",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "App config",
+        "tags": [
+          "config"
         ]
       }
     },
@@ -8463,69 +8391,6 @@
         "summary": "I'm interested",
         "tags": [
           "startups"
-        ]
-      }
-    },
-    "/api/today": {
-      "get": {
-        "description": "Circles for connections, my organisation and startups I follow who posted or opened a role in the last 24 hours. Unseen first. Items are included, so the story viewer needs no second call.",
-        "operationId": "apps_social_api_get_today",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/CircleOut"
-                  },
-                  "title": "Response",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "SupabaseAuth": []
-          }
-        ],
-        "summary": "Today strip",
-        "tags": [
-          "social"
-        ]
-      }
-    },
-    "/api/today/seen": {
-      "post": {
-        "description": "Call when a circle is opened. A circle that is not in my strip is a 404.",
-        "operationId": "apps_social_api_today_seen",
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ViewedIn"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        },
-        "security": [
-          {
-            "SupabaseAuth": []
-          }
-        ],
-        "summary": "Mark a circle as viewed",
-        "tags": [
-          "social"
         ]
       }
     },

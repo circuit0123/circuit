@@ -7,10 +7,11 @@ from pydantic import Field, field_validator
 
 from apps.accounts.models import ConnectionRequest
 from apps.jobs.api import JobOut
-from apps.social import connections, drop, livewire, media, pulse, services, today
+from apps.social import connections, drop, livewire, media, pulse, services
 from apps.social.models import Post
 from apps.social.schemas import AuthorOut, author
 from core.auth import current_member
+from core.flags import require_flag
 from core.pagination import CursorParams
 
 router = Router()
@@ -125,6 +126,7 @@ def _post(viewer, post: Post) -> dict:
     description="Up to 4 images (each with alt text), 500 characters, 3 capability tags and an optional link. "
     "Members under 18 can only post to their organisation.",
 )
+@require_flag("pulse")
 def create_post(request, body: PostIn):
     member = current_member(request)
     post = services.create_post(member, body.dict())
@@ -137,6 +139,7 @@ def create_post(request, body: PostIn):
     summary="One build log",
     description="404 unless the post's visibility lets me see it. Reaction totals appear only on my own posts.",
 )
+@require_flag("pulse")
 def get_post(request, post_id: int):
     member = current_member(request)
     return _post(member, services.get_post(member, post_id))
@@ -145,6 +148,7 @@ def get_post(request, post_id: int):
 @router.delete(
     "/posts/{post_id}", response={204: None}, summary="Delete my build log", description="Author only; anyone else gets a 404."
 )
+@require_flag("pulse")
 def delete_post(request, post_id: int):
     services.delete_post(current_member(request), post_id)
     return Status(204, None)
@@ -156,6 +160,7 @@ def delete_post(request, post_id: int):
     summary="A member's build logs",
     description="Newest first, only the ones I am allowed to see. 404 for members I cannot see.",
 )
+@require_flag("pulse")
 def member_posts(request, member_id: int):
     member = current_member(request)
     return services.post_rows(member, services.member_posts(member, member_id))
@@ -171,6 +176,7 @@ ReactionKind = Literal["helpful", "intro_me", "lets_talk"]
     summary="React to a build log",
     description="Helpful, intro_me or lets_talk. Safe to repeat. Nobody but the author sees totals.",
 )
+@require_flag("pulse")
 def react(request, post_id: int, kind: ReactionKind):
     services.react(current_member(request), post_id, kind)
     return Status(204, None)
@@ -179,6 +185,7 @@ def react(request, post_id: int, kind: ReactionKind):
 @router.delete(
     "/posts/{post_id}/reactions/{kind}", response={204: None}, summary="Remove my reaction", description="Safe to repeat."
 )
+@require_flag("pulse")
 def unreact(request, post_id: int, kind: ReactionKind):
     services.unreact(current_member(request), post_id, kind)
     return Status(204, None)
@@ -203,6 +210,7 @@ class ReplyOut(Schema):
     summary="Replies to a build log",
     description="Oldest first, nested one level. Replies from people I blocked or who blocked me are left out.",
 )
+@require_flag("pulse")
 def list_replies(request, post_id: int):
     return services.list_replies(current_member(request), post_id)
 
@@ -213,6 +221,7 @@ def list_replies(request, post_id: int):
     summary="Reply to a build log",
     description="Up to 300 characters. The post's author is notified.",
 )
+@require_flag("pulse")
 def reply(request, post_id: int, body: ReplyIn):
     member = current_member(request)
     r = services.reply_to(member, post_id, body.body, body.parent_id)
@@ -225,12 +234,13 @@ def reply(request, post_id: int, body: ReplyIn):
     summary="Delete a reply",
     description="The reply's author or the post's author. Anyone else gets a 404.",
 )
+@require_flag("pulse")
 def delete_reply(request, reply_id: int):
     services.delete_reply(current_member(request), reply_id)
     return Status(204, None)
 
 
-# -- pulse, today, drop ---------------------------------------------------------------------------------
+# -- pulse, drop ---------------------------------------------------------------------------------
 class ActivityOut(Schema):
     type: str  # circuit_completed, intro_accepted, startup_claimed
     circuit_id: int | None = None
@@ -279,6 +289,7 @@ class PulseParams(CursorParams):
     description="Chronological, last 7 days, never ranked. Shows what is new since I last marked Pulse as seen; "
     "include_seen=true shows earlier items too. Ends with caught_up=true.",
 )
+@require_flag("pulse")
 def get_pulse(request, params: PulseParams = Query(...)):
     return pulse.pulse(current_member(request), params.cursor, params.limit, params.include_seen)
 
@@ -289,54 +300,9 @@ def get_pulse(request, params: PulseParams = Query(...)):
     summary="Mark Pulse as seen",
     description="Call when the member reaches the end. The next visit shows only newer items.",
 )
+@require_flag("pulse")
 def pulse_seen(request):
     pulse.mark_seen(current_member(request))
-    return Status(204, None)
-
-
-class StoryRoleOut(Schema):
-    id: int
-    title: str
-    kind: str
-    startup_id: int
-    created_at: datetime
-
-
-class CircleOut(Schema):
-    kind: Literal["member", "startup"]
-    id: int
-    name: str
-    latest_at: datetime
-    seen: bool
-    author: AuthorOut | None
-    posts: list[PostOut]
-    roles: list[StoryRoleOut]
-
-
-@router.get(
-    "/today",
-    response=list[CircleOut],
-    summary="Today strip",
-    description="Circles for connections, my organisation and startups I follow who posted or opened a role in the last "
-    "24 hours. Unseen first. Items are included, so the story viewer needs no second call.",
-)
-def get_today(request):
-    return today.today_strip(current_member(request))
-
-
-class ViewedIn(Schema):
-    kind: Literal["member", "startup"]
-    id: int
-
-
-@router.post(
-    "/today/seen",
-    response={204: None},
-    summary="Mark a circle as viewed",
-    description="Call when a circle is opened. A circle that is not in my strip is a 404.",
-)
-def today_seen(request, body: ViewedIn):
-    today.mark_viewed(current_member(request), body.kind, body.id)
     return Status(204, None)
 
 
@@ -377,6 +343,7 @@ class WireItemOut(Schema):
     "to me first, unseen before seen. Each has one line of what happened, why it matters to me, and one action. "
     "No view or reaction counts.",
 )
+@require_flag("pulse")
 def get_livewire(request):
     return livewire.live_wire(current_member(request))
 
@@ -391,6 +358,7 @@ class WireSeenIn(Schema):
     summary="Mark an update as viewed",
     description="Call when an update is opened. A key that is not on my wire is a 404.",
 )
+@require_flag("pulse")
 def livewire_seen(request, body: WireSeenIn):
     livewire.mark_viewed(current_member(request), body.key)
     return Status(204, None)
@@ -422,6 +390,7 @@ class DropOut(Schema):
     description="Up to 3 people, ready at 08:00 IST, each a Strong or Good match (anything weaker is never dropped). Empty until "
     "the daily job has run. Members under 18 get no drop.",
 )
+@require_flag("daily_drop")
 def get_drop(request):
     return drop.today_drop(current_member(request))
 
@@ -437,6 +406,7 @@ class SwipeIn(Schema):
     description="intro or skip. This records the choice only; to ask for the intro, call the intros endpoint next. "
     "A person who is not in today's drop is a 404.",
 )
+@require_flag("daily_drop")
 def swipe(request, member_id: int, body: SwipeIn):
     return drop.swipe(current_member(request), member_id, body.direction)
 
