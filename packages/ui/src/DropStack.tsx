@@ -77,45 +77,11 @@ export function DropStack({ cards, onAnswer, doneText, className }: Props) {
   );
 }
 
-type CardHandle = { throw: (a: "intro" | "skip") => void };
-
-const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | "skip") => void }>(function TopCard({ card, onThrow }, ref) {
-  const reduce = useReducedMotion();
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 0, 300], [-8, 0, 8]);
-  const introOpacity = useTransform(x, [20, 120], [0, 1]);
-  const skipOpacity = useTransform(x, [-120, -20], [1, 0]);
-  const el = useRef<HTMLDivElement>(null);
-  const done = useRef(false);
-
-  const fling = (a: "intro" | "skip") => {
-    if (done.current) return;
-    done.current = true;
-    const width = el.current?.offsetWidth ?? 360;
-    if (reduce) { onThrow(a); return; }
-    animate(x, (a === "intro" ? 1 : -1) * width * 1.4, { ...spring, onComplete: () => onThrow(a) });
-  };
-  useImperativeHandle(ref, () => ({ throw: fling }));
-
+/** The card's content without the gesture: used by the Daily Drop stack and by the last onboarding screen (static). */
+export function DropCardFace({ card, overlay }: { card: DropCard; overlay?: React.ReactNode }) {
   const p = card.person;
   return (
-    <motion.div
-      ref={el}
-      className="relative touch-pan-y overflow-hidden rounded-card bg-surface shadow-lift"
-      style={{ x, rotate: reduce ? 0 : rotate }}
-      drag={reduce ? false : "x"}
-      dragSnapToOrigin
-      dragMomentum={false}
-      dragElastic={1}
-      onDragEnd={(_, i) => {
-        const w = el.current?.offsetWidth ?? 360;
-        if (i.offset.x > w * THROW_FRACTION || i.velocity.x > THROW_VELOCITY) fling("intro");
-        else if (i.offset.x < -w * THROW_FRACTION || i.velocity.x < -THROW_VELOCITY) fling("skip");
-      }}
-      initial={reduce ? { opacity: 0 } : false}
-      animate={{ opacity: 1 }}
-      transition={fade}
-    >
+    <>
       <div className="flex flex-col gap-3 px-surface pb-4 pt-surface">
         <h2 className="t-title3">
           {card.helpWith ? (
@@ -140,8 +106,7 @@ const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | 
         ) : (
           <PatternArt id={p.id} initial={p.name[0]} banner />
         )}
-        <motion.span style={{ opacity: introOpacity }} className="pointer-events-none absolute left-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Intro me</motion.span>
-        <motion.span style={{ opacity: skipOpacity }} className="pointer-events-none absolute right-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Skip</motion.span>
+        {overlay}
       </div>
       <div className="flex flex-col gap-3 p-surface">
         <div>
@@ -160,6 +125,57 @@ const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | 
           </div>
         )}
       </div>
+    </>
+  );
+}
+
+type CardHandle = { throw: (a: "intro" | "skip") => void };
+
+const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | "skip") => void }>(function TopCard({ card, onThrow }, ref) {
+  const reduce = useReducedMotion();
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-300, 0, 300], [-8, 0, 8]);
+  const introOpacity = useTransform(x, [20, 120], [0, 1]);
+  const skipOpacity = useTransform(x, [-120, -20], [1, 0]);
+  const el = useRef<HTMLDivElement>(null);
+  const done = useRef(false);
+
+  const fling = (a: "intro" | "skip") => {
+    if (done.current) return;
+    done.current = true;
+    const width = el.current?.offsetWidth ?? 360;
+    if (reduce) { onThrow(a); return; }
+    animate(x, (a === "intro" ? 1 : -1) * width * 1.4, { ...spring, onComplete: () => onThrow(a) });
+  };
+  useImperativeHandle(ref, () => ({ throw: fling }));
+
+  return (
+    <motion.div
+      ref={el}
+      className="relative touch-pan-y overflow-hidden rounded-card bg-surface shadow-lift"
+      style={{ x, rotate: reduce ? 0 : rotate }}
+      drag={reduce ? false : "x"}
+      dragSnapToOrigin
+      dragMomentum={false}
+      dragElastic={1}
+      onDragEnd={(_, i) => {
+        const w = el.current?.offsetWidth ?? 360;
+        if (i.offset.x > w * THROW_FRACTION || i.velocity.x > THROW_VELOCITY) fling("intro");
+        else if (i.offset.x < -w * THROW_FRACTION || i.velocity.x < -THROW_VELOCITY) fling("skip");
+      }}
+      initial={reduce ? { opacity: 0 } : false}
+      animate={{ opacity: 1 }}
+      transition={fade}
+    >
+      <DropCardFace
+        card={card}
+        overlay={
+          <>
+            <motion.span style={{ opacity: introOpacity }} className="pointer-events-none absolute left-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Intro me</motion.span>
+            <motion.span style={{ opacity: skipOpacity }} className="pointer-events-none absolute right-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Skip</motion.span>
+          </>
+        }
+      />
     </motion.div>
   );
 });

@@ -156,7 +156,7 @@ test.describe("mock scenarios", () => {
 
   test("beta access missing: the gate holds the app back", async ({ page }) => {
     await open(page, "beta");
-    await expect(page.getByRole("heading", { name: "Almost there" })).toBeVisible(); // F2 replaces this with the invite screen
+    await expect(page.getByRole("heading", { name: "Got an invite code?" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Main" })).toHaveCount(0);
   });
 

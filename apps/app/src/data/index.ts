@@ -1,6 +1,8 @@
 // The data layer's public surface. Screens import from "@/data" and nothing else reaches the backend.
+export * from "./access";
 export * from "./appearance";
 export * from "./auth";
+export * from "./capabilities";
 export * from "./errors";
 export * from "./features";
 export * from "./gate";
@@ -9,6 +11,8 @@ export * from "./join";
 export * from "./me";
 export * from "./notifications";
 export * from "./onboarding";
+export * from "./organisations";
 export { DataProvider } from "./provider";
 export { useSession } from "./session";
+export * from "./where";
 export { MOCK, SCENARIOS, currentScenario, switchScenario, type Scenario } from "./mocks/config";

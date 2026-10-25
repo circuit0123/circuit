@@ -1,22 +1,28 @@
 "use client";
 
-import { Button, CodeField, Step, StepTransition, TextField, Skeleton } from "@circuit/ui";
+import { Button, CodeField, Logo, Step, StepTransition, TextField, Skeleton } from "@circuit/ui";
 import { useEffect, useRef, useState } from "react";
 import { problemOf, usePersonaSignIn, usePersonas, useSupabaseSignIn } from "@/data";
-import { LANDING_URL, SHOW_DEV_TOOLS } from "@/lib/env";
+import { SHOW_DEV_TOOLS } from "@/lib/env";
+import { Legal } from "./Legal";
 
 type Screen = "welcome" | "email" | "code";
 const ORDER: Screen[] = ["welcome", "email", "code"];
 const RESEND_SECONDS = 30;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-function Legal() {
-  const link = (path: string, label: string) =>
-    LANDING_URL ? <a href={`${LANDING_URL}${path}`} target="_blank" rel="noopener noreferrer" className="underline">{label}</a> : <span className="underline">{label}</span>;
+/** The circuit-trace drawing above the title (Welcome.dc.html): decoration only, in the surface tones, with one live node. */
+function Trace() {
   return (
-    <p className="t-footnote text-center text-text-muted">
-      By continuing you agree to the {link("/terms", "Terms")} and {link("/privacy", "Privacy Policy")}.
-    </p>
+    <svg viewBox="0 0 390 360" fill="none" aria-hidden className="h-full w-full max-w-[440px]" preserveAspectRatio="xMidYMax slice">
+      <path d="M-10 250 H110 L160 170 H260 L300 210 H400" className="stroke-surface-2" strokeWidth="2" />
+      <path d="M40 120 H150 L190 160 H330" className="stroke-surface-2" strokeWidth="2" />
+      <path d="M-10 310 H70 L100 280 H220" className="stroke-surface" strokeWidth="2" />
+      <circle cx="160" cy="170" r="5" className="fill-surface-3" />
+      <circle cx="300" cy="210" r="5" className="fill-surface-3" />
+      <circle cx="190" cy="160" r="5" className="fill-surface-3" />
+      <circle cx="260" cy="170" r="6" className="fill-live" />
+    </svg>
   );
 }
 
@@ -36,7 +42,7 @@ function Personas() {
           <li key={p.key}>
             <button type="button" disabled={pick.isPending} onClick={() => pick.mutate(p.key)} className="flex min-h-11 w-full flex-col items-start rounded-control bg-surface-2 px-3 py-2 text-left active:opacity-80 disabled:opacity-50">
               <span className="t-subhead w-full truncate font-medium">{p.name}</span>
-              <span className="t-caption text-text-muted">{p.role}</span>
+              <span className="t-caption text-text">{p.role}</span>
             </button>
           </li>
         ))}
@@ -104,20 +110,21 @@ export function SignIn() {
   return (
     <StepTransition stepKey={screen} direction={direction}>
       {screen === "welcome" && (
-        <Step
-          title="Build with people near you."
-          subhead="Find work, collaborators and mentors who need what you're good at."
-          footer={
-            <>
-              <Button variant="primary" className="w-full" disabled={sb.google.isPending} onClick={google}>Continue with Google</Button>
-              {googleError && <p role="alert" className="t-footnote text-danger">{googleError}</p>}
-              <Button variant="text" className="w-full" onClick={() => go("email")}>Use email instead</Button>
-              <Legal />
-            </>
-          }
-        >
-          <Personas />
-        </Step>
+        <main className="mx-auto flex min-h-dvh w-full max-w-[440px] flex-col px-4">
+          <div className="pointer-events-none -mx-4 mt-[env(safe-area-inset-top)] min-h-0 flex-1 basis-[28vh]"><Trace /></div>
+          <div className="pt-6">
+            <Logo height={36} />
+            <h1 className="t-large mt-3">Build with people near you.</h1>
+            <p className="t-body mt-3 text-text-muted">Find work, collaborators and mentors who need what you're good at.</p>
+            <Personas />
+          </div>
+          <footer className="sticky bottom-0 -mx-4 mt-8 flex flex-col gap-1 bg-bg px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-3">
+            <Button variant="primary" className="w-full" disabled={sb.google.isPending} onClick={google}>Continue with Google</Button>
+            {googleError && <p role="alert" className="t-footnote text-danger">{googleError}</p>}
+            <Button variant="text" className="w-full" onClick={() => go("email")}>Use email instead</Button>
+            <Legal />
+          </footer>
+        </main>
       )}
       {screen === "email" && (
         <Step

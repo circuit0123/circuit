@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { SHOW_DEV_TOOLS } from "@/lib/env";
 import { roleLabel } from "@/lib/format";
 import { api, unwrap } from "./client";
+import { MOCK } from "./mocks/config";
 import { useSession } from "./session";
 import { getSupabase, supabaseConfigured } from "./supabase";
 
@@ -39,8 +40,10 @@ export function useSupabaseSignIn() {
   };
   const google = useMutation({
     mutationFn: async () => {
-      const { error } = await sb().auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl() } });
+      const { data, error } = await sb().auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl(), skipBrowserRedirect: true } });
       if (error) throw error;
+      // Mock mode has no Google to visit: it comes straight back with a code, and the mock Supabase answers the exchange.
+      window.location.assign(MOCK ? `${callbackUrl()}?code=mock-code` : data.url);
     },
   });
   const sendCode = useMutation({

@@ -2,6 +2,7 @@
 
 import { ChevronLeft } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef } from "react";
 import { cx } from "./cx";
 import { BarButton } from "./TopBar";
 import { fade, pushSpring } from "./theme";
@@ -26,11 +27,12 @@ type StepProps = {
  * A centred 440px column on desktop.
  */
 export function Step({ title, subhead, progress, onBack, onSkip, footer, children, className }: StepProps) {
+  const ref = useEdgeSwipeBack(onBack);
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-[440px] flex-col px-4 lg:justify-center lg:pb-12">
+    <main ref={ref} className="mx-auto flex min-h-dvh w-full max-w-[440px] flex-col px-4 lg:justify-center lg:pb-12">
       {progress !== undefined && (
-        <div className="fixed inset-x-0 top-0 z-30 h-0.5 bg-surface-3" role="progressbar" aria-label="Progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
-          <motion.div className="h-full origin-left bg-primary" initial={false} animate={{ scaleX: Math.min(1, Math.max(0, progress)) }} transition={pushSpring} style={{ width: "100%" }} />
+        <div className="fixed inset-x-0 top-0 z-30 h-[3px] bg-surface-2" role="progressbar" aria-label="Progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+          <motion.div className="h-full origin-left bg-live" initial={false} animate={{ scaleX: Math.min(1, Math.max(0, progress)) }} transition={pushSpring} style={{ width: "100%" }} />
         </div>
       )}
       <header className="-mx-2 flex min-h-11 items-center justify-between pt-[env(safe-area-inset-top)]">
@@ -43,6 +45,40 @@ export function Step({ title, subhead, progress, onBack, onSkip, footer, childre
       {footer && <footer className="sticky bottom-0 -mx-4 flex flex-col gap-2 bg-bg px-4 lg:mt-8 pb-[max(16px,env(safe-area-inset-bottom))] pt-3">{footer}</footer>}
     </main>
   );
+}
+
+const EDGE = 24;
+const COMMIT = 72;
+
+/** Swiping right from the left edge goes back, as on every pushed screen (DESIGN.md §4). Touch only; never while a field has focus or motion is reduced. */
+function useEdgeSwipeBack(onBack?: () => void) {
+  const ref = useRef<HTMLElement>(null);
+  const back = useRef(onBack);
+  useEffect(() => { back.current = onBack; }, [onBack]);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let start: { x: number; y: number } | null = null;
+    const down = (e: TouchEvent) => {
+      const t = e.touches[0];
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      start = t.clientX <= EDGE && back.current && !reduce ? { x: t.clientX, y: t.clientY } : null;
+    };
+    const move = (e: TouchEvent) => {
+      if (!start) return;
+      const t = e.touches[0];
+      const dx = t.clientX - start.x;
+      const dy = Math.abs(t.clientY - start.y);
+      if (dy > dx) { start = null; return; }
+      if (dx >= COMMIT) { start = null; back.current?.(); }
+    };
+    const end = () => { start = null; };
+    el.addEventListener("touchstart", down, { passive: true });
+    el.addEventListener("touchmove", move, { passive: true });
+    el.addEventListener("touchend", end, { passive: true });
+    return () => { el.removeEventListener("touchstart", down); el.removeEventListener("touchmove", move); el.removeEventListener("touchend", end); };
+  }, []);
+  return ref;
 }
 
 /** Slides steps in from the right (and back from the left), as pushed screens do. A 150ms fade when motion is reduced. */

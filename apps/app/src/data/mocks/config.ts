@@ -12,6 +12,8 @@ export const SCENARIOS = [
   { id: "beta", label: "Beta access missing" },
   { id: "features_off", label: "Features off" },
   { id: "under18", label: "Under 18" },
+  { id: "signup", label: "New member" },
+  { id: "signup_ai_down", label: "New member, AI down" },
 ] as const;
 
 export type Scenario = (typeof SCENARIOS)[number]["id"];
