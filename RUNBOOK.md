@@ -40,6 +40,14 @@ Never delete a Member row by hand: orders and payments (Stage 4e) point at it. U
 
 Dev only: `make export MEMBER=<id>` and `make delete-account MEMBER=<id>` do one member immediately.
 
+## Landing site: feature flags are baked in at build time
+`apps/landing` reads `GET /api/config` once while it builds (`src/lib/features.ts`), so the pages are static. `/investors` shows the app button when
+`investor_mode` is on and a waitlist form ("Investor access opens soon.") when it is off; `/partners` shows the app button when `partner_mode` is on and a
+contact form when it is off; the home investor tile follows `investor_mode` too. **After changing either flag in Django admin or `FEATURES`, redeploy the
+landing site** (Vercel: redeploy `circuit-landing`, or trigger its deploy hook), otherwise visitors keep seeing the old state. If the API can't be reached
+during a build, every flag is treated as off and the build log says `[landing] Could not read … /api/config`: check the log before shipping a deploy that
+should have the app buttons.
+
 ## Privacy checks before real users
 - `GRIEVANCE_OFFICER_NAME`, `GRIEVANCE_EMAIL`, `GRIEVANCE_ADDRESS` are real (not `<PLACEHOLDER>`).
 - `POLICY_VERSION` matches the published text (docs/legal/ after the lawyer's review).

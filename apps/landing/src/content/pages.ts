@@ -125,7 +125,7 @@ const ALL: ReadonlyArray<AudiencePageContent> = [
 ];
 
 /** Pages that have a route. A page is added here when it ships, so the header, footer and sitemap never link to one that doesn't exist yet. */
-const BUILT: ReadonlyArray<Slug> = ["students", "founders", "mentors", "investors"];
+const BUILT: ReadonlyArray<Slug> = ["students", "founders", "mentors", "investors", "partners"];
 export const PAGES: ReadonlyArray<AudiencePageContent> = ALL.filter((p) => BUILT.includes(p.slug));
 
 export const page = (slug: Slug): AudiencePageContent => {
