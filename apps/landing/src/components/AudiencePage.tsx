@@ -7,11 +7,13 @@ import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { Hero } from "./Hero";
 import { HowItWorks } from "./HowItWorks";
+import { FoundersProof } from "./proof/FoundersProof";
 import { StudentsProof } from "./proof/StudentsProof";
 
 /** The proof section of each page: a labelled example or a labelled placeholder, never invented numbers or people. */
 const PROOF: Partial<Record<Slug, React.ReactNode>> = {
   students: <StudentsProof />,
+  founders: <FoundersProof />,
 };
 
 /** Header → hero → three steps → one proof section → FAQ → closing link → footer. */

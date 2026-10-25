@@ -2,6 +2,9 @@ import { expect, test } from "@playwright/test";
 import { PAGES } from "../src/content/pages";
 import { APP, ON } from "./support";
 
+/** What each proof section must say it is (DESIGN.md §12: never fake numbers or people). Students has real placeholders instead. */
+const PROOF_LABEL: Record<string, string | null> = { students: null, founders: "Example", mentors: "Example", investors: "Example", partners: "Demo data" };
+
 for (const p of PAGES) {
   test.describe(`/${p.slug}/`, () => {
     test.beforeEach(async ({ page }) => { await page.goto(`/${p.slug}/`); });
@@ -27,6 +30,13 @@ for (const p of PAGES) {
       const faq = await page.locator("section[aria-labelledby=faq-h] details").count();
       expect(faq).toBeGreaterThanOrEqual(4);
       expect(faq).toBeLessThanOrEqual(6);
+    });
+
+    test("the proof section says what it is", async ({ page }) => {
+      const proof = page.locator("section[aria-labelledby=proof-h]");
+      const label = PROOF_LABEL[p.slug];
+      if (label) await expect(proof.getByText(label, { exact: true })).toHaveCount(1);
+      else await expect(proof.getByRole("img", { name: /App screenshot coming/ }).first()).toBeVisible();
     });
 
     test("the call to action carries this page's role and src, in the hero and after the FAQ", async ({ page }) => {
