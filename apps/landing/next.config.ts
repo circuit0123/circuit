@@ -18,6 +18,8 @@ export default function config(phase: string): NextConfig {
     trailingSlash: true, // /privacy/index.html, so any static host (and `pnpm start`) serves it
     images: { unoptimized: true },
     transpilePackages: ["@circuit/ui"],
+    // The tests build twice (feature flags on and off) into separate folders; normal builds use the default `out/`.
+    ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
     env: dev ? Object.fromEntries(missing.map((k) => [k, URLS[k as keyof typeof URLS]])) : {},
   };
 }

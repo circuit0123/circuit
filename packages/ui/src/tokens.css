@@ -153,6 +153,8 @@
    Tracking: -0.022em at 28px and up, -0.012em for 20-22px, 0 for body, +0.01em for 12-13px. */
 /* Landing hero only (the Landing.dc.html headline): bigger than Large title, never used inside the app. */
 @utility t-display { font-size: 40px; line-height: 1.05; font-weight: 600; letter-spacing: -0.03em; @media (min-width: 1024px) { font-size: 64px; } }
+/* Landing audience pages: a long headline, so one step below the home hero. Landing only. */
+@utility t-display-sm { font-size: 32px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em; @media (min-width: 1024px) { font-size: 48px; } }
 @utility t-large { font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em; @media (min-width: 1024px) { font-size: 36px; } }
 @utility t-title1 { font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em; @media (min-width: 1024px) { font-size: 30px; } }
 @utility t-title2 { font-size: 22px; line-height: 1.2; font-weight: 600; letter-spacing: -0.012em; }

@@ -11,6 +11,9 @@ export const COMPANY_LEGAL_NAME = process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME ?? 
 
 export type Role = "student" | "founder" | "mentor" | "investor" | "partner";
 
+/** A `src` label: lower-case letters, digits, `-` and `_`, up to 40 (the same rule as the API and the app). Anything else is ignored. */
+export const isSrc = (v: string | null | undefined): v is string => !!v && /^[a-z0-9_-]{1,40}$/.test(v);
+
 /** Where every call to action goes: the app's join screen with the role and the page it came from. The hero passes no role. */
 export function joinUrl(src: string, role?: Role): string {
   const q = new URLSearchParams();

@@ -20,3 +20,4 @@ coverage/
 /apps/landing/out/
 /apps/landing/test-results/
 /apps/landing/playwright-report/
+/apps/landing/.out-*/

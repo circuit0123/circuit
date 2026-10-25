@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { THEMES } from "./support";
+import { PATHS, THEMES } from "./support";
 
 /**
  * The measurable "premium" rules from DESIGN.md §5 and §13 item 5, for the landing home page (apps/app/tests/premium.spec.ts is the
@@ -17,6 +17,9 @@ async function scan(page: Page, wide: boolean): Promise<Hit[]> {
     const describe = (el: Element) => `${el.tagName.toLowerCase()}${cls(el) ? "." + cls(el).split(/\s+/).slice(0, 3).join(".") : ""} "${(el.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 28)}"`;
     const hit = (rule: string, el: Element | null, detail = "") => hits.push({ rule, element: el ? describe(el) : "(page)", detail });
     const shown = (el: Element) => {
+      // The answer inside a closed <details> isn't on screen, though the browser still reports a box for it.
+      const closed = el.closest("details:not([open])");
+      if (closed && !el.closest("summary") && el !== closed) return false;
       const r = el.getBoundingClientRect();
       if (r.width < 2 || r.height < 2) return false;
       const s = getComputedStyle(el);
@@ -93,14 +96,16 @@ async function scan(page: Page, wide: boolean): Promise<Hit[]> {
   }, wide);
 }
 
-for (const theme of THEMES) {
-  test(`premium rules, home page, ${theme}`, async ({ page }, info) => {
-    await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-    const wide = info.project.name === "desktop";
-    const hits = await scan(page, wide);
-    for (const h of hits) expect.soft(false, `${theme} | ${wide ? 1280 : 375} | ${h.rule} | ${h.element} | ${h.detail}`).toBe(true);
-    expect(hits.length).toBe(0);
-  });
+for (const path of PATHS) {
+  for (const theme of THEMES) {
+    test(`premium rules, ${path}, ${theme}`, async ({ page }, info) => {
+      await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
+      await page.goto(path);
+      await page.waitForLoadState("networkidle");
+      const wide = info.project.name === "desktop";
+      const hits = await scan(page, wide);
+      for (const h of hits) expect.soft(false, `${path} | ${theme} | ${wide ? 1280 : 375} | ${h.rule} | ${h.element} | ${h.detail}`).toBe(true);
+      expect(hits.length).toBe(0);
+    });
+  }
 }
