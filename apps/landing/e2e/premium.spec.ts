@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { PATHS, THEMES } from "./support";
+import { OFF, OFF_PATHS, ON, PATHS, THEMES } from "./support";
 
 /**
  * The measurable "premium" rules from DESIGN.md §5 and §13 item 5, for the landing home page (apps/app/tests/premium.spec.ts is the
@@ -96,15 +96,17 @@ async function scan(page: Page, wide: boolean): Promise<Hit[]> {
   }, wide);
 }
 
-for (const path of PATHS) {
+const CASES = [...PATHS.map((path) => ({ base: ON, path, name: path })), ...OFF_PATHS.map((path) => ({ base: OFF, path, name: `${path} (flag off)` }))];
+
+for (const c of CASES) {
   for (const theme of THEMES) {
-    test(`premium rules, ${path}, ${theme}`, async ({ page }, info) => {
+    test(`premium rules, ${c.name}, ${theme}`, async ({ page }, info) => {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
-      await page.goto(path);
+      await page.goto(c.base + c.path);
       await page.waitForLoadState("networkidle");
       const wide = info.project.name === "desktop";
       const hits = await scan(page, wide);
-      for (const h of hits) expect.soft(false, `${path} | ${theme} | ${wide ? 1280 : 375} | ${h.rule} | ${h.element} | ${h.detail}`).toBe(true);
+      for (const h of hits) expect.soft(false, `${c.name} | ${theme} | ${wide ? 1280 : 375} | ${h.rule} | ${h.element} | ${h.detail}`).toBe(true);
       expect(hits.length).toBe(0);
     });
   }

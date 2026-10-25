@@ -9,6 +9,8 @@ export const ON = "http://localhost:3101";
 export const OFF = "http://localhost:3102";
 /** Home plus every audience page that has shipped. */
 export const PATHS = ["/", ...PAGES.map((p) => `/${p.slug}/`)];
+/** Pages whose content changes when their feature flag is off: also checked on the flags-off build. */
+export const OFF_PATHS = PAGES.filter((p) => p.slug === "investors" || p.slug === "partners").map((p) => `/${p.slug}/`);
 export const THEMES = ["dark", "light"] as const;
 
 /** Answers the waitlist call (and its CORS preflight) from the test, so no real API is needed. Returns the bodies it received. */
