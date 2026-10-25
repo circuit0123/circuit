@@ -8,12 +8,14 @@ import { Header } from "./Header";
 import { Hero } from "./Hero";
 import { HowItWorks } from "./HowItWorks";
 import { FoundersProof } from "./proof/FoundersProof";
+import { MentorsProof } from "./proof/MentorsProof";
 import { StudentsProof } from "./proof/StudentsProof";
 
 /** The proof section of each page: a labelled example or a labelled placeholder, never invented numbers or people. */
 const PROOF: Partial<Record<Slug, React.ReactNode>> = {
   students: <StudentsProof />,
   founders: <FoundersProof />,
+  mentors: <MentorsProof />,
 };
 
 /** Header → hero → three steps → one proof section → FAQ → closing link → footer. */
