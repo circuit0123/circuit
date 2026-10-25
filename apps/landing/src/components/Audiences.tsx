@@ -14,7 +14,7 @@ export function Audiences({ investorOpen }: { investorOpen: boolean }) {
     <section aria-labelledby="audiences-h">
       <Container className="pb-20 lg:pb-[120px]">
         <h2 id="audiences-h" className="t-title1 mb-6">Who it&rsquo;s for</h2>
-        <ul className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+        <ul data-stagger className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
           {AUDIENCES.map((a) => {
             const body = (
               <>
@@ -22,15 +22,15 @@ export function Audiences({ investorOpen }: { investorOpen: boolean }) {
                   <span className="block t-headline">{a.who}</span>
                   <span className="mt-2 block t-subhead text-text-muted">{a.line}</span>
                 </span>
-                <span className="t-subhead">{a.cta} <span aria-hidden="true">→</span></span>
+                <span className="t-subhead">{a.cta} <span aria-hidden="true" data-arrow className="inline-block">→</span></span>
               </>
             );
             return (
               <li key={a.id} className="contents">
                 {a.role === "investor" && !investorOpen ? (
-                  <Link id={a.id} prefetch={false} href="/investors/" data-press className={tile}>{body}</Link>
+                  <Link id={a.id} prefetch={false} href="/investors/" data-press data-tile className={tile}>{body}</Link>
                 ) : (
-                  <CtaLink id={a.id} src={SRC} role={a.role} data-press className={tile}>{body}</CtaLink>
+                  <CtaLink id={a.id} src={SRC} role={a.role} data-press data-tile className={tile}>{body}</CtaLink>
                 )}
               </li>
             );
