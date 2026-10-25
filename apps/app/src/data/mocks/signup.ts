@@ -50,6 +50,9 @@ function read(): Store {
 function write(s: Store) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* not remembered */ } }
 function update(f: (s: Store) => void): Store { const s = read(); f(s); write(s); return s; }
 
+/** Test hook: `localStorage["circuit.mock.fail"] = "onboarding"` makes that call fail the way a dropped connection does. */
+const failing = (what: string) => { try { return localStorage.getItem("circuit.mock.fail") === what; } catch { return false; } };
+
 const error = (status: number, code: string, message: string) => HttpResponse.json({ error: { code, message, details: null } }, { status });
 
 /* -- who am I ------------------------------------------------------------------------------------------------------ */
@@ -244,6 +247,7 @@ export const signupHandlers: HttpHandler[] = [
   http.get(`${API}/onboarding/state`, () => (isSignup() ? HttpResponse.json(onboardingOf(read())) : undefined)),
   http.patch(`${API}/onboarding/state`, async ({ request }) => {
     if (!isSignup()) return;
+    if (failing("onboarding")) return HttpResponse.error();
     const b = (await request.json()) as { current_step?: string; answers?: Record<string, Record<string, unknown>>; signup_source?: string; completed?: boolean };
     const steps = [...Object.keys(b.answers ?? {}), ...(b.current_step ? [b.current_step] : [])];
     if (steps.some((x) => !ALL_STEPS.has(x))) return error(422, "validation_error", "Unknown step.");

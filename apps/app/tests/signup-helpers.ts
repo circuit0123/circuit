@@ -62,3 +62,28 @@ export async function checkStep(page: Page, info: TestInfo, screen: string, opts
 
 /** The inline error on the screen (Next adds its own role=alert route announcer, which is not it). */
 export const alertOf = (page: Page) => page.locator('[role="alert"]:not(#__next-route-announcer__)');
+
+/** Signs in by email, accepts the terms and uses the open invite code: ends on the first onboarding screen. */
+export async function intoOnboarding(page: Page, path = "/", opts: { google?: boolean; scenario?: string } = {}) {
+  await openAsNewMember(page, path, opts.scenario);
+  if (opts.google) await page.getByRole("button", { name: "Continue with Google" }).click();
+  else await signInByEmail(page);
+  await page.getByRole("button", { name: "I agree" }).click();
+  // Either the invite screen (no code on the link) or straight to Name (the link's code was used).
+  await page.getByRole("heading", { level: 1, name: /Got an invite code\?|What should we call you\?/ }).waitFor();
+  const invite = page.getByLabel("Invite code");
+  if (await invite.isVisible()) { await invite.fill("CIRCUIT-0001"); await invite.press("Enter"); }
+}
+
+/** The thin bar at the top: how far along, 0–100. */
+export const progressOf = (page: Page) => page.getByRole("progressbar", { name: "Progress" }).last().getAttribute("aria-valuenow").then(Number);
+
+/** A swipe from the left edge, as a finger would make it (touch events, because Playwright has no touch drag). */
+export async function edgeSwipe(page: Page) {
+  await page.evaluate(() => {
+    const main = document.querySelector("main")!;
+    const touch = (x: number, y: number) => new Touch({ identifier: 1, target: main, clientX: x, clientY: y });
+    const fire = (type: string, x: number) => main.dispatchEvent(new TouchEvent(type, { touches: type === "touchend" ? [] : [touch(x, 400)], changedTouches: [touch(x, 400)], bubbles: true, cancelable: true }));
+    fire("touchstart", 4); fire("touchmove", 40); fire("touchmove", 120); fire("touchend", 120);
+  });
+}

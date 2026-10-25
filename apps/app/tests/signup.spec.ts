@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { alertOf, checkStep, openAsNewMember, serverState, signInByEmail } from "./signup-helpers";
+import { alertOf, checkStep, edgeSwipe, intoOnboarding, isPhone, openAsNewMember, progressOf, serverState, signInByEmail } from "./signup-helpers";
 
 /**
  * F2: sign-up and access, on mock mode (the "New member" scenario: a stateful fake of the API and of Supabase sign-in).
@@ -120,5 +120,175 @@ test.describe("sign-in and access", () => {
     await page.getByRole("button", { name: "Join the waitlist" }).click();
     await expect(page.getByRole("heading", { name: "You're on the list." })).toBeVisible();
     expect((await serverState(page)).waitlist[0].role).toBe("mentor");
+  });
+});
+
+const heading = (page: import("@playwright/test").Page, name: string) => page.getByRole("heading", { level: 1, name });
+
+test.describe("onboarding: name, role, age, safety, where", () => {
+  test("Name is prefilled from Google, asks for a first name, and Enter submits", async ({ page }, info) => {
+    await intoOnboarding(page, "/", { google: true });
+    await expect(heading(page, "What should we call you?")).toBeVisible();
+    await expect(page.getByLabel("First name")).toHaveValue("Meera");
+    await expect(page.getByLabel("Last name")).toHaveValue("Krishnan");
+    await checkStep(page, info, "name");
+    await page.getByLabel("First name").fill("");
+    await page.getByLabel("First name").press("Enter");
+    await expect(page.getByText("Add your first name.")).toBeVisible();
+    await page.getByLabel("First name").fill("Meera");
+    await page.getByLabel("Last name").press("Enter");
+    await expect(heading(page, "What brings you here?")).toBeVisible();
+    expect((await serverState(page)).me.name).toBe("Meera Krishnan");
+  });
+
+  test("Name by email starts empty", async ({ page }) => {
+    await intoOnboarding(page);
+    await expect(page.getByLabel("First name")).toHaveValue("");
+    await expect(page.getByRole("button", { name: "Back" })).toHaveCount(0); // nothing to go back to inside sign-up
+  });
+
+  test("Role shows three rows, advances on tap, and saves the answer", async ({ page }, info) => {
+    await intoOnboarding(page);
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(heading(page, "What brings you here?")).toBeVisible();
+    await expect(page.getByRole("button", { name: /^(Find work and internships|Build a startup|Mentor people)$/ })).toHaveCount(3);
+    await expect(page.getByRole("button", { name: "Invest" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Run a college/ })).toHaveCount(0);
+    await checkStep(page, info, "role", { primary: 0 });
+    await page.getByRole("button", { name: "Build a startup" }).click();
+    await expect(heading(page, "Are you 18 or older?")).toBeVisible();
+    const s = await serverState(page);
+    expect(s.me.role).toBe("founder");
+    expect(s.onboarding.answers.role).toEqual({ choice: "founder" });
+  });
+
+  test("a role link skips the Role screen and saves the role", async ({ page }) => {
+    await intoOnboarding(page, "/join?role=founder&src=landing-founders");
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(heading(page, "Are you 18 or older?")).toBeVisible();
+    const s = await serverState(page);
+    expect(s.me.role).toBe("founder");
+    expect(s.onboarding.answers.role).toEqual({ choice: "founder" });
+    expect(s.signup_source).toBe("landing-founders");
+  });
+
+  test("a link for a role that isn't built yet falls back to the Role screen", async ({ page }) => {
+    await intoOnboarding(page, "/join?role=investor&src=landing-investors");
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(heading(page, "What brings you here?")).toBeVisible();
+  });
+
+  test("Age: Yes goes straight to Where; Not yet shows the safety screen first", async ({ page }, info) => {
+    await intoOnboarding(page);
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Find work and internships" }).click();
+    await expect(heading(page, "Are you 18 or older?")).toBeVisible();
+    await checkStep(page, info, "age", { primary: 0 });
+    await page.getByRole("button", { name: "Yes", exact: true }).click();
+    await expect(heading(page, "Where are you based?")).toBeVisible();
+    expect((await serverState(page)).me.profile_visibility).toBe("members");
+  });
+
+  test("under 18: Not yet → safety screen → private defaults saved → Where", async ({ page }, info) => {
+    await intoOnboarding(page);
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Find work and internships" }).click();
+    await page.getByRole("button", { name: "Not yet" }).click();
+    await expect(heading(page, "We've made a few things private.")).toBeVisible();
+    await checkStep(page, info, "safety");
+    await page.getByRole("button", { name: "Got it" }).click();
+    await expect(heading(page, "Where are you based?")).toBeVisible();
+    const s = await serverState(page);
+    expect(s.me.profile_visibility).toBe("hidden");
+    expect(s.me.allow_requests).toBe(false);
+    expect(s.onboarding.answers.age).toEqual({ adult: false });
+  });
+
+  test("Where: Use my location saves a coarse point and the nearest city", async ({ page, context }, info) => {
+    await context.grantPermissions(["geolocation"]);
+    await context.setGeolocation({ latitude: 13.0827123, longitude: 80.2707456 });
+    await intoOnboarding(page);
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Find work and internships" }).click();
+    await page.getByRole("button", { name: "Yes", exact: true }).click();
+    await expect(heading(page, "Where are you based?")).toBeVisible();
+    await checkStep(page, info, "where");
+    await page.getByRole("button", { name: "Use my location" }).click();
+    await expect.poll(async () => (await serverState(page)).me.city).toBe("Chennai");
+    const s = await serverState(page);
+    expect([s.me.lat, s.me.lng]).toEqual([13.08, 80.27]); // two decimals: about 1 km
+  });
+
+  test("Where: location off → one sentence, then Choose a city works", async ({ page }, info) => {
+    await intoOnboarding(page);
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Find work and internships" }).click();
+    await page.getByRole("button", { name: "Yes", exact: true }).click();
+    await page.getByRole("button", { name: "Use my location" }).click();
+    await expect(alertOf(page)).toHaveText("Location is off. Choose a city instead.");
+    await page.getByRole("button", { name: "Choose a city" }).click();
+    const sheet = page.getByRole("dialog");
+    await expect(sheet).toBeVisible();
+    await checkStep(page, info, "where-cities");
+    await sheet.getByLabel("Search cities").fill("mad");
+    await expect(sheet.getByRole("button")).toHaveCount(1);
+    await sheet.getByRole("button", { name: "Madurai" }).click();
+    await expect.poll(async () => (await serverState(page)).me.city).toBe("Madurai");
+    await expect(heading(page, "Almost there")).toBeVisible(); // the next screens arrive in F2 parts 3–4
+  });
+
+  test("reloading resumes on the screen you were on, with the progress kept", async ({ page }) => {
+    await intoOnboarding(page);
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Mentor people" }).click();
+    await expect(heading(page, "Are you 18 or older?")).toBeVisible();
+    const before = await progressOf(page);
+    await page.reload();
+    await expect(heading(page, "Are you 18 or older?")).toBeVisible();
+    expect(await progressOf(page)).toBe(before);
+  });
+
+  test("progress grows with each screen and Back returns to the one before", async ({ page }) => {
+    await intoOnboarding(page);
+    const first = await progressOf(page);
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    const second = await progressOf(page);
+    expect(second).toBeGreaterThan(first);
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(heading(page, "What should we call you?")).toBeVisible();
+    await expect(page.getByLabel("First name")).toHaveValue("Ravi"); // typed text is never lost
+  });
+
+  test("swiping from the left edge goes back (touch)", async ({ page }, info) => {
+    test.skip(!isPhone(info), "a touch gesture");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await intoOnboarding(page);
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(heading(page, "What brings you here?")).toBeVisible();
+    await page.waitForTimeout(600);
+    await edgeSwipe(page);
+    await expect(heading(page, "What should we call you?")).toBeVisible();
+  });
+
+  test("a save that fails keeps the screen and says so in one sentence", async ({ page }) => {
+    await intoOnboarding(page);
+    await page.evaluate(() => localStorage.setItem("circuit.mock.fail", "onboarding")); // the mock drops the next save, like a lost connection
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(alertOf(page)).toHaveText("Can't reach Circuit. Check your connection and try again.");
+    await expect(page.getByLabel("First name")).toHaveValue("Ravi");
+    await page.evaluate(() => localStorage.removeItem("circuit.mock.fail"));
+    await page.getByRole("button", { name: "Continue" }).click(); // trying again works
+    await expect(heading(page, "What brings you here?")).toBeVisible();
   });
 });

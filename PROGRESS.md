@@ -3,7 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
-- F2 — sign-up and access, **part 1 of 4 done** (`/join`, sign-in polish, consent, invite code, waitlist; branch `frontend-F2`). Steps 4–14 are still to build (details in "F2" below)
+- F2 — sign-up and access, **part 2 of 4 done** (`/join`, sign-in, consent, invite, waitlist, Name, Role, Age, Safety, Where; branch `frontend-F2`). Work, Offers, Needs, Organisation, Photo, Colour, Ready still to build (details in "F2" below)
 - F1 — app foundation (theme, components, shell, data layer, mock mode, PWA basics, /design, design checks): **done, waiting for your OK** (branch `frontend-F1`) (details in "F1" below)
 - L3 — landing motion (DESIGN.md §7) on all six pages: **done, waiting for your OK** (branch `landing-pages`) (details in "L3" below)
 - L2 — landing audience pages (F14): **done, waiting for your OK** (branch `landing-pages`, from `frontend-landing`) (details in "L2" below)
@@ -32,9 +32,10 @@ Things the screens need that the API (frozen openapi.json) does not give yet. Ne
 - **Instant first Daily Drop for new members** (step 14). Ready shows the first card of `GET /api/drop/today` if there is one, otherwise "your first drop arrives tomorrow".
 - **Two schemas named `CountOut`.** The notification unread count answers `{count}`, but the OpenAPI file keeps the dashboard's `{hidden, value}` shape under the same name. `useUnreadCount` reads the real shape with a cast (`data/notifications.ts`). Give them different names.
 
-## F2 — Sign-up and access (branch `frontend-F2`): part 1 of 4 done, waiting for your OK
+## F2 — Sign-up and access (branch `frontend-F2`): part 2 of 4 done, waiting for your OK
 Built and tested: `/join`, Welcome (matches the reference), email code, consent, invite code, waitlist, and the data layer for the rest (`useOnboarding`, `useCapabilities`, `useWhere`, `useOrganisationSearch`; not yet drawn). `tests/signup.spec.ts`: 9 tests at 375px and 1280px (18 runs), axe, no overflow, one primary button, ≤5 font sizes, dark and light. Screenshots: `screenshots/f2/`. Mock mode has two new scenarios, "New member" and "New member, AI down" (stateful mock of the API and of Supabase sign-in; code `000000` is refused, `CIRCUIT-0001` lets anyone in, `SVIT-2026` also joins the mock college).
-- **Still to do (parts 2–4):** Name, Role, Age, Safety, Where; Work, Offers, Needs, Organisation; Photo, Colour, Ready; the timed full sign-up test, resume, role-link, under-18 and AI-down tests; `/design` entries for AccentPicker, large Chip and DropCardFace; `make check`.
+- **Part 2 (done):** Name (prefilled from Google), Role (three rows; investor and partner rows appear with their flags), Age, the under-18 safety screen, Where (location rounded to ~1 km, or a chosen city). Tests: 13 more in `signup.spec.ts` (role link skips Role, under-18 path, location allowed and denied, resume after reload, Back, edge swipe, a failed save). Progress counts steps we already knew as done, so the bar reads the same after a reload. Screens after Where show a temporary "Almost there".
+- **Still to do (parts 3–4):** Work, Offers, Needs, Organisation; Photo, Colour, Ready; the timed full sign-up test, resume, role-link, under-18 and AI-down tests; `/design` entries for AccentPicker, large Chip and DropCardFace; `make check`.
 - **Landing: set NEXT_PUBLIC_JOIN_LIVE=true after the app deploys.**
 - Changed in F1's tests: "beta access missing" now expects the invite screen instead of the old placeholder.
 - Google in mock mode returns straight to `/auth/callback` (the real call now uses `skipBrowserRedirect` and navigates itself; same URL in production).

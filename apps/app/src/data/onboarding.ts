@@ -102,6 +102,9 @@ const sentence = (e: unknown) => {
   return p.kind === "network" || p.kind === "rate_limited" ? p.message : "Couldn't save that. Try again.";
 };
 
+/** What `useOnboarding()` returns: the one controller every sign-up screen is handed. */
+export type Flow = ReturnType<typeof useOnboarding>;
+
 /**
  * The sign-up flow (DESIGN.md §4 steps 4–14). Owns which screen shows, what each answer does, and saving: every answer is saved as the
  * person moves on (`PATCH /api/onboarding/state`), so closing the app resumes on the same screen with the same answers. Screens call
@@ -140,7 +143,11 @@ export function useOnboarding() {
   };
   const current: StepId = view && visible.includes(view) ? view : resume();
   const index = Math.max(0, visible.indexOf(current));
-  const progress = visible.length ? (index + 1) / visible.length : 0;
+  // The bar counts what we already knew as done (a name from Google, a college from the email): it must read the same after a reload,
+  // when the server has started skipping the steps that were answered a minute ago.
+  const whole = visibleSteps({ steps: state?.steps ?? [], skipped: [], answers, joinRole: linkRole, organisationKnown: false, roleChoice });
+  const place = whole.indexOf(current);
+  const progress = whole.length ? (place >= 0 ? place + 1 : index + 1) / whole.length : 0;
 
   const patchState = useCallback(
     async (patch: { current_step?: StepId; answers?: Record<string, Record<string, unknown>>; completed?: boolean }) => {

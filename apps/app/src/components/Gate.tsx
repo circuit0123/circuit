@@ -6,6 +6,7 @@ import { useGate, useJoinContext } from "@/data";
 import { Centered } from "./Centered";
 import { Consent } from "./onboarding/Consent";
 import { Invite } from "./onboarding/Invite";
+import { Onboarding } from "./onboarding/Onboarding";
 import { SignIn } from "./SignIn";
 
 /** Shows the screen the person belongs on: sign-in, consent, invite, onboarding, or the app itself. */
@@ -33,8 +34,9 @@ export function Gate({ children }: { children: React.ReactNode }) {
       return <Consent />;
     case "invite":
       return <Invite />;
+    case "onboarding":
+      return <Onboarding />;
     default:
-      // onboarding arrives in the next step.
       return <Centered><h1 className="t-title2">Almost there</h1></Centered>;
   }
 }
