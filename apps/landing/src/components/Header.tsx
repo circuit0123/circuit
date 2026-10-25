@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Logo } from "@circuit/ui/Logo";
-import { AUDIENCES } from "@/content/home";
+import { PAGES } from "@/content/pages";
+import type { Slug } from "@/content/types";
 import { Container } from "./Container";
 
-/** Logo and the five audience links. Until the audience pages exist (next session) they jump to the tiles on the home page. */
-export function Header() {
+/** Logo and the five audience pages. The page you are on is marked (`aria-current="page"`) and set in the full text colour. */
+export function Header({ current }: { current?: Slug }) {
   return (
     <header>
       <Container className="flex flex-wrap items-center justify-between gap-x-4 py-3 lg:py-5">
@@ -12,9 +13,15 @@ export function Header() {
           <Logo kind="lockup" height={28} />
         </Link>
         <nav aria-label="Audiences" className="-mx-3 flex flex-wrap lg:mx-0">
-          {AUDIENCES.map((a) => (
-            <Link key={a.id} href={`/#${a.id}`} className="inline-flex min-h-11 items-center px-3 t-subhead text-text-muted hover:text-text lg:px-3">
-              {a.who}
+          {PAGES.map((p) => (
+            <Link
+              key={p.slug}
+              prefetch={false}
+              href={`/${p.slug}/`}
+              aria-current={p.slug === current ? "page" : undefined}
+              className={`inline-flex min-h-11 items-center px-3 t-subhead hover:text-text ${p.slug === current ? "font-medium text-text" : "text-text-muted"}`}
+            >
+              {p.who}
             </Link>
           ))}
         </nav>

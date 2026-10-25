@@ -3,6 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
+- L2 — landing audience pages (F14): **done, waiting for your OK** (branch `landing-pages`, from `frontend-landing`) (details in "L2" below)
 - L1 — landing site home page (F14, first part): **done, waiting for your OK** (branch `frontend-landing`) (details in "L1" below)
 - B4 — matching ML pipeline + onboarding state, backend (Stage 4c): **done, waiting for your OK** (branch `backend-b4`) (details in "B4" below)
 - B3 — settings, notifications, report/block, export/delete, consent, legal drafts, backend (Stages 6 + 7): **done and merged** (PR #12, `backend-b3`) (details in "B3" below)
@@ -183,6 +184,45 @@ Not exercised: `admin-user` interactively (unit-tested with a mocked password pr
 ### Frontend remaining (from B4)
 - **Onboarding** (DESIGN.md §4): read `GET /api/onboarding/state` on launch to resume at `current_step`; save each screen with `PATCH` (the answer under its step key; e.g. `role: {"choice": "invest" | "partner" | …}` decides the branch); skip the screens in `skip`; send `signup_source` from `/join?src=…` on the first call; send `completed: true` at the end.
 - Nothing visible for the ranker: members see no difference except a different order once a model is promoted.
+
+## L2 — The five audience pages (`landing-pages`, from `frontend-landing`): done, waiting for your OK
+
+`/students`, `/founders`, `/mentors`, `/investors` and `/partners` are built; you approved the first four from their screenshots, `/partners` is waiting for your OK. Screenshots: `screenshots/landing-pages/<page>/{375,1280}-{dark,light}.png`, and `screenshots/landing-pages-flag-off/{investors,partners}/` for the flag-off versions. The branch is based on `frontend-landing` because L1 is not merged into `main` yet; a PR can follow once it is.
+
+**What was built**
+- **Shared pieces (the home page looks the same):** `Header` (marks the current page with `aria-current="page"`), `Hero`, `HowItWorks`/`Shot`, `Faq`, `Waitlist`, `Footer` (now also lists the five pages), tiles. Copy for every page lives in `src/content/pages.ts`; a page is added to `BUILT` there when its route ships (header, footer and sitemap follow it).
+- **Each page:** its own headline and call to action (DESIGN.md §4 table), a one-line subhead, ONE primary button, three steps, one proof section, 5–6 honest FAQ answers, a text link to the same call to action after the FAQ, and its own title, description, canonical and Open Graph image (`/og.png`, the on-dark logo on black). All six URLs are in `sitemap.xml`.
+- **Calls to action (switch `NEXT_PUBLIC_JOIN_LIVE`, below):** with it on, `APP_URL/join?role=<role>&src=landing-<page>` with roles student, founder, mentor, investor, partner. A valid `?src=` in the page address replaces the `src` in every link and in both forms (home too); an invalid one is ignored. Without JavaScript the page's own `src` is used.
+- **Proof sections (no fake numbers or people):** students: two labelled placeholder frames (Jobs, Job page); founders: an **Example** "claim your startup" card; mentors: an **Example** anonymised circuit (marketer, founder, mentor); investors: an **Example** "Today's picks" card; partners: a **Demo data** gap-map frame (a placeholder: the dashboard isn't in the app yet). No "real roles near you" list (no public data source).
+- **Feature flags at build time** (`src/lib/features.ts`): `GET /api/config` with a 3 s timeout and one retry; any failure means every flag is off, with a warning in the build log.
+  - `investor_mode` off: `/investors` replaces the app button with a waitlist form (email, city; `role=investor`, `src=landing-investors`) and the line "Investor access opens soon."; the home investor tile opens `/investors/`.
+  - `partner_mode` off: on `/partners` the "Bring Circuit to your campus" button jumps to a short form (name, organisation, city, email, note) sent to the public waitlist endpoint with `role=partner`. The endpoint has no name or organisation field, so the organisation goes in `college` and `note` starts with `Name: <name>`. No other API is called.
+- **Tests (`make test-landing`, in `make check`):** two builds, flags on (:3101) and off (:3102), with a mock `/api/config`. 310 tests at 375px and 1280px, on three builds (flags on with the switch on, flags off with the switch on, flags on with the switch off): per page (headline, title, current page, one primary, steps, proof label, FAQ count, role and `src`, `?src=` carry-through, SEO, sitemap), both flag-off fallbacks with forms (success, carried `src`, duplicate, 422, 429, 500 with retry, only the waitlist endpoint called), axe and premium rules on every page in both themes (and on the flag-off versions), no numbers or placeholder text on any page.
+
+**Lighthouse (mobile, simulated slow 4G, brotli-compressed server, 25 Oct 2026)**
+
+| Page | Performance | Accessibility | Best practices | SEO |
+|---|---|---|---|---|
+| /students/ | 98–99 | 100 | 100 | 100 |
+| /founders/ | 98 | 100 | 100 | 100 |
+| /mentors/ | 98 | 100 | 100 | 100 |
+| /investors/ (flag on, off) | 97, 97 | 100 | 100 | 100 |
+| /partners/ (flag on, off) | 98, 96–98 | 100 | 100 | 100 |
+
+**App screenshots still to come (labelled placeholders, "App screenshot coming: …")**
+- Students: You offer, Apply, Jobs, Job page
+- Founders: Claim, You need
+- Mentors: You offer, Circuit ring
+- Investors: Investor focus, Today's picks, Introduction request
+- Partners: Organisation page, Invite, Partner home, Gap map (Demo data)
+- Real screenshots used: the Daily Drop (students 02, founders 03, mentors 02, home 02). Replace a placeholder by adding `public/shots/<name>-{dark,light}.{avif,webp}` (780×1280) and setting `shot` in `src/content/pages.ts`.
+
+**Things to know**
+1. **Flags are baked into the static pages**, so changing `investor_mode` or `partner_mode` needs a landing redeploy (RUNBOOK.md, new "Landing site" entry).
+2. **`/join` doesn't exist in the app yet, so there is a switch (`NEXT_PUBLIC_JOIN_LIVE`, default `false`).** Off: every button keeps its label but scrolls to a waitlist form on the same page and puts the cursor in it (home: the role you pressed is preselected in the form; audience pages: the form's role is the page's audience; /partners: the contact form). The form says "Circuit is invite-only right now. Join the waitlist and we'll send you an invite." and sends `role` and `src` (`landing-<page>`, or a valid `?src=`), so each sign-up shows its page and audience. Nothing links to `APP_URL/join`, so no button can lead to a 404. On: buttons link to `APP_URL/join?role=…&src=…`. A sheet on mobile was not built: an anchor works without JavaScript and needs no focus trap. **Turn NEXT_PUBLIC_JOIN_LIVE on after F2 ships /join and the app is deployed.** Like the feature flags it is baked in at build time, so flipping it needs a landing redeploy (RUNBOOK.md).
+3. **Partner role value:** the partners button carries `role=partner` (what the app's join parser, the waitlist API and the home tile accept), not `partner_admin`.
+4. Small changes outside the landing folder: `packages/ui/src/tokens.css` (one utility, `t-display-sm`), `scripts/serve-static.mjs` (a static server with brotli, used for Lighthouse runs and the screenshots), `screenshots/landing-pages.mjs`.
+5. Not done on purpose: a real-phone test (DESIGN.md §13) and Lighthouse on the deployed site (Stage 5).
 
 ## L1 — Landing home page (`frontend-landing`, from `main`): done, waiting for your OK
 

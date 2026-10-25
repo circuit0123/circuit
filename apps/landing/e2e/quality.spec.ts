@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { checkPage, THEMES } from "./support";
+import { checkPage, digitsIn, PATHS, THEMES } from "./support";
 
 for (const theme of THEMES) {
   test.describe(`${theme} theme`, () => {
@@ -10,7 +10,7 @@ for (const theme of THEMES) {
       await page.getByRole("heading", { name: "Questions" }).scrollIntoViewIfNeeded();
       await checkPage(page, `home ${info.project.name} ${theme}`);
       await expect(page.locator("header svg[aria-label=Circuit]:visible")).toHaveCount(1);
-      for (const path of ["/privacy/", "/terms/"]) {
+      for (const path of [...PATHS.slice(1), "/privacy/", "/terms/"]) {
         await page.goto(path);
         await checkPage(page, `${path} ${info.project.name} ${theme}`);
       }
@@ -26,6 +26,22 @@ for (const theme of THEMES) {
   });
 }
 
+
+test("every page: no placeholder text, no fake numbers, nothing requested from another origin", async ({ page }) => {
+  for (const path of PATHS) {
+    const origins = new Set<string>();
+    const onRequest = (r: import("@playwright/test").Request) => origins.add(new URL(r.url()).origin);
+    page.on("request", onRequest);
+    await page.goto(path, { waitUntil: "networkidle" });
+    page.off("request", onRequest);
+    expect([...origins], path).toEqual(["http://localhost:3101"]);
+    const text = await page.locator("body").innerText();
+    expect(text, path).not.toMatch(/\[[^\]]+\]/);
+    expect(text, path).not.toMatch(/lorem|john doe/i);
+    expect(digitsIn(text), `${path}: digits`).toBeNull();
+  }
+});
+
 test("makes no request outside the landing origin, and shows no placeholder text or fake numbers", async ({ page }) => {
   const origins = new Set<string>();
   page.on("request", (r) => origins.add(new URL(r.url()).origin));
@@ -34,8 +50,7 @@ test("makes no request outside the landing origin, and shows no placeholder text
   const text = await page.locator("body").innerText();
   expect(text).not.toMatch(/\[[^\]]+\]/);
   expect(text).not.toMatch(/lorem|john doe/i);
-  // The only digits on the page are the step numbers and "under 18": no counts, no stats (DESIGN.md §12).
-  expect(text.replace(/\b0[123]\b|\b18\b/g, "").match(/\d+/g)).toBeNull();
+  expect(digitsIn(text)).toBeNull();
   await expect(page.getByRole("region", { name: /Live in/ })).toHaveCount(0);
 });
 

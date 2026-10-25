@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { PAGES } from "../src/content/pages";
 import { APP } from "./support";
 
 const TILES = [
@@ -24,12 +25,28 @@ for (const t of TILES) {
     await expect(tile).toHaveAttribute("href", `${APP}/join?role=${t.role}&src=landing-home`);
   });
 
-  test(`header link ${t.who} jumps to its tile`, async ({ page }) => {
-    await page.getByRole("navigation", { name: "Audiences" }).getByRole("link", { name: t.who }).click();
-    await expect(page).toHaveURL(new RegExp(`#${t.id}$`));
-    await expect(page.locator(`a#${t.id}`)).toBeInViewport();
+}
+
+for (const p of PAGES) {
+  test(`header link ${p.who} opens /${p.slug}/ and is marked as the current page`, async ({ page }) => {
+    await page.getByRole("navigation", { name: "Audiences" }).getByRole("link", { name: p.who }).click();
+    await expect(page).toHaveURL(new RegExp(`/${p.slug}/$`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(p.headline);
+    await expect(page.getByRole("navigation", { name: "Audiences" }).locator("[aria-current=page]")).toHaveText(p.who);
   });
 }
+
+test("a campaign ?src= is carried into the hero button and every tile", async ({ page }) => {
+  await page.goto("/?src=campaign-1");
+  await expect(page.getByRole("region", { name: "Introduction" }).getByRole("link", { name: "Join the beta" })).toHaveAttribute("href", `${APP}/join?src=campaign-1`);
+  for (const t of TILES) await expect(page.locator(`a#${t.id}`)).toHaveAttribute("href", `${APP}/join?role=${t.role}&src=campaign-1`);
+});
+
+test("an invalid ?src= is ignored", async ({ page }) => {
+  await page.goto("/?src=Bad%20Value!");
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByRole("region", { name: "Introduction" }).getByRole("link", { name: "Join the beta" })).toHaveAttribute("href", `${APP}/join?src=landing-home`);
+});
 
 test("exactly one primary button on the page", async ({ page }) => {
   const primaries = await page.evaluate(() => {

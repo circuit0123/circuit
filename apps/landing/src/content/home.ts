@@ -1,4 +1,5 @@
 import type { Role } from "@/lib/env";
+import type { FaqItem, Step } from "./types";
 
 export const SRC = "landing-home";
 
@@ -11,14 +12,13 @@ export const AUDIENCES: ReadonlyArray<{ role: Role; id: string; who: string; lin
   { role: "partner", id: "partners", who: "Partners", line: "See what your ecosystem is missing, and fix it.", cta: "Bring Circuit to your campus" },
 ];
 
-/** `shot` is the file in public/shots (without extension); null = the screen doesn't exist in the app yet, so a labelled placeholder is shown. */
-export const STEPS: ReadonlyArray<{ n: string; title: string; body: string; shot: string | null; alt: string; missing: string }> = [
+export const STEPS: ReadonlyArray<Step> = [
   { n: "01", title: "Say what you need and offer", body: "Paste a bio. We suggest your skills; you confirm them in a few taps.", shot: null, alt: "", missing: "You offer" },
   { n: "02", title: "Get three matches a day", body: "Each one comes with the reason and the mutual connection who can introduce you.", shot: "daily-drop", alt: "The Daily Drop in the Circuit app: a person to meet, with the reason they match you and an Intro me button.", missing: "Daily Drop" },
   { n: "03", title: "Meet through people you trust", body: "Warm intros and three-way circuits where everyone helps someone.", shot: null, alt: "", missing: "Circuit ring" },
 ];
 
-export const FAQ: ReadonlyArray<{ q: string; a: string }> = [
+export const FAQ: ReadonlyArray<FaqItem> = [
   { q: "Is Circuit free?", a: "Yes for students, founders, mentors and investors. Startups can pay to promote a role, always labelled as promoted." },
   { q: "Why is it invite-only?", a: "We are starting with one city and one partner college so every match is worth your time." },
   { q: "What do you do with my data?", a: "We use it to match you. We never sell it, and you can export or delete it any time from Settings." },
@@ -33,3 +33,9 @@ export const WAITLIST_ROLES: ReadonlyArray<{ value: Role; label: string }> = [
   { value: "investor", label: "Investor" },
   { value: "partner", label: "Partner (college, incubator, programme)" },
 ];
+
+/** What the waitlist form says while the app has no /join screen yet (NEXT_PUBLIC_JOIN_LIVE off). */
+export const INVITE_ONLY = {
+  heading: "Circuit is invite-only right now",
+  copy: "Join the waitlist and we\u2019ll send you an invite.",
+} as const;

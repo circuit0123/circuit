@@ -96,7 +96,7 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 |---|---|
 | `make test` | Backend tests (pytest) |
 | `make test-web` | Frontend type check (Playwright + axe arrive with Stage 4) |
-| `make test-landing` | Landing site tests: builds the static site with test URLs, serves it on :3101 and runs Playwright at 375px and 1280px in both themes (CTA links with role and src, waitlist success/duplicate/error/rate-limit with a mocked API, reduced motion, axe, SEO tags, DESIGN.md premium rules). No backend needed; the first run takes about a minute |
+| `make test-landing` | Landing site tests: builds the static site three times with test URLs (every feature flag on and `NEXT_PUBLIC_JOIN_LIVE=true` on :3101; flags off with the switch on, :3102; flags on with the switch off, the default, :3103; the flags come from a mock `/api/config`) and runs Playwright at 375px and 1280px in both themes: home and the five audience pages (CTA role and src, `?src=` carry-through, both flag-off fallbacks, the join switch (no button leads to a 404 in either mode), the waitlist and partner forms with a mocked API, reduced motion, axe, SEO tags, DESIGN.md premium rules). No backend needed; a run takes about four minutes |
 | `make e2e [SPEC=premium]` | Playwright journeys and design checks at 375px and 1280px, signed in as demo personas. Needs `make dev` running. `SPEC=premium` runs only `apps/app/tests/premium.spec.ts` (DESIGN.md §13: spacing, one primary button, accent budget, type sizes, truncation) and writes a report to `screenshots/premium/report/` |
 | `make lint` | ruff (check + format check), mypy, ESLint (prettier is not installed yet) |
 | `make fmt` | Auto-format Python with ruff (TypeScript formatting arrives with prettier) |
