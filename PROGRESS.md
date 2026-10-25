@@ -197,7 +197,7 @@ Not exercised: `admin-user` interactively (unit-tested with a mocked password pr
 - **Audience tiles:** hover or keyboard focus lifts 2px and nudges the arrow 4px; press scales to 0.98. **Buttons:** press scales to 0.97. Both use the default spring (`duration: 0.35, bounce: 0`). When the motion code runs it turns off the old CSS press scale so two scales never stack (`html[data-motion]`).
 - **FAQ:** the answer fades in and rises 8px as it opens, and fades out before it closes; the + turns to × (350ms). See decision 1.
 - **Rules kept:** only `transform`, `opacity` and `stroke-dashoffset` are animated (a test checks every animation and every CSS keyframe); everything plays once; `prefers-reduced-motion: reduce` runs none of it (no animation, nothing hidden, no arch, `getAnimations()` is empty).
-- **Library:** `motion` (`motion/mini` for the animations, plus its small `inView`, `hover`, `press` helpers). One client component, `LandingMotion.tsx`, mounted in the layout; the page components only gained `data-*` hooks. Landing JavaScript: +7.9 KB brotli (165.8 → 173.7 KB across all chunks).
+- **Library:** `motion` (`motion/mini` for the animations, plus its small `inView`, `hover`, `press` helpers). One client component, `LandingMotion.tsx`, mounted in the layout; the page components only gained `data-*` hooks. Landing JavaScript: +9.3 KB brotli (165.8 → 175.1 KB across all chunks).
 
 **Lighthouse (mobile, simulated slow 4G, brotli-compressed server, 3 runs per page, 25 Oct 2026)**
 
@@ -222,7 +222,8 @@ Every score stays ≥ 96, so ≥ 95 holds, though investors is the tightest (it 
 2. **The hero is CSS, not `motion`**, for the LCP reason above. It uses a fixed ease-out curve close to the default spring (a spring without overshoot), not the spring itself.
 3. **The first scroll-reveal frame:** a section is hidden only after the page's JavaScript runs, and only if it is below the fold, so nothing flashes; a visitor who scrolls extremely fast before that moment just sees the content.
 4. **Phone arch:** on a phone the steps are stacked about 700px apart, so the arch is a long thin line in the left gutter. It reads as a connector but you may prefer something else there; the desktop arch is the intended look.
-5. Not done on purpose: a real-phone test (DESIGN.md §13) and Lighthouse on the deployed site (Stage 5). `make test-landing` leaves a stale mock on port 3201 if one is already running (yours from `make dev`); harmless, the builds use it.
+5. **Spring fix after first push:** `motion/mini` rejects `type: "spring"` as a string (a development-only error, "Mini animate() doesn't support type as a string"); in a production build it was silently turned into a plain 300ms ease-out, so my first push was not using the spring. It now passes the `spring` generator from `motion`. A test checks the animations carry a CSS `linear()` spring curve, and I confirmed the dev error is gone on all six pages (and that putting the string back brings it back). The Lighthouse table was measured before this one-line change (+1.4 KB JS); I did not re-run it.
+6. Not done on purpose: a real-phone test (DESIGN.md §13) and Lighthouse on the deployed site (Stage 5). `make test-landing` leaves a stale mock on port 3201 if one is already running (yours from `make dev`); harmless, the builds use it.
 
 ## L2 — The five audience pages (`landing-pages`, from `frontend-landing`): done, waiting for your OK
 

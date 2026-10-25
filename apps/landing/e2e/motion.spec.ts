@@ -99,12 +99,14 @@ test.describe("normal motion", () => {
     test(`${path}: hero words rise once and end at rest; reveals, arch and FAQ play once`, async ({ page }) => {
       // Record every property any animation touches (script-driven ones here; the CSS keyframes are read from the stylesheet below).
       await page.addInitScript(() => {
-        const w = window as unknown as { __props: Set<string>; __calls: number };
+        const w = window as unknown as { __props: Set<string>; __easings: Set<string>; __calls: number };
         w.__props = new Set();
+        w.__easings = new Set();
         w.__calls = 0;
         const original = Element.prototype.animate;
         Element.prototype.animate = function (keyframes, options) {
           w.__calls++;
+          if (options && typeof options === "object" && typeof options.easing === "string") w.__easings.add(options.easing);
           const list = Array.isArray(keyframes) ? keyframes : [keyframes ?? {}];
           for (const k of list) for (const key of Object.keys(k)) if (key !== "offset" && key !== "easing" && key !== "composite") w.__props.add(key);
           return original.call(this, keyframes, options);
@@ -154,6 +156,10 @@ test.describe("normal motion", () => {
       await page.waitForTimeout(600);
       expect(await page.evaluate(() => (window as unknown as { __calls: number }).__calls), "animations started on the second pass").toBe(before);
       expect(await page.locator(REVEALABLE).evaluateAll((els) => els.filter((el) => getComputedStyle(el).opacity !== "1").length)).toBe(0);
+
+      // The default spring is really applied (a CSS linear() curve), not silently replaced by a plain ease-out.
+      const easings = await page.evaluate(() => [...(window as unknown as { __easings: Set<string> }).__easings]);
+      expect(easings.some((e) => e.startsWith("linear(")), `easings seen: ${easings.join(" | ")}`).toBe(true);
 
       // Only transform, opacity and stroke-dashoffset, in script-driven animations and in the CSS keyframes.
       const props = await page.evaluate(() => [...(window as unknown as { __props: Set<string> }).__props]);

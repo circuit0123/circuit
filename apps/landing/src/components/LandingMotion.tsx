@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { animate } from "motion/mini";
-import { hover, inView, press } from "motion";
+import { hover, inView, press, spring } from "motion";
 
 /**
  * Landing site motion (DESIGN.md §7), switched on once the page has loaded. Renders nothing.
@@ -12,8 +12,8 @@ import { hover, inView, press } from "motion";
  * (The hero headline is plain CSS in globals.css, so it starts at first paint without waiting for this code.)
  */
 
-/** The default spring of DESIGN.md §7. */
-const SPRING = { type: "spring", duration: 0.35, bounce: 0 } as const;
+/** The default spring of DESIGN.md §7. `motion/mini` needs the spring generator itself: the string "spring" is rejected in development and silently turned into a plain ease-out in production. */
+const SPRING = { type: spring, duration: 0.35, bounce: 0 } as const;
 const RISE = 12;
 const REVEAL_STAGGER = 0.04;
 const REVEAL_STAGGERED = 6;
