@@ -12,7 +12,7 @@ endef
 
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
-	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web e2e lint fmt check \
+	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
 	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback
 
 help: ## List every command
@@ -156,6 +156,9 @@ test-web: ## Frontend type check (Playwright + axe arrive with Stage 4)
 	pnpm typecheck
 	@echo "note: Playwright and axe tests are not set up yet (LAUNCH.md Stage 4)."
 
+test-landing: ## Landing site: build, serve and run Playwright (CTAs, waitlist, reduced motion, axe, premium rules). No backend needed
+	pnpm --filter @circuit/landing exec playwright test
+
 e2e: ## Playwright (needs `make dev` running). SPEC=premium runs only the design checks
 	pnpm --filter @circuit/app exec playwright test $(if $(SPEC),$(SPEC),)
 
@@ -166,7 +169,7 @@ lint: ## ruff, mypy, ESLint
 fmt: ## Auto-format Python (prettier is not installed yet)
 	$(BACKEND) ruff check . --fix && $(BACKEND) ruff format .
 
-check: lint test test-web ## Everything: lint, tests with demo story PASS/FAIL, frontend types. Green before any push
+check: lint test test-web test-landing ## Everything: lint, tests with demo story PASS/FAIL, frontend types, landing tests. Green before any push
 
 smoke: ## Check a deployed environment (not built yet)
 	$(call not_yet,smoke,Stage 5 (deploy staging and demo))

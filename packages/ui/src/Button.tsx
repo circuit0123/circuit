@@ -36,3 +36,18 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
     </button>
   );
 });
+
+type LinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & { variant?: ButtonVariant };
+
+/** A link that looks like a Button (50px on every screen size): for calls to action that leave the page, e.g. on the landing site. */
+export function LinkButton({ variant = "secondary", className, children, ...rest }: LinkProps) {
+  return (
+    <a
+      data-press
+      className={cx("inline-flex min-h-[50px] items-center justify-center gap-2 rounded-control px-7 t-body font-semibold transition-transform active:scale-[0.97]", variants[variant], className)}
+      {...rest}
+    >
+      {children}
+    </a>
+  );
+}

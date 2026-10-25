@@ -15,3 +15,8 @@ coverage/
 
 # Output of apps/app/tests/premium.spec.ts
 /screenshots/premium/report/
+
+# Landing build output and test artefacts
+/apps/landing/out/
+/apps/landing/test-results/
+/apps/landing/playwright-report/
