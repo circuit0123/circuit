@@ -70,7 +70,7 @@ export function DropStack({ cards, onAnswer, doneText, className }: Props) {
         <TopCard key={top.id} ref={topRef} card={top} onThrow={(a) => answer(top.id, a)} />
       </div>
       <div className="mt-6 flex items-center gap-3">
-        <Button variant="ghost" className="px-4" icon={<X size={20} strokeWidth={1.75} />} onClick={() => topRef.current?.throw("skip")}>Skip</Button>
+        <Button variant="text" className="px-4" icon={<X size={20} strokeWidth={1.75} />} onClick={() => topRef.current?.throw("skip")}>Skip</Button>
         <Button variant="primary" className="flex-1" icon={<UserPlus size={20} strokeWidth={1.75} />} onClick={() => topRef.current?.throw("intro")}>Intro me</Button>
       </div>
     </section>

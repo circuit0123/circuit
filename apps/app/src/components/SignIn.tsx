@@ -111,7 +111,7 @@ export function SignIn() {
             <>
               <Button variant="primary" className="w-full" disabled={sb.google.isPending} onClick={google}>Continue with Google</Button>
               {googleError && <p role="alert" className="t-footnote text-danger">{googleError}</p>}
-              <Button variant="ghost" className="w-full" onClick={() => go("email")}>Use email instead</Button>
+              <Button variant="text" className="w-full" onClick={() => go("email")}>Use email instead</Button>
               <Legal />
             </>
           }
@@ -137,7 +137,7 @@ export function SignIn() {
           subhead={`We sent a 6-digit code to ${email.trim()}.`}
           onBack={() => go("email")}
           footer={
-            <Button variant="ghost" className="w-full" disabled={wait > 0 || sb.sendCode.isPending} onClick={() => sendCode()}>
+            <Button variant="text" className="w-full" disabled={wait > 0 || sb.sendCode.isPending} onClick={() => sendCode()}>
               {wait > 0 ? `Resend in ${wait}s` : "Resend code"}
             </Button>
           }

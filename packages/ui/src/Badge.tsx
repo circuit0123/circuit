@@ -23,7 +23,7 @@ const pill = "inline-flex items-center gap-1 rounded-full px-2 py-0.5 t-footnote
 
 export function BridgeBadge({ className }: { className?: string }) {
   return (
-    <span className={cx(pill, "bg-bridge/15 text-bridge", className)}>
+    <span className={cx(pill, "bg-surface-2 text-bridge", className)}>
       <Waypoints size={12} strokeWidth={1.75} aria-hidden />
       Bridge match
     </span>
@@ -31,12 +31,12 @@ export function BridgeBadge({ className }: { className?: string }) {
 }
 
 export function HiringBadge({ className }: { className?: string }) {
-  return <span className={cx(pill, "bg-live/15 text-live", className)}>Hiring</span>;
+  return <span className={cx(pill, "bg-surface-3 text-live", className)}>Hiring</span>;
 }
 
 export function PrivateBadge({ className }: { className?: string }) {
   return (
-    <span className={cx(pill, "bg-surface-2 text-text-muted", className)}>
+    <span className={cx(pill, "bg-surface-3 text-text-muted", className)}>
       <Lock size={12} strokeWidth={1.75} aria-hidden />
       Private
     </span>

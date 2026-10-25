@@ -2,7 +2,7 @@
 
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { motion, useReducedMotion } from "motion/react";
-import { ActivityCard, BottomSheet, Button, CaughtUp, FeedItem, PostCard, RoleCard, Section, Skeleton, spring, useToast, type ReactionKind } from "@circuit/ui";
+import { ActivityCard, Sheet, Button, CaughtUp, FeedItem, PostCard, RoleCard, Section, Skeleton, spring, useToast, type ReactionKind } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadFailed, useMarkPulseSeen, usePulse, useReact, useReport, type PulseEntry } from "@/data";
@@ -84,7 +84,7 @@ export function Pulse() {
       </div>
       {q.isFetchingNextPage && <PulseSkeleton />}
       {caughtUp && <CaughtUp onDiscover={() => router.push("/discover")} onEarlier={earlier ? undefined : () => setEarlier(true)} />}
-      <BottomSheet open={menu !== null} onClose={() => setMenu(null)} title="Report this post">
+      <Sheet open={menu !== null} onClose={() => setMenu(null)} title="Report this post">
         <ul className="flex flex-col gap-2">
           {REASONS.map((r) => (
             <li key={r}>
@@ -103,7 +103,7 @@ export function Pulse() {
             </li>
           ))}
         </ul>
-      </BottomSheet>
+      </Sheet>
     </Section>
   );
 }

@@ -1,13 +1,13 @@
 import { forwardRef } from "react";
 import { cx } from "./cx";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
+export type ButtonVariant = "primary" | "secondary" | "text" | "destructive";
 
 const variants: Record<ButtonVariant, string> = {
   primary: "bg-primary text-on-primary",
   secondary: "bg-surface-2 text-text",
-  ghost: "bg-transparent text-text",
-  destructive: "bg-surface-2 text-danger",
+  text: "bg-transparent text-text",
+  destructive: "bg-surface text-danger",
 };
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {

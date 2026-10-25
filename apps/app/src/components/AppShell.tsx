@@ -1,30 +1,26 @@
 "use client";
 
-import { CircleDot, Compass, Home as HomeIcon, MessageCircle, UserRound } from "lucide-react";
-import { TabBar, TabPager, cx, type PagerTab, type TabItem } from "@circuit/ui";
+import { TabBar, TabPager, cx, memberTabs, type PagerTab } from "@circuit/ui";
 import { useMotionValue } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFeatures, useMe, useUnreadCount } from "@/data";
 import { useDesktop } from "@/hooks/useDesktop";
-import { DevBar } from "./DevBar";
 import { Discover } from "./discover/Discover";
 import { Home, NotificationsBell } from "./home/Home";
 import { HomeRail } from "./home/Rail";
 import { Inbox } from "./inbox/Inbox";
 import { Profile } from "./profile/Profile";
 
-type Def = { id: string; label: string; href: string; Icon: typeof HomeIcon; node: React.ReactNode; feature?: "circuits" };
-
-/** All tabs the app can draw, in bar order. `circuits` has no screens yet, so the features hook keeps it hidden. */
-const DEFS: Def[] = [
-  { id: "home", label: "Home", href: "/", Icon: HomeIcon, node: <Home /> },
-  { id: "discover", label: "Discover", href: "/discover", Icon: Compass, node: <Discover /> },
-  { id: "circuits", label: "Circuits", href: "/circuits", Icon: CircleDot, node: null, feature: "circuits" },
-  { id: "inbox", label: "Inbox", href: "/inbox", Icon: MessageCircle, node: <Inbox /> },
-  { id: "profile", label: "Profile", href: "/profile", Icon: UserRound, node: <Profile /> },
-];
+/** The screen behind each tab id. A tab with no screens yet (Circuits, until its session) has no node, so the features hook keeps it hidden. */
+const NODES: Record<string, React.ReactNode> = {
+  home: <Home />,
+  discover: <Discover />,
+  circuits: null,
+  inbox: <Inbox />,
+  profile: <Profile />,
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const features = useFeatures();
@@ -34,29 +30,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
 
-  const defs = DEFS.filter((d) => !d.feature || features.on(d.feature));
-  const fromPath = defs.find((d) => d.href === path)?.id ?? null;
+  // Bar order and labels come from the shared preset. `features.on` is false for anything the server has off or the app has no screens for.
+  const tabs = memberTabs({ circuits: features.on("circuits"), inboxDot: false });
+  const fromPath = tabs.find((t) => t.href === path)?.id ?? null;
   const [picked, setPicked] = useState<string | null>(fromPath);
   useEffect(() => { setPicked(fromPath); }, [fromPath]); // eslint-disable-line react-hooks/set-state-in-effect
   const active = fromPath === null ? null : picked;
-  const progress = useMotionValue(Math.max(0, defs.findIndex((d) => d.id === active)));
+  const progress = useMotionValue(Math.max(0, tabs.findIndex((t) => t.id === active)));
 
   const select = (id: string) => {
-    const d = defs.find((x) => x.id === id);
+    const d = tabs.find((x) => x.id === id);
     if (!d) return;
     if (id === active) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     setPicked(id);
     router.push(d.href, { scroll: false });
   };
 
-  const tabs: TabItem[] = defs.map((d) => ({ id: d.id, label: d.label, href: d.href, icon: <d.Icon size={24} strokeWidth={1.75} aria-hidden />, dot: d.id === "inbox" ? false : undefined }));
-  const panes: PagerTab[] = defs.map((d) => ({ id: d.id, node: d.node }));
+  const panes: PagerTab[] = tabs.map((t) => ({ id: t.id, node: NODES[t.id] }));
   const pushed = active === null;
   const rail = !pushed && desktop && active === "home" ? <HomeRail /> : null;
 
   return (
-    <div className="min-h-dvh">
-      <DevBar />
+    <div id="app-root" className="min-h-dvh">
       {/* Desktop left rail: the same destinations as the bar. */}
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col gap-2 border-r border-separator px-4 py-6 lg:flex" style={{ top: "var(--dev-bar, 0px)" }}>
         <Link href="/" className="t-title2 mb-6 px-3">Circuit</Link>
@@ -83,7 +78,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="lg:pl-60">
         <div className="mx-auto flex w-full max-w-[1036px] justify-center gap-12 lg:px-6">
-          <main className="w-full min-w-0 overflow-x-clip pb-24 lg:max-w-[600px] lg:pb-12">
+          <main data-page-behind className="w-full min-w-0 overflow-x-clip pb-[calc(88px+env(safe-area-inset-bottom))] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] lg:max-w-[600px] lg:p-0 lg:pb-12">
             <TabPager className="min-h-dvh overflow-x-clip" tabs={panes} value={active} progress={progress} swipe={!!me?.appearance.swipeTabs && !desktop && !pushed} onSwipe={(id) => select(id)} />
             {pushed && children}
           </main>

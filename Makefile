@@ -45,8 +45,8 @@ app: ## Only the product app on :3000
 landing: ## Only the landing site on :3001
 	pnpm --filter @circuit/landing dev
 
-mock: ## App on mock data, no backend (not built yet)
-	$(call not_yet,mock,the frontend data layer session)
+mock: ## App on mock data on :3000, no backend and no login. Switch scenario in the banner, or add ?scenario=empty to the address
+	pnpm --filter @circuit/app dev:mock
 
 up: ## Start Postgres + Redis containers
 	docker compose up -d --wait
@@ -152,15 +152,20 @@ eval: ## Matching eval set against tests/eval/pairs.json
 test: ## Backend tests (pytest)
 	$(BACKEND) pytest -p no:cacheprovider
 
-test-web: ## Frontend type check (Playwright + axe arrive with Stage 4)
+test-web: ## Frontend: type check, the "only src/data talks to the backend" rule, then Playwright on mock mode (design checks, TabPager touch tests, 404/500, scenarios, PWA, /design, axe). No backend needed
 	pnpm typecheck
-	@echo "note: Playwright and axe tests are not set up yet (LAUNCH.md Stage 4)."
+	pnpm --filter @circuit/app test:boundary
+	pnpm --filter @circuit/app test:mock
 
 test-landing: ## Landing site: build, serve and run Playwright (CTAs, waitlist, reduced motion, axe, premium rules). No backend needed
 	pnpm --filter @circuit/landing exec playwright test
 
-e2e: ## Playwright (needs `make dev` running). SPEC=premium runs only the design checks
-	pnpm --filter @circuit/app exec playwright test $(if $(SPEC),$(SPEC),)
+e2e: ## Playwright journeys against the real API (needs `make dev` running): sign-in and shell. SPEC=premium runs only the design checks (on mock mode, no backend needed)
+ifeq ($(SPEC),)
+	pnpm --filter @circuit/app exec playwright test
+else
+	pnpm --filter @circuit/app exec playwright test -c playwright.mock.config.ts $(SPEC)
+endif
 
 lint: ## ruff, mypy, ESLint
 	$(BACKEND) ruff check . && $(BACKEND) ruff format --check . && $(BACKEND) mypy .

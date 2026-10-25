@@ -44,7 +44,7 @@ Stop everything with Ctrl+C, then `make down`.
 | `make api` | Only the Django API on :8000 |
 | `make app` | Only the product app on :3000 |
 | `make landing` | Only the landing site on :3001 |
-| `make mock` | App on :3000 against mock data (no backend, no login). Not available until the frontend data-layer session |
+| `make mock` | App on :3000 against mock data: no backend, no login, you are signed in as Ravi Kumar. The banner at the top switches scenario (default, empty, loading, error, slow 3G, beta access missing, features off, under 18) and theme; `?scenario=empty` in the address does the same. The data is temporary and typed against openapi.json (`apps/app/src/data/mocks/`; B7 replaces it with the contract fixtures). `/design` shows every component in both themes and all six accents |
 | `make up` / `make down` | Start / stop Postgres + Redis containers |
 | `make logs` | Follow container logs |
 | `make shell` | Django shell (`manage.py shell`) |
@@ -95,9 +95,9 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 | Command | What it does |
 |---|---|
 | `make test` | Backend tests (pytest) |
-| `make test-web` | Frontend type check (Playwright + axe arrive with Stage 4) |
+| `make test-web` | Frontend: type check, the "only `src/data` talks to the backend" ESLint rule (`apps/app/tests/boundary.test.mjs`), then Playwright on mock mode at 375px and 1280px (no backend needed, about 3 minutes): the DESIGN.md §13 design checks, TabPager touch tests, sheet detents, first paint and accents, 404/500, every mock scenario, the PWA manifest, `/design` with axe |
 | `make test-landing` | Landing site tests: builds the static site three times with test URLs (every feature flag on and `NEXT_PUBLIC_JOIN_LIVE=true` on :3101; flags off with the switch on, :3102; flags on with the switch off, the default, :3103; the flags come from a mock `/api/config`) and runs Playwright at 375px and 1280px in both themes: home and the five audience pages (CTA role and src, `?src=` carry-through, both flag-off fallbacks, the join switch (no button leads to a 404 in either mode), the waitlist and partner forms with a mocked API, reduced motion, axe, SEO tags, DESIGN.md premium rules). No backend needed; a run takes about four minutes |
-| `make e2e [SPEC=premium]` | Playwright journeys and design checks at 375px and 1280px, signed in as demo personas. Needs `make dev` running. `SPEC=premium` runs only `apps/app/tests/premium.spec.ts` (DESIGN.md §13: spacing, one primary button, accent budget, type sizes, truncation) and writes a report to `screenshots/premium/report/` |
+| `make e2e [SPEC=premium]` | Playwright journeys against the real API (sign-in and the shell, `apps/app/e2e/`), signed in as demo personas. Needs `make dev` running. `SPEC=premium` (or any other spec name from `apps/app/tests/`) runs just that spec on mock mode, no backend needed; `premium` writes its report to `screenshots/premium/report/` |
 | `make lint` | ruff (check + format check), mypy, ESLint (prettier is not installed yet) |
 | `make fmt` | Auto-format Python with ruff (TypeScript formatting arrives with prettier) |
 | `make check` | lint + backend tests with demo stories PASS/FAIL + frontend type check + landing tests. Must be green before any push |

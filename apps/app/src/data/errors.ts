@@ -23,3 +23,6 @@ export function problemOf(e: unknown): Problem {
 
 /** Sentence for an error state: what happened and what to do (DESIGN.md §9). */
 export const loadFailed = (what: string) => `Couldn't load ${what}. Check your connection and pull to refresh.`;
+
+/** For screens: the problem behind a failed query or mutation, or null. `kind === "network"` means show an ErrorState with Try again. */
+export const useProblem = (error: unknown): Problem | null => (error ? problemOf(error) : null);

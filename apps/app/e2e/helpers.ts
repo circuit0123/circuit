@@ -21,10 +21,12 @@ export async function signInAs(ctx: BrowserContext, persona: string) {
 export const isPhone = (info: TestInfo) => info.project.name === "phone";
 
 /** No horizontal page scroll, and no axe violations. */
-export async function checkPage(page: Page, label: string) {
+export async function checkPage(page: Page, label: string, opts: { exclude?: string[] } = {}) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(overflow, `${label}: horizontal overflow`).toBe(false);
-  const axe = await new AxeBuilder({ page }).analyze();
+  const builder = new AxeBuilder({ page });
+  for (const sel of opts.exclude ?? []) builder.exclude(sel);
+  const axe = await builder.analyze();
   expect(axe.violations.map((v) => `${v.id} (${v.impact}) x${v.nodes.length}`), `${label}: axe`).toEqual([]);
 }
 

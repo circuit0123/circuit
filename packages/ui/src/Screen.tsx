@@ -2,67 +2,11 @@
 
 import { ChevronLeft } from "lucide-react";
 import { animate, motion, useMotionValue, useReducedMotion } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { cx } from "./cx";
+import { LargeTitleHeader } from "./LargeTitleHeader";
 import { fade, pushSpring } from "./theme";
-
-/** Fades the inline title and hairline in as the large title scrolls under the bar. Tied to scroll position, not time. */
-function useCollapse(ref: React.RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      if (!el.offsetParent) return; // pane is hidden
-      const c = Math.min(1, Math.max(0, (window.scrollY - 8) / 32));
-      el.style.setProperty("--collapse", String(c));
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
-  }, [ref]);
-}
-
-type BarProps = {
-  /** Inline title; it appears as the large title collapses. */
-  title?: string;
-  left?: React.ReactNode;
-  right?: React.ReactNode;
-  /** Hide on desktop, where the left rail and the large title do the job. */
-  mobileOnly?: boolean;
-  className?: string;
-};
-
-/** Translucent top bar (DESIGN.md §5 Materials). 44px plus the top safe area. */
-export function ScreenBar({ title, left, right, mobileOnly, className }: BarProps) {
-  const ref = useRef<HTMLElement>(null);
-  useCollapse(ref);
-  return (
-    <header
-      ref={ref}
-      className={cx("material sticky top-0 z-20 grid min-h-11 grid-cols-[1fr_auto_1fr] items-center px-2 pt-[env(safe-area-inset-top)]", mobileOnly && "lg:hidden", className)}
-      style={{ "--collapse": 0 } as React.CSSProperties}
-    >
-      <div className="flex justify-start">{left}</div>
-      <div className="min-w-0 text-center">
-        {title && <span className="t-headline block truncate" style={{ opacity: "var(--collapse)" }}>{title}</span>}
-      </div>
-      <div className="flex justify-end">{right}</div>
-      <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-separator" style={{ opacity: "var(--collapse)" }} />
-    </header>
-  );
-}
-
-/** A 44px round icon button for bars. Always has a label for screen readers. */
-export function BarButton({ label, children, ...rest }: { label: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button type="button" aria-label={label} className="relative flex h-11 w-11 items-center justify-center rounded-full active:opacity-80" {...rest}>
-      {children}
-    </button>
-  );
-}
+import { BarButton, TopBar } from "./TopBar";
 
 /**
  * A top-level tab screen (DESIGN.md §5 "Large titles"): the bar, then a Large title that collapses into the bar on scroll, with 8px
@@ -71,10 +15,10 @@ export function BarButton({ label, children, ...rest }: { label: string } & Reac
 export function Screen({ title, left, right, children, className }: { title: string; left?: React.ReactNode; right?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
     <>
-      <ScreenBar title={title} left={left} right={right} mobileOnly />
+      <TopBar title={title} left={left} right={right} mobileOnly />
       {/* The first block sits 8px under the title (the h1's padding), not a section gap away. */}
       <div className={cx("[&>h1+*]:mt-0", className)}>
-        <h1 className="t-large px-4 pb-2 pt-1 lg:px-0 lg:pt-8">{title}</h1>
+        <LargeTitleHeader title={title} />
         {children}
       </div>
     </>

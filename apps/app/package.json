@@ -4,10 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
+    "dev:mock": "NEXT_PUBLIC_MOCK=1 NEXT_PUBLIC_ENV=dev NEXT_PUBLIC_API_URL=http://localhost:3000 NEXT_DIST_DIR=.next-mock next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test:boundary": "node --test tests/boundary.test.mjs",
+    "test:mock": "playwright test -c playwright.mock.config.ts"
   },
   "dependencies": {
     "@circuit/api-client": "workspace:*",
@@ -32,6 +35,7 @@
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.4.0",
+    "msw": "^3.0.3",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.0"
   }

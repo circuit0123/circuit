@@ -55,7 +55,7 @@ export function CaughtUp({ onEarlier, onDiscover }: { onEarlier?: () => void; on
       <p className="t-body max-w-[36ch] text-text-muted">That's everything from the last week. Look for people and startups near you in Discover.</p>
       <div className="mt-3 flex flex-wrap gap-3">
         <Button variant="secondary" onClick={onDiscover}>Go to Discover</Button>
-        {onEarlier && <Button variant="ghost" className="px-2" onClick={onEarlier}>See earlier this week</Button>}
+        {onEarlier && <Button variant="text" className="px-2" onClick={onEarlier}>See earlier this week</Button>}
       </div>
     </div>
   );

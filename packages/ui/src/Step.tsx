@@ -3,7 +3,7 @@
 import { ChevronLeft } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { cx } from "./cx";
-import { BarButton } from "./Screen";
+import { BarButton } from "./TopBar";
 import { fade, pushSpring } from "./theme";
 
 type StepProps = {
