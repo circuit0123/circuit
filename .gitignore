@@ -12,6 +12,8 @@ coverage/
 /apps/app/test-results/
 /apps/app/playwright-report/
 .next-e2e/
+.next-mock/
+.next-mock-e2e/
 
 # Output of apps/app/tests/premium.spec.ts
 /screenshots/premium/report/

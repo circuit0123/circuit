@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { fade, spring } from "./theme";
 
-type ToastInput = { text: string; undo?: () => void; ms?: number };
+type ToastInput = { text: string; undo?: () => void; ms?: number; tone?: "error" };
 type Item = ToastInput & { id: number };
 const Ctx = createContext<(t: ToastInput) => void>(() => {});
 export const useToast = () => useContext(Ctx);
@@ -29,7 +29,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           {item && (
             <motion.div
               key={item.id}
-              className="pointer-events-auto flex items-center gap-4 rounded-full bg-text py-2 pl-5 pr-2 text-bg shadow-lift"
+              className={`pointer-events-auto flex items-center gap-4 rounded-full py-2 pl-5 pr-2 text-bg shadow-lift ${item.tone === "error" ? "bg-danger" : "bg-text"}`}
               initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}

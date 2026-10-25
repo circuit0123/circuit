@@ -5,5 +5,9 @@ const config: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
   devIndicators: false,
   transpilePackages: ["@circuit/ui", "@circuit/api-client"],
+  turbopack: {
+    // Mock mode (`make mock`) imports "msw/browser", which has no Node entry. The server pass gets an empty stand-in.
+    resolveAlias: { "msw/browser": { browser: "./node_modules/msw/lib/browser/index.js", default: "./src/data/mocks/empty.ts" } },
+  },
 };
 export default config;

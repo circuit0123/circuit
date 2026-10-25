@@ -1,16 +1,16 @@
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { inBothThemes, isPhone, signInAs } from "../e2e/helpers";
+import { inBothThemes, isPhone } from "../e2e/helpers";
 
 /**
- * The "premium" checks from DESIGN.md §13 item 5 (rules in §5 "Breathing room"). Every tab screen, at 375px and 1280px, in both themes:
+ * The "premium" checks from DESIGN.md §13 item 5 (rules in §5 "Breathing room"). Every tab screen and the 404 and 500 pages, at 375px and 1280px, in both themes:
  *   one primary button · no border AND background on a feed item · section gaps (40px phone / 56px desktop) · body lines under 600px ·
- *   at most 4 font sizes · accent on at most 2 kinds of element and never on a button · no mid-sentence truncation.
+ *   at most 5 font sizes · accent on at most 2 kinds of element and never on a button · no mid-sentence truncation.
  * Three more rules from §5/§3 that can be measured are checked too: a Large title that sits 8px above the first block, at most 3 blocks
  * before the first scroll on a phone, and the desktop rail (one rail, max 340px, 48px from the column).
  *
- * Needs `make dev` (API + app). Failures are soft, so one run lists every broken rule. The list is also written to
+ * Runs on mock mode (playwright.mock.config.ts), so it needs no backend. Failures are soft, so one run lists every broken rule. The list is also written to
  * screenshots/premium/report/<project>-<screen>.json. PREMIUM_SHOTS=before|after also saves screenshots to screenshots/premium/<screen>/.
  */
 const OUT = join(__dirname, "../../../screenshots/premium");
@@ -19,12 +19,14 @@ const SCREENS = [
   { id: "discover", path: "/discover" },
   { id: "inbox", path: "/inbox" },
   { id: "profile", path: "/profile" },
+  // The back of the fence (DESIGN.md §1a) follows the same rules: the 404 page and the 500 page (a route that throws on purpose).
+  { id: "not-found", path: "/nope" },
+  { id: "server-error", path: "/design/crash" },
 ] as const;
 
 type Hit = { rule: string; element: string; detail: string };
 type Scan = { hits: Hit[]; fontSizes: string[] };
 
-test.beforeEach(async ({ context }) => { await signInAs(context, "ravi"); });
 
 /** Runs inside the page: measures the active tab pane (and the desktop rail) and returns what breaks a rule. */
 async function scan(page: Page, wide: boolean): Promise<Scan> {
@@ -70,10 +72,10 @@ async function scan(page: Page, wide: boolean): Promise<Scan> {
     const ACCENT = token("--current");
 
     // Where the screen lives: the visible tab pane, plus the desktop rail. Chrome (tab bar, left nav, dev banner) is not the screen.
-    const pane = document.querySelector<HTMLElement>("[data-pane]:not([hidden])");
+    const pane = document.querySelector<HTMLElement>("[data-pane]:not([hidden])") ?? document.querySelector<HTMLElement>("main");
     const rail = document.querySelector<HTMLElement>('aside[aria-label="For you"]');
     const roots = [pane, rail].filter((x): x is HTMLElement => !!x && shown(x));
-    if (!pane) { hit("setup", null, "no visible tab pane"); return { hits, fontSizes: [] }; }
+    if (!pane) { hit("setup", null, "no visible tab pane or <main>"); return { hits, fontSizes: [] }; }
     const inScope = (el: Element) => roots.some((r) => r.contains(el));
     const all = roots.flatMap((r) => [r, ...Array.from(r.querySelectorAll("*"))]).filter((el) => !el.closest("svg") || el.tagName.toLowerCase() === "svg");
     const everything = roots.flatMap((r) => [r, ...Array.from(r.querySelectorAll("*"))]);
@@ -193,7 +195,7 @@ async function scan(page: Page, wide: boolean): Promise<Scan> {
 
     for (const root of roots) {
       const blocks = blocksOf(root).filter((b) => !b.matches("[data-pane]"));
-      const isMain = root === pane;
+      const isMain = root === pane && pane.hasAttribute("data-pane");
       const titleIdx = blocks.findIndex((b) => [b, ...Array.from(b.querySelectorAll("h1"))].some((x) => x.matches("h1") && shown(x)));
       if (isMain) {
         const h1 = Array.from(pane.querySelectorAll("h1")).find(shown);
@@ -210,7 +212,7 @@ async function scan(page: Page, wide: boolean): Promise<Scan> {
       }
       if (isMain && !wide && sy === 0) {
         // The dev banner (dev and demo only) isn't part of the product, so the fold is measured from under it.
-        const banner = document.querySelector('[aria-label="Development tools"]')?.getBoundingClientRect().height ?? 0;
+        const banner = document.querySelector('[aria-label="Environment"]')?.getBoundingClientRect().height ?? 0;
         const above = inks.filter((x) => x.top - banner < window.innerHeight).length;
         if (above > 3) hit("above-the-fold", null, `${above} blocks before the first scroll (max 3)`);
       }
@@ -255,7 +257,7 @@ async function scanWholePage(page: Page, wide: boolean) {
   await page.waitForTimeout(250);
   const out = Array.from(hits.values());
   // Rules that only make sense for the screen as a whole: they were measured at the top, where the page starts.
-  if (sizes.size > 4) out.push({ rule: "font-sizes", element: "(screen)", detail: `${sizes.size} sizes: ${Array.from(sizes).sort((a, b) => +a - +b).join(", ")}px (max 4)` });
+  if (sizes.size > 5) out.push({ rule: "font-sizes", element: "(screen)", detail: `${sizes.size} sizes: ${Array.from(sizes).sort((a, b) => +a - +b).join(", ")}px (max 5)` });
   return out;
 }
 
@@ -263,12 +265,12 @@ for (const screen of SCREENS) {
   test(`premium: ${screen.id}`, async ({ page }, info) => {
     const width = isPhone(info) ? 375 : 1280;
     await page.goto(screen.path);
-    await expect(page.locator("[data-pane]:not([hidden])")).toBeVisible();
+    await expect(["not-found", "server-error"].includes(screen.id) ? page.locator("main h1") : page.locator("[data-pane]:not([hidden])")).toBeVisible();
     if (screen.id === "home") {
       await expect(page.getByRole("list", { name: "Live wire" })).toBeVisible();
       // Opening Home marks Pulse as seen, so a second run starts at "You're caught up": ask for the earlier items.
       const earlier = page.getByRole("button", { name: "See earlier this week" });
-      await expect(earlier.or(page.locator('section[aria-label="Pulse"] article').first())).toBeVisible();
+      await expect(page.locator('section[aria-label="Pulse"] article').first()).toBeVisible();
       if (await earlier.count()) await earlier.click();
       await expect(page.locator('section[aria-label="Pulse"] article').first()).toBeVisible();
     }

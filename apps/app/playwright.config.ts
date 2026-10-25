@@ -5,9 +5,10 @@ import { defineConfig, devices } from "@playwright/test";
  * Two projects: a 375px phone (touch) and a 1280px desktop. Screenshots land in /screenshots/frontend-core/.
  */
 export default defineConfig({
-  // e2e/ holds the journey tests; tests/ holds the design checks (premium.spec.ts, DESIGN.md §13).
+  // e2e/ holds the journey tests that need the real API and demo personas. The design checks and gesture tests in tests/ run on
+  // mock mode instead (playwright.mock.config.ts), so they need no backend.
   testDir: ".",
-  testMatch: ["e2e/**/*.spec.ts", "tests/**/*.spec.ts"],
+  testMatch: ["e2e/**/*.spec.ts"],
   timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,

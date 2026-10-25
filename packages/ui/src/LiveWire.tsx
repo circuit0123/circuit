@@ -123,7 +123,7 @@ export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
         <div className="relative flex h-11 items-center"><span className="absolute inset-x-0 top-1/2 h-[1.5px] -translate-y-1/2 bg-separator" aria-hidden /></div>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
           <p className="t-body text-text-muted">Quiet on the wire today</p>
-          {onEmptyAction && <Button variant="ghost" className="min-h-11 px-2" onClick={onEmptyAction}>Post a build log</Button>}
+          {onEmptyAction && <Button variant="text" className="min-h-11 px-2" onClick={onEmptyAction}>Post a build log</Button>}
         </div>
       </div>
     );

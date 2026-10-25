@@ -11,10 +11,9 @@ export type Persona = { key: string; name: string; role: string };
 
 /** Dev and demo only (F9): the people you can sign in as. Never asked for in staging or production. */
 export function usePersonas() {
-  const { token } = useSession();
   return useQuery({
     queryKey: ["personas"],
-    enabled: SHOW_DEV_TOOLS && !token,
+    enabled: SHOW_DEV_TOOLS,
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<Persona[]> =>
       (await unwrap(api.GET("/api/demo/personas"))).filter((p) => p.key !== "admin").map((p) => ({ key: p.key, name: p.display_name, role: roleLabel(p.role) })),

@@ -11,3 +11,4 @@ export * from "./notifications";
 export * from "./onboarding";
 export { DataProvider } from "./provider";
 export { useSession } from "./session";
+export { MOCK, SCENARIOS, currentScenario, switchScenario, type Scenario } from "./mocks/config";

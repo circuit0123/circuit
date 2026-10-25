@@ -36,8 +36,24 @@ function ownsHorizontalSwipe(start: EventTarget | null, root: HTMLElement): bool
   return false;
 }
 
+let locks = 0;
+/**
+ * A screen calls this while its own gestures need the whole surface (Discover's Map segment: the map owns every gesture there).
+ * Tab swiping is off for as long as any caller says `locked`.
+ */
+export function useTabSwipeLock(locked = true) {
+  useEffect(() => {
+    if (!locked) return;
+    locks += 1;
+    return () => { locks -= 1; };
+  }, [locked]);
+}
+
+/** A sheet, a menu or the on-screen keyboard is open, or a text field has focus: a sideways drag belongs to them (DESIGN.md §3). */
 const overlayOpen = () =>
-  !!document.querySelector('[aria-modal="true"]') ||
+  locks > 0 ||
+  !!document.querySelector('[aria-modal="true"], [role="menu"]') ||
+  !!document.activeElement?.matches("input, textarea, select, [contenteditable=\"true\"]") ||
   (window.visualViewport ? window.visualViewport.height < window.innerHeight - 120 : false);
 
 type Drag = {
