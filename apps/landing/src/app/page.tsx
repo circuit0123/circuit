@@ -8,7 +8,8 @@ import { HeroVideo } from "@/components/HeroVideo";
 import { HowItWorks } from "@/components/HowItWorks";
 import { PilotCity } from "@/components/PilotCity";
 import { Waitlist } from "@/components/Waitlist";
-import { FAQ, SRC, STEPS } from "@/content/home";
+import { FAQ, INVITE_ONLY, SRC, STEPS } from "@/content/home";
+import { JOIN_LIVE } from "@/lib/env";
 import { flagOn, getFeatures } from "@/lib/features";
 
 export default async function Page() {
@@ -28,10 +29,14 @@ export default async function Page() {
         <HowItWorks steps={STEPS} />
         {/* Hidden until real counts exist: no public stats endpoint yet, so nothing is passed (never fake numbers). */}
         <PilotCity stats={null} />
-        <Waitlist
-          src={SRC}
-          copy="We are opening Circuit one city and one college at a time. Leave your email and we’ll write when there’s a place for you."
-        />
+        {JOIN_LIVE ? (
+          <Waitlist
+            src={SRC}
+            copy="We are opening Circuit one city and one college at a time. Leave your email and we’ll write when there’s a place for you."
+          />
+        ) : (
+          <Waitlist src={SRC} heading={INVITE_ONLY.heading} copy={INVITE_ONLY.copy} />
+        )}
         <Faq items={FAQ} />
       </main>
       <Footer />

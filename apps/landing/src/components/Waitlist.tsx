@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef, useState, useEffect } from "react";
 import { Button } from "@circuit/ui/Button";
 import { WAITLIST_ROLES } from "@/content/home";
 import type { Role } from "@/lib/env";
+import { usePicked } from "@/lib/join";
 import { useSrc } from "@/lib/src";
 import { fieldClass, MESSAGES, useReady, useWaitlistSubmit } from "@/lib/waitlist";
 import { Container } from "./Container";
@@ -27,6 +29,18 @@ export function Waitlist({ src, role, layout = "section", heading = "Ask for an 
   const ready = useReady();
   const label = useSrc(src);
   const { busy, result, submit } = useWaitlistSubmit();
+  // The role button the visitor pressed (home tiles) is preselected; they can still change it.
+  const picked = usePicked();
+  const [chosen, setChosen] = useState<string | null>(null);
+  const email = useRef<HTMLInputElement>(null);
+  const seenClicks = useRef(picked.clicks);
+  useEffect(() => {
+    // A call to action was pressed since this form appeared: the page has scrolled here, so put the cursor in the first field.
+    if (picked.clicks !== seenClicks.current) {
+      seenClicks.current = picked.clicks;
+      email.current?.focus({ preventScroll: true });
+    }
+  }, [picked.clicks]);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,12 +62,12 @@ export function Waitlist({ src, role, layout = "section", heading = "Ask for an 
           <legend className="sr-only">Join the waitlist</legend>
           <label className="flex flex-col gap-2 t-subhead text-text-muted">
             Email
-            <input name="email" type="email" required autoComplete="email" maxLength={254} placeholder="name@example.com" className={fieldClass} />
+            <input ref={email} name="email" type="email" required autoComplete="email" maxLength={254} placeholder="name@example.com" className={fieldClass} />
           </label>
           {role ? null : (
             <label className="flex flex-col gap-2 t-subhead text-text-muted">
               I am a
-              <select name="role" required defaultValue="" className={fieldClass}>
+              <select name="role" required value={chosen ?? picked.role ?? ""} onChange={(e) => setChosen(e.target.value)} className={fieldClass}>
                 <option value="" disabled>Choose one</option>
                 {WAITLIST_ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>

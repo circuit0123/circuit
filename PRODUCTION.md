@@ -85,7 +85,9 @@ platform default URL (`*.vercel.app`, `*.run.app`).
 
 Frontend build-time variables (set per Vercel project): `NEXT_PUBLIC_APP_URL`,
 `NEXT_PUBLIC_LANDING_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
-`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_ENV`.
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_ENV`. The landing project also reads `NEXT_PUBLIC_JOIN_LIVE`
+(default `false`: every call to action opens the waitlist form; set `true` once the app has `/join` and is deployed),
+and optionally `NEXT_PUBLIC_CONTACT_EMAIL` and `NEXT_PUBLIC_COMPANY_LEGAL_NAME` (footer).
 
 Switching to the real domain (config only, ~1 hour plus DNS wait):
 1. [YOU] Vercel: add `<domain>` to the landing project and `app.<domain>` to the

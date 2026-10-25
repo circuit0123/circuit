@@ -9,6 +9,12 @@ export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "";
 /** Footer company name. Left out when not set (never a [placeholder]). */
 export const COMPANY_LEGAL_NAME = process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME ?? "";
 
+/**
+ * `true` once the app has a /join screen and is deployed: call to action buttons then link to `APP_URL/join?role=…&src=…`.
+ * Anything else (the default) means /join isn't there yet, so every call to action opens the waitlist form on the same page instead.
+ */
+export const JOIN_LIVE = process.env.NEXT_PUBLIC_JOIN_LIVE === "true";
+
 export type Role = "student" | "founder" | "mentor" | "investor" | "partner";
 
 /** A `src` label: lower-case letters, digits, `-` and `_`, up to 40 (the same rule as the API and the app). Anything else is ignored. */

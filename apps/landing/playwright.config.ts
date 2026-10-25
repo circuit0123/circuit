@@ -1,12 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Builds the static export twice with test URLs and serves both: feature flags ON on :3101 (the default baseURL) and OFF on :3102
- * (e2e/serve-test-builds.sh). The API and the app are never contacted: the waitlist call is mocked in each test and every other request
+ * Builds the static export three times with test URLs (e2e/serve-test-builds.sh): feature flags ON on :3101 (the default baseURL), flags OFF
+ * on :3102, both with NEXT_PUBLIC_JOIN_LIVE=true; and flags ON with the join switch off (the default) on :3103. The API and the app are never contacted: the waitlist call is mocked in each test and every other request
  * must stay on the landing origin. Two projects: a 375px phone and a 1280px desktop.
  */
 const ON = "http://localhost:3101";
 const OFF = "http://localhost:3102";
+const WAIT = "http://localhost:3103";
 
 export default defineConfig({
   testDir: "e2e",
@@ -16,7 +17,7 @@ export default defineConfig({
   reporter: [["list"]],
   webServer: {
     command: "e2e/serve-test-builds.sh",
-    url: OFF,
+    url: WAIT,
     reuseExistingServer: false,
     timeout: 360_000,
   },

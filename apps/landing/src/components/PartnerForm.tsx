@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Button } from "@circuit/ui/Button";
+import { usePicked } from "@/lib/join";
 import { useSrc } from "@/lib/src";
 import { fieldClass, MESSAGES, useReady, useWaitlistSubmit } from "@/lib/waitlist";
 import { Container } from "./Container";
@@ -12,10 +14,20 @@ const SRC = "landing-partners";
  * public waitlist endpoint with role=partner: nothing else is called. The endpoint has no name or organisation field, so the
  * organisation goes in `college` and the name is the first line of `note`.
  */
-export function PartnerForm() {
+export function PartnerForm({ intro }: { intro?: string }) {
   const ready = useReady();
   const src = useSrc(SRC);
   const { busy, result, submit } = useWaitlistSubmit();
+  const picked = usePicked();
+  const name = useRef<HTMLInputElement>(null);
+  const seenClicks = useRef(picked.clicks);
+  useEffect(() => {
+    // The button above was pressed: the page has scrolled here, so put the cursor in the first field.
+    if (picked.clicks !== seenClicks.current) {
+      seenClicks.current = picked.clicks;
+      name.current?.focus({ preventScroll: true });
+    }
+  }, [picked.clicks]);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,7 +50,7 @@ export function PartnerForm() {
         <div>
           <h2 id="partner-form-h" className="t-title1">Bring Circuit to your campus</h2>
           <p className="mt-3 max-w-[540px] t-body text-text-muted">
-            Tell us about your organisation. We&rsquo;ll write to you to arrange a short call and to check the organisation before anyone gets admin powers.
+            {intro ? `${intro} ` : ""}Tell us about your organisation. We&rsquo;ll write to you to arrange a short call and to check the organisation before anyone gets admin powers.
           </p>
         </div>
         {result === "ok" ? (
@@ -49,7 +61,7 @@ export function PartnerForm() {
               <legend className="sr-only">Contact us about your organisation</legend>
               <label className="flex flex-col gap-2 t-subhead text-text-muted">
                 Your name
-                <input name="name" type="text" required autoComplete="name" maxLength={80} className={fieldClass} />
+                <input ref={name} name="name" type="text" required autoComplete="name" maxLength={80} className={fieldClass} />
               </label>
               <label className="flex flex-col gap-2 t-subhead text-text-muted">
                 Organisation

@@ -7,6 +7,8 @@ export const APP = "http://app.test";
 /** The same site built with every feature flag on (default) and off. */
 export const ON = "http://localhost:3101";
 export const OFF = "http://localhost:3102";
+/** Flags on, NEXT_PUBLIC_JOIN_LIVE off: call to action buttons open the waitlist form instead of the app. */
+export const WAIT = "http://localhost:3103";
 /** Home plus every audience page that has shipped. */
 export const PATHS = ["/", ...PAGES.map((p) => `/${p.slug}/`)];
 /** Pages whose content changes when their feature flag is off: also checked on the flags-off build. */
@@ -42,3 +44,6 @@ export async function checkPage(page: Page, label: string) {
   const axe = await new AxeBuilder({ page }).analyze();
   expect(axe.violations.map((v) => `${v.id} (${v.impact}) x${v.nodes.length}: ${v.nodes[0]?.html.slice(0, 120)}`), `${label}: axe`).toEqual([]);
 }
+
+/** The only digits allowed on a page are step numbers, "under 18", "under 5" (small counts hidden), "72 hours" and "8:00 IST": no counts, no stats (DESIGN.md §12). */
+export const digitsIn = (text: string) => text.replace(/\b0[123]\b|\b18\b|\b5\b|\b72\b|8:00/g, "").match(/\d+/g);

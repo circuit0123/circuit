@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { OFF, OFF_PATHS, ON, PATHS, THEMES } from "./support";
+import { OFF, OFF_PATHS, ON, PATHS, THEMES, WAIT } from "./support";
 
 /**
  * The measurable "premium" rules from DESIGN.md §5 and §13 item 5, for the landing home page (apps/app/tests/premium.spec.ts is the
@@ -96,7 +96,7 @@ async function scan(page: Page, wide: boolean): Promise<Hit[]> {
   }, wide);
 }
 
-const CASES = [...PATHS.map((path) => ({ base: ON, path, name: path })), ...OFF_PATHS.map((path) => ({ base: OFF, path, name: `${path} (flag off)` }))];
+const CASES = [...PATHS.map((path) => ({ base: ON, path, name: path })), ...OFF_PATHS.map((path) => ({ base: OFF, path, name: `${path} (flag off)` })), ...PATHS.map((path) => ({ base: WAIT, path, name: `${path} (join switch off)` }))];
 
 for (const c of CASES) {
   for (const theme of THEMES) {

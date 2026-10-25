@@ -33,3 +33,9 @@ export const WAITLIST_ROLES: ReadonlyArray<{ value: Role; label: string }> = [
   { value: "investor", label: "Investor" },
   { value: "partner", label: "Partner (college, incubator, programme)" },
 ];
+
+/** What the waitlist form says while the app has no /join screen yet (NEXT_PUBLIC_JOIN_LIVE off). */
+export const INVITE_ONLY = {
+  heading: "Circuit is invite-only right now",
+  copy: "Join the waitlist and we\u2019ll send you an invite.",
+} as const;

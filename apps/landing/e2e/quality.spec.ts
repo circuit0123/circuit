@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { checkPage, PATHS, THEMES } from "./support";
+import { checkPage, digitsIn, PATHS, THEMES } from "./support";
 
 for (const theme of THEMES) {
   test.describe(`${theme} theme`, () => {
@@ -26,8 +26,6 @@ for (const theme of THEMES) {
   });
 }
 
-/** The only digits allowed are step numbers, "under 18", "under 5" (small counts hidden), "72 hours" and "8:00 IST": no counts, no stats (DESIGN.md §12). */
-const digitsIn = (text: string) => text.replace(/\b0[123]\b|\b18\b|\b5\b|\b72\b|8:00/g, "").match(/\d+/g);
 
 test("every page: no placeholder text, no fake numbers, nothing requested from another origin", async ({ page }) => {
   for (const path of PATHS) {
