@@ -303,8 +303,26 @@ Tabs: `People` · `Startups` · `Jobs` · `Map`
 - Jobs: list with startup logo, role, stipend in ₹, distance, match %; job page with a
   sticky `Apply` button.
 - Map: the existing MapLibre map, full-screen, pins by hiring status; tapping a pin opens
-  a bottom sheet with the startup card.
+  a bottom sheet with the startup card (name, sector, distance, hiring summary, skill match).
+  The pin tap itself never navigates (accidental taps while panning). The sheet's primary
+  action for a hiring startup is `See open roles`: it opens the Startup page scrolled to
+  its Hiring section, or the job page directly when the startup has exactly one open role.
+  Non-hiring startups show `Follow` instead. Back returns to the map with the same pin
+  selected and the same zoom.
 - Search field at the top of Discover searches all four.
+
+### Startup page
+Reached from the map sheet, Discover → Startups, job pages and Pulse.
+- Header: logo (or circuit-pattern square), name, verification/claimed state, sector,
+  stage, team size, place and distance. Unclaimed startups show "Unclaimed · from public
+  sources" in Footnote and, to signed-in founders, `Claim this startup`.
+- Primary action: `Follow` (or `Following`). One primary only.
+- **Hiring** (first section when hiring): open roles as rows (role, stipend in ₹ in Geist
+  Mono, type, skill match in words), each opening the job page; "Not hiring right now"
+  with `Follow for updates` otherwise. `See open roles` and deep links land here.
+- About, build logs grid, founders (with `Intro via a mutual` when a warm path exists),
+  and for investors only (when the startup opted in) stage and fundraising status.
+- No public follower counts; founders see their own interest and view counts privately.
 
 ### Circuits (signature screen)
 - Active and proposed circuits as large cards: three avatars on a ring connected by the
@@ -563,6 +581,19 @@ staggered, movement follows physics, and the UI layers like paper in light.
 - `prefers-reduced-motion`: replace all motion with 150ms fades; the circuit closing
   becomes a static closed ring with a checkmark.
 - Library: `motion` (Framer Motion for React).
+
+**Landing site motion** (same principles, one orchestrated moment per page):
+- Hero: headline words rise 16px and fade in with a 60ms stagger (total ≤ 700ms), then
+  the logo video starts; the page is fully readable at rest before any of it runs.
+- Bridge line: a thin `current` arch draws once between "How it works" steps as they
+  enter the viewport (stroke-dashoffset, 900ms), connecting step 1 → 2 → 3.
+- Scroll reveals: sections fade + rise 12px when they enter (once, 40ms stagger, first
+  6 items); content starts visible if JavaScript or IntersectionObserver is missing.
+- Audience tiles: hover/focus lifts 2px and the arrow nudges 4px; press scales to 0.98.
+- Buttons: press scale 0.97 with the default spring. FAQ: height animates with the
+  default spring, the + rotates to ×.
+- No parallax, no scroll-jacking, no looping background motion besides the hero video;
+  Lighthouse ≥ 95 mobile still applies; reduced motion = everything static.
 
 ## 8. Healthy habit rules (non-negotiable)
 - The Daily Drop is finite (3 per day). Pulse ends with "You're caught up."
