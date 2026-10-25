@@ -27,10 +27,10 @@ export function HeroVideo() {
       });
       io.observe(box.current);
     };
+    // The headline stagger (DESIGN.md §7) takes up to 700ms; the video starts after it.
     const whenIdle = () => {
       const ric = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
-      if (ric) ric(start);
-      else setTimeout(start, 200);
+      setTimeout(() => (ric ? ric(start) : start()), Math.max(200, 700 - performance.now()));
     };
     if (document.readyState === "complete") whenIdle();
     else window.addEventListener("load", whenIdle, { once: true });

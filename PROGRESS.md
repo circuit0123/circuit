@@ -3,6 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
+- L3 — landing motion (DESIGN.md §7) on all six pages: **done, waiting for your OK** (branch `landing-pages`) (details in "L3" below)
 - L2 — landing audience pages (F14): **done, waiting for your OK** (branch `landing-pages`, from `frontend-landing`) (details in "L2" below)
 - L1 — landing site home page (F14, first part): **done, waiting for your OK** (branch `frontend-landing`) (details in "L1" below)
 - B4 — matching ML pipeline + onboarding state, backend (Stage 4c): **done, waiting for your OK** (branch `backend-b4`) (details in "B4" below)
@@ -184,6 +185,44 @@ Not exercised: `admin-user` interactively (unit-tested with a mocked password pr
 ### Frontend remaining (from B4)
 - **Onboarding** (DESIGN.md §4): read `GET /api/onboarding/state` on launch to resume at `current_step`; save each screen with `PATCH` (the answer under its step key; e.g. `role: {"choice": "invest" | "partner" | …}` decides the branch); skip the screens in `skip`; send `signup_source` from `/join?src=…` on the first call; send `completed: true` at the end.
 - Nothing visible for the ranker: members see no difference except a different order once a model is promoted.
+
+## L3 — Landing motion (`landing-pages`): done, waiting for your OK
+
+`make check` is green (ruff, mypy, backend tests, frontend types, landing Playwright: 361 passed, 1 skipped = tile hover, which needs a pointer, on the phone project). Screenshots and recordings: `screenshots/landing-motion/` (script: `screenshots/landing-motion.mjs`).
+
+**What was built (all six pages: `/`, `/students`, `/founders`, `/mentors`, `/investors`, `/partners`)**
+- **Hero word stagger:** each headline word rises 16px and fades in, 60ms apart (the gap shrinks on long headlines so the total stays ≤ 700ms). It is a **CSS animation, not JavaScript**: it starts at first paint, so the headline never waits for the script bundle (that would cost Lighthouse LCP), and it ends visible with JavaScript off. The hero video now starts after the 700ms.
+- **Bridge arch:** a thin `current` line drawn between the three "How it works" steps (1 → 2, then 2 → 3, 450ms each, 900ms in all), when each step comes into view, once. Steps in a row: it arches over the empty part of the number row. Steps stacked (phone): it bows through the page's left gutter. It is built by JavaScript and positioned absolutely, so with reduced motion or without JavaScript it simply does not exist and the layout never changes.
+- **Section reveals:** sections below the fold fade and rise 12px when they come into view (once, 40ms stagger over the first 6 items). Only sections that start off-screen are ever hidden, and only by JavaScript, so without JavaScript everything is visible.
+- **Audience tiles:** hover or keyboard focus lifts 2px and nudges the arrow 4px; press scales to 0.98. **Buttons:** press scales to 0.97. Both use the default spring (`duration: 0.35, bounce: 0`). When the motion code runs it turns off the old CSS press scale so two scales never stack (`html[data-motion]`).
+- **FAQ:** the answer fades in and rises 8px as it opens, and fades out before it closes; the + turns to × (350ms). See decision 1.
+- **Rules kept:** only `transform`, `opacity` and `stroke-dashoffset` are animated (a test checks every animation and every CSS keyframe); everything plays once; `prefers-reduced-motion: reduce` runs none of it (no animation, nothing hidden, no arch, `getAnimations()` is empty).
+- **Library:** `motion` (`motion/mini` for the animations, plus its small `inView`, `hover`, `press` helpers). One client component, `LandingMotion.tsx`, mounted in the layout; the page components only gained `data-*` hooks. Landing JavaScript: +7.9 KB brotli (165.8 → 173.7 KB across all chunks).
+
+**Lighthouse (mobile, simulated slow 4G, brotli-compressed server, 3 runs per page, 25 Oct 2026)**
+
+| Page | Performance before | Performance after | A11y / best practices / SEO | CLS |
+|---|---|---|---|---|
+| / | 99–100 | 98–100 | 100 / 100 / 100 | 0 |
+| /students/ | 99 | 98–99 | 100 / 100 / 100 | 0 |
+| /founders/ | 99–100 | 98–99 | 100 / 100 / 100 | 0 |
+| /mentors/ | 99 | 98–99 | 100 / 100 / 100 | 0 |
+| /investors/ | 96–98 | 96–98 | 100 / 100 / 100 | 0 |
+| /partners/ | 96–98 | 98–99 | 100 / 100 / 100 | 0 |
+
+Every score stays ≥ 96, so ≥ 95 holds, though investors is the tightest (it is the same before and after: its Total Blocking Time was already the highest). Real-host numbers still need the Stage 5 deployment.
+
+**Tests (`apps/landing/e2e/motion.spec.ts`, every page, 375px and 1280px)**
+- Reduced motion: no animations running after a full scroll, nothing hidden or offset, no arch, FAQ opens with no animation, tiles stay still on hover.
+- Normal motion: hero words end at rest; a below-the-fold item starts hidden and reveals; both arch lines end fully drawn; FAQ opens and closes; scrolling down, up and down again starts **no** new animation; only the three allowed properties are animated; layout shift is exactly 0 during load and a full scroll; tile hover and focus; button and tile press without a stacked CSS scale.
+- No JavaScript: headline and every section fully visible, FAQ still opens.
+
+**Decisions / things to know**
+1. **FAQ height does not animate.** DESIGN.md said "height animates", but the rule for this work is transform, opacity and stroke-dashoffset only, and animating height moves the layout. So the answer fades and rises while the height changes at once. DESIGN.md §7 now says so. If you want the smooth height back it is a different trade-off (layout work every frame): tell me.
+2. **The hero is CSS, not `motion`**, for the LCP reason above. It uses a fixed ease-out curve close to the default spring (a spring without overshoot), not the spring itself.
+3. **The first scroll-reveal frame:** a section is hidden only after the page's JavaScript runs, and only if it is below the fold, so nothing flashes; a visitor who scrolls extremely fast before that moment just sees the content.
+4. **Phone arch:** on a phone the steps are stacked about 700px apart, so the arch is a long thin line in the left gutter. It reads as a connector but you may prefer something else there; the desktop arch is the intended look.
+5. Not done on purpose: a real-phone test (DESIGN.md §13) and Lighthouse on the deployed site (Stage 5). `make test-landing` leaves a stale mock on port 3201 if one is already running (yours from `make dev`); harmless, the builds use it.
 
 ## L2 — The five audience pages (`landing-pages`, from `frontend-landing`): done, waiting for your OK
 

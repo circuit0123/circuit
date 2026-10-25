@@ -583,15 +583,18 @@ staggered, movement follows physics, and the UI layers like paper in light.
 - Library: `motion` (Framer Motion for React).
 
 **Landing site motion** (same principles, one orchestrated moment per page):
-- Hero: headline words rise 16px and fade in with a 60ms stagger (total ≤ 700ms), then
-  the logo video starts; the page is fully readable at rest before any of it runs.
+- Hero: headline words rise 16px and fade in with a 60ms stagger (total ≤ 700ms; the gap
+  shrinks for long headlines), then the logo video starts; the page is fully readable at
+  rest before any of it runs. This one is a CSS animation, not JavaScript, so it starts at
+  first paint and the headline never waits for the script bundle (Lighthouse LCP).
 - Bridge line: a thin `current` arch draws once between "How it works" steps as they
   enter the viewport (stroke-dashoffset, 900ms), connecting step 1 → 2 → 3.
 - Scroll reveals: sections fade + rise 12px when they enter (once, 40ms stagger, first
   6 items); content starts visible if JavaScript or IntersectionObserver is missing.
 - Audience tiles: hover/focus lifts 2px and the arrow nudges 4px; press scales to 0.98.
-- Buttons: press scale 0.97 with the default spring. FAQ: height animates with the
-  default spring, the + rotates to ×.
+- Buttons: press scale 0.97 with the default spring. FAQ: the answer fades in and rises
+  8px with the default spring (and fades out before it closes); the + rotates to ×. The
+  height does not animate: only transform, opacity and stroke-dashoffset ever do.
 - No parallax, no scroll-jacking, no looping background motion besides the hero video;
   Lighthouse ≥ 95 mobile still applies; reduced motion = everything static.
 
