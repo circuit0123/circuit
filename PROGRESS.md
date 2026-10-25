@@ -3,6 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
+- F2 — sign-up and access, **part 1 of 4 done** (`/join`, sign-in polish, consent, invite code, waitlist; branch `frontend-F2`). Steps 4–14 are still to build (details in "F2" below)
 - F1 — app foundation (theme, components, shell, data layer, mock mode, PWA basics, /design, design checks): **done, waiting for your OK** (branch `frontend-F1`) (details in "F1" below)
 - L3 — landing motion (DESIGN.md §7) on all six pages: **done, waiting for your OK** (branch `landing-pages`) (details in "L3" below)
 - L2 — landing audience pages (F14): **done, waiting for your OK** (branch `landing-pages`, from `frontend-landing`) (details in "L2" below)
@@ -24,7 +25,19 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 contin
 ## Frontend → API needed
 Things the screens need that the API (frozen openapi.json) does not give yet. Never worked around in the app; served from a clearly marked mock where a screen needs it. B7 picks these up.
 - **Accent name.** `PATCH /api/me/appearance` and `GET /api/me` call the default accent `mint`; DESIGN.md §5 calls it Emerald (and its colours are the Emerald ones). The app maps `mint` ↔ `emerald` in one place (`apps/app/src/data/appearance.ts`), so screens only say Emerald. Rename the value to `emerald` in the backend when convenient (the migration must read old `mint` rows).
+- **Age answer → `is_minor`.** Nothing sets `is_minor` from the Age step; the app saves the answer, shows the safety screen and sets `profile_visibility: hidden`, `allow_requests: false` through `PATCH /api/me/privacy`. The server-side under-18 rules only apply once the age answer sets `is_minor` (and the same defaults).
+- **Profile photo upload.** `POST /api/media/uploads` only accepts `post` or `message`; the Photo step (13) is shown in mock mode only.
+- **Organisation search** (step 11, "Where do you study?"). No endpoint; real builds accept the typed name as `college`, mock mode searches a marked list (`data/missing.ts`).
+- **City list with centres** (step 7, "Choose a city", and naming the city from "Use my location"). `data/missing.ts` holds a marked static list, pilot city first.
+- **Instant first Daily Drop for new members** (step 14). Ready shows the first card of `GET /api/drop/today` if there is one, otherwise "your first drop arrives tomorrow".
 - **Two schemas named `CountOut`.** The notification unread count answers `{count}`, but the OpenAPI file keeps the dashboard's `{hidden, value}` shape under the same name. `useUnreadCount` reads the real shape with a cast (`data/notifications.ts`). Give them different names.
+
+## F2 — Sign-up and access (branch `frontend-F2`): part 1 of 4 done, waiting for your OK
+Built and tested: `/join`, Welcome (matches the reference), email code, consent, invite code, waitlist, and the data layer for the rest (`useOnboarding`, `useCapabilities`, `useWhere`, `useOrganisationSearch`; not yet drawn). `tests/signup.spec.ts`: 9 tests at 375px and 1280px (18 runs), axe, no overflow, one primary button, ≤5 font sizes, dark and light. Screenshots: `screenshots/f2/`. Mock mode has two new scenarios, "New member" and "New member, AI down" (stateful mock of the API and of Supabase sign-in; code `000000` is refused, `CIRCUIT-0001` lets anyone in, `SVIT-2026` also joins the mock college).
+- **Still to do (parts 2–4):** Name, Role, Age, Safety, Where; Work, Offers, Needs, Organisation; Photo, Colour, Ready; the timed full sign-up test, resume, role-link, under-18 and AI-down tests; `/design` entries for AccentPicker, large Chip and DropCardFace; `make check`.
+- **Landing: set NEXT_PUBLIC_JOIN_LIVE=true after the app deploys.**
+- Changed in F1's tests: "beta access missing" now expects the invite screen instead of the old placeholder.
+- Google in mock mode returns straight to `/auth/callback` (the real call now uses `skipBrowserRedirect` and navigates itself; same URL in production).
 
 ## F1 — App foundation (branch `frontend-F1`, from the landing work): done, waiting for your OK
 `make test-web` is green (type check, the architecture rule, 76 Playwright tests on mock mode at 375px and 1280px). `make check` is green too: ruff, mypy, 2,396 backend tests (Stories 1–5 PASS), 361 landing tests. Screenshots: `screenshots/f1/` (shell at 375 dark and light and at 1280, `/design` at both widths, 404, 500, the five-tab pager).
