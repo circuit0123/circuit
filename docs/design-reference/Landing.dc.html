@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Circuit landing page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}a:hover{color:#FFFFFF}
+summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
+</style>
+</helmet>
+<div style="background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; min-height: 2200px">
+
+  <header style="max-width: 1120px; margin: 0 auto; padding: 20px 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
+    <a href="Landing.dc.html" aria-label="Circuit home" style="display: flex; align-items: center; gap: 10px"><svg width="32" height="32" viewBox="0 0 100 100" fill="none" role="img" aria-label="Circuit logo"><path d="M20 68 C20 30, 80 30, 80 68" stroke="#2FBF8A" stroke-width="7" stroke-linecap="round"/><circle cx="20" cy="68" r="9" fill="#2FBF8A" stroke="#000000" stroke-width="4"/><circle cx="80" cy="68" r="9" fill="#2FBF8A" stroke="#000000" stroke-width="4"/><circle cx="50" cy="39.5" r="6" fill="#2FBF8A" stroke="#000000" stroke-width="4"/></svg><span style="font-size: 22px; font-weight: 600; letter-spacing: -0.035em">circuit</span></a>
+    <nav aria-label="Audiences" style="display: flex; flex-wrap: wrap; gap: 24px; font-size: 15px; color: #A79FAD">
+      <a href="Landing.dc.html" style="color: #A79FAD">Students</a>
+      <a href="Landing.dc.html" style="color: #A79FAD">Founders</a>
+      <a href="Landing.dc.html" style="color: #A79FAD">Mentors</a>
+      <a href="Landing.dc.html" style="color: #A79FAD">Investors</a>
+      <a href="Landing.dc.html" style="color: #A79FAD">Partners</a>
+    </nav>
+  </header>
+
+  <section aria-label="Introduction" style="max-width: 1120px; margin: 0 auto; padding: 120px 24px 96px 24px">
+    <h1 style="margin: 0; max-width: 820px; font-size: 64px; line-height: 1.05; font-weight: 600; letter-spacing: -0.03em">Build with people near you.</h1>
+    <p style="margin: 24px 0 0 0; max-width: 560px; font-size: 22px; line-height: 1.4; color: #A79FAD">Circuit matches you on what you need and what you can offer, not on your college name or job title.</p>
+    <a href="Welcome.dc.html" style="margin-top: 40px; display: inline-flex; align-items: center; height: 50px; padding: 0 28px; border-radius: 12px; background: #00563F; color: #FFFFFF; font-size: 17px; font-weight: 600">Join the beta</a>
+  </section>
+
+  <section aria-label="Who it's for" style="max-width: 1120px; margin: 0 auto; padding: 0 24px 120px 24px">
+    <h2 style="margin: 0 0 24px 0; font-size: 28px; font-weight: 600; letter-spacing: -0.022em">Who it's for</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px">
+      <sc-for list="{{tiles}}" as="t" hint-placeholder-count="5">
+        <a href="Welcome.dc.html" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; padding: 24px; border-radius: 14px; background: #08140F">
+          <div>
+            <div style="font-size: 17px; font-weight: 600">{{t.who}}</div>
+            <div style="font-size: 15px; line-height: 1.4; color: #A79FAD; margin-top: 8px">{{t.line}}</div>
+          </div>
+          <span style="font-size: 15px; color: #F3EEF5">{{t.cta}} →</span>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="How it works" style="max-width: 1120px; margin: 0 auto; padding: 0 24px 120px 24px">
+    <h2 style="margin: 0 0 24px 0; font-size: 28px; font-weight: 600; letter-spacing: -0.022em">How it works</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="3">
+        <div>
+          <div role="img" aria-label="{{s.shot}}" style="aspect-ratio: 4 / 5; border-radius: 22px; background: #08140F; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #8A8390">[{{s.shot}}]</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 15px; color: #8A8390; margin-top: 20px">{{s.n}}</div>
+          <div style="font-size: 22px; font-weight: 600; margin-top: 4px; letter-spacing: -0.012em">{{s.title}}</div>
+          <p style="margin: 8px 0 0 0; font-size: 17px; line-height: 1.4; color: #A79FAD">{{s.body}}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="In the pilot city" style="max-width: 1120px; margin: 0 auto; padding: 0 24px 120px 24px">
+    <div style="padding: 48px; border-radius: 22px; background: #08140F">
+      <h2 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.022em">Live in [PILOT CITY]</h2>
+      <p style="margin: 12px 0 0 0; max-width: 560px; font-size: 17px; line-height: 1.4; color: #A79FAD">[Real counts of startups, open roles and closed circuits appear here once the pilot has meaningful numbers. Until then this section stays hidden.]</p>
+    </div>
+  </section>
+
+  <section aria-label="Questions" style="max-width: 760px; margin: 0 auto; padding: 0 24px 120px 24px">
+    <h2 style="margin: 0 0 16px 0; font-size: 28px; font-weight: 600; letter-spacing: -0.022em">Questions</h2>
+    <sc-for list="{{faq}}" as="f" hint-placeholder-count="5">
+      <details style="border-bottom: 0.5px solid rgba(255,255,255,0.10); padding: 20px 0">
+        <summary style="font-size: 17px; font-weight: 500; display: flex; justify-content: space-between; gap: 16px">{{f.q}}<span aria-hidden="true" style="color: #8A8390">+</span></summary>
+        <p style="margin: 12px 0 0 0; font-size: 17px; line-height: 1.4; color: #A79FAD">{{f.a}}</p>
+      </details>
+    </sc-for>
+  </section>
+
+  <footer style="border-top: 0.5px solid rgba(255,255,255,0.10)">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 32px 24px 48px 24px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; font-size: 15px; color: #8A8390">
+      <span>Circuit · [COMPANY LEGAL NAME]</span>
+      <span style="display: flex; gap: 24px"><a href="Landing.dc.html" style="color: #A79FAD">Privacy</a><a href="Landing.dc.html" style="color: #A79FAD">Terms</a><a href="Landing.dc.html" style="color: #A79FAD">Contact</a></span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tiles: [
+        { who: 'Students', line: 'Startups near you want your skills, not your college name.', cta: 'Find work near you' },
+        { who: 'Founders', line: 'Find people who can help you, and students who want to work with you.', cta: 'Claim your startup' },
+        { who: 'Mentors', line: 'Help founders who need exactly what you know.', cta: 'Start mentoring' },
+        { who: 'Investors', line: 'Three startups a day that fit your thesis. No noise.', cta: 'Set your focus' },
+        { who: 'Partners', line: 'See what your ecosystem is missing, and fix it.', cta: 'Bring Circuit to campus' }
+      ],
+      steps: [
+        { n: '01', title: 'Say what you need and offer', body: 'Paste a bio. We suggest your skills; you confirm them in a few taps.', shot: 'App screenshot: You offer' },
+        { n: '02', title: 'Get three matches a day', body: 'Each one comes with the reason and the mutual connection who can introduce you.', shot: 'App screenshot: Daily Drop' },
+        { n: '03', title: 'Meet through people you trust', body: 'Warm intros and three-way circuits where everyone helps someone.', shot: 'App screenshot: Circuit ring' }
+      ],
+      faq: [
+        { q: 'Is Circuit free?', a: 'Yes for students, founders, mentors and investors. Startups can pay to promote a role, always labelled as promoted.' },
+        { q: 'Why is it invite-only?', a: 'We are starting with one city and one partner college so every match is worth your time.' },
+        { q: 'What do you do with my data?', a: 'We use it to match you. We never sell it, and you can export or delete it any time from Settings.' },
+        { q: 'I am under 18. Can I join?', a: 'Yes, with a private profile by default and no messages from strangers.' },
+        { q: 'Do you charge investors or founders a fee on deals?', a: 'No. Circuit only makes introductions. No success fees, ever.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

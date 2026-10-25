@@ -64,9 +64,8 @@ Mobile bottom bar (5 destinations, icons with labels):
 
 `Home` · `Discover` · `Circuits` · `Inbox` · `Profile`
 
-- **Top bar on Home:** `+` (create build log) on the left, notifications bell on the
-  right (dot for unread, never a number over 9 → "9+"). Home starts with a `Today` Large
-  title that collapses into the bar's centre on scroll, like every other tab.
+- **Top bar on Home:** `+` (create build log) on the left, the Circuit wordmark in the
+  centre, notifications bell on the right (dot for unread, never a number over 9 → "9+").
 - **Circuits** sits in the centre as our signature, like Instagram centres what it values most.
 - Desktop (≥1024px): left rail with the same five destinations + create button; centre
   column max 600px for Home and Profile; ONE right rail (max 340px, 48px gap from the
@@ -109,7 +108,7 @@ Mobile bottom bar (5 destinations, icons with labels):
 ## 4. Core screens
 
 ### Landing site (one home, five front doors)
-Same visual system as the app (default Mint, Graphite neutrals, Geist). Each page has
+Same visual system as the app (brand emerald, the Bridge logo, Geist). Each page has
 one job: get that audience into the app with their role pre-set.
 
 | Page | Headline | Proof shown | Call to action |
@@ -153,7 +152,7 @@ resumes exactly where you left off.
 | 10 | You need | "And what you need right now." | Same chip pattern for needs | Max 3. |
 | 11 | Organisation (students, partners; skipped if detected) | "Where do you study?" (or "Which programme?") | Search field with college/organisation results | Auto-filled and skipped when the verified email domain matches an organisation. "Not listed" is fine. |
 | 12 | Photo (optional) | "Add a photo." | Large circle; tap to choose; `Continue` | Skip allowed; re-prompted once later. Shows the circuit-pattern avatar as the placeholder. |
-| 13 | Make it yours (optional) | "Pick your colour." | The six accent swatches with a live preview | Skip keeps Mint. |
+| 13 | Make it yours (optional) | "Pick your colour." | The six accent swatches with a live preview | Skip keeps Emerald. |
 | 14 | Ready | "You're on the circuit." | `See today's drop` | Short reveal of the first Daily Drop card (matches computed on the spot for new members, from precomputed candidates). |
 
 **Investor branch.** Choosing "Invest" at step 5 replaces steps 8–11 with:
@@ -355,47 +354,66 @@ viewed your profile" more than once a week.
 
 ## 5. Visual system
 
-### Colour: "Graphite & Current" (dark-first, light supported)
-The interface is monochrome, like Apple's own apps: people's photos and work provide the
-colour. Colour appears only when it MEANS something. Primary buttons are solid
-graphite/white, not coloured. One functional colour, **Current**, marks anything live or
-active (it's the electricity in the circuit); **Bridge** marks cross-sector matches.
+### Colour: "Emerald" (dark-first, light supported)
+Circuit's brand colour is **emerald**. It fills the one primary button on each screen and the
+app icon. A brighter emerald, **Current**, marks anything live or active (it's the
+electricity in the circuit). **Bridge** (indigo) marks cross-sector matches. Everything
+else is neutral, so people's photos and work stay the loudest thing on screen. The dark
+theme is true black with faintly green-tinted surfaces; the light theme is a soft lavender grey.
 
 | Token | Dark | Light | Use |
 |---|---|---|---|
-| `bg` | `#000000` | `#FFFFFF` | App background (true black on OLED) |
-| `bg-grouped` | `#000000` | `#F2F2F7` | Behind grouped lists and settings |
-| `surface` | `#111113` | `#FFFFFF` | Cards, sheets |
-| `surface-2` | `#1C1C1F` | `#F2F2F5` | Inputs, chips, grouped rows (dark) |
-| `surface-3` | `#2A2A2E` | `#E5E5EA` | Pressed states, elevated controls |
-| `separator` | `rgba(255,255,255,0.10)` | `rgba(0,0,0,0.10)` | Hairlines (0.5px on retina, 1px otherwise) |
-| `text` | `#F5F5F7` | `#1D1D1F` | Primary text |
-| `text-muted` | `#98989F` | `#6E6E73` | Secondary text |
-| `text-subtle` | `#6E6E73` | `#8E8E93` | Tertiary text, placeholders |
-| `primary` | `#F5F5F7` | `#1D1D1F` | Primary button fill (one per screen) |
-| `on-primary` | `#000000` | `#FFFFFF` | Text/icon on primary buttons |
-| `current` | `#3DDBB0` | `#0A8A69` | Live and active: powered Live wire nodes, unread dots, focus rings, accepted/completed states, links |
-| `bridge` | `#8E8CFF` | `#5856D6` | Bridge match badge and bridge UI only |
-| `warning` | `#FFB340` | `#B25E00` | Expiring soon |
-| `danger` | `#FF453A` | `#D70015` | Destructive actions, errors |
+| `bg` | `#000000` | `#C2BCC8` | App background (true black on OLED) |
+| `bg-grouped` | `#000000` | `#C2BCC8` | Behind grouped lists and settings |
+| `surface` | `#08140F` | `#D2CDD7` | Cards, sheets, grouped rows |
+| `surface-2` | `#0E2019` | `#B3ACBA` | Inputs, chips, placeholders, segmented-control track |
+| `surface-3` | `#1B382D` | `#D2CDD7` | Selected segment, pressed states, elevated controls |
+| `separator` | `rgba(255,255,255,0.10)` | `rgba(18,3,9,0.12)` | Hairlines (0.5px on retina, 1px otherwise) |
+| `text` | `#F3EEF5` | `#120309` | Primary text |
+| `text-muted` | `#A79FAD` | `#4A4150` | Secondary text |
+| `text-subtle` | `#8A8390` | `#4A4150` | Tertiary text, timestamps, placeholders |
+| `primary` | `#00563F` | `#00563F` | Primary button fill (one per screen), selected chips, own chat bubbles, app icon |
+| `on-primary` | `#FFFFFF` | `#FFFFFF` | Text/icon on primary |
+| `current` | `#2FBF8A` | `#00563F` | Live and active: powered Live wire nodes, unread dots, focus rings, progress bars, hiring pins, accepted/completed states, links |
+| `bridge` | `#8E8CFF` | `#3B2F9E` | Bridge match badge and bridge UI only |
+| `warning` | `#FFB340` | `#6A3800` | Expiring soon |
+| `danger` | `#FF453A` | `#8F0016` | Destructive actions, errors |
+
+Measured contrast (WCAG): white on `primary` 8.7:1; `current` on black 8.9:1 and on
+lavender 4.7:1; body text 16.4:1 (dark) and 10.9:1 (light); `text-subtle` on dark
+`surface` 5.1:1; warning and danger pass 4.5:1 in both themes. Deep `#00563F` on black is only 2.4:1, which is why dark mode uses the
+brighter `#2FBF8A` for dots, rings and links, never the deep emerald.
+
+### Logo: "The Bridge"
+An arch joining two people (two nodes), with a smaller node at the top for the mutual
+connection between them: a warm intro and a bridge match in one shape. Wordmark:
+lowercase `circuit` in Geist Semibold, tracking -0.035em, mark to the left.
+- App icon: white mark on `primary` `#00563F`, rounded square (the platform mask wins).
+- On black: mark in `#2FBF8A`, wordmark `#F3EEF5`. On lavender or white: mark `#00563F`,
+  wordmark `#120309`. One colour only, never a gradient, outline or shadow.
+- Node gaps are cut with the background colour (a 4-unit ring in a 100-unit box), so the
+  mark always sits on a flat background.
+- Minimum size 20px (mark) / 88px wide (lockup); clear space = the top node's diameter.
+- Source: `docs/design-reference/Brand.dc.html`. [YOU] run a trademark search in India
+  before public launch.
 
 ### Personal accent (members choose their Current colour)
 Members can choose the colour that plays the `current` role for them. It's personal
 expression with guardrails: it only changes `current` (live states, unread dots, focus
 rings, links, powered Live wire nodes) and the signature gradient. Primary buttons stay
-graphite/white and status colours never change, so the app stays coherent.
+brand emerald and status colours never change, so the app stays coherent.
 
 | Accent | Dark | Light | Bridge colour while selected |
 |---|---|---|---|
-| Mint (default) | `#3DDBB0` | `#0A8A69` | Indigo `#8E8CFF` / `#5856D6` |
-| Sky | `#5AC8FA` | `#0071C2` | Indigo |
-| Indigo | `#8E8CFF` | `#5856D6` | Mint `#3DDBB0` / `#0A8A69` (swapped so Bridge stays distinct) |
-| Rose | `#FF6482` | `#C7254E` | Indigo |
-| Lime | `#B6E85A` | `#4D7C0F` | Indigo |
-| Mono | `#F5F5F7` | `#1D1D1F` | Indigo |
+| Emerald (default) | `#2FBF8A` | `#00563F` | Indigo `#8E8CFF` / `#3B2F9E` |
+| Sky | `#5AC8FA` | `#004E8C` | Indigo |
+| Indigo | `#8E8CFF` | `#3B2F9E` | Emerald `#2FBF8A` / `#00563F` (swapped so Bridge stays distinct) |
+| Rose | `#FF6482` | `#8A1238` | Indigo |
+| Lime | `#B6E85A` | `#285004` | Indigo |
+| Mono | `#F3EEF5` | `#120309` | Indigo |
 
-- Only these six; no free colour picker (every option is pre-checked for WCAG AA in both
-  themes; recheck if any value changes).
+- Only these six; no free colour picker (every light value is ≥4.5:1 on `#C2BCC8` and
+  every dark value ≥3:1 on black; recheck if any value changes).
 - Chosen in Settings → Appearance (with a live preview of a Live wire node, a Bridge
   badge and a link) and offered once, optionally, at the end of onboarding.
 - Stored on the member (`appearance.accent`) so it follows them across devices; applied
@@ -403,15 +421,12 @@ graphite/white and status colours never change, so the app stays coherent.
 - Mono: live states also use shape and weight (filled dot, semibold) so nothing relies on
   colour alone.
 - Danger and warning are fixed and never selectable.
-- The landing site and emails always use the default Mint.
+- The landing site, emails and the logo always use brand emerald.
 
 **Signature gradient (the only gradient allowed):** `current → bridge`, using the
-member's accent and its paired Bridge colour (default `#3DDBB0 → #8E8CFF` dark,
-`#0A8A69 → #5856D6` light) at 135°. Used ONLY for the circuit
-ring, its closing animation, and the app icon.
-
-Contrast: all text meets WCAG AA on its background in both themes (verify `current` and
-`text-subtle` with a contrast checker; darken in light mode if any pair fails).
+member's accent and its paired Bridge colour (default `#2FBF8A → #8E8CFF` dark,
+`#00563F → #3B2F9E` light) at 135°. Used ONLY for the circuit ring and its closing
+animation. Never on the logo or app icon.
 
 ### Materials (iOS-style translucency, used systematically)
 - Top bars, tab bar and sheet headers use a translucent material: `bg` at 72% opacity
@@ -436,7 +451,8 @@ Contrast: all text meets WCAG AA on its background in both themes (verify `curre
 ### Breathing room (this is what "premium" means here)
 Colour doesn't make Circuit feel like Apple; space, restraint and hierarchy do. When a
 screen feels cramped, remove something before you shrink anything. These are hard rules,
-checked in review and by the `premium` Playwright checks (§13):
+checked in review and by the `premium` Playwright checks (§13). The reference
+mock is the "Circuit app design" canvas (Home, Discover, Inbox, Profile, desktop Home):
 - **Fewer things per screen.** Home on mobile shows at most 3 distinct blocks before the
   first scroll (e.g. large title, Live wire, Daily Drop card). Desktop: at most 2 columns
   of content (centre column + one rail), never 3 competing ones.
@@ -451,12 +467,13 @@ checked in review and by the `premium` Playwright checks (§13):
   max 540px); reasons and bios never truncate mid-sentence: show 2 full lines, then
   "more".
 - **One loud thing per block.** Each block has one element in Headline/Title weight; the
-  rest is Body or Subhead in `text-muted`. Max 4 type sizes per screen.
+  rest is Body or Subhead in `text-muted`. Max 5 type sizes per screen (normally
+  34 Large title, 22 Title 2, 17 Body/Headline, 15 Subhead, 12 Caption).
 - **Accent budget:** the accent (`current`) appears on at most 2 kinds of element per
-  screen (e.g. unseen Live wire nodes + unread dot). Never on buttons, card backgrounds,
+  screen (e.g. unseen Live wire nodes + unread dot). Never on buttons (they use `primary`), card backgrounds,
   large icons or headlines. If you can see accent in more than ~3 places in one
   viewport, it's too much.
-- **One primary button per screen**, graphite/white. Everything else is a secondary
+- **One primary button per screen**, brand emerald (`primary`) with white text. Everything else is a secondary
   (`surface-2` fill) or a text button. On the Daily Drop: `Intro me` is primary,
   `Skip` is a text button.
 - **Media:** images are calm. Generated circuit-pattern avatars and placeholders use only
@@ -479,7 +496,7 @@ checked in review and by the `premium` Playwright checks (§13):
   for sheets and the Daily Drop stack only (`0 12px 40px rgba(0,0,0,.45)` dark, `.10` light).
 
 ### iOS-quality patterns (mobile)
-- **Large titles** on top-level screens that collapse into a centred
+- **Large titles** on top-level screens (Home excepted) that collapse into a centred
   inline title on scroll, with the translucent bar appearing as content passes under it.
 - **Grouped inset lists** for settings, profile About and account screens.
 - **Sheets with detents** (medium and large), a grabber, drag-to-dismiss and the page
@@ -589,14 +606,14 @@ staggered, movement follows physics, and the UI layers like paper in light.
 
 ## 12. Banned (never ship these)
 - Any gradient other than the signature gradient, and the signature gradient anywhere
-  outside the circuit ring, its closing animation and the app icon
+  outside the circuit ring and its closing animation (never on the logo or app icon)
 - Instagram-style circular story rings with gradient borders, or anything that looks
   like a copy of another app's signature pattern
 - Initials-only avatars as the main visual of a card (Daily Drop, Live wire, Discover)
 - Grey skeleton bars used as content inside images or cards (skeletons are for loading only)
 - Raw match percentages below 55%, or any number that makes a recommendation look weak
 - Glassmorphism on cards or content, neon glows, blurred blobs, aurora backgrounds (translucent system bars per "Materials" are the only blur allowed)
-- Coloured primary buttons (primary actions are graphite/white per the palette); orange or warm accent colours
+- Primary buttons in any colour other than brand emerald; the bright `current` on a button; orange or warm accent colours; the logo recoloured, outlined, gradient-filled or redrawn
 - Emoji as icons; sparkle icons; "AI-powered" labels
 - Stock photos, lorem ipsum, "John Doe", fake stats, placeholder logos
 - Public follower/like counts; infinite feeds without an end; streaks
@@ -616,8 +633,9 @@ staggered, movement follows physics, and the UI layers like paper in light.
 5. `premium` Playwright checks (apps/app/tests/premium.spec.ts) run on every tab screen at
    375px and 1280px and fail the build when: more than one primary button is visible;
    a feed item has both a border and a background; section gaps are under 40px (mobile)
-   or 56px (desktop); body text lines exceed 600px; more than 4 font sizes are used; the
-   accent colour is used on more than 2 kinds of element or on any button; text is
+   or 56px (desktop); body text lines exceed 600px; more than 5 font sizes are used; the
+   `current` colour is used on more than 2 kinds of element or on any button, or a
+   primary button is not `primary`; text is
    truncated mid-sentence with an ellipsis.
 
 ---

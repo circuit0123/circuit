@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+  <div style="padding: 20px 8px 0 8px; height: 44px; display: flex; align-items: center">
+    <a href="Profile.dc.html" aria-label="Back" style="height: 44px; display: flex; align-items: center; gap: 2px; padding: 0 8px; font-size: 17px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Profile</a>
+  </div>
+  <h1 style="margin: 4px 16px 0 16px; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Settings</h1>
+
+  <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+    <section aria-label="{{g.name}}" style="margin: 28px 16px 0 16px">
+      <h2 style="margin: 0 0 8px 16px; font-size: 12px; font-weight: 400; letter-spacing: 0.01em; color: #A79FAD; text-transform: uppercase">{{g.name}}</h2>
+      <div style="background: #08140F; border-radius: 10px">
+        <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="2">
+          <a href="{{r.href}}" style="display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 16px; border-bottom: {{r.sep}}; color: {{r.color}}; font-size: 17px">
+            <span>{{r.label}}</span>
+            <span style="display: flex; align-items: center; gap: 6px; color: #A79FAD; font-size: 17px">{{r.value}}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8390" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+  <p style="margin: 24px 32px 0 32px; font-size: 12px; color: #8A8390">Circuit beta · Version [VERSION]</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var line = '0.5px solid rgba(255,255,255,0.10)';
+    function rows(list) {
+      return list.map(function (r, k) {
+        return { label: r[0], value: r[1] || '', href: r[2] || 'Settings.dc.html', color: r[3] || '#F3EEF5', sep: k < list.length - 1 ? line : '0' };
+      });
+    }
+    return { groups: [
+      { name: 'Account', rows: rows([['Edit profile', '', 'Profile.dc.html'], ['Privacy', 'Connections'], ['Notifications', 'Intros, messages']]) },
+      { name: 'Appearance', rows: rows([['Appearance', 'Dark · Mint', 'Appearance.dc.html']]) },
+      { name: 'Your data', rows: rows([['Export my data'], ['Delete account', '', 'Settings.dc.html', '#FF453A']]) },
+      { name: 'Help', rows: rows([['Help and FAQ'], ['Contact support'], ['Privacy policy'], ['Terms']]) }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

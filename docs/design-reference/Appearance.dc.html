@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Appearance settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: {{t.bg}}; color: {{t.text}}; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+  <div style="padding: 20px 8px 0 8px; height: 44px; display: flex; align-items: center">
+    <a href="Settings.dc.html" aria-label="Back" style="height: 44px; display: flex; align-items: center; gap: 2px; padding: 0 8px; font-size: 17px; color: {{t.text}}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Settings</a>
+  </div>
+  <h1 style="margin: 4px 16px 0 16px; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Appearance</h1>
+
+  <section aria-label="Theme" style="margin: 28px 16px 0 16px">
+    <h2 style="margin: 0 0 8px 0; font-size: 17px; font-weight: 600">Theme</h2>
+    <div role="radiogroup" aria-label="Theme" style="background: {{t.s2}}; border-radius: 10px; padding: 2px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px">
+      <sc-for list="{{themes}}" as="o" hint-placeholder-count="3">
+        <button role="radio" aria-checked="{{o.checked}}" onClick="{{o.pick}}" style="height: 32px; border: 0; border-radius: 8px; background: {{o.bg}}; color: {{o.color}}; font-size: 15px; font-weight: 500; cursor: pointer">{{o.label}}</button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="Colour" style="margin: 40px 16px 0 16px">
+    <h2 style="margin: 0 0 4px 0; font-size: 17px; font-weight: 600">Your colour</h2>
+    <p style="margin: 0 0 16px 0; font-size: 15px; color: {{t.muted}}">Marks what's live and new. Buttons stay neutral.</p>
+    <div role="radiogroup" aria-label="Accent colour" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px">
+      <sc-for list="{{accents}}" as="a" hint-placeholder-count="6">
+        <button role="radio" aria-checked="{{a.checked}}" aria-label="{{a.name}}" onClick="{{a.pick}}" style="border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0; color: {{t.muted}}; cursor: pointer">
+          <span style="width: 44px; height: 44px; border-radius: 999px; background: {{a.hex}}; box-shadow: {{a.ring}}; display: block"></span>
+          <span style="font-size: 12px">{{a.name}}</span>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="Preview" style="margin: 40px 16px 0 16px; background: {{t.surface}}; border-radius: 14px; padding: 20px">
+    <div style="font-size: 12px; color: {{t.muted}}; letter-spacing: 0.01em; text-transform: uppercase">Preview</div>
+    <div style="display: flex; align-items: center; gap: 16px; margin-top: 16px">
+      <div style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 12px; background: {{t.s2}}; border: 2px solid {{cur}}"></div>
+      <div style="flex: 1">
+        <div style="font-size: 17px; font-weight: 600">Divya shipped offline sync</div>
+        <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px">
+          <span style="font-size: 15px; color: {{cur}}">View role</span>
+          <span style="font-size: 12px; color: {{bridge}}; border: 1px solid {{bridge}}; border-radius: 999px; padding: 1px 8px">Bridge match</span>
+        </div>
+      </div>
+      <span aria-label="Unread" style="width: 10px; height: 10px; border-radius: 999px; background: {{cur}}"></span>
+    </div>
+  </section>
+
+  <div style="margin: 28px 16px 0 16px; background: {{t.surface}}; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; min-height: 52px; padding: 0 16px">
+    <span style="font-size: 17px">Swipe between tabs</span>
+    <button role="switch" aria-checked="{{swipeOn}}" aria-label="Swipe between tabs" onClick="{{toggle}}" style="width: 51px; height: 31px; border: 0; border-radius: 999px; background: {{swBg}}; position: relative; cursor: pointer; padding: 0">
+      <span style="position: absolute; top: 2px; left: {{knob}}px; width: 27px; height: 27px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,.3)"></span>
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { theme: 'Dark', accent: 0, swipe: true }; }
+  renderVals() {
+    var self = this, st = this.state;
+    var dark = st.theme !== 'Light';
+    var t = dark
+      ? { bg: '#000000', surface: '#08140F', s2: '#0E2019', s3: '#1B382D', text: '#F3EEF5', muted: '#A79FAD' }
+      : { bg: '#C2BCC8', surface: '#D2CDD7', s2: '#B3ACBA', s3: '#D2CDD7', text: '#120309', muted: '#4A4150' };
+    var list = [
+      ['Emerald', '#2FBF8A', '#00563F', 0], ['Sky', '#5AC8FA', '#004E8C', 0], ['Indigo', '#8E8CFF', '#3B2F9E', 1],
+      ['Rose', '#FF6482', '#8A1238', 0], ['Lime', '#B6E85A', '#285004', 0], ['Mono', '#F3EEF5', '#120309', 0]
+    ];
+    var a = list[st.accent];
+    var cur = dark ? a[1] : a[2];
+    var bridge = a[3] ? (dark ? '#2FBF8A' : '#00563F') : (dark ? '#8E8CFF' : '#3B2F9E');
+    return {
+      t: t, cur: cur, bridge: bridge,
+      themes: ['System', 'Dark', 'Light'].map(function (l) {
+        var on = l === st.theme;
+        return { label: l, checked: on ? 'true' : 'false', bg: on ? t.s3 : 'transparent', color: on ? t.text : t.muted, pick: function () { self.setState({ theme: l }); } };
+      }),
+      accents: list.map(function (x, k) {
+        var on = k === st.accent;
+        var hex = dark ? x[1] : x[2];
+        return { name: x[0], hex: hex, checked: on ? 'true' : 'false',
+          ring: on ? ('0 0 0 3px ' + t.bg + ', 0 0 0 5px ' + t.text) : (x[0] === 'Mono' ? ('inset 0 0 0 1px ' + t.s3) : 'none'),
+          pick: function () { self.setState({ accent: k }); } };
+      }),
+      swipeOn: st.swipe ? 'true' : 'false',
+      swBg: st.swipe ? cur : t.s3,
+      knob: st.swipe ? 22 : 2,
+      toggle: function () { self.setState({ swipe: !st.swipe }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>New build log</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+button{font-family:inherit}
+textarea::placeholder,input::placeholder{color:#8A8390}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+  <header style="padding: 20px 16px 0 16px; height: 44px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center">
+    <a href="Main.dc.html" style="font-size: 17px; color: #A79FAD; justify-self: start">Cancel</a>
+    <h1 style="margin: 0; font-size: 17px; font-weight: 600; justify-self: center; white-space: nowrap">New build log</h1>
+    <a href="Main.dc.html" style="justify-self: end; height: 32px; padding: 0 16px; border-radius: 999px; background: #00563F; color: #FFFFFF; font-size: 15px; font-weight: 600; display: flex; align-items: center">Post</a>
+  </header>
+
+  <button style="margin: 20px 16px 0 16px; width: 358px; height: 300px; border: 0; border-radius: 14px; background: #08140F; color: #A79FAD; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; cursor: pointer">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg>
+    <span style="font-size: 17px">Add up to 4 photos</span>
+  </button>
+
+  <label style="display: block; margin: 20px 16px 0 16px">
+    <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">What did you build?</span>
+    <textarea maxlength="500" placeholder="What did you build or learn?" style="width: 100%; box-sizing: border-box; height: 96px; border: 0; background: transparent; color: #F3EEF5; font-family: inherit; font-size: 17px; line-height: 1.4; resize: none; outline: none; padding: 0"></textarea>
+  </label>
+  <div style="margin: 0 16px; text-align: right; font-family: 'Geist Mono', monospace; font-size: 12px; color: #8A8390">0 / 500</div>
+
+  <div style="margin: 16px 16px 0 16px; display: flex; gap: 8px; flex-wrap: wrap">
+    <span style="font-size: 15px; background: #0E2019; border-radius: 999px; padding: 6px 12px">React</span>
+    <span style="font-size: 15px; background: #0E2019; border-radius: 999px; padding: 6px 12px">Maps</span>
+    <span style="font-size: 15px; color: #A79FAD; border: 1px dashed #1B382D; border-radius: 999px; padding: 5px 11px">+ Skill</span>
+  </div>
+
+  <div style="margin: 28px 16px 0 16px; background: #08140F; border-radius: 10px">
+    <button onClick="{{cycle}}" style="width: 100%; display: flex; justify-content: space-between; align-items: center; min-height: 52px; padding: 0 16px; border: 0; border-bottom: 0.5px solid rgba(255,255,255,0.10); background: transparent; color: #F3EEF5; font-size: 17px; cursor: pointer">
+      <span>Who can see this</span><span style="color: #A79FAD">{{vis}} ›</span></button>
+    <button style="width: 100%; display: flex; justify-content: space-between; align-items: center; min-height: 52px; padding: 0 16px; border: 0; background: transparent; color: #F3EEF5; font-size: 17px; cursor: pointer">
+      <span>Add a link</span><span style="color: #A79FAD">GitHub, demo, Figma ›</span></button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { v: 0 }; }
+  renderVals() {
+    var self = this, opts = ['Everyone', 'Connections', 'My organisation'];
+    return { vis: opts[this.state.v], cycle: function () { self.setState({ v: (self.state.v + 1) % 3 }); } };
+  }
+}
+</script>
+</body>
+</html>

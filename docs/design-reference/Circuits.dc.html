@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Circuits</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+  <div style="height: 64px"></div>
+  <h1 style="margin: 0 16px; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Circuits</h1>
+
+  <section aria-label="This week's circuit" style="margin: 24px 16px 0 16px; background: #08140F; border-radius: 14px; padding: 20px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 600">{{title}}</h2>
+      <span style="font-family: 'Geist Mono', monospace; font-size: 15px; color: #A79FAD">{{timeLeft}}</span>
+    </div>
+
+    <div style="position: relative; width: 240px; height: 210px; margin: 16px auto 0 auto">
+      <svg width="240" height="210" viewBox="0 0 240 210" fill="none" role="img" aria-label="{{ringLabel}}">
+        <defs>
+          <linearGradient id="sig" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#2FBF8A"/>
+            <stop offset="1" stop-color="#8E8CFF"/>
+          </linearGradient>
+        </defs>
+        <path d="M120 22 A88 88 0 0 1 196.2 154" stroke="{{seg.a}}" stroke-width="4" stroke-linecap="round"/>
+        <path d="M196.2 154 A88 88 0 0 1 43.8 154" stroke="{{seg.b}}" stroke-width="4" stroke-linecap="round"/>
+        <path d="M43.8 154 A88 88 0 0 1 120 22" stroke="{{seg.c}}" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="120" cy="22" r="20" fill="#0E2019" stroke="#08140F" stroke-width="4"/>
+        <circle cx="196.2" cy="154" r="20" fill="#0E2019" stroke="#08140F" stroke-width="4"/>
+        <circle cx="43.8" cy="154" r="20" fill="#0E2019" stroke="#08140F" stroke-width="4"/>
+      </svg>
+      <span style="position: absolute; left: 0; right: 0; top: 92px; display: flex; justify-content: center; font-size: 15px; color: #A79FAD">{{centre}}</span>
+      <span style="position: absolute; left: 140px; top: 10px; font-size: 15px">You</span>
+      <span style="position: absolute; right: -36px; top: 186px; font-size: 15px">Priya</span>
+      <span style="position: absolute; left: -36px; top: 186px; font-size: 15px">Arjun</span>
+    </div>
+
+    <ul style="list-style: none; margin: 20px 0 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px">
+      <li style="font-size: 17px">You help Priya with <span style="font-weight: 600">fundraising</span></li>
+      <li style="font-size: 17px; color: #A79FAD">Priya helps Arjun with hiring · accepted</li>
+      <li style="font-size: 17px; color: #A79FAD">Arjun helps you with marketing · accepted</li>
+    </ul>
+
+    <sc-if value="{{pending}}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{accept}}" style="margin-top: 24px; width: 100%; height: 50px; border: 0; border-radius: 12px; background: #00563F; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Accept</button>
+      <button style="width: 100%; height: 44px; border: 0; background: transparent; color: #A79FAD; font-size: 17px; cursor: pointer">Decline</button>
+    </sc-if>
+    <sc-if value="{{closed}}" hint-placeholder-val="{{ false }}">
+      <p style="margin: 24px 0 0 0; font-size: 17px; line-height: 1.4">Circuit closed. You help Priya with fundraising. We'll check in next week.</p>
+      <button onClick="{{reset}}" style="margin-top: 8px; height: 44px; border: 0; background: transparent; color: #A79FAD; font-size: 17px; padding: 0; cursor: pointer">Replay</button>
+    </sc-if>
+  </section>
+
+  <section aria-label="Completed circuits" style="margin: 40px 16px 0 16px">
+    <h2 style="margin: 0 0 12px 0; font-size: 17px; font-weight: 600">Completed</h2>
+    <div style="display: flex; gap: 16px">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" role="img" aria-label="Completed circuit, September"><circle cx="22" cy="22" r="17" stroke="#1B382D" stroke-width="3"/></svg>
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" role="img" aria-label="Completed circuit, August"><circle cx="22" cy="22" r="17" stroke="#1B382D" stroke-width="3"/></svg>
+      <span style="font-size: 15px; color: #A79FAD; align-self: center">2 circuits closed</span>
+    </div>
+  </section>
+
+  <div style="position: absolute; left: 0; bottom: 0; width: 390px; height: 83px">
+    <dc-import name="TabBar" active="circuits" hint-size="390px,83px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { closed: false }; }
+  renderVals() {
+    var self = this, c = this.state.closed;
+    var lit = 'url(#sig)', dim = '#142C23';
+    return {
+      title: c ? 'Circuit closed' : 'Proposed for you',
+      timeLeft: c ? 'Done' : '2d 14h left',
+      centre: c ? '3 of 3 in' : '2 of 3 in',
+      ringLabel: c ? 'All three accepted' : 'Priya and Arjun accepted, waiting for you',
+      seg: { a: c ? lit : dim, b: lit, c: lit },
+      pending: !c, closed: c,
+      accept: function () { self.setState({ closed: true }); },
+      reset: function () { self.setState({ closed: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

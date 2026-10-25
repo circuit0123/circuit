@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Circuit Profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}a:hover{color:#FFFFFF}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div style="padding: 20px 16px 0 16px; display: flex; justify-content: flex-end; align-items: center; height: 44px">
+    <a href="Settings.dc.html" aria-label="Settings" style="width: 44px; height: 44px; color: #F3EEF5; display: flex; align-items: center; justify-content: flex-end">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"></path></svg>
+    </a>
+  </div>
+
+  <div style="display: flex; gap: 16px; align-items: center; margin: 4px 16px 0 16px">
+    <div style="flex: 0 0 72px; width: 72px; height: 72px; border-radius: 999px; background: #0E2019; display: flex; align-items: center; justify-content: center; color: #1B382D">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 15h6l3-6 3 6h6"></path><circle cx="12" cy="9" r="1.2"></circle></svg>
+    </div>
+    <div style="min-width: 0">
+      <h1 style="margin: 0; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Ravi Kumar</h1>
+      <div style="font-size: 15px; color: #A79FAD; margin-top: 4px">Frontend developer · Madurai</div>
+    </div>
+  </div>
+
+  <p style="margin: 20px 16px 0 16px; font-size: 17px; line-height: 1.4">Third-year B.Tech student building maps and dashboards for small farms. Open to internships.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 16px 0 16px">
+    <a href="Profile.dc.html" style="height: 44px; border-radius: 12px; background: #0E2019; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 500">Edit profile</a>
+    <a href="Profile.dc.html" style="height: 44px; border-radius: 12px; background: #0E2019; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 500">Share</a>
+  </div>
+
+  <section aria-label="Offers and needs" style="margin: 40px 16px 0 16px">
+    <h2 style="margin: 0 0 12px 0; font-size: 17px; font-weight: 600">What I offer and need</h2>
+    <div style="background: #08140F; border-radius: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 56px; padding: 0 16px; border-bottom: 0.5px solid rgba(255,255,255,0.10)">
+        <span style="font-size: 17px">Offers</span>
+        <span style="font-size: 15px; color: #A79FAD">React, maps, dashboards</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 56px; padding: 0 16px">
+        <span style="font-size: 17px">Needs</span>
+        <span style="font-size: 15px; color: #A79FAD">Mentoring, backend</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Build logs" style="margin: 40px 16px 0 16px">
+    <h2 style="margin: 0 0 12px 0; font-size: 17px; font-weight: 600">Build logs</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+      <sc-for list="{{logs}}" as="l" hint-placeholder-count="3">
+        <div role="img" aria-label="{{l}}" style="aspect-ratio: 1 / 1; border-radius: 6px; background: #0E2019; display: flex; align-items: center; justify-content: center; color: #1B382D">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M2 16h6l3-7 3 7h8"></path><circle cx="11" cy="9" r="1.2"></circle></svg>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <nav aria-label="Tabs" style="position: absolute; left: 0; right: 0; bottom: 0; height: 83px; background: rgba(8,20,15,0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid rgba(255,255,255,0.10); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding-top: 8px; box-sizing: border-box">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20h-5v-6H9v6H4z"></path></svg>Home</a>
+    <a href="Discover.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></svg>Discover</a>
+    <a href="Circuits.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="4.5" r="1.8" fill="#000"></circle><circle cx="5.5" cy="15.8" r="1.8" fill="#000"></circle><circle cx="18.5" cy="15.8" r="1.8" fill="#000"></circle></svg>Circuits</a>
+    <a href="Inbox.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>Inbox</a>
+    <a href="Profile.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #F3EEF5; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"></circle><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { logs: ['Build log: farm map v2', 'Build log: soil dashboard', 'Build log: offline mode'] };
+  }
+}
+</script>
+</body>
+</html>

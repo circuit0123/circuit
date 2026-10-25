@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Circuit Discover Jobs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}a:hover{color:#FFFFFF}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div style="padding: 20px 16px 0 16px; display: flex; justify-content: flex-end; align-items: center; height: 44px">
+    <button aria-label="Search" style="width: 44px; height: 44px; border: 0; background: transparent; color: #F3EEF5; display: flex; align-items: center; justify-content: flex-end; padding: 0; cursor: pointer">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>
+    </button>
+  </div>
+  <h1 style="margin: 4px 16px 0 16px; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Discover</h1>
+
+  <div role="tablist" aria-label="Discover sections" style="margin: 20px 16px 0 16px; background: #0E2019; border-radius: 10px; padding: 2px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px">
+    <sc-for list="{{segments}}" as="s" hint-placeholder-count="4">
+      <button role="tab" aria-selected="{{s.selected}}" onClick="{{s.pick}}" style="height: 32px; border: 0; border-radius: 8px; background: {{s.bg}}; color: {{s.color}}; font-size: 15px; font-weight: 500; cursor: pointer">{{s.label}}</button>
+    </sc-for>
+  </div>
+
+  <section aria-label="Skills in demand" style="margin: 40px 16px 0 16px">
+    <h2 style="margin: 0 0 12px 0; font-size: 17px; font-weight: 600">Skills in demand near you</h2>
+    <p style="margin: 0; font-size: 15px; line-height: 1.4; color: #A79FAD">Backend development, frontend development and embedded systems have the most open roles within 10 km.</p>
+  </section>
+
+  <section aria-label="Roles near you" style="margin: 40px 0 0 0">
+    <h2 style="margin: 0 16px 4px 16px; font-size: 17px; font-weight: 600">Roles that fit your skills</h2>
+    <sc-for list="{{jobs}}" as="j" hint-placeholder-count="4">
+      <a href="Job.dc.html" style="display: flex; gap: 16px; align-items: flex-start; padding: 16px; border-bottom: 0.5px solid rgba(255,255,255,0.10)">
+        <div style="flex: 0 0 44px; width: 44px; height: 44px; border-radius: 12px; background: #0E2019; display: flex; align-items: center; justify-content: center; color: #8A8390">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="2"></rect><path d="M9 7V5h6v2"></path></svg>
+        </div>
+        <div style="flex: 1 1 auto; min-width: 0">
+          <div style="font-size: 17px; font-weight: 600; line-height: 1.3">{{j.title}}</div>
+          <div style="font-size: 15px; color: #A79FAD; margin-top: 4px">{{j.where}}</div>
+          <div style="display: flex; justify-content: space-between; margin-top: 4px">
+            <span style="font-family: 'Geist Mono', monospace; font-size: 15px; color: #F3EEF5">{{j.pay}}</span>
+            <span style="font-size: 15px; color: #A79FAD">{{j.fit}}</span>
+          </div>
+        </div>
+      </a>
+    </sc-for>
+  </section>
+
+  <nav aria-label="Tabs" style="position: absolute; left: 0; right: 0; bottom: 0; height: 83px; background: rgba(8,20,15,0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid rgba(255,255,255,0.10); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding-top: 8px; box-sizing: border-box">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20h-5v-6H9v6H4z"></path></svg>Home</a>
+    <a href="Discover.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #F3EEF5; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></svg>Discover</a>
+    <a href="Circuits.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="4.5" r="1.8" fill="#000"></circle><circle cx="5.5" cy="15.8" r="1.8" fill="#000"></circle><circle cx="18.5" cy="15.8" r="1.8" fill="#000"></circle></svg>Circuits</a>
+    <a href="Inbox.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>Inbox</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"></circle><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { seg: 'Jobs' }; }
+  renderVals() {
+    var self = this;
+    var seg = this.state.seg;
+    var segments = ['People', 'Startups', 'Jobs', 'Map'].map(function (l) {
+      var on = l === seg;
+      return { label: l, selected: on ? 'true' : 'false', bg: on ? '#1B382D' : 'transparent', color: on ? '#F3EEF5' : '#A79FAD', pick: function () { self.setState({ seg: l }); } };
+    });
+    return {
+      segments: segments,
+      jobs: [
+        { title: 'Frontend intern', where: 'Tatvagrid · Agritech · 3.2 km', pay: '₹15,000/mo', fit: 'Strong skill match' },
+        { title: 'Backend engineer', where: 'Sutragrid · Logistics · 5.8 km', pay: '₹6–8 LPA', fit: 'Good skill match' },
+        { title: 'Embedded intern', where: 'Zetapulse · Deeptech · 7.1 km', pay: '₹12,000/mo', fit: 'Good skill match' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Circuit logo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 960px; height: 640px; display: flex; flex-direction: column; font-family: Geist, system-ui, sans-serif">
+  <sc-for list="{{rows}}" as="r" hint-placeholder-count="2">
+    <div style="flex: 1 1 0; background: {{r.bg}}; display: flex; align-items: center; gap: 72px; padding: 0 72px">
+      <div style="width: 176px; height: 176px; border-radius: 40px; background: {{r.iconBg}}; display: flex; align-items: center; justify-content: center; flex: 0 0 auto">
+        <svg width="120" height="120" viewBox="0 0 100 100" fill="none" role="img" aria-label="Circuit app icon">
+          <path d="M20 68 C20 30, 80 30, 80 68" stroke="{{r.iconMark}}" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="20" cy="68" r="9" fill="{{r.iconMark}}" stroke="{{r.iconBg}}" stroke-width="4"/>
+          <circle cx="80" cy="68" r="9" fill="{{r.iconMark}}" stroke="{{r.iconBg}}" stroke-width="4"/>
+          <circle cx="50" cy="39.5" r="6" fill="{{r.iconMark}}" stroke="{{r.iconBg}}" stroke-width="4"/>
+        </svg>
+      </div>
+      <div style="display: flex; align-items: center; gap: 20px">
+        <svg width="80" height="80" viewBox="0 0 100 100" fill="none" role="img" aria-label="Circuit logo">
+          <path d="M20 68 C20 30, 80 30, 80 68" stroke="{{r.mark}}" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="20" cy="68" r="9" fill="{{r.mark}}" stroke="{{r.bg}}" stroke-width="4"/>
+          <circle cx="80" cy="68" r="9" fill="{{r.mark}}" stroke="{{r.bg}}" stroke-width="4"/>
+          <circle cx="50" cy="39.5" r="6" fill="{{r.mark}}" stroke="{{r.bg}}" stroke-width="4"/>
+        </svg>
+        <span style="font-size: 64px; font-weight: 600; letter-spacing: -0.035em; color: {{r.text}}">circuit</span>
+      </div>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { rows: [
+      { bg: '#C2BCC8', text: '#120309', mark: '#00563F', iconBg: '#00563F', iconMark: '#FFFFFF' },
+      { bg: '#000000', text: '#F3EEF5', mark: '#2FBF8A', iconBg: '#00563F', iconMark: '#FFFFFF' }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

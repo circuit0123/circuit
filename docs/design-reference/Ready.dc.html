@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>You're on the circuit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+  <div role="progressbar" aria-label="Sign-up complete" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="position: absolute; left: 0; right: 0; top: 0; height: 3px; background: #2FBF8A"></div>
+
+  <div style="margin: 88px 16px 0 16px">
+    <svg width="64" height="64" viewBox="0 0 100 100" fill="none" role="img" aria-label="Circuit logo"><path d="M20 68 C20 30, 80 30, 80 68" stroke="#2FBF8A" stroke-width="7" stroke-linecap="round"/><circle cx="20" cy="68" r="9" fill="#2FBF8A" stroke="#000000" stroke-width="4"/><circle cx="80" cy="68" r="9" fill="#2FBF8A" stroke="#000000" stroke-width="4"/><circle cx="50" cy="39.5" r="6" fill="#2FBF8A" stroke="#000000" stroke-width="4"/></svg>
+    <h1 style="margin: 24px 0 0 0; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">You're on the circuit.</h1>
+    <p style="margin: 12px 0 0 0; font-size: 17px; line-height: 1.4; color: #A79FAD">Here's the first person in today's drop.</p>
+  </div>
+
+  <article style="margin: 40px 16px 0 16px; background: #08140F; border-radius: 14px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.45)">
+    <p style="margin: 0; font-size: 22px; line-height: 1.25; font-weight: 500; letter-spacing: -0.012em">Sakthi can help you with <span style="font-weight: 600">backend</span></p>
+    <div style="font-size: 15px; color: #A79FAD; margin-top: 12px">via Meera, mentor</div>
+    <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px">
+      <div style="width: 44px; height: 44px; border-radius: 999px; background: #0E2019"></div>
+      <div>
+        <div style="font-size: 17px; font-weight: 600">Sakthi Vel</div>
+        <div style="font-size: 15px; color: #A79FAD">Backend mentor · Chennai</div>
+      </div>
+    </div>
+  </article>
+
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 34px">
+    <a href="Main.dc.html" style="width: 100%; height: 50px; border-radius: 12px; background: #00563F; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center">See today's drop</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

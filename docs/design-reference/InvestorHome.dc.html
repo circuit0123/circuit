@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Investor home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+  <div style="height: 64px"></div>
+  <h1 style="margin: 0 16px; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Today</h1>
+
+  <section aria-label="Today's picks" style="margin: 32px 16px 0 16px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 600">Today's picks</h2>
+      <span style="font-size: 15px; color: #A79FAD">{{counter}}</span>
+    </div>
+    <sc-if value="{{hasPick}}" hint-placeholder-val="{{ true }}">
+      <article style="background: #08140F; border-radius: 14px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.45)">
+        <p style="margin: 0; font-size: 22px; line-height: 1.25; font-weight: 500; letter-spacing: -0.012em">{{p.fit}}</p>
+        <div style="margin-top: 16px; height: 140px; border-radius: 10px; background: #0E2019"></div>
+        <div style="display: flex; align-items: center; gap: 6px; margin-top: 16px">
+          <span style="font-size: 17px; font-weight: 600">{{p.name}}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A79FAD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Verified founders"><path d="M12 3l2.4 1.8 3 .1.9 2.9 2.4 1.8-.9 2.9.9 2.9-2.4 1.8-.9 2.9-3 .1L12 21l-2.4-1.8-3-.1-.9-2.9-2.4-1.8.9-2.9-.9-2.9 2.4-1.8.9-2.9 3-.1z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+        </div>
+        <div style="font-size: 15px; color: #A79FAD; margin-top: 4px">{{p.meta}}</div>
+        <ul style="list-style: none; margin: 16px 0 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{p.signals}}" as="s" hint-placeholder-count="3">
+            <li style="font-size: 15px; color: #F3EEF5">{{s}}</li>
+          </sc-for>
+        </ul>
+        <div style="font-size: 15px; color: #A79FAD; margin-top: 12px">{{p.via}}</div>
+        <button onClick="{{next}}" style="margin-top: 20px; width: 100%; height: 50px; border: 0; border-radius: 12px; background: #00563F; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Request intro</button>
+        <button onClick="{{next}}" style="width: 100%; height: 44px; border: 0; background: transparent; color: #A79FAD; font-size: 17px; cursor: pointer">Pass</button>
+      </article>
+    </sc-if>
+    <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 40px 0">
+        <p style="margin: 0; font-size: 22px; font-weight: 500">That's today's picks.</p>
+        <p style="margin: 8px 0 0 0; font-size: 17px; color: #A79FAD">New ones tomorrow at 8.</p>
+        <button onClick="{{restart}}" style="margin-top: 16px; height: 44px; border: 0; background: transparent; color: #F3EEF5; font-size: 17px; padding: 0; cursor: pointer">See them again</button>
+      </div>
+    </sc-if>
+  </section>
+
+  <div style="position: absolute; left: 0; bottom: 0; width: 390px; height: 83px">
+    <dc-import name="TabBar" active="home" hint-size="390px,83px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { i: 0 }; }
+  renderVals() {
+    var self = this, i = this.state.i;
+    var picks = [
+      { fit: 'Seed-stage healthtech in Coimbatore, shipping weekly', name: 'Medisetu', meta: 'Healthtech · Seed · 6 people', signals: ['4 build logs this month', '2 roles open', 'Raising'], via: 'via Kavya, growth lead' },
+      { fit: 'Pre-seed agritech in Madurai with paying farms', name: 'Tatvagrid', meta: 'Agritech · Pre-seed · 4 people', signals: ['6 build logs this month', 'Hiring an intern', 'Founders verified'], via: 'via Meera, mentor' },
+      { fit: 'Seed-stage logistics in Chennai, growing routes', name: 'Sutragrid', meta: 'Logistics · Seed · 11 people', signals: ['3 build logs this month', '1 role open', 'Closing round'], via: 'No mutual connections yet' }
+    ];
+    return {
+      p: picks[Math.min(i, 2)], hasPick: i < 3, done: i >= 3,
+      counter: (Math.min(i, 2) + 1) + ' of 3',
+      next: function () { self.setState({ i: i + 1 }); },
+      restart: function () { self.setState({ i: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

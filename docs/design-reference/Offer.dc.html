@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What you can offer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+  <div role="progressbar" aria-label="Sign-up progress" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100" style="position: absolute; left: 0; right: 0; top: 0; height: 3px; background: #0E2019"><div style="width: 65%; height: 3px; background: #2FBF8A"></div></div>
+  <div style="padding: 20px 8px 0 8px; height: 44px; display: flex; align-items: center">
+    <a href="Work.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+  </div>
+
+  <div style="margin: 24px 16px 0 16px">
+    <h1 style="margin: 0; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Here's what you can offer.</h1>
+    <p style="margin: 12px 0 0 0; font-size: 17px; line-height: 1.4; color: #A79FAD">We picked these from what you wrote. Tap to remove or add back.</p>
+    <div role="group" aria-label="Your skills" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px">
+      <sc-for list="{{chips}}" as="c" hint-placeholder-count="6">
+        <button aria-pressed="{{c.pressed}}" onClick="{{c.toggle}}" style="height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: {{c.bg}}; color: {{c.fg}}; font-size: 17px; font-weight: 500; cursor: pointer">{{c.label}}</button>
+      </sc-for>
+      <button style="height: 40px; padding: 0 16px; border: 1px dashed #1B382D; border-radius: 999px; background: transparent; color: #A79FAD; font-size: 17px; cursor: pointer">+ Add</button>
+    </div>
+    <p style="margin: 20px 0 0 0; font-family: 'Geist Mono', monospace; font-size: 15px; color: #8A8390">{{count}} of 5</p>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 34px">
+    <a href="Colour.dc.html" style="width: 100%; height: 50px; border-radius: 12px; background: #00563F; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center">Continue</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { on: { 'Frontend development': true, 'React': true, 'Maps': true, 'Dashboards': true, 'UI design': false, 'Data analysis': false } }; }
+  renderVals() {
+    var self = this, on = this.state.on;
+    var labels = Object.keys(on);
+    var n = labels.filter(function (l) { return on[l]; }).length;
+    return {
+      count: n,
+      chips: labels.map(function (l) {
+        var sel = on[l];
+        return { label: l, pressed: sel ? 'true' : 'false', bg: sel ? '#00563F' : '#0E2019', fg: sel ? '#FFFFFF' : '#A79FAD',
+          toggle: function () {
+            if (!sel && n >= 5) { return; }
+            var next = Object.assign({}, on); next[l] = !sel; self.setState({ on: next });
+          } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

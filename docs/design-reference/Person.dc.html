@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sakthi Vel profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+  <div style="padding: 20px 8px 0 8px; display: flex; justify-content: space-between; align-items: center; height: 44px">
+    <a href="People.dc.html" aria-label="Back" style="height: 44px; display: flex; align-items: center; gap: 2px; padding: 0 8px; font-size: 17px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Discover</a>
+    <button aria-label="More: share, report, block" style="width: 44px; height: 44px; border: 0; background: transparent; color: #F3EEF5; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>
+  </div>
+
+  <div style="margin: 8px 16px 0 16px">
+    <div style="width: 88px; height: 88px; border-radius: 999px; background: #0E2019"></div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-top: 16px">
+      <h1 style="margin: 0; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Sakthi Vel</h1>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A79FAD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Verified, level 3"><path d="M12 3l2.4 1.8 3 .1.9 2.9 2.4 1.8-.9 2.9.9 2.9-2.4 1.8-.9 2.9-3 .1L12 21l-2.4-1.8-3-.1-.9-2.9-2.4-1.8.9-2.9-.9-2.9 2.4-1.8.9-2.9 3-.1z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+    </div>
+    <div style="font-size: 15px; color: #A79FAD; margin-top: 4px">Backend mentor · Chennai · 12 mutual connections</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 16px 0 16px">
+    <button onClick="{{connect}}" style="height: 44px; border: 0; border-radius: 12px; background: {{cBg}}; color: {{cFg}}; font-size: 17px; font-weight: 600; cursor: pointer">{{cLabel}}</button>
+    <a href="Chat.dc.html" style="height: 44px; border-radius: 12px; background: #0E2019; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 500">Message</a>
+  </div>
+  <a href="Chat.dc.html" style="display: flex; align-items: center; justify-content: space-between; margin: 12px 16px 0 16px; height: 44px; font-size: 15px; color: #A79FAD">Intro via Meera, mentor
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>
+
+  <section aria-label="Offers and needs" style="margin: 28px 16px 0 16px">
+    <div style="font-size: 15px; color: #A79FAD; margin-bottom: 8px">Offers</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <span style="font-size: 15px; background: #0E2019; border-radius: 999px; padding: 6px 12px">API design</span>
+      <span style="font-size: 15px; background: #0E2019; border-radius: 999px; padding: 6px 12px">Offline sync</span>
+      <span style="font-size: 15px; background: #0E2019; border-radius: 999px; padding: 6px 12px">First hire</span>
+    </div>
+    <div style="font-size: 15px; color: #A79FAD; margin: 16px 0 8px 0">Needs</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <span style="font-size: 15px; background: #0E2019; border-radius: 999px; padding: 6px 12px">UI design</span>
+    </div>
+  </section>
+
+  <div role="tablist" aria-label="Profile sections" style="margin: 32px 16px 0 16px; background: #0E2019; border-radius: 10px; padding: 2px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px">
+    <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+      <button role="tab" aria-selected="{{t.selected}}" onClick="{{t.pick}}" style="height: 32px; border: 0; border-radius: 8px; background: {{t.bg}}; color: {{t.color}}; font-size: 15px; font-weight: 500; cursor: pointer">{{t.label}}</button>
+    </sc-for>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin: 16px 16px 0 16px">
+    <div style="aspect-ratio: 1 / 1; border-radius: 6px; background: #0E2019"></div>
+    <div style="aspect-ratio: 1 / 1; border-radius: 6px; background: #0E2019"></div>
+    <div style="aspect-ratio: 1 / 1; border-radius: 6px; background: #0E2019"></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sent: false, tab: 'Build logs' }; }
+  renderVals() {
+    var self = this, sent = this.state.sent, tab = this.state.tab;
+    return {
+      cLabel: sent ? 'Request sent' : 'Connect',
+      cBg: sent ? '#0E2019' : '#00563F',
+      cFg: sent ? '#A79FAD' : '#FFFFFF',
+      connect: function () { self.setState({ sent: !sent }); },
+      tabs: ['Build logs', 'Circuits', 'About'].map(function (l) {
+        var on = l === tab;
+        return { label: l, selected: on ? 'true' : 'false', bg: on ? '#1B382D' : 'transparent', color: on ? '#F3EEF5' : '#A79FAD', pick: function () { self.setState({ tab: l }); } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

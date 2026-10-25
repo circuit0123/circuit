@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Live wire update</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div role="img" aria-label="{{u.alt}}" style="position: absolute; left: 0; top: 0; width: 390px; height: 560px; background: #08140F; display: flex; align-items: center; justify-content: center; color: #142C23">
+    <svg width="340" height="220" viewBox="0 0 340 220" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M0 160h90l40-70h110l40 40h60"/><path d="M60 60h80l30 30h100"/><circle cx="130" cy="90" r="5"/><circle cx="280" cy="130" r="5"/><circle cx="170" cy="90" r="5"/></svg>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; top: 0; padding: 20px 16px 0 16px; display: flex; justify-content: space-between; align-items: center; height: 44px">
+    <a href="Main.dc.html" aria-label="Close" style="width: 44px; height: 44px; border-radius: 999px; background: rgba(8,20,15,0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3EEF5" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </a>
+    <span style="font-family: 'Geist Mono', monospace; font-size: 15px; color: #A79FAD; background: rgba(8,20,15,0.6); border-radius: 999px; padding: 6px 12px">{{pos}}</span>
+  </div>
+
+  <button aria-label="Previous update" onClick="{{prev}}" style="position: absolute; left: 0; top: 80px; width: 120px; height: 460px; border: 0; background: transparent; cursor: pointer"></button>
+  <button aria-label="Next update" onClick="{{next}}" style="position: absolute; right: 0; top: 80px; width: 120px; height: 460px; border: 0; background: transparent; cursor: pointer"></button>
+
+  <div style="position: absolute; left: 0; right: 0; top: 584px; padding: 0 16px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <div style="width: 40px; height: 40px; border-radius: 999px; background: #0E2019"></div>
+      <div>
+        <div style="font-size: 17px; font-weight: 600">{{u.name}}</div>
+        <div style="font-size: 15px; color: #A79FAD">{{u.meta}}</div>
+      </div>
+    </div>
+    <p style="margin: 16px 0 0 0; font-size: 22px; line-height: 1.25; font-weight: 500; letter-spacing: -0.012em">{{u.what}}</p>
+    <p style="margin: 8px 0 0 0; font-size: 15px; color: #A79FAD">{{u.why}}</p>
+    <button style="margin-top: 20px; width: 100%; height: 50px; border: 0; border-radius: 12px; background: #00563F; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">{{u.action}}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { i: 0 }; }
+  renderVals() {
+    var ups = [
+      { name: 'Divya Subramanian', meta: 'Founder, Tatvagrid · 2h', what: 'Divya shipped offline sync for farm records.', why: 'You both build with React · 3 km away', action: 'Intro me', alt: 'Screenshot of the offline sync screen' },
+      { name: 'Sutragrid', meta: 'Logistics startup · 5h', what: 'Sutragrid is hiring a backend engineer.', why: 'Matches 4 of your 5 skills · 5.8 km away', action: 'View role', alt: 'Sutragrid office' },
+      { name: 'Balaji Natarajan', meta: 'Founder · 8h', what: 'Balaji needs help with UI design.', why: 'You offer UI design · via Meera, mentor', action: 'Intro me', alt: 'Sketch of a dashboard' }
+    ];
+    var i = this.state.i, self = this, n = ups.length;
+    return {
+      u: ups[i],
+      pos: (i + 1) + ' of ' + n,
+      next: function () { self.setState({ i: (i + 1) % n }); },
+      prev: function () { self.setState({ i: (i + n - 1) % n }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

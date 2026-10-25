@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Circuit Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}a:hover{color:#FFFFFF}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #000000; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div style="padding: 20px 16px 0 16px; display: flex; justify-content: space-between; align-items: center; height: 44px">
+    <a href="Composer.dc.html" aria-label="New build log" style="width: 44px; height: 44px; color: #F3EEF5; display: flex; align-items: center; justify-content: flex-start">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    </a>
+    <a href="Notifications.dc.html" aria-label="Notifications, 2 unread" style="width: 44px; height: 44px; color: #F3EEF5; display: flex; align-items: center; justify-content: flex-end; position: relative">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"></path><path d="M10 19.5a2 2 0 0 0 4 0"></path></svg>
+      <span style="position: absolute; top: 9px; right: 0px; width: 8px; height: 8px; border-radius: 999px; background: {{accent}}; border: 2px solid #000000"></span>
+    </a>
+  </div>
+
+  <h1 style="margin: 4px 16px 0 16px; font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em">Today</h1>
+
+  <section aria-label="Live wire" style="margin-top: 24px; position: relative">
+    <div style="position: absolute; left: 0; right: 0; top: 22px; height: 1.5px; background: rgba(255,255,255,0.10)"></div>
+    <div style="display: flex; gap: 20px; padding: 0 16px; overflow: hidden; -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent)">
+      <sc-for list="{{wire}}" as="n" hint-placeholder-count="6">
+        <a href="Update.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 0 0 auto; width: 52px; opacity: {{n.opacity}}">
+          <div style="position: relative; width: 44px; height: 44px">
+            <div style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 12px; background: #0E2019; border: {{n.ring}}; display: flex; align-items: center; justify-content: center; color: #8A8390">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 16h5l3-8 3 8h5"></path><circle cx="4" cy="16" r="1.4"></circle><circle cx="20" cy="16" r="1.4"></circle></svg>
+            </div>
+            <div style="position: absolute; right: -4px; bottom: -4px; width: 20px; height: 20px; border-radius: 999px; background: #142C23; border: 2px solid #000000; box-sizing: border-box"></div>
+          </div>
+          <div style="font-size: 12px; line-height: 1.2; color: #F3EEF5; letter-spacing: 0.01em">{{n.verb}}</div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="Daily Drop" style="margin: 40px 16px 0 16px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 600">Your drop</h2>
+      <span style="font-size: 15px; color: #A79FAD">{{counter}}</span>
+    </div>
+
+    <sc-if value="{{hasCard}}" hint-placeholder-val="{{ true }}">
+      <article style="background: #08140F; border-radius: 14px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.45)">
+        <p style="margin: 0; font-size: 22px; line-height: 1.25; font-weight: 500; letter-spacing: -0.012em">{{card.lead}} <span style="font-weight: 600">{{card.cap}}</span></p>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px">
+          <div style="display: flex">
+            <span style="width: 20px; height: 20px; border-radius: 999px; background: #142C23; border: 2px solid #08140F"></span>
+            <span style="width: 20px; height: 20px; border-radius: 999px; background: #1B382D; border: 2px solid #08140F; margin-left: -6px"></span>
+          </div>
+          <span style="font-size: 15px; color: #A79FAD">{{card.via}}</span>
+        </div>
+        <div style="margin-top: 16px; height: 120px; border-radius: 10px; background: #0E2019; display: flex; align-items: center; justify-content: center; color: #1B382D">
+          <svg width="220" height="80" viewBox="0 0 220 80" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M0 60h50l20-30h60l20 20h70"></path><path d="M30 20h40l15 15h50"></path><circle cx="70" cy="30" r="3"></circle><circle cx="150" cy="50" r="3"></circle><circle cx="135" cy="35" r="3"></circle></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; margin-top: 16px">
+          <span style="font-size: 17px; font-weight: 600">{{card.name}}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A79FAD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Verified"><path d="M12 3l2.4 1.8 3 .1.9 2.9 2.4 1.8-.9 2.9.9 2.9-2.4 1.8-.9 2.9-3 .1L12 21l-2.4-1.8-3-.1-.9-2.9-2.4-1.8.9-2.9-.9-2.9 2.4-1.8.9-2.9 3-.1z"></path><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg>
+          <sc-if value="{{card.bridge}}" hint-placeholder-val="{{ false }}">
+            <span style="margin-left: 4px; font-size: 12px; color: #8E8CFF; border: 1px solid rgba(142,140,255,0.45); border-radius: 999px; padding: 2px 8px">Bridge match</span>
+          </sc-if>
+        </div>
+        <div style="font-size: 15px; color: #A79FAD; margin-top: 4px">{{card.meta}}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <sc-for list="{{card.chips}}" as="c" hint-placeholder-count="2">
+              <span style="font-size: 15px; background: #0E2019; border-radius: 999px; padding: 6px 12px">{{c}}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="font-size: 15px; color: #A79FAD; margin-top: 12px">{{card.strength}}</div>
+        <button onClick="{{intro}}" style="margin-top: 20px; width: 100%; height: 50px; border: 0; border-radius: 12px; background: #00563F; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Intro me</button>
+        <button onClick="{{skip}}" style="width: 100%; height: 44px; border: 0; background: transparent; color: #A79FAD; font-size: 17px; cursor: pointer">Skip</button>
+      </article>
+    </sc-if>
+    <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 48px 0; text-align: left">
+        <p style="margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.012em">That's today's drop.</p>
+        <p style="margin: 8px 0 0 0; font-size: 17px; color: #A79FAD">New one tomorrow at 8.</p>
+        <button onClick="{{restart}}" style="margin-top: 24px; height: 44px; border: 0; background: transparent; color: #F3EEF5; font-size: 17px; padding: 0; cursor: pointer">See the drop again</button>
+      </div>
+    </sc-if>
+  </section>
+
+  <nav aria-label="Tabs" style="position: absolute; left: 0; right: 0; bottom: 0; height: 83px; background: rgba(8,20,15,0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid rgba(255,255,255,0.10); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding-top: 8px; box-sizing: border-box">
+    <a href="Main.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #F3EEF5; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20h-5v-6H9v6H4z"></path></svg>Home</a>
+    <a href="Discover.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></svg>Discover</a>
+    <a href="Circuits.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="4.5" r="1.8" fill="#000"></circle><circle cx="5.5" cy="15.8" r="1.8" fill="#000"></circle><circle cx="18.5" cy="15.8" r="1.8" fill="#000"></circle></svg>Circuits</a>
+    <a href="Inbox.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>Inbox</a>
+    <a href="Profile.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8A8390; font-size: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"></circle><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#2FBF8A","options":["#2FBF8A","#5AC8FA","#8E8CFF","#FF6482","#B6E85A","#F3EEF5"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { i: 0 }; }
+  renderVals() {
+    var accent = this.props.accent ?? '#2FBF8A';
+    var cards = [
+      { lead: 'Sakthi can help you with', cap: 'mentoring', via: 'via Meera, mentor', name: 'Sakthi Vel', meta: 'Backend mentor · Chennai · 4 km', chips: ['API design', 'First hire'], strength: 'Strong match', bridge: false },
+      { lead: 'Kavya can help you with', cap: 'go-to-market', via: 'via Arun, founder', name: 'Kavya Raman', meta: 'Growth lead, healthtech · Coimbatore', chips: ['Pricing', 'Launch plan'], strength: 'Good match', bridge: true },
+      { lead: 'Farhan needs', cap: 'frontend development, which you offer', via: 'via Ishaan, student', name: 'Farhan Ali', meta: 'Founder, agritech · Chennai · 6 km', chips: ['React', 'Maps'], strength: 'Strong match', bridge: false }
+    ];
+    var verbs = ['shipped', 'hiring', 'needs', 'joined', 'shipped', 'hiring', 'needs'];
+    var wire = verbs.map(function (v, k) {
+      var unseen = k < 3;
+      return { verb: v, ring: unseen ? ('2px solid ' + accent) : '0', opacity: unseen ? 1 : 0.6 };
+    });
+    var i = this.state.i;
+    var self = this;
+    return {
+      accent: accent,
+      wire: wire,
+      card: cards[Math.min(i, 2)],
+      hasCard: i < 3,
+      done: i >= 3,
+      counter: i < 3 ? (i + 1) + ' of 3' : '3 of 3',
+      skip: function () { self.setState({ i: i + 1 }); },
+      intro: function () { self.setState({ i: i + 1 }); },
+      restart: function () { self.setState({ i: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

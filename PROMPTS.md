@@ -100,7 +100,7 @@ I'll approve which groups to do and in which session.
 
 ## Design refinement pass (keep the existing frontend)
 ```
-Read DESIGN.md (§1a philosophy, §3 swipe between tabs, §5 "Graphite & Current" palette,
+Read DESIGN.md (§1a philosophy, §3 swipe between tabs, §5 "Emerald" palette and logo,
 personal accent, materials and iOS patterns, §7 motion). Keep the existing frontend and
 refine it in place; don't rebuild. Plan first, stopping after each step with screenshots
 at 375px (dark and light) and 1280px:

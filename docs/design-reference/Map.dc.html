@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Discover Map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+a{color:#F3EEF5;text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #050B08; color: #F3EEF5; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <svg width="390" height="844" viewBox="0 0 390 844" fill="none" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+    <path d="M-20 300 C 80 260, 160 340, 420 280" stroke="#09160F" stroke-width="40"/>
+    <path d="M0 120 L390 210 M0 520 L390 430 M120 0 L170 844 M290 0 L250 844 M0 690 L390 740" stroke="#0E2019" stroke-width="6"/>
+    <path d="M0 380 L390 360 M60 0 L40 844 M340 0 L370 844 M0 600 L390 620" stroke="#0B1A14" stroke-width="3"/>
+  </svg>
+
+  <sc-for list="{{pins}}" as="p" hint-placeholder-count="6">
+    <button aria-label="{{p.label}}" onClick="{{p.pick}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+      <span style="width: {{p.size}}px; height: {{p.size}}px; border-radius: 999px; background: {{p.fill}}; border: 3px solid #050B08; box-shadow: {{p.ring}}"></span>
+    </button>
+  </sc-for>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 60px; display: flex; flex-direction: column; gap: 12px">
+    <div role="tablist" aria-label="Discover sections" style="background: rgba(14,32,25,0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 10px; padding: 2px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px">
+      <a href="People.dc.html" role="tab" aria-selected="false" style="height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; color: #A79FAD">People</a>
+      <a href="People.dc.html" role="tab" aria-selected="false" style="height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; color: #A79FAD">Startups</a>
+      <a href="Discover.dc.html" role="tab" aria-selected="false" style="height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; color: #A79FAD">Jobs</a>
+      <a href="Map.dc.html" role="tab" aria-selected="true" style="height: 32px; border-radius: 8px; background: #1B382D; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500">Map</a>
+    </div>
+    <div style="display: flex; gap: 8px">
+      <span style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 999px; background: #00563F; color: #FFFFFF; font-size: 15px; font-weight: 500">Hiring</span>
+      <span style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 999px; background: rgba(14,32,25,0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); font-size: 15px">Within 10 km</span>
+      <span style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 999px; background: rgba(14,32,25,0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); font-size: 15px">Frontend</span>
+    </div>
+  </div>
+
+  <section aria-label="Selected startup" style="position: absolute; left: 0; right: 0; bottom: 83px; background: #08140F; border-radius: 22px 22px 0 0; padding: 8px 16px 20px 16px; box-shadow: 0 12px 40px rgba(0,0,0,.45)">
+    <div style="width: 36px; height: 5px; border-radius: 999px; background: #1B382D; margin: 0 auto 16px auto"></div>
+    <div style="display: flex; gap: 16px; align-items: center">
+      <div style="flex: 0 0 52px; height: 52px; border-radius: 12px; background: #0E2019"></div>
+      <div style="min-width: 0">
+        <div style="font-size: 17px; font-weight: 600">{{s.name}}</div>
+        <div style="font-size: 15px; color: #A79FAD; margin-top: 2px">{{s.meta}}</div>
+      </div>
+    </div>
+    <div style="font-size: 15px; color: #A79FAD; margin-top: 16px">{{s.roles}}</div>
+    <button style="margin-top: 16px; width: 100%; height: 50px; border: 0; border-radius: 12px; background: #00563F; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">I'm interested</button>
+  </section>
+
+  <div style="position: absolute; left: 0; bottom: 0; width: 390px; height: 83px">
+    <dc-import name="TabBar" active="discover" hint-size="390px,83px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sel: 0 }; }
+  renderVals() {
+    var self = this, sel = this.state.sel;
+    var data = [
+      { x: 150, y: 330, hiring: true, name: 'Tatvagrid', meta: 'Agritech · 3.2 km', roles: 'Hiring · Frontend intern · Strong skill match' },
+      { x: 250, y: 250, hiring: true, name: 'Sutragrid', meta: 'Logistics · 5.8 km', roles: 'Hiring · Backend engineer · Good skill match' },
+      { x: 90, y: 440, hiring: false, name: 'Medisetu', meta: 'Healthtech · 4.1 km', roles: 'Not hiring right now · Follow for updates' },
+      { x: 300, y: 400, hiring: true, name: 'Zetapulse', meta: 'Deeptech · 7.1 km', roles: 'Hiring · Embedded intern · Good skill match' },
+      { x: 200, y: 200, hiring: false, name: 'Kalam Labs', meta: 'Edtech · 2.4 km', roles: 'Not hiring right now · Follow for updates' },
+      { x: 330, y: 300, hiring: false, name: 'Neerflow', meta: 'Climate · 6.0 km', roles: 'Not hiring right now · Follow for updates' }
+    ];
+    var pins = data.map(function (d, k) {
+      var on = k === sel;
+      return { x: d.x, y: d.y, label: d.name + (d.hiring ? ', hiring' : ''), size: on ? 22 : 16,
+        fill: d.hiring ? '#2FBF8A' : '#2A4A3D', ring: on ? '0 0 0 4px rgba(47,191,138,0.3)' : 'none',
+        pick: function () { self.setState({ sel: k }); } };
+    });
+    return { pins: pins, s: data[sel] };
+  }
+}
+</script>
+</body>
+</html>
