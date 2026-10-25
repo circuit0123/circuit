@@ -1,21 +1,21 @@
-/* Design tokens from DESIGN.md §5 "Graphite & Current". Import once per app, after `@import "tailwindcss"`.
+/* Design tokens from DESIGN.md §5 "Emerald". Import once per app, after `@import "tailwindcss"`.
    Dark is the default; light follows the system unless data-theme overrides it.
-   `data-accent` (mint | sky | indigo | rose | lime | mono) changes only `current` and, for
-   Indigo, the paired `bridge` colour. Everything else is fixed. */
+   `data-accent` (emerald | sky | indigo | rose | lime | mono) changes only `current` and, for
+   Indigo, the paired `bridge` colour. Everything else is fixed. The landing site always uses brand emerald. */
 :root {
   color-scheme: dark;
   --bg: #000000;
   --bg-grouped: #000000;
-  --surface: #111113;
-  --surface-2: #1c1c1f;
-  --surface-3: #2a2a2e;
+  --surface: #08140f;
+  --surface-2: #0e2019;
+  --surface-3: #1b382d;
   --separator: rgba(255, 255, 255, 0.1);
-  --text: #f5f5f7;
-  --text-muted: #98989f;
-  --text-subtle: #6e6e73;
-  --primary: #f5f5f7;
-  --on-primary: #000000;
-  --current: #3ddbb0;
+  --text: #f3eef5;
+  --text-muted: #a79fad;
+  --text-subtle: #8a8390;
+  --primary: #00563f;
+  --on-primary: #ffffff;
+  --current: #2fbf8a;
   --bridge: #8e8cff;
   --warning: #ffb340;
   --danger: #ff453a;
@@ -33,64 +33,75 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     color-scheme: light;
-    --bg: #ffffff;
-    --bg-grouped: #f2f2f7;
-    --surface: #ffffff;
-    --surface-2: #f2f2f5;
-    --surface-3: #e5e5ea;
-    --separator: rgba(0, 0, 0, 0.1);
-    --text: #1d1d1f;
-    --text-muted: #6e6e73;
-    --text-subtle: #747479;
-    --primary: #1d1d1f;
+    --bg: #c2bcc8;
+    --bg-grouped: #c2bcc8;
+    --surface: #d2cdd7;
+    --surface-2: #b3acba;
+    --surface-3: #d2cdd7;
+    --separator: rgba(18, 3, 9, 0.12);
+    --text: #120309;
+    --text-muted: #4a4150;
+    --text-subtle: #4a4150;
+    --primary: #00563f;
     --on-primary: #ffffff;
-    --current: #0a8a69;
-    --bridge: #5856d6;
-    --warning: #b25e00;
-    --danger: #d70015;
+    --current: #00563f;
+    --bridge: #3b2f9e;
+    --warning: #6a3800;
+    --danger: #8f0016;
     --shadow-lift: 0 12px 40px rgba(0, 0, 0, 0.1);
   }
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #ffffff;
-  --bg-grouped: #f2f2f7;
-  --surface: #ffffff;
-  --surface-2: #f2f2f5;
-  --surface-3: #e5e5ea;
-  --separator: rgba(0, 0, 0, 0.1);
-  --text: #1d1d1f;
-  --text-muted: #6e6e73;
-  --text-subtle: #747479;
-  --primary: #1d1d1f;
+  --bg: #c2bcc8;
+  --bg-grouped: #c2bcc8;
+  --surface: #d2cdd7;
+  --surface-2: #b3acba;
+  --surface-3: #d2cdd7;
+  --separator: rgba(18, 3, 9, 0.12);
+  --text: #120309;
+  --text-muted: #4a4150;
+  --text-subtle: #4a4150;
+  --primary: #00563f;
   --on-primary: #ffffff;
-  --current: #0a8a69;
-  --bridge: #5856d6;
-  --warning: #b25e00;
-  --danger: #d70015;
+  --current: #00563f;
+  --bridge: #3b2f9e;
+  --warning: #6a3800;
+  --danger: #8f0016;
   --shadow-lift: 0 12px 40px rgba(0, 0, 0, 0.1);
 }
 
-/* Personal accents. Dark values first, then light (system light, then forced light).
-   The light rules are one step more specific so they win over the dark ones. */
+/* Personal accents (DESIGN.md §5). Dark values first, then light (system light, then forced light).
+   The light rules are one step more specific so they win over the dark ones. Emerald is the default and needs no rule. */
 :root[data-accent="sky"] { --current: #5ac8fa; }
-:root[data-accent="indigo"] { --current: #8e8cff; --bridge: #3ddbb0; }
+:root[data-accent="indigo"] { --current: #8e8cff; --bridge: #2fbf8a; }
 :root[data-accent="rose"] { --current: #ff6482; }
 :root[data-accent="lime"] { --current: #b6e85a; }
-:root[data-accent="mono"] { --current: #f5f5f7; }
+:root[data-accent="mono"] { --current: #f3eef5; }
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"])[data-accent="sky"] { --current: #0071c2; }
-  :root:not([data-theme="dark"])[data-accent="indigo"] { --current: #5856d6; --bridge: #0a8a69; }
-  :root:not([data-theme="dark"])[data-accent="rose"] { --current: #c7254e; }
-  :root:not([data-theme="dark"])[data-accent="lime"] { --current: #4d7c0f; }
-  :root:not([data-theme="dark"])[data-accent="mono"] { --current: #1d1d1f; }
+  :root:not([data-theme="dark"])[data-accent="sky"] { --current: #004e8c; }
+  :root:not([data-theme="dark"])[data-accent="indigo"] { --current: #3b2f9e; --bridge: #00563f; }
+  :root:not([data-theme="dark"])[data-accent="rose"] { --current: #8a1238; }
+  :root:not([data-theme="dark"])[data-accent="lime"] { --current: #285004; }
+  :root:not([data-theme="dark"])[data-accent="mono"] { --current: #120309; }
 }
-:root[data-theme="light"][data-accent="sky"] { --current: #0071c2; }
-:root[data-theme="light"][data-accent="indigo"] { --current: #5856d6; --bridge: #0a8a69; }
-:root[data-theme="light"][data-accent="rose"] { --current: #c7254e; }
-:root[data-theme="light"][data-accent="lime"] { --current: #4d7c0f; }
-:root[data-theme="light"][data-accent="mono"] { --current: #1d1d1f; }
+:root[data-theme="light"][data-accent="sky"] { --current: #004e8c; }
+:root[data-theme="light"][data-accent="indigo"] { --current: #3b2f9e; --bridge: #00563f; }
+:root[data-theme="light"][data-accent="rose"] { --current: #8a1238; }
+:root[data-theme="light"][data-accent="lime"] { --current: #285004; }
+:root[data-theme="light"][data-accent="mono"] { --current: #120309; }
+
+/* Show one of two versions by theme, with CSS only (the Logo uses this: on-dark and on-light files).
+   Same rule as the tokens above: dark by default, light when the system is light or data-theme="light". */
+.only-light { display: none; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .only-dark { display: none; }
+  :root:not([data-theme="dark"]) .only-light { display: revert; }
+}
+:root[data-theme="light"] .only-dark { display: none; }
+:root[data-theme="light"] .only-light { display: revert; }
+:root[data-theme="dark"] .only-light { display: none; }
 
 /* `current` is the live/active colour. Tailwind already owns `text-current` (currentColor),
    so the utility is named `live`: text-live, bg-live, border-live, ring-live. */
@@ -140,6 +151,8 @@
 
 /* Type scale (DESIGN.md §5), mobile. Large title and Title 1 grow by 2px on desktop. Sentence case, left aligned.
    Tracking: -0.022em at 28px and up, -0.012em for 20-22px, 0 for body, +0.01em for 12-13px. */
+/* Landing hero only (the Landing.dc.html headline): bigger than Large title, never used inside the app. */
+@utility t-display { font-size: 40px; line-height: 1.05; font-weight: 600; letter-spacing: -0.03em; @media (min-width: 1024px) { font-size: 64px; } }
 @utility t-large { font-size: 34px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em; @media (min-width: 1024px) { font-size: 36px; } }
 @utility t-title1 { font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em; @media (min-width: 1024px) { font-size: 30px; } }
 @utility t-title2 { font-size: 22px; line-height: 1.2; font-weight: 600; letter-spacing: -0.012em; }

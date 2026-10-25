@@ -1,9 +1,26 @@
-/** Placeholder until the landing site is rebuilt on the new design (LAUNCH.md Stage 4, landing item). */
+import { Audiences } from "@/components/Audiences";
+import { Faq } from "@/components/Faq";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { Hero } from "@/components/Hero";
+import { HowItWorks } from "@/components/HowItWorks";
+import { PilotCity } from "@/components/PilotCity";
+import { Waitlist } from "@/components/Waitlist";
+
 export default function Page() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-xl flex-col justify-center gap-4 px-4">
-      <h1 className="t-large">Circuit</h1>
-      <p className="t-body text-text-muted">Find who near you is building, who needs help and who is hiring.</p>
-    </main>
+    <>
+      <Header />
+      <main id="main">
+        <Hero />
+        <Audiences />
+        <HowItWorks />
+        {/* Hidden until real counts exist: no public stats endpoint yet, so nothing is passed (never fake numbers). */}
+        <PilotCity stats={null} />
+        <Waitlist />
+        <Faq />
+      </main>
+      <Footer />
+    </>
   );
 }

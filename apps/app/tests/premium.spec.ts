@@ -134,7 +134,8 @@ async function scan(page: Page, wide: boolean): Promise<Scan> {
       const owner = svgShape ? ((el.closest("svg")!.parentElement as Element) ?? el) : el;
       const ownText = Array.from(el.childNodes).some((c) => c.nodeType === 3 && (c as Text).data.trim());
       if (ownText && !svgShape && s.color === ACCENT) uses.push({ el, how: "text" });
-      else if (alpha(s.backgroundColor) > 0.02 && s.backgroundColor === ACCENT) uses.push({ el, how: "background" });
+      // In the light theme `primary` and `current` are the same green (DESIGN.md §5), so a primary fill is not accent use.
+      else if (alpha(s.backgroundColor) > 0.02 && s.backgroundColor === ACCENT && ACCENT !== PRIMARY) uses.push({ el, how: "background" });
       else if (hasBorder(s) && s.borderTopColor === ACCENT) uses.push({ el, how: "border" });
       else if (svgShape && (s.stroke === ACCENT || s.fill === ACCENT) && !el.closest("defs")) uses.push({ el: owner, how: "icon" });
       else if (!svgShape && liveClass.test(cls(el))) uses.push({ el, how: "class" });

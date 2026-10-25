@@ -10,6 +10,7 @@ export * from "./EmptyState";
 export * from "./FeedItem";
 export * from "./Field";
 export * from "./LiveWire";
+export * from "./Logo";
 export * from "./MatchCard";
 export * from "./MatchStrength";
 export * from "./MediaPager";

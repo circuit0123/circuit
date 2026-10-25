@@ -96,10 +96,11 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 |---|---|
 | `make test` | Backend tests (pytest) |
 | `make test-web` | Frontend type check (Playwright + axe arrive with Stage 4) |
+| `make test-landing` | Landing site tests: builds the static site with test URLs, serves it on :3101 and runs Playwright at 375px and 1280px in both themes (CTA links with role and src, waitlist success/duplicate/error/rate-limit with a mocked API, reduced motion, axe, SEO tags, DESIGN.md premium rules). No backend needed; the first run takes about a minute |
 | `make e2e [SPEC=premium]` | Playwright journeys and design checks at 375px and 1280px, signed in as demo personas. Needs `make dev` running. `SPEC=premium` runs only `apps/app/tests/premium.spec.ts` (DESIGN.md §13: spacing, one primary button, accent budget, type sizes, truncation) and writes a report to `screenshots/premium/report/` |
 | `make lint` | ruff (check + format check), mypy, ESLint (prettier is not installed yet) |
 | `make fmt` | Auto-format Python with ruff (TypeScript formatting arrives with prettier) |
-| `make check` | lint + backend tests with demo stories PASS/FAIL + frontend type check. Must be green before any push |
+| `make check` | lint + backend tests with demo stories PASS/FAIL + frontend type check + landing tests. Must be green before any push |
 | `make smoke URL=https://...` (Stage 5) | Check a deployed environment (sign-in page, CORS, one read, one write, test email) |
 
 ## 7. API client

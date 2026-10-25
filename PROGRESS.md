@@ -3,6 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
+- L1 — landing site home page (F14, first part): **done, waiting for your OK** (branch `frontend-landing`) (details in "L1" below)
 - B4 — matching ML pipeline + onboarding state, backend (Stage 4c): **done, waiting for your OK** (branch `backend-b4`) (details in "B4" below)
 - B3 — settings, notifications, report/block, export/delete, consent, legal drafts, backend (Stages 6 + 7): **done and merged** (PR #12, `backend-b3`) (details in "B3" below)
 - B2 — invite-only beta, backend (Stage 4b): **done and merged** (PR #11, `backend-b2`) (details in "B2" below)
@@ -182,6 +183,40 @@ Not exercised: `admin-user` interactively (unit-tested with a mocked password pr
 ### Frontend remaining (from B4)
 - **Onboarding** (DESIGN.md §4): read `GET /api/onboarding/state` on launch to resume at `current_step`; save each screen with `PATCH` (the answer under its step key; e.g. `role: {"choice": "invest" | "partner" | …}` decides the branch); skip the screens in `skip`; send `signup_source` from `/join?src=…` on the first call; send `completed: true` at the end.
 - Nothing visible for the ranker: members see no difference except a different order once a model is promoted.
+
+## L1 — Landing home page (`frontend-landing`, from `main`): done, waiting for your OK
+
+`make check` is green: ruff, mypy, 2,396 backend tests (Stories 1–5 PASS), frontend type check, and the new landing Playwright suite (68 tests at 375px and 1280px). Screenshots: `screenshots/landing-home/` (`compare-*` has Landing.dc.html on the left, ours on the right; `home-*-{dark,light}.png` are full pages). Scripts: `screenshots/landing-compare.mjs`, `screenshots/landing-app-shots.mjs`.
+
+**What was built**
+- **packages/ui:** the Emerald colour tokens from DESIGN.md §5 for both themes (dark default, light follows the system, `data-theme` overrides) and the six accents; a `t-display` size for the landing headline only; a `Logo` component (lockup and mark, inline SVG made from `docs/brand/svg`, picks the on-dark or on-light file with CSS only, so there is no flash); `LinkButton` (a link that looks like the button); subpath exports (`@circuit/ui/Button`, `/Logo`, `/cx`) so the landing page does not pull the app's animation library into its JavaScript. Logo SVGs copied to `packages/ui/assets/logo/`.
+- **apps/landing `/`:** header (logo + five audience links), hero ("Build with people near you.", one primary button "Join the beta"), "Who it's for" (five tiles), "How it works" (three steps), the pilot-city section (hidden), "Ask for an invite" (waitlist form), five FAQ answers, footer. `/privacy` and `/terms` are holding pages (not indexed). Favicon, apple-touch icon, brand PNGs and the Open Graph image (`og.png`, 1200×630, the on-dark logo on black) are in `public/`.
+- **Hero video:** the poster (the video's last frame) is plain HTML, so the page is complete without JavaScript. The video (re-encoded to 37 KB, 540px, no audio) is added only after the page has loaded and only when it is on screen. Not added when the person asked for reduced motion or Data Saver.
+- **Every CTA** goes to `APP_URL/join?role=<role>&src=landing-home` (the hero has no role). The header links jump to the tiles for now (audience pages are L2).
+- **Waitlist:** email, role, city to `API_URL/api/waitlist` (8 s timeout, one retry after 1 s on network errors and 5xx). A duplicate shows the same message as a new sign-up (the API answers 202 for both). Nothing typed is logged or sent anywhere else; no trackers.
+- **Config:** `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_LANDING_URL`, `NEXT_PUBLIC_API_URL` (a production build fails if one is missing; `next dev` has localhost defaults), plus new optional `NEXT_PUBLIC_CONTACT_EMAIL` and `NEXT_PUBLIC_COMPANY_LEGAL_NAME` (documented in `.env.example`).
+- **SEO:** title, description, canonical, Open Graph and Twitter card, `robots.txt`, `sitemap.xml`, `lang="en-IN"`, theme colours.
+- **Tests:** `make test-landing` (also in `make check`; COMMANDS.md updated) builds the site with test URLs, serves it on :3101 and runs: CTA links (role and src), the waitlist (success, duplicate, 422, 429, 500 with retry, network retry, browser validation), reduced motion and the video rules, axe and no horizontal scroll in both themes at both widths, no requests to other origins, no placeholder text or numbers, SEO tags, and the DESIGN.md premium rules (`apps/landing/e2e/premium.spec.ts`).
+- **Housekeeping:** `apps/landing/out/` (a build folder that had been committed) is now untracked and gitignored.
+
+**Lighthouse (mobile, simulated slow 4G, run 25 Oct 2026):** performance 99–100, accessibility 100, best practices 100, SEO 100 when served with brotli compression like a real host (269 KiB transferred). Served by Python's plain `http.server` (what `pnpm start` uses, no compression) performance is 83–90 only because the JavaScript is sent uncompressed; that is not what visitors will get on Vercel. Please re-run it on the real deployment (Stage 5).
+
+**Remaining differences from Landing.dc.html**
+1. The hero has the video square beside the headline (the mock is text only), so the headline breaks over two lines on desktop ("Build with people / near you.").
+2. **App screenshots:** step 2 is a real screenshot of the Daily Drop (demo data, from `make dev`; dark and light versions). Steps 1 ("You offer", onboarding) and 3 ("Circuit ring", Circuits tab) are labelled placeholder frames reading "App screenshot coming: …", because those screens are not built yet. Replace them when onboarding and Circuits exist (add files in `public/shots/` and set `shot` in `src/content/home.ts`). Step frames are 39:64 (phone shape) instead of 4:5 so the whole card fits.
+3. The pilot-city section is hidden (the mock shows bracketed placeholder text). `PilotCity` renders only when real numbers are passed; there is no public stats endpoint yet.
+4. New "Ask for an invite" section (the waitlist form); the mock has none.
+5. Footer: the company name and the Contact link appear only when the two new variables are set (the mock shows `[COMPANY LEGAL NAME]`).
+6. The header uses the real brand lockup; nav links are 44px tap targets, so spacing is a little wider. Section spacing is 80px on a phone (120px on desktop as in the mock).
+7. There is no light-theme version of the mock; light was built from the tokens.
+
+**Things to know / decide**
+1. **The token change reaches the app.** `packages/ui/src/tokens.css` was still the old palette, so I moved it to Emerald (the app now shows emerald primary buttons and the lavender light theme). No app screen file changed. I made one change to `apps/app/tests/premium.spec.ts`: in the light theme `primary` and `current` are the same green, so the accent check counted every primary button as accent use; it now ignores a primary fill. App premium specs pass (8/8).
+2. **Waitlist without JavaScript:** the form is switched off in the server HTML and switched on once the page runs, and "Join the beta" works without JavaScript. A real no-JS submit would need a form-encoded waitlist endpoint with a redirect (backend, not done).
+3. **`/privacy` and `/terms`** only say the documents are coming (the drafts in `docs/legal/` are not lawyer-approved). Replace them when approved. [YOU]
+4. **Investor tile:** it links to the app with `role=investor` regardless of the `investor_mode` flag. L2 adds the build-time `/api/config` read (DESIGN.md §3) together with `/investors`.
+5. The LAUNCH.md landing box stays unticked (it also covers the five audience pages, per-page SEO and the footer legal pages).
+6. Not done on purpose: a real-phone test (DESIGN.md §13 item 4) and Lighthouse on the deployed site.
 
 ## Stage 4 — Frontends (branch `frontend-v2`): round 2 of Home done, waiting for your OK
 Round 2 redoes Home for the new DESIGN.md (taken from `main`; CLAUDE.md F16 and LAUNCH.md Stage 3b/Home lines updated to match).

@@ -1,3 +1,9 @@
 @import "tailwindcss";
 @import "@circuit/ui/tokens.css";
 @source "../../../../packages/ui/src";
+
+/* The hero subhead (Landing.dc.html): Title 2 size, regular weight, body line height. Landing only. */
+@utility t-lede { font-size: 22px; line-height: 1.4; font-weight: 400; letter-spacing: -0.012em; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
