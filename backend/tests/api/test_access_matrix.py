@@ -160,6 +160,7 @@ MATRIX = {
     # B7 part 1: gaps the screens reported
     ("PUT", "/api/me/photo"): by_role(404),  # upload 999999 is nobody's
     ("DELETE", "/api/me/photo"): by_role(200),
+    ("PUT", "/api/me/highlights"): by_role(200),  # an empty list clears them
     ("PUT", "/api/startups/{startup_id}/logo"): by_role(404),
     ("DELETE", "/api/startups/{startup_id}/logo"): by_role(404),
     ("GET", "/api/cities"): by_role(200),
@@ -210,6 +211,7 @@ BODIES = {
     ("POST", "/api/me/deletion"): '{"confirm": "DELETE"}',
     ("POST", "/api/support"): '{"kind": "question", "message": "Hello, a question"}',
     ("PUT", "/api/me/photo"): '{"upload_id": 999999}',
+    ("PUT", "/api/me/highlights"): '{"items": []}',
     ("PUT", "/api/startups/{startup_id}/logo"): '{"upload_id": 999999}',
 }
 QUERIES = {

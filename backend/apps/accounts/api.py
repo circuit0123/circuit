@@ -1,14 +1,15 @@
 from typing import Literal
+from urllib.parse import urlparse
 
 from django.conf import settings
 from ninja import Router, Schema
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, field_validator
 
-from apps.accounts import appearance, photo, profile, services
+from apps.accounts import appearance, highlights, photo, profile, services
 from apps.accounts.models import Member
 from apps.matching.models import Capability, MemberSkill, MemberTrait, Need, Offer, Trait
 from apps.social import media
-from apps.social.api import BuildLogTileOut
+from apps.social.api import BuildLogTileOut, PostMediaOut
 from core import gate
 from core.auth import current_context, current_member
 from core.ratelimit import check_rate
@@ -29,8 +30,10 @@ class MeOut(Schema):
     role: Literal["student", "founder", "mentor", "investor", "partner_admin", "super_admin"]
     display_name: str
     bio: str
+    headline: str  # the line under my name; the start of my bio until I write one
     city: str
     college: str
+    organisation_name: str | None  # my own organisation (what I picked or joined), for the profile line and Edit profile
     lat: float | None
     lng: float | None
     verification_level: int
@@ -56,6 +59,7 @@ class MePatch(Schema):
 
     display_name: str | None = Field(None, min_length=1, max_length=120)
     bio: str | None = Field(None, max_length=2000)
+    headline: str | None = Field(None, max_length=140)  # one line, no line breaks; "" goes back to the start of the bio
     city: str | None = Field(None, max_length=100)
     college: str | None = Field(None, max_length=200)
     role: RoleChoice | None = None
@@ -68,7 +72,8 @@ def _me(m: Member, beta_access: bool) -> dict:
     from apps.startups.services import startup_id_of
 
     return {
-        "id": m.pk, "role": m.role, "display_name": m.display_name, "bio": m.bio, "city": m.city, "college": m.college,
+        "id": m.pk, "role": m.role, "display_name": m.display_name, "bio": m.bio, "headline": m.headline_line(), "city": m.city, "college": m.college,
+        "organisation_name": m.organisation.name if m.organisation_id else None,
         "lat": m.location.y if m.location else None, "lng": m.location.x if m.location else None,
         "verification_level": m.verification_level, "organisation_id": m.organisation_id, "is_minor": m.is_minor,
         "profile_visibility": m.profile_visibility, "visible_to_org": m.visible_to_org, "circuits_opt_in": m.circuits_opt_in,
@@ -100,6 +105,56 @@ def me(request):
 def update_me(request, body: MePatch):
     member = current_member(request)
     return _me(services.update_profile(member, body.dict(exclude_unset=True)), beta_access=True)  # the gate let this call in
+
+
+class HighlightOut(Schema):
+    id: int
+    title: str
+    link: str  # http(s) or empty
+    image: PostMediaOut
+
+
+class HighlightIn(Schema):
+    model_config = ConfigDict(extra="forbid")
+    upload_id: int  # one of my finished `highlight` uploads, or one already pinned
+    title: str = Field(min_length=1, max_length=80)
+    link: str = Field("", max_length=500)
+    alt_text: str = Field(min_length=1, max_length=300, description="What the picture shows, for people using a screen reader")
+
+    @field_validator("link")
+    @classmethod
+    def _http_only(cls, v: str) -> str:
+        if v and (urlparse(v).scheme not in ("http", "https") or not urlparse(v).netloc):
+            raise ValueError("Use a full http(s) link")
+        return v
+
+    @field_validator("title", "alt_text")
+    @classmethod
+    def _not_blank(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Write something")
+        return v
+
+
+class HighlightsIn(Schema):
+    model_config = ConfigDict(extra="forbid")
+    items: list[HighlightIn] = Field(max_length=6)
+
+
+@router.put(
+    "/me/highlights",
+    response=list[HighlightOut],
+    summary="Set my highlights",
+    description="Replaces my pinned projects (up to 6, in the order sent; an empty list clears them). Upload each picture first "
+    "(`POST /api/media/uploads` with purpose `highlight`, PUT the file, then complete) and send its id with a title (80), an "
+    "optional http(s) link and the picture's description. An upload already pinned can stay by sending it again; one that drops out "
+    "is deleted. Someone else's upload is a 404. Everyone who may see my profile sees them in `ProfileOut.highlights`, except "
+    "that an under-18 member's highlights are shown to nobody but themselves.",
+)
+def put_highlights(request, body: HighlightsIn):
+    member = current_member(request)
+    check_rate(member.pk, "settings_write")
+    return highlights.replace(member, [i.dict() for i in body.items])
 
 
 class PhotoIn(Schema):
@@ -270,6 +325,12 @@ class StrengthOut(Schema):
     next_step: StrengthStepOut | None  # the one thing to do next
 
 
+class CircuitTogetherOut(Schema):
+    id: int
+    month: str  # "2026-03"
+    completed: bool
+
+
 class ProfileOut(Schema):
     id: int
     is_me: bool
@@ -283,6 +344,8 @@ class ProfileOut(Schema):
     build_logs: list[BuildLogTileOut]  # first picture of their latest build logs I may see; empty when Pulse is off
     circuits_closed: int | None  # mine, or a connection's; null for everyone else and when circuits are off
     strength: StrengthOut | None  # my own profile only: how complete it is
+    circuits_together: list[CircuitTogetherOut] | None  # circuits we are both in (running or finished); null on my own profile and when circuits are off
+    highlights: list[HighlightOut]  # up to 6 pinned projects; empty for an under-18 member's profile seen by anyone else
     role: str
     display_name: str
     bio: str

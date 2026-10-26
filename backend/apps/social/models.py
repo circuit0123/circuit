@@ -9,6 +9,7 @@ class MediaUpload(models.Model):
         MESSAGE = "message"
         AVATAR = "avatar"  # a member's profile photo
         STARTUP_LOGO = "startup_logo"  # a startup's logo, set by its team
+        HIGHLIGHT = "highlight"  # a pinned project tile on a member's profile
 
     class Status(models.TextChoices):
         PENDING = "pending"  # signed URL handed out, bytes not checked yet
@@ -60,6 +61,22 @@ class PostMedia(models.Model):
     class Meta:
         ordering = ["order"]
         constraints = [models.UniqueConstraint(fields=["post", "order"], name="postmedia_unique_order")]
+
+
+class Highlight(models.Model):
+    """A project a member pinned to their profile (up to 6, in order). The picture is one of their own `highlight` uploads."""
+
+    member = models.ForeignKey("accounts.Member", on_delete=models.CASCADE, related_name="highlights")
+    upload = models.OneToOneField(MediaUpload, on_delete=models.CASCADE, related_name="highlight")
+    title = models.CharField(max_length=80)
+    link = models.URLField(max_length=500, blank=True)
+    alt_text = models.CharField(max_length=300)
+    position = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["position"]
+        constraints = [models.UniqueConstraint(fields=["member", "position"], name="highlight_unique_position")]
 
 
 class Reaction(models.Model):

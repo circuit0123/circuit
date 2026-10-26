@@ -29,6 +29,11 @@ def update_profile(member: Member, changes: dict) -> Member:
     lat, lng = changes.pop("lat", None), changes.pop("lng", None)
     if (lat is None) != (lng is None):
         raise ApiError(422, "validation_error", "Send both lat and lng, or neither")
+    if "headline" in changes:
+        headline = changes["headline"]
+        if headline is None or "\n" in headline or "\r" in headline:
+            raise ApiError(422, "validation_error", "The headline is one line of up to 140 characters")
+        changes["headline"] = headline.strip()
     role = changes.pop("role", None)
     if role is not None and role != member.role:
         if member.role not in SELF_SERVE_ROLES or role not in SELF_SERVE_ROLES:

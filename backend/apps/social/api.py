@@ -20,7 +20,7 @@ Visibility = Literal["everyone", "connections", "organisation"]
 
 # -- media -----------------------------------------------------------------------------------------
 class UploadIn(Schema):
-    purpose: Literal["post", "message", "avatar", "startup_logo"]  # avatar: my profile photo; startup_logo: founders only
+    purpose: Literal["post", "message", "avatar", "startup_logo", "highlight"]  # avatar: my profile photo; startup_logo: founders only; highlight: a pinned project
     content_type: Literal["image/jpeg", "image/png", "image/webp"]
     size: int = Field(gt=0)
 
@@ -120,6 +120,11 @@ class PostOut(Schema):
     private_stats: PrivateStatsOut | None = None  # the author's own totals; always None for everyone else
 
 
+class MemberPostsOut(Schema):
+    items: list[PostOut]
+    next_cursor: str | None  # null on the last page
+
+
 def _post(viewer, post: Post) -> dict:
     return services.post_rows(viewer, [post])[0]
 
@@ -161,14 +166,16 @@ def delete_post(request, post_id: int):
 
 @router.get(
     "/members/{member_id}/posts",
-    response=list[PostOut],
+    response=MemberPostsOut,
     summary="A member's build logs",
-    description="Newest first, only the ones I am allowed to see. 404 for members I cannot see.",
+    description="Newest first, 20 at a time (`cursor` from `next_cursor`, `limit` up to 100), only the ones I am allowed to see. "
+    "No total is sent. 404 for members I cannot see; a bad cursor is a 422 `bad_cursor`.",
 )
 @require_flag("pulse")
-def member_posts(request, member_id: int):
+def member_posts(request, member_id: int, params: CursorParams = Query(...)):
     member = current_member(request)
-    return services.post_rows(member, services.member_posts(member, member_id))
+    posts, next_cursor = services.member_posts(member, member_id, params.cursor, params.limit)
+    return {"items": services.post_rows(member, posts), "next_cursor": next_cursor}
 
 
 # -- reactions and replies -----------------------------------------------------------------------------

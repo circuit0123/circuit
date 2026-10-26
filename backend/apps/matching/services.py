@@ -439,7 +439,7 @@ def matches_for(
                 "candidate_id": p.pk, "display_name": p.display_name, "role": p.role, "verification_level": p.verification_level,
                 "city": p.city, "sector": sectors.get(p.pk), "score": r["score"], "strength": strength_for(r["score"]),
                 "reason": r["reason"], "is_bridge": r["is_bridge"], "photo": media.photo_of(p),
-                "headline": (p.bio or "").strip()[:140], "capabilities": [name for _, name in offers.get(p.pk, [])[:3]],
+                "headline": p.headline_line(), "capabilities": [name for _, name in offers.get(p.pk, [])[:3]],
             }
         )  # fmt: skip
     return out

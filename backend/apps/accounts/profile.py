@@ -2,21 +2,23 @@
 
 Rules the screen relies on: no follower or connection counts (only "N mutual connections", which is about me and them); the
 strength meter and the exact circuit history belong to the owner; a connection sees how many circuits were closed, a stranger sees
-nothing about circuits. What a viewer may do with this person (connect, message, ask for an intro) is decided here, once, from the
+nothing about circuits, and the circuits two people are both in are only their shared history. What a viewer may do with this person (connect, message, ask for an intro) is decided here, once, from the
 same rules the endpoints enforce, so the screen never has to guess.
 """
 
+from apps.accounts import highlights
 from apps.accounts.models import ConnectionRequest, Member, Role
 from apps.matching.models import MemberSkill, Need, Offer
 from apps.social import media
 from apps.social.relations import connected_ids, is_connected, may_message, may_request_connection, same_org
-from core import flags
+from core import flags, ist
 from core.permissions import NETWORK_ROLES
 from core.schemas import person
 
 MAX_TILES = 12
 STRENGTH_STEPS = (
     ("photo", "Add a photo"),
+    ("headline", "Add a headline under your name"),
     ("bio", "Write a line about what you do"),
     ("offers", "Add something you can offer"),
     ("needs", "Add something you need"),
@@ -58,6 +60,7 @@ def strength(member: Member) -> dict:
 
     done = {
         "photo": bool(member.photo_path),
+        "headline": bool(member.headline.strip()),
         "bio": len((member.bio or "").strip()) >= 20,
         "offers": Offer.objects.filter(member=member, is_active=True).exists(),
         "needs": Need.objects.filter(member=member, is_active=True).exists(),
@@ -79,6 +82,21 @@ def circuits_closed(target: Member) -> int:
     ).count()
 
 
+def circuits_together(viewer: Member, target: Member) -> list[dict]:
+    """Circuits that both of us are in and that are running or finished (a proposal, a no or a lapse is never shown), newest first.
+    It is only my own history with them, so it tells a stranger nothing."""
+    from apps.circuits.models import Circuit, CircuitLeg
+
+    mine = CircuitLeg.objects.filter(giver=viewer).values("circuit")
+    theirs = CircuitLeg.objects.filter(giver=target).values("circuit")
+    done = (Circuit.Status.ACTIVE, Circuit.Status.COMPLETED)
+    rows = Circuit.objects.filter(pk__in=mine, status__in=done).filter(pk__in=theirs).order_by("-created_at", "-id")[:MAX_TILES]
+    return [
+        {"id": c.pk, "month": ist.local(c.created_at).strftime("%Y-%m"), "completed": c.status == Circuit.Status.COMPLETED}
+        for c in rows
+    ]
+
+
 def header(viewer: Member, target: Member) -> dict:
     """Everything the Profile screen adds to the basic profile fields."""
     from apps.intros.services import warm_path
@@ -98,7 +116,7 @@ def header(viewer: Member, target: Member) -> dict:
     out = {
         "is_me": me,
         "photo": media.own_photo(target) if me else media.photo_of(target),
-        "headline": (target.bio or "").strip()[:140],
+        "headline": target.headline_line(),
         "organisation": target.organisation.name if target.organisation and (me or same_org(viewer, target)) else None,
         "connection": state,
         "actions": actions(viewer, target, state, via),
@@ -106,6 +124,8 @@ def header(viewer: Member, target: Member) -> dict:
         "via": person(via) if via is not None else None,
         "build_logs": picture_tiles(viewer, [target.pk], MAX_TILES) if target.role in Role.values else [],
         "circuits_closed": circuits_closed(target) if (me or friends) and flags.enabled("circuits", viewer) else None,
+        "circuits_together": circuits_together(viewer, target) if not me and flags.enabled("circuits", viewer) else None,
+        "highlights": highlights.rows_for(viewer, target),
         "strength": strength(target) if me else None,
     }
     return out

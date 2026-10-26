@@ -4,8 +4,10 @@
 Anything the viewer may not see is a 404, the same as a post that does not exist.
 """
 
+from datetime import UTC, datetime
+
 from django.db import IntegrityError, transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from apps.accounts.models import Member
 from apps.events.services import record
@@ -18,6 +20,7 @@ from apps.social.schemas import author
 from apps.startups.models import Startup
 from apps.startups.services import get_startup
 from core.errors import ApiError, Forbidden, NotFound
+from core.pagination import decode_cursor, encode_cursor
 from core.ratelimit import check_rate
 
 MAX_MEDIA = 4
@@ -124,7 +127,8 @@ def post_rows(viewer: Member, posts) -> list[dict]:
     return rows
 
 
-def member_posts(viewer: Member, member_id: int) -> list[Post]:
+def member_posts(viewer: Member, member_id: int, cursor: str | None = None, limit: int = 20) -> tuple[list[Post], str | None]:
+    """One page of a member's build logs, newest first, plus the cursor for the next page (None on the last one)."""
     from apps.social.relations import is_connected, same_org
 
     require_social(viewer)
@@ -134,7 +138,18 @@ def member_posts(viewer: Member, member_id: int) -> list[Post]:
     if target.pk != viewer.pk and (target.is_minor or target.profile_visibility == Member.Visibility.HIDDEN):
         if not (is_connected(viewer.pk, target.pk) or same_org(viewer, target)):
             raise NotFound()  # a stranger cannot tell a hidden member from one who does not exist
-    return list(visible_posts(viewer).filter(author=target).select_related("author").order_by("-created_at", "-id")[:60])
+    qs = visible_posts(viewer).filter(author=target).select_related("author").order_by("-created_at", "-id")
+    if cursor:
+        micros, post_id = decode_cursor(cursor, 2)
+        if not isinstance(micros, int) or not isinstance(post_id, int):
+            raise ApiError(422, "bad_cursor", "That page marker is not valid. Reload from the top.")
+        before = datetime.fromtimestamp(micros / 1_000_000, tz=UTC)
+        qs = qs.filter(Q(created_at__lt=before) | Q(created_at=before, pk__lt=post_id))
+    page = list(qs[: limit + 1])
+    more = len(page) > limit
+    page = page[:limit]
+    nxt = encode_cursor(int(page[-1].created_at.timestamp() * 1_000_000), page[-1].pk) if more else None
+    return page, nxt
 
 
 # -- reactions ------------------------------------------------------------------------------------------

@@ -132,6 +132,7 @@ def claim_uploads(member: Member, ids: list[int], purpose: str) -> list[MediaUpl
             status=MediaUpload.Status.READY,
             post_media__isnull=True,
             message__isnull=True,
+            highlight__isnull=True,
         )
     }
     if len(found) != len(ids):
