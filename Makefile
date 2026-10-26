@@ -187,20 +187,25 @@ api-client: ## Export openapi.json from Django and regenerate packages/api-clien
 openapi: api-client ## Same as api-client
 
 # -- build ---------------------------------------------------------------------------------
-build: ## Production builds of everything (not built yet)
-	$(call not_yet,build,Stage 5 (the backend image is a placeholder))
+IMAGE ?= circuit-api
 
-build-api: ## Backend Docker image (not built yet)
-	$(call not_yet,build-api,Stage 5 (the backend image is a placeholder))
+build: build-api build-web ## Production builds of everything: backend image + app + landing
 
-build-api-multiarch: ## Backend image for ARM64 + x86_64 (not built yet)
-	$(call not_yet,build-api-multiarch,Stage 5 (the backend image is a placeholder))
+build-api: ## Backend Docker image for your machine's architecture (tagged circuit-api:local)
+	docker build -f docker/backend/Dockerfile -t $(IMAGE):local .
+	@docker images $(IMAGE):local --format 'built {{.Repository}}:{{.Tag}}, {{.Size}}'
+
+build-api-multiarch: ## Prove the backend image builds for ARM64 and x86_64 (slow: one of them runs under emulation; nothing is pushed)
+	docker buildx build --platform linux/amd64,linux/arm64 -f docker/backend/Dockerfile -t $(IMAGE):multiarch .
 
 build-web: ## pnpm build for the app and the landing site
 	pnpm build
 
-run-prod-local: ## Run the production build locally (not built yet)
-	$(call not_yet,run-prod-local,Stage 5 (the backend image is a placeholder))
+run-prod-local: ## Run the built backend image against the local Postgres/Redis (ENV=dev from .env) on :8080, to check the production build before pushing
+	@docker image inspect $(IMAGE):local >/dev/null 2>&1 || { echo "Build it first: make build-api"; exit 1; }
+	@# docker's --env-file keeps "# comments" in values, unlike the .env reader Django uses, so strip them into a temporary file first
+	@f=$$(mktemp) && sed -E 's/[[:space:]]+#.*$$//' .env > $$f && \
+	  docker run --rm --network host --env-file $$f -e DEBUG=false -e PORT=$(or $(PORT),8080) $(IMAGE):local; rc=$$?; rm -f $$f; exit $$rc
 
 # -- deploy (no production target: production deploys only through CI with approval) -------
 deploy: ## Deploy staging or demo (not built yet)

@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.staticfiles",  # collectstatic gathers the Django admin's CSS/JS for WhiteNoise
     "django.contrib.gis",
     "django.contrib.postgres",
     "corsheaders",
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "core.logging.RequestLogMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # serves the Django admin's CSS/JS from the container (collectstatic runs at image build)
     # Security headers sit outside everything that can answer early (CORS preflight, redirects, errors).
     "core.security.SecurityHeadersMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -95,6 +97,12 @@ USE_TZ = True
 TIME_ZONE = "UTC"
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+if ENV != "dev":
+    # Hashed file names + gzip/brotli copies, so the admin's static files can be cached for a year.
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
 
 # Circuit-specific settings -------------------------------------------------
 APP_URL = cfg.app_url
