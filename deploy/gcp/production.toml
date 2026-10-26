@@ -15,11 +15,11 @@ max_instances = 3
 secrets = ["RESEND_API_KEY"]
 
 [env]
-ENV = "production"            # AI calls per day; past it onboarding uses the manual pickers until tomorrow. 0 = no cap
-APP_URL = "https://circuit-phi.vercel.app/"     # the Vercel production app (https://circuit-app-production.vercel.app until the domain exists)
-LANDING_URL = "https://circuit-phi.vercel.app/"
+ENV = "production"
+APP_URL = "https://circuit-phi.vercel.app/app"   # the app lives under /app (vercel.json). Invite, export and unsubscribe links are built from this
+LANDING_URL = "https://circuit-phi.vercel.app"    # the landing site is the root of the same Vercel project; no path
 API_URL = "auto"                         # auto = https://circuit-production-api-<project number>.<region>.run.app. After mapping a custom domain, write it here
-ALLOWED_HOSTS = ".run.app"               # add api.<domain> once it is mapped. Probes and the smoke test reach the service through *.run.app addresses         # the Django admin's login form posts from the API origin; add https://api.<domain> later
+ALLOWED_HOSTS = ".run.app"               # add api.<domain> once it is mapped. Probes and the smoke test reach the service through *.run.app addresses
 ADMIN_PATH = "xY3k_9fQ2bLm/"     # the admin's address. This file is public, so choose your own: python -c "import secrets; print(secrets.token_urlsafe(12))"
 SUPABASE_URL = "https://hhnyfsvhupdijzvemeaj.supabase.co"
 CSRF_TRUSTED_ORIGINS = "https://*.run.app"   # the Django admin login posts from the API origin. Add https://api.<domain> once it is mapped

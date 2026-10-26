@@ -575,3 +575,13 @@ def test_production_cors_allows_exactly_the_origin_the_app_and_landing_are_serve
 
     cors = [o for o in prod.env_vars["CORS_ALLOWED_ORIGINS"].split(",") if o]
     assert cors == [origin(prod.env_vars["APP_URL"])] == [origin(prod.env_vars["LANDING_URL"])]
+
+
+def test_links_built_from_the_production_app_url_land_inside_the_app(prod, settings):
+    from apps.beta.services import invite_link
+    from apps.notifications.unsubscribe import page_url
+
+    settings.APP_URL = prod.env_vars["APP_URL"]
+    assert invite_link("ABCD2345").startswith("https://circuit-phi.vercel.app/app/join?")
+    assert page_url("t").startswith("https://circuit-phi.vercel.app/app/unsubscribe?")
+    assert not prod.env_vars["LANDING_URL"].endswith("/app")

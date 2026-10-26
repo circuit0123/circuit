@@ -74,10 +74,10 @@ platform default URL (`*.vercel.app`, `*.run.app`).
 
 | Variable | Used for | Before domain | After domain (production) |
 |---|---|---|---|
-| `LANDING_URL` | Landing site origin, links from app/emails | `https://circuit-landing.vercel.app` | `https://<domain>` |
-| `APP_URL` | App origin, email links, auth redirects | `https://circuit-app-<env>.vercel.app` | `https://app.<domain>` |
+| `LANDING_URL` | Landing site origin, links from app/emails | Production beta: `https://circuit-phi.vercel.app` (one Vercel project, landing at `/`) | `https://<domain>` |
+| `APP_URL` | App address, email and invite links, auth redirects. May carry a path | Production beta: `https://circuit-phi.vercel.app/app` (same project as the landing site, `vercel.json` serves the app under `/app`; build variable `NEXT_PUBLIC_BASE_PATH=/app`). Staging/demo: `https://circuit-app-<env>.vercel.app` | `https://app.<domain>` |
 | `API_URL` | App API base, links in emails | `auto` in deploy/gcp/<env>.toml: `https://circuit-<env>-api-<project number>.asia-south1.run.app` | `https://api.<domain>` |
-| `CORS_ALLOWED_ORIGINS` | Exact origins allowed by the API | `APP_URL` (+ `http://localhost:3000` in dev) | `APP_URL` only |
+| `CORS_ALLOWED_ORIGINS` | Exact origins allowed by the API: scheme + host only, no path or slash | The origin of `APP_URL` (+ `http://localhost:3000` in dev) | The origin of `APP_URL` only |
 | `CORS_PREVIEW_REGEX` | Vercel PR previews (staging only) | `^https://circuit-app-staging-git-.*\.vercel\.app$` | empty |
 | `CSRF_TRUSTED_ORIGINS` | Django admin form posts | `https://*.run.app` | `https://api.<domain>` |
 | `ALLOWED_HOSTS` | Django host check | `.run.app` (any Cloud Run address; probes and `make smoke` need it) | `api.<domain>` (keep `.run.app` if you still deploy with a test address) |
@@ -86,6 +86,9 @@ platform default URL (`*.vercel.app`, `*.run.app`).
 | `SUPABASE_URL` | Auth, storage, realtime | Per-env project URL | Production project URL |
 | `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` | Orders, payment signature | Test keys | Live keys |
 | `RAZORPAY_WEBHOOK_SECRET` | Webhook signature | Test webhook secret | Live webhook secret |
+
+Production beta uses ONE Vercel project: the landing site at `/` and the app at `/app` (`vercel.json`). Supabase redirect URL is
+`https://circuit-phi.vercel.app/app/auth/callback`. The two-project layout above is what staging/demo and the real domain use.
 
 Frontend build-time variables (set per Vercel project): `NEXT_PUBLIC_APP_URL`,
 `NEXT_PUBLIC_LANDING_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
