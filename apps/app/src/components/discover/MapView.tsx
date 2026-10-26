@@ -2,12 +2,12 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import { SlidersHorizontal, X } from "lucide-react";
-import { Avatar, Button, Chip, ErrorState, cx } from "@circuit/ui";
+import { Avatar, Button, Chip, ErrorState, cx, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  activeFilters, kmOrNull, loadFailed, metaLine, roleHref, startupHref, useFollow, useFollows, useHere, useMapPins, useMe, useStartupJobs,
+  activeFilters, kmOrNull, loadFailed, metaLine, roleHref, startupHref, useFollow, useFollows, useHere, useInterest, useMapPins, useMe, useStartupJobs,
   type Bounds, type DiscoverFilters, type StartupTile,
 } from "@/data";
 import { MAP_TILES_URL } from "@/lib/env";
@@ -227,6 +227,11 @@ function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
   const follows = useFollows();
   const follow = useFollow();
   const following = follows.data?.has(pin.id) ?? false;
+  const interest = useInterest(pin.id);
+  const toast = useToast();
+  const toggleInterest = async () => {
+    if (!(await interest.set(!interest.interested))) toast({ text: "Couldn't save that. Try again.", tone: "error" });
+  };
   const roles = jobs.data ?? [];
   // Under-18 members only see roles from verified startups; for them an unverified startup is simply not hiring.
   const hiring = pin.hiring && (!me?.isMinor || pin.verified);
@@ -263,6 +268,11 @@ function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
         ) : (
           <Button variant={following ? "secondary" : "primary"} className="w-full" aria-pressed={following} onClick={() => follow.mutate({ id: pin.id, on: !following })}>
             {following ? "Following" : "Follow"}
+          </Button>
+        )}
+        {me?.role === "student" && (
+          <Button variant="text" className="w-full" aria-pressed={interest.interested} disabled={interest.pending} onClick={toggleInterest}>
+            {interest.interested ? "Interested · tap to withdraw" : "I'm interested"}
           </Button>
         )}
         <Button variant="text" className="w-full" onClick={() => router.push(startupHref(pin.id))}>View startup</Button>

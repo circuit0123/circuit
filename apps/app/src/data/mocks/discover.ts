@@ -57,6 +57,7 @@ export const JOBS: Job[] = [
 /** What the mock remembers in this page load. */
 const applied = new Map<number, { id: number; status: string; created_at: string }>([[305, { id: 9001, status: "shortlisted", created_at: hoursAgo(72) }]]);
 const followed = new Set<number>([45]);
+const interestedIn = new Set<number>([42]);
 const claimedNow = new Set<number>();
 const applicantStatus = new Map<number, string>();
 
@@ -73,7 +74,7 @@ function startupOut(s: Startup, sc: Scenario): Schemas["StartupOut"] {
     ...s,
     claimed: s.claimed || claimedNow.has(s.id),
     hiring: hiring(s),
-    interested: false,
+    interested: interestedIn.has(s.id),
     build_logs: [],
     founders: [],
     logo: null,
@@ -180,6 +181,8 @@ export const discoverHandlers: HttpHandler[] = [
     return x ? HttpResponse.json(startupOut(x, s)) : envelope(404, "not_found", "No such startup.");
   })),
   http.post(`${API}/startups/:id/follow`, scenario((_s, { params }) => { followed.add(Number(params.id)); return new HttpResponse(null, { status: 204 }); })),
+  http.post(`${API}/startups/:id/interest`, scenario((_s, { params }) => { interestedIn.add(Number(params.id)); return new HttpResponse(null, { status: 204 }); })),
+  http.delete(`${API}/startups/:id/interest`, scenario((_s, { params }) => { interestedIn.delete(Number(params.id)); return new HttpResponse(null, { status: 204 }); })),
   http.delete(`${API}/startups/:id/follow`, scenario((_s, { params }) => { followed.delete(Number(params.id)); return new HttpResponse(null, { status: 204 }); })),
   http.get(`${API}/me/follows`, scenario((s) => HttpResponse.json(empty(s) ? [] : STARTUPS.filter((x) => followed.has(x.id)).map((x) => ({ id: x.id, name: x.name, sector: x.sector, hiring: hiring(x) }))))),
   http.post(`${API}/startups/:id/claim`, scenario(async (_s, { params, request }) => {
