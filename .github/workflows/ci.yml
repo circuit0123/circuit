@@ -31,6 +31,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the API freeze check compares with the base commit
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -44,6 +46,8 @@ jobs:
         run: uv run --directory backend ruff format --check .
       - name: mypy
         run: uv run --directory backend mypy .
+      - name: API freeze (openapi.json needs a version bump and a FRONTEND_HANDOFF.md change)
+        run: python3 scripts/check_api_freeze.py --base "${{ github.event.pull_request.base.sha || github.event.before }}"
 
   check:
     runs-on: ubuntu-latest

@@ -1,5 +1,7 @@
 # Circuit — Frontend handoff
 
+**API version:** 1.1.0 (frozen). Any change to `packages/api-client/openapi.json` needs a higher version here and in `backend/circuit/api.py`, and an entry in section 3; `make api-freeze` (and CI) fails otherwise.
+
 What the app's data layer (`apps/app/src/data`) can rely on from the backend. One section per screen: the hook that serves it, the
 endpoints it calls, what comes back, which errors to draw, the Realtime channels and the rate limits.
 
