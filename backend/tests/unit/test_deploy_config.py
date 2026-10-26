@@ -42,6 +42,9 @@ def filled(env: str, tmp_path):
         text = re.sub(r"<([a-z]+@[^>]+)>", r"\1", text)
         text = re.sub(r"<(Circuit [a-z]+ on-call [a-z]+)>", r"\1", text)
         text = text.replace("<age1...>", "age1" + "q" * 58)
+        # production.toml now holds the real project and billing account; the tests use their own so they do not depend on them
+        text = re.sub(r'(?m)^id\s*=\s*"[^"]*"', 'id = "circuit-test-1"', text)
+        text = re.sub(r'(?m)^billing_account\s*=\s*"[^"]*"', 'billing_account = "AAAAAA-BBBBBB-CCCCCC"', text)
         text = text.replace("<name>", "Asha Rao").replace("<postal address>", "1 Example Road, Chennai")
         toml.write_text(text)
     return tmp_path / env
@@ -527,3 +530,10 @@ def test_the_jobs_listing_shows_every_job_and_marks_the_unbuilt_ones(cli):
         assert job.key in text
     assert "reset-demo" not in text  # demo only
     assert "build-investor-picks" in text and "not built yet" in text
+
+
+def test_every_committed_deploy_file_is_valid_toml_with_no_repeated_keys():
+    import tomllib
+
+    for path in sorted((REPO / "deploy" / "gcp").glob("*.toml")):
+        tomllib.loads(path.read_text())  # a key written twice in one table raises here
