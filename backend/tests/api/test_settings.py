@@ -24,8 +24,8 @@ def test_settings_returns_the_whole_screen_in_one_call(make_member, client_for, 
     assert body["profile"]["email_hint"] == "a***@example.org"  # a hint, never the address
     assert "asha.rao" not in r.content.decode()
     assert body["appearance"] == {"theme": "system", "accent": "emerald", "swipe_tabs": True}
-    assert body["notifications"]["intros"] == {"in_app": True, "email": True}
-    assert body["notifications"]["messages"] == {"in_app": True, "email": False}
+    assert body["notifications"]["intros"] == {"in_app": True, "email": True, "push": True}
+    assert body["notifications"]["messages"] == {"in_app": True, "email": False, "push": True}
     assert body["blocked_count"] == 0 and body["export"] is None
     assert body["consent"]["policy_version"] == settings.POLICY_VERSION
     assert body["support"]["support_email"] == settings.SUPPORT_EMAIL
@@ -174,9 +174,9 @@ def test_notification_preferences_default_and_change_one_channel(make_member, cl
     r = patch(client_for(m), "/api/me/notification-preferences", {"intros": {"email": False}, "messages": {"email": True}})
     assert r.status_code == 200
     body = r.json()
-    assert body["intros"] == {"in_app": True, "email": False}
-    assert body["messages"] == {"in_app": True, "email": True}
-    assert body["circuits"] == {"in_app": True, "email": True}  # untouched
+    assert body["intros"] == {"in_app": True, "email": False, "push": True}
+    assert body["messages"] == {"in_app": True, "email": True, "push": True}
+    assert body["circuits"] == {"in_app": True, "email": True, "push": True}  # untouched
     m.refresh_from_db()
     assert m.notification_prefs["intros"]["email"] is False
 
