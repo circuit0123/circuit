@@ -317,3 +317,17 @@ def test_applicants_come_with_skill_names_in_a_fixed_number_of_queries(
         r = c.get(f"/api/jobs/{job.pk}/applicants?limit=12")
     skill = r.json()["items"][0]["skills"][0]
     assert skill == {"capability": "seo", "name": cap.name, "level": 3, "proof_url": "https://example.com/p"}
+
+
+# -- views: the map sheet never counts one --------------------------------------------------------------------
+def test_the_map_sheet_reads_roles_without_counting_a_view(lists, make_member, make_startup, client_for):
+    founder, s = team_of(make_member, make_startup)
+    add_job(s)
+    c = client_for(make_member("student"))
+    c.get(f"/api/jobs?startup_id={s.pk}")  # what a pin tap loads
+    s.refresh_from_db()
+    assert s.view_count == 0
+    c.get(f"/api/startups/{s.pk}")
+    c.get(f"/api/startups/{s.pk}")  # the page itself counts once per member per day
+    s.refresh_from_db()
+    assert s.view_count == 1

@@ -22,7 +22,6 @@ from apps.matching.models import MemberSkill
 from apps.matching.scoring import skill_match
 from apps.notifications.services import notify, notify_many
 from apps.social import media
-from apps.social import services as social_services
 from apps.startups.models import ClaimRequest, Startup, StartupInterest, StartupMember
 from core import codes
 from core.cache import get_cache
@@ -217,7 +216,9 @@ def _founders(member: Member, startup: Startup) -> list[dict]:
 
 def _build_logs(member: Member, startup: Startup) -> list[dict]:
     """The first picture of the team's latest build logs that this member may see (empty when Pulse is off for them)."""
-    return social_services.picture_tiles(member, team_member_ids(startup), MAX_BUILD_LOGS)
+    from apps.social.services import picture_tiles  # imported here: social.services imports this module
+
+    return picture_tiles(member, team_member_ids(startup), MAX_BUILD_LOGS)
 
 
 def detail(member: Member, startup: Startup, count_view: bool = True) -> dict:

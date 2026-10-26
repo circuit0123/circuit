@@ -9,7 +9,6 @@ same rules the endpoints enforce, so the screen never has to guess.
 from apps.accounts.models import ConnectionRequest, Member, Role
 from apps.matching.models import MemberSkill, Need, Offer
 from apps.social import media
-from apps.social import services as social_services
 from apps.social.relations import connected_ids, is_connected, may_message, may_request_connection, same_org
 from core import flags
 from core.permissions import NETWORK_ROLES
@@ -83,6 +82,7 @@ def circuits_closed(target: Member) -> int:
 def header(viewer: Member, target: Member) -> dict:
     """Everything the Profile screen adds to the basic profile fields."""
     from apps.intros.services import warm_path
+    from apps.social.services import picture_tiles
     from core.errors import ApiError
 
     me = viewer.pk == target.pk
@@ -99,12 +99,12 @@ def header(viewer: Member, target: Member) -> dict:
         "is_me": me,
         "photo": media.own_photo(target) if me else media.photo_of(target),
         "headline": (target.bio or "").strip()[:140],
-        "organisation": target.organisation.name if target.organisation_id and (me or same_org(viewer, target)) else None,
+        "organisation": target.organisation.name if target.organisation and (me or same_org(viewer, target)) else None,
         "connection": state,
         "actions": actions(viewer, target, state, via),
         "mutual_count": None if me else len(connected_ids(viewer.pk) & connected_ids(target.pk)),
         "via": person(via) if via is not None else None,
-        "build_logs": social_services.picture_tiles(viewer, [target.pk], MAX_TILES) if target.role in Role.values else [],
+        "build_logs": picture_tiles(viewer, [target.pk], MAX_TILES) if target.role in Role.values else [],
         "circuits_closed": circuits_closed(target) if (me or friends) and flags.enabled("circuits", viewer) else None,
         "strength": strength(target) if me else None,
     }
