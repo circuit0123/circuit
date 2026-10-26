@@ -310,6 +310,13 @@ Tabs: `People` · `Startups` · `Jobs` · `Map`
   Non-hiring startups show `Follow` instead. Back returns to the map with the same pin
   selected and the same zoom.
 - Search field at the top of Discover searches all four.
+- Opening segment: students start on `Jobs` (a role nearby is what they came for), everyone
+  else on `People`. A link can pick one (`/discover?s=map`), and the last choice is kept
+  for the session.
+- Headings inside Discover's segments ("Skills in demand near you", "Roles that fit your
+  skills", "Near you, matched on skills") are Headline (17/600) with the `Filters` text
+  button beside them, as in Discover.dc.html and People.dc.html. This is the one
+  exception to Title 3 section headers (§5); pushed pages (job, startup) use Title 3.
 
 ### Startup page
 Reached from the map sheet, Discover → Startups, job pages and Pulse.
