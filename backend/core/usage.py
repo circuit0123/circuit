@@ -7,18 +7,16 @@ The increment is one INSERT ... ON CONFLICT DO UPDATE, so any number of instance
 """
 
 from datetime import date, datetime, timedelta
-from zoneinfo import ZoneInfo
 
-from django.conf import settings
 from django.db import connection
 from django.db.models import Sum
-from django.utils import timezone
 
+from core import ist
 from core.models import UsageCounter
 
 
 def today(now: datetime | None = None) -> date:
-    return (now or timezone.now()).astimezone(ZoneInfo(settings.NOTIFICATION_TZ)).date()
+    return ist.day(now)
 
 
 def bump(name: str, by: int = 1, day: date | None = None) -> int:

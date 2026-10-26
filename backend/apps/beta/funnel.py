@@ -11,8 +11,8 @@ from django.utils import timezone
 
 from apps.accounts.models import Member
 from apps.beta.models import JoinVisit
-from apps.dashboard.services import count
 from apps.events.models import Event
+from core.smallcount import count
 
 STEPS = ("clicks", "signed_up", "beta_access", "onboarding_done", "first_match_action")
 FIRST_ACTION_EVENTS = ("intro.requested", "drop.swiped", "connection.requested")  # the first thing done with a match

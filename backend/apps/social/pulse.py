@@ -8,7 +8,6 @@ Every post goes through the same visibility rule as everywhere else (relations.v
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import cast
-from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.contrib.gis.geos import Point
@@ -26,7 +25,7 @@ from apps.social.models import Follow
 from apps.social.relations import blocked_ids, connected_ids, org_mate_ids, visible_posts
 from apps.startups.models import Startup
 from apps.startups.services import default_centre, team_member_ids
-from core import flags
+from core import flags, ist
 from core.errors import ApiError
 from core.pagination import decode_cursor, encode_cursor
 
@@ -139,14 +138,9 @@ def activity_items(member: Member, since: datetime, upto: datetime) -> list[Item
     return items
 
 
-def ist_day_start(now: datetime) -> datetime:
-    tz = ZoneInfo(settings.DROP_TZ)
-    return now.astimezone(tz).replace(hour=0, minute=0, second=0, microsecond=0)
-
-
 def skills_item(member: Member, since: datetime, upto: datetime, now: datetime) -> list[Item]:
     """At most one 'Skills in demand near you' card, dated the start of today (IST). Role counts, never people counts."""
-    at = ist_day_start(now)
+    at = ist.day_start(now)
     if not (since <= at <= upto):
         return []
     top = skills_in_demand(member, settings.STUDENT_MAX_DISTANCE_KM, since=now - timedelta(days=settings.PULSE_WINDOW_DAYS))

@@ -13,7 +13,6 @@ Payloads hold ids and enums only (no names or emails): the app and the email cop
 """
 
 from datetime import datetime, time, timedelta
-from zoneinfo import ZoneInfo
 
 import structlog
 from django.conf import settings
@@ -27,7 +26,7 @@ from apps.notifications import copy, prefs, unsubscribe
 from apps.notifications.models import Notification
 from apps.social.relations import is_blocked
 from core import email as outbox
-from core import flags, realtime
+from core import flags, ist, realtime
 from core.errors import NotFound
 
 log = structlog.get_logger("notifications")
@@ -66,7 +65,7 @@ def email_send_time(recipient: Member, now: datetime | None = None) -> datetime:
     now = now or timezone.now()
     if not recipient.is_minor:
         return now
-    tz = ZoneInfo(settings.NOTIFICATION_TZ)
+    tz = ist.tz()
     start, end = settings.QUIET_HOURS_IST
     local = now.astimezone(tz)
     if start <= local.hour < end:

@@ -5,17 +5,6 @@ from django.http import Http404
 from ninja import NinjaAPI
 from ninja.errors import AuthenticationError, HttpError, ValidationError
 from ninja.errors import AuthorizationError as NinjaAuthorizationError
-from pydantic import BaseModel
-
-
-class ErrorBody(BaseModel):
-    code: str
-    message: str
-    details: list | dict | None = None
-
-
-class ErrorResponse(BaseModel):
-    error: ErrorBody
 
 
 class ApiError(Exception):
@@ -64,11 +53,6 @@ class RateLimited(ApiError):
     def __init__(self, message: str = "Too many requests, try again later", retry_after: int | None = None):
         super().__init__(429, "rate_limited", message, {"retry_after": retry_after} if retry_after else None)
         self.retry_after = retry_after
-
-
-class Unauthenticated(ApiError):
-    def __init__(self, message: str = "Authentication required"):
-        super().__init__(401, "unauthenticated", message)
 
 
 class ServiceUnavailable(ApiError):

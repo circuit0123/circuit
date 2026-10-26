@@ -10,7 +10,6 @@ staging/production use ResendBackend below. No address or message text is ever l
 
 import time
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 
 import httpx
 import structlog
@@ -20,6 +19,7 @@ from django.core.mail.backends.base import BaseEmailBackend
 from django.db import transaction
 from django.utils import timezone
 
+from core import ist
 from core.models import OutboundEmail
 
 log = structlog.get_logger("email")
@@ -76,7 +76,7 @@ class ResendBackend(BaseEmailBackend):
 
 
 def period_starts(now: datetime) -> tuple[datetime, datetime]:
-    local = now.astimezone(ZoneInfo(settings.NOTIFICATION_TZ))
+    local = ist.local(now)
     day = local.replace(hour=0, minute=0, second=0, microsecond=0)
     return day, day.replace(day=1)
 

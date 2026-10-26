@@ -1,8 +1,8 @@
 # Circuit — runbook
 
-What to do when something needs a human. Sections are added by the stage that builds the thing (LAUNCH.md Stage 11 completes this file:
-takedown, and the dated manual checks). Day-to-day operation (deploy, rollback, restore, secrets, alerts) is under "Operating it" below.
-Commands are `make` targets (COMMANDS.md).
+What to do when something needs a human. Day-to-day operation (deploy, rollback, restore, secrets, alerts) is under "Operating it" below;
+the beta's daily admin jobs (invites, waitlist, flags, takedowns), the load test, the incident checklist and the contact list are under
+"Running the beta". Commands are `make` targets (COMMANDS.md). Django admin is at the secret path in `ADMIN_PATH` (a password plus a 2FA code).
 
 ## First production deploy on Google Cloud
 
@@ -332,6 +332,100 @@ After changing a limit or a plan, run `make usage-report ENV=production` again a
 
 ### Turn on branch protection (one line)
 Settings → Branches → rule for `main` → Require status checks → **ci** (see step 7 of the one-time setup).
+
+## Running the beta
+
+### Approve a production deploy
+Production never deploys by itself. Actions → **deploy production** → Run workflow; the run stops at the `production` environment and waits for you
+(the required reviewer) to press **Review deployments → Approve**. Before you approve, check:
+1. The commit is on `main` and the `ci` check is green (the run itself refuses otherwise).
+2. The staging deploy of the same commit passed `make smoke` and you clicked through sign-in, Home and an apply on staging.
+3. The pull request lists a migration? Read it: it must only add (new table, new nullable column, new index). A rename or a drop needs a two-step release.
+4. Nothing is on fire: no open alert (Sentry, uptime), and it is not the middle of a payment or circuit round (circuits run Mondays; payments are off in the beta).
+After approving, watch the run to its last lines (`OK: 0 failed`, `Done.`). If the live smoke test fails, traffic goes back by itself; then read "When a deploy fails".
+Not sure? Do not approve. A deploy can wait; a bad one cannot be un-seen.
+
+### Revoke an invite code
+Django admin → Beta → **Invite codes** → tick the code → action **Revoke selected codes**. New sign-ins with that code get the same
+`invalid_code` as a wrong code. People who already used it **stay in**; to remove one person, go to Beta → **Beta access**, tick them, **Revoke access**
+(they are locked out at once and a revoked row stays so nothing re-grants it; **Restore access** undoes it). Everything here is audit-logged.
+A code that leaked on a public page: revoke it, then create new ones: `make invite-codes N=10 USES=1 DAYS=30 NOTE="why"` (locally) or Add invite code in admin.
+
+### Approve the waitlist
+Django admin → Beta → **Waitlist entries** → filter `status = pending`, tick the people → **Approve and send the invite email** (a single-use code
+is emailed, valid `INVITE_EXPIRY_DAYS_WAITLIST` = 30 days). **Reject** sends nothing. Approve in small batches (10–20) so the pilot stays
+manageable; look at the funnel first (Django admin → Metrics, or `make funnel`) to see which sources actually finish onboarding.
+Email limits apply (`make usage-report ENV=production`): at 100 a day on the free plan, approvals queue and go out the next day.
+
+### Switch a feature flag
+Django admin → Core → **Feature flags** → pick the flag → audience `off | testers | everyone` → save. It takes effect within 60 seconds. No deploy.
+Rules the admin enforces: `promotions` and `payments` cannot be switched off while a paid campaign is active or an order is `created` (pause or refund first);
+a flag cannot be on without the flag it depends on. Check the numbers in PRODUCTION.md §2b before switching anything on, and write the date and reason in
+PROGRESS.md. After changing `investor_mode` or `partner_mode`, redeploy the landing site (see "Landing site" below). Testers: Members → tick `is_tester`.
+Locally: `make flags` and `make flag NAME=circuits TO=testers`.
+
+### Take down a post, a profile or a startup
+1. **From a report** (the normal way): Django admin → Moderation → **Reports** → open the oldest unhandled one → tick it → choose an action:
+   *hide* (post/reply stays in the database, members stop seeing it), *remove*, *warn the author* (in-app + email), *suspend* the author (or the startup's
+   claimant; they are signed out at once), or *dismiss*. Each action marks the report handled and writes the audit log.
+2. **Without a report** (a court or police notice, a legal complaint): find the item (Social → Posts, Members, Startups), then:
+   - a post: set status to `hidden` or `removed`;
+   - a member: tick them → **Suspend members** (reversible with **Reinstate members**);
+   - a startup (crawled or user-made): set `hidden_at` to now. It disappears from the map, search and Pulse; the data stays.
+3. Write down who asked, when, what you did and why (a line in the report's note or in PROGRESS.md). Answer the complainant within the time in the Terms.
+4. Never delete rows by hand. Members' own deletion requests go through the deletion pipeline ("Data requests" below).
+A startup owner who asks to be removed: use the takedown form's email, hide the startup, and tell them it is done.
+
+### Run a load test on staging
+Do this before a public launch and after any change to feeds, matching or the database. It sends real traffic: use staging, never production (the script refuses production).
+1. Staging needs real sign-ins, because demo sign-in is off there by design. Create 10–20 test accounts in the staging app (use throwaway emails, invite codes,
+   finish onboarding; one student, one founder, a few of each role). For each, sign in in a browser, open DevTools → Application → Local Storage → the Supabase
+   `access_token`, and put one token per line in a file **outside the repository**, e.g. `~/staging-tokens.txt`. Tokens last 1 hour: run within it.
+2. `make load-test URL=https://<staging API address> TOKENS=~/staging-tokens.txt USERS=50,200 SECONDS=120 JSON=~/load-staging.json`
+3. Read the table: every row should say PASS (p95 under 300 ms for cached reads and 800 ms for the rest, no errors). `429` counts are the per-member limits working:
+   with few tokens many users share a member, so 429s on apply and message are expected, not a failure.
+4. For the full ~1,000-user run (PRODUCTION.md §9) use `USERS=1000` from a machine with a good network, with at least 20 tokens, and watch Cloud Run
+   (instances, CPU, "too many connections") and Supabase (Reports → Database) while it runs. Write the date and numbers in PROGRESS.md.
+5. Afterwards delete the test accounts' data (they are ordinary members: Settings → delete account) and delete the token file.
+
+### Incident checklist
+Something is wrong in production (alerts, a member's report, your own eyes). Work top to bottom; do not skip to the fix.
+1. **Assess (5 minutes).** What is broken, for whom, since when? `make smoke URL=... ORIGIN=...`; `make logs ENV=production`; Sentry; the uptime alert. Write the start time down.
+2. **Is it a recent deploy?** Yes → `make rollback ENV=production` first, ask questions afterwards.
+3. **Contain.** Data exposed or being damaged? Switch the feature off in Django admin (flags, 60 seconds), suspend an abusive account, pause Cloud Scheduler
+   triggers, or set `BETA_MODE` access closed (revoke the invite code). Stopping the leak comes before understanding it.
+4. **Communicate.** Tell invited members if it lasts more than an hour (community channel / waitlist email). Say what you know, not what you guess.
+5. **Personal data involved?** (someone saw another member's data, a key leaked, a backup was exposed.) Rotate the secret ("Rotate a secret"), note which
+   members and which fields, and contact the Grievance Officer's lawyer the same day: the DPDP Act has a duty to tell the Data Protection Board and the people affected.
+6. **Fix forward.** A pull request with a test that fails before the fix; deploy through the normal approval.
+7. **Write it up** (within 2 days) in PROGRESS.md: timeline, cause, what you did, what changes so it cannot repeat (a test, an alert, a runbook line).
+
+### Who to contact
+Fill this in before launch and keep it current (the first row is the person on call).
+| For | Who / where | Contact |
+|---|---|---|
+| Everything (on call) | `<YOUR NAME>` | `<PHONE, EMAIL>` |
+| Backup person if you are unreachable | `<NAME>` | `<PHONE, EMAIL>` |
+| Data requests, grievances (DPDP) | Grievance Officer | `GRIEVANCE_EMAIL` in the environment; `<LAWYER, PHONE>` |
+| Database, sign-in, files (Supabase) | Dashboard → Support; status.supabase.com | `<ACCOUNT EMAIL, PROJECT ID>` |
+| Servers, jobs, logs (Google Cloud) | Console → Support; status.cloud.google.com | `<PROJECT ID, BILLING CONTACT>` |
+| App and landing hosting (Vercel) | vercel.com/support; vercel-status.com | `<TEAM NAME>` |
+| Redis (Upstash) | upstash.com/support | `<ACCOUNT EMAIL>` |
+| Email (Resend) | resend.com/support; resend-status.com | `<ACCOUNT EMAIL>` |
+| Payments (Razorpay), once `payments` is on | dashboard → Support | `<MERCHANT ID>` |
+| Errors (Sentry) | sentry.io | `<ORG NAME>` |
+| Domain and DNS | `<REGISTRAR>` | `<ACCOUNT EMAIL>` |
+
+### Manual checks (PRODUCTION.md §14), with the date each last passed
+Everything else in §14 has an automated test in `make check`. These need a person, a phone or a real environment. Put the date and your initials when done.
+| # | Check | How | Last passed |
+|---|---|---|---|
+| 3 | Migrations on production-sized data | Staging copy with ≥50k members and ≥500k events; time each migration | `<DATE>` |
+| 4 | No "too many connections" under load | "Run a load test on staging" with 1,000 users; watch Supabase connections | `<DATE>` |
+| 6 | Cold start time | `min_instances = 0`, wait 15 minutes, time the first `/api/config`. Write the number here: `<SECONDS>` | `<DATE>` |
+| 19 | Email lands in the inbox | SPF/DKIM/DMARC verified at Resend; send to a Gmail and an Outlook address | `<DATE>` |
+| 21 | Rollback and restore drills | "Rollback drill" and `make restore-drill` (setup steps 8 and 9) | `<DATE>` |
+| 22 | A budget Android on throttled 4G | Sign in, Home, Discover, apply, Inbox; Lighthouse ≥ 90 | `<DATE>` |
 
 ## Retention
 

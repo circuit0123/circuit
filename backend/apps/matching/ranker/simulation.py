@@ -13,9 +13,7 @@ import math
 import random
 import uuid
 from datetime import datetime, time, timedelta
-from zoneinfo import ZoneInfo
 
-from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.db import transaction
 from django.utils import timezone
@@ -26,6 +24,7 @@ from apps.matching import services
 from apps.matching.models import Capability, FeatureSnapshot, MemberTrait, Need, Offer, Trait
 from apps.matching.ranker import training
 from apps.matching.ranker.serving import Serving
+from core import ist
 
 CITY = "Simulation"
 CENTRE = (12.0, 80.0)  # far from the seeded pilot city
@@ -123,7 +122,7 @@ def simulate(members: int = 400, rounds: int = 14, seed: int = 7) -> dict:
         now, simulated=True, serving=Serving()
     )  # the rule ranks: unbiased data for the model to learn from
     lists = {mid: services.rank_member(ctx, mid) for mid in sorted(ctx.world.members)}
-    tz = ZoneInfo(settings.DROP_TZ)
+    tz = ist.tz()
     snaps: list[FeatureSnapshot] = []
     intros: list[IntroRequest] = []
     whens: list[datetime] = []

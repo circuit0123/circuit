@@ -248,7 +248,7 @@ FINANCIAL_RECORD_RETENTION_YEARS = (
     8  # orders, payments and invoices survive account deletion for this long. ACCOUNTANT TO CONFIRM the period
 )
 QUIET_HOURS_IST = (9, 19)  # under-18 members get no email or push outside these hours (CLAUDE.md F22 and DESIGN.md §8)
-NOTIFICATION_TZ = "Asia/Kolkata"
+APP_TZ = "Asia/Kolkata"  # India time: notifications, quiet hours, usage days, and the Daily Drop (ready at 08:00)
 
 # Invite-only beta (F18)
 INVITE_EXPIRY_DAYS_WAITLIST = 30  # the single-use code emailed when a waitlist entry is approved
@@ -276,13 +276,11 @@ FREE_TIER_LIMITS = {
 
 # Social (F15-F17)
 PULSE_WINDOW_DAYS = 7
-PULSE_PAGE_SIZE = 20
 TODAY_WINDOW_HOURS = 24  # Live wire looks back this far
 DROP_SIZE = 3
 MATCH_STRONG = 0.75  # at or above: "Strong match" (DESIGN.md §4)
 MATCH_GOOD = 0.55  # at or above: "Good match". Below this a match is not shown to a person as a recommendation
 DROP_REPEAT_DAYS = 14  # nobody is dropped to the same member twice within this many days
-DROP_TZ = "Asia/Kolkata"  # drops are built for the IST calendar day, ready at 08:00
 
 EMAIL_BACKEND = {
     "console": "django.core.mail.backends.console.EmailBackend",
