@@ -1196,6 +1196,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/highlights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set my highlights
+         * @description Replaces my pinned projects (up to 6, in the order sent; an empty list clears them). Upload each picture first (`POST /api/media/uploads` with purpose `highlight`, PUT the file, then complete) and send its id with a title (80), an optional http(s) link and the picture's description. An upload already pinned can stay by sending it again; one that drops out is deleted. Someone else's upload is a 404. Everyone who may see my profile sees them in `ProfileOut.highlights`, except that an under-18 member's highlights are shown to nobody but themselves.
+         */
+        put: operations["apps_accounts_api_put_highlights"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/needs": {
         parameters: {
             query?: never;
@@ -1235,7 +1255,7 @@ export interface paths {
         head?: never;
         /**
          * Update my notification preferences
-         * @description Per type (intros, applications, circuits, messages, pulse_replies, announcements) and channel (in_app, email). Send only what changes, e.g. {"intros": {"email": false}}. Account notices (a warning from a moderator) are always shown in the app and cannot be turned off.
+         * @description Per type (intros, applications, circuits, messages, pulse_replies, announcements) and channel (in_app, email, push), plus quiet_hours {start, end} (IST hours, default 22 to 8) and push_daily_cap (1 to 10, default 3). Push is stored only: nothing sends a push yet. Members under 18 cannot change quiet hours or raise the cap above 3 (403 `under_18_restricted`). Send only what changes, e.g. {"intros": {"email": false}}. Account notices (a warning from a moderator) are always shown in the app and cannot be turned off.
          */
         patch: operations["apps_accounts_settings_api_patch_notification_preferences"];
         trace?: never;
@@ -1509,7 +1529,7 @@ export interface paths {
         };
         /**
          * A member's build logs
-         * @description Newest first, only the ones I am allowed to see. 404 for members I cannot see.
+         * @description Newest first, 20 at a time (`cursor` from `next_cursor`, `limit` up to 100), only the ones I am allowed to see. No total is sent. 404 for members I cannot see; a bad cursor is a 422 `bad_cursor`.
          */
         get: operations["apps_social_api_member_posts"];
         put?: never;
@@ -2458,6 +2478,8 @@ export interface components {
             email: boolean;
             /** In App */
             in_app: boolean;
+            /** Push */
+            push: boolean;
         };
         /** ChannelsPatch */
         ChannelsPatch: {
@@ -2465,6 +2487,8 @@ export interface components {
             email?: boolean | null;
             /** In App */
             in_app?: boolean | null;
+            /** Push */
+            push?: boolean | null;
         };
         /** CircuitOut */
         CircuitOut: {
@@ -2501,6 +2525,15 @@ export interface components {
             /** Week */
             week: string;
             you_help: components["schemas"]["LineOut"];
+        };
+        /** CircuitTogetherOut */
+        CircuitTogetherOut: {
+            /** Completed */
+            completed: boolean;
+            /** Id */
+            id: number;
+            /** Month */
+            month: string;
         };
         /** CityOut */
         CityOut: {
@@ -2804,6 +2837,38 @@ export interface components {
             cell_degrees: number;
             /** Cells */
             cells: components["schemas"]["CellOut"][];
+        };
+        /** HighlightIn */
+        HighlightIn: {
+            /**
+             * Alt Text
+             * @description What the picture shows, for people using a screen reader
+             */
+            alt_text: string;
+            /**
+             * Link
+             * @default
+             */
+            link: string;
+            /** Title */
+            title: string;
+            /** Upload Id */
+            upload_id: number;
+        };
+        /** HighlightOut */
+        HighlightOut: {
+            /** Id */
+            id: number;
+            image: components["schemas"]["PostMediaOut"];
+            /** Link */
+            link: string;
+            /** Title */
+            title: string;
+        };
+        /** HighlightsIn */
+        HighlightsIn: {
+            /** Items */
+            items: components["schemas"]["HighlightIn"][];
         };
         /** IntroIn */
         IntroIn: {
@@ -3160,6 +3225,8 @@ export interface components {
             display_name: string;
             /** Has Needs And Offers */
             has_needs_and_offers: boolean;
+            /** Headline */
+            headline: string;
             /** Id */
             id: number;
             /** Is Minor */
@@ -3174,6 +3241,8 @@ export interface components {
             open_intro_slots: number;
             /** Organisation Id */
             organisation_id: number | null;
+            /** Organisation Name */
+            organisation_name: string | null;
             /** Photo */
             photo: string | null;
             /** Policy Version */
@@ -3204,6 +3273,8 @@ export interface components {
             college?: string | null;
             /** Display Name */
             display_name?: string | null;
+            /** Headline */
+            headline?: string | null;
             /** Lat */
             lat?: number | null;
             /** Lng */
@@ -3222,6 +3293,13 @@ export interface components {
             alt_text: string;
             /** Upload Id */
             upload_id: number;
+        };
+        /** MemberPostsOut */
+        MemberPostsOut: {
+            /** Items */
+            items: components["schemas"]["PostOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
         };
         /** MemberStatusOut */
         MemberStatusOut: {
@@ -3368,6 +3446,11 @@ export interface components {
             intros: components["schemas"]["ChannelsOut"];
             messages: components["schemas"]["ChannelsOut"];
             pulse_replies: components["schemas"]["ChannelsOut"];
+            /** Push Daily Cap */
+            push_daily_cap: number;
+            quiet_hours: components["schemas"]["QuietHours"];
+            /** Quiet Hours Locked */
+            quiet_hours_locked: boolean;
         };
         /** NotificationPrefsPatch */
         NotificationPrefsPatch: {
@@ -3377,6 +3460,9 @@ export interface components {
             intros?: components["schemas"]["ChannelsPatch"] | null;
             messages?: components["schemas"]["ChannelsPatch"] | null;
             pulse_replies?: components["schemas"]["ChannelsPatch"] | null;
+            /** Push Daily Cap */
+            push_daily_cap?: number | null;
+            quiet_hours?: components["schemas"]["QuietHours"] | null;
         };
         /** OnboardingOut */
         OnboardingOut: {
@@ -3739,6 +3825,8 @@ export interface components {
             build_logs: components["schemas"]["BuildLogTileOut"][];
             /** Circuits Closed */
             circuits_closed: number | null;
+            /** Circuits Together */
+            circuits_together: components["schemas"]["CircuitTogetherOut"][] | null;
             /** City */
             city: string;
             /** College */
@@ -3752,6 +3840,8 @@ export interface components {
             display_name: string;
             /** Headline */
             headline: string;
+            /** Highlights */
+            highlights: components["schemas"]["HighlightOut"][];
             /** Id */
             id: number;
             /** Is Me */
@@ -3838,6 +3928,13 @@ export interface components {
              * @default 20
              */
             limit: number;
+        };
+        /** QuietHours */
+        QuietHours: {
+            /** End */
+            end: number;
+            /** Start */
+            start: number;
         };
         /** RatingIn */
         RatingIn: {
@@ -4218,7 +4315,7 @@ export interface components {
              * Purpose
              * @enum {string}
              */
-            purpose: "post" | "message" | "avatar" | "startup_logo";
+            purpose: "post" | "message" | "avatar" | "startup_logo" | "highlight";
             /** Size */
             size: number;
         };
@@ -5870,6 +5967,30 @@ export interface operations {
             };
         };
     };
+    apps_accounts_api_put_highlights: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HighlightsIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HighlightOut"][];
+                };
+            };
+        };
+    };
     apps_accounts_api_get_needs: {
         parameters: {
             query?: never;
@@ -6316,7 +6437,10 @@ export interface operations {
     };
     apps_social_api_member_posts: {
         parameters: {
-            query?: never;
+            query?: {
+                cursor?: string | null;
+                limit?: number;
+            };
             header?: never;
             path: {
                 member_id: number;
@@ -6331,7 +6455,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PostOut"][];
+                    "application/json": components["schemas"]["MemberPostsOut"];
                 };
             };
         };

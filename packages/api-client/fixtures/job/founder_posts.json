@@ -118,7 +118,7 @@
       "hook": "useEditStartup",
       "request": {
         "body": {
-          "upload_id": 25
+          "upload_id": 26
         },
         "method": "PUT",
         "path": "/api/startups/1/logo"
