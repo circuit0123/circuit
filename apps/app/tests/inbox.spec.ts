@@ -38,7 +38,8 @@ test.describe("Inbox: folders and unread", () => {
     await expect(rows(page)).toHaveCount(5);
     await expect(rows(page).first()).toContainText("Meera Krishnan");
     await expect(rows(page).first()).toContainText("Happy to intro you to Sakthi this week.");
-    await expect(page.getByRole("list", { name: "Chats" }).getByRole("img", { name: "Unread" })).toHaveCount(2);
+    await expect(page.getByRole("list", { name: "Chats" }).locator("[data-unread]")).toHaveCount(2);
+    await expect(row(page, "Meera Krishnan")).toContainText("Unread"); // said to screen readers; the dot itself is decoration
     const weight = (who: string) => row(page, who).getByText(who, { exact: true }).evaluate((e) => getComputedStyle(e).fontWeight);
     expect(await weight("Meera Krishnan")).toBe("600");
     expect(await weight("Divya Subramanian")).toBe("400");
@@ -65,7 +66,7 @@ test.describe("Inbox: folders and unread", () => {
     const farhan = row(page, "Farhan Ali");
     await expect(farhan).toContainText("Can you share the map prototype?");
     await expect(farhan).toContainText("Also, is the repo public?", { timeout: 10_000 });
-    await expect(farhan.getByRole("img", { name: "Unread" })).toBeVisible();
+    await expect(farhan).toHaveAttribute("data-unread", "");
     await expect(rows(page).first()).toContainText("Farhan Ali"); // newest first
   });
 
@@ -127,7 +128,7 @@ test.describe("Conversation", () => {
     // Read receipts are off: nothing says seen or read.
     await expect(page.getByText(/\b(Seen|Read)\b/)).toHaveCount(0);
     await page.getByRole("button", { name: "Back to Inbox" }).click();
-    await expect(row(page, "Meera Krishnan").getByRole("img", { name: "Unread" })).toHaveCount(0);
+    await expect(row(page, "Meera Krishnan")).not.toHaveAttribute("data-unread");
   });
 
   test("sending is optimistic, and the reply arrives live", async ({ page }) => {

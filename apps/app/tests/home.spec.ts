@@ -262,7 +262,7 @@ test.describe("Desktop Home (Desktop.dc.html)", () => {
     const r = rail(page);
     await expect(r.getByRole("link", { name: "Circuit, Home" })).toBeVisible();
     const rows = r.getByRole("navigation", { name: "Main" }).getByRole("link");
-    await expect(rows).toHaveText(["Home", "Discover", "Inbox", "Profile"]);
+    await expect(rows).toHaveText(["Home", "Discover", "Circuits", /^Inbox/, "Profile"]); // Inbox may carry ", unread messages"
     for (const row of await rows.all()) expect((await row.boundingBox())!.height).toBe(48);
     await expect(rows.first()).toHaveAttribute("aria-current", "page");
     expect(await rows.first().evaluate((e) => getComputedStyle(e).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");

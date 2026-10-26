@@ -65,7 +65,7 @@ function Row({ r }: { r: InboxRow }) {
         </span>
         <span className="mt-0.5 flex items-center justify-between gap-2">
           <span className="t-subhead line-clamp-2 min-w-0 text-text-muted">{r.waiting ? `${r.preview} · Waiting for them to accept` : r.preview}</span>
-          {r.unread && <span role="img" aria-label="Unread" className="h-2.5 w-2.5 shrink-0 rounded-full bg-live" />}
+          {r.unread && <><span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full bg-live" /><span className="sr-only">Unread</span></>}
         </span>
       </span>
     </Link>

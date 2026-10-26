@@ -34,7 +34,7 @@ export function Circuits() {
         </Section>
       ))}
       {list.history.length > 0 && (
-        <Section title="Completed">
+        <Section title="Completed" className="pt-1">
           <div className="flex flex-wrap items-center gap-4">
             {list.history.map((h) => <MiniRing key={h.id} label={h.label} />)}
             <span className="t-subhead text-text-muted">{list.history.length === 1 ? "1 circuit closed" : `${list.history.length} circuits closed`}</span>
