@@ -274,6 +274,7 @@ def test_backup_db_is_a_job_that_records_its_result(monkeypatch, capsys, setting
 
 def test_a_failed_backup_is_a_failed_job(monkeypatch, settings):
     settings.BACKUP_DATABASE_URL = URL
+
     def boom():
         raise CommandError("pg_dump failed (exit 1): no message")
 

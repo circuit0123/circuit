@@ -344,7 +344,9 @@ class ProfileOut(Schema):
     build_logs: list[BuildLogTileOut]  # first picture of their latest build logs I may see; empty when Pulse is off
     circuits_closed: int | None  # mine, or a connection's; null for everyone else and when circuits are off
     strength: StrengthOut | None  # my own profile only: how complete it is
-    circuits_together: list[CircuitTogetherOut] | None  # circuits we are both in (running or finished); null on my own profile and when circuits are off
+    circuits_together: (
+        list[CircuitTogetherOut] | None
+    )  # circuits we are both in (running or finished); null on my own profile and when circuits are off
     highlights: list[HighlightOut]  # up to 6 pinned projects; empty for an under-18 member's profile seen by anyone else
     role: str
     display_name: str
