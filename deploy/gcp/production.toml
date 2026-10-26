@@ -11,7 +11,7 @@ budget="8000INR"# amount + the CURRENCY OF YOUR BILLING ACCOUNT (INR or USD). Al
 min_instances = 0                        # raise to 1 (about $8-12/month more) when cold starts of 5-10 s start to annoy real users
 max_instances = 3
 
-# Only the names of extra secrets (the LLM key for the provider chosen below, the email key, the Sentry address, and the database address used for backups). Their values go in with `make secret`.
+# Only the names of extra secrets (the email key now; later the LLM key for the provider chosen below, the Sentry address, REDIS_URL and BACKUP_DATABASE_URL). Their values go in with `make secret`.
 secrets = ["RESEND_API_KEY"]
 
 [env]
@@ -26,6 +26,7 @@ CORS_ALLOWED_ORIGINS = "https://circuit-app.vercel.app"
 GRIEVANCE_OFFICER_NAME = "G Lokesh Kumar"
 GRIEVANCE_EMAIL = "support@circuitapp.net"
 GRIEVANCE_ADDRESS = "pondicherry,India"
+LLM_PROVIDER = "none"                    # no AI in the beta: onboarding uses the manual pickers. To switch on: set gemini|groq|anthropic here AND add <NAME>_API_KEY to `secrets` above
 STORAGE_PROVIDER = "supabase"
 EMAIL_BACKEND = "resend"
 EMAIL_FROM = "Circuit <support@circuitapp.net>"   # production refuses Resend's @resend.dev test sender: verify your domain in Resend first

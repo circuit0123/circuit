@@ -512,6 +512,9 @@ def test_a_secret_the_deploy_mounts_is_a_variable_the_app_reads(cfg):
 
 def test_the_llm_key_mounted_is_the_one_for_the_provider_in_use(cfg):
     provider = cfg.env_vars["LLM_PROVIDER"]
+    if provider == "none":
+        assert not any(name.endswith("_API_KEY") and name != "RESEND_API_KEY" for name in cfg.secrets)
+        return
     assert f"{provider.upper()}_API_KEY" in cfg.secrets
 
 
