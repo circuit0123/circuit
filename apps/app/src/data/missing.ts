@@ -19,18 +19,6 @@ export const CITIES: ReadonlyArray<{ name: string; lat: number; lng: number }> =
   { name: "Kolkata", lat: 22.57, lng: 88.36 },
 ];
 
-/** API needed: organisation search (sign-up step 11). Mock mode only; real builds search nothing and accept the typed name. */
-export const ORGANISATIONS: readonly string[] = [
-  "Sri Venkateswara Institute of Technology",
-  "Thiagarajar College of Engineering",
-  "PSG College of Technology",
-  "Anna University, Guindy",
-  "Loyola College",
-  "SRM Institute of Science and Technology",
-  "Madras Institute of Technology",
-  "Government College of Technology, Coimbatore",
-];
-
 /**
  * API needed: Pulse items for partner calls/events and for promoted roles. `GET /api/pulse` returns neither today, so these two
  * stand-ins exist for mock mode only (never in a real build, where a flag on with no item simply draws nothing). Marked, and listed in

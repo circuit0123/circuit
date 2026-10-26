@@ -11,6 +11,18 @@ import { CONFIG, ME, dropOf } from "./fixtures";
 
 export const isSignup = () => currentScenario() === "signup" || currentScenario() === "signup_ai_down";
 
+/** The colleges the mock search knows. */
+const ORGANISATIONS: readonly string[] = [
+  "Sri Venkateswara Institute of Technology",
+  "Thiagarajar College of Engineering",
+  "PSG College of Technology",
+  "Anna University, Guindy",
+  "Loyola College",
+  "SRM Institute of Science and Technology",
+  "Madras Institute of Technology",
+  "Government College of Technology, Coimbatore",
+];
+
 const KEY = "circuit.mock.member";
 const API = "*/api";
 const AUTH = "*/mock-supabase/auth/v1";
@@ -235,6 +247,12 @@ export const signupHandlers: HttpHandler[] = [
     });
     const m = signupMe();
     return HttpResponse.json({ profile_visibility: m.profile_visibility, visible_to_org: false, circuits_opt_in: false, allow_requests: m.allow_requests });
+  }),
+  http.get(`${API}/organisations/search`, ({ request }) => {
+    if (!isSignup()) return;
+    const q = (new URL(request.url).searchParams.get("q") ?? "").toLowerCase();
+    const hits = q.length < 2 ? [] : ORGANISATIONS.filter((o) => o.toLowerCase().includes(q)).slice(0, 10);
+    return HttpResponse.json(hits.map((name, i) => ({ id: 100 + i, name, kind: "college", city: "Chennai" })));
   }),
   http.post(`${API}/organisations/join-by-email`, ({ request }) => {
     if (!isSignup()) return;
