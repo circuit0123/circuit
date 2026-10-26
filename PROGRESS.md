@@ -174,8 +174,8 @@ Served from clearly marked mocks (`data/missing.ts`, `data/mocks/discover.ts`); 
 
 ### Decisions and things to know (F4)
 1. **The map sheet says `See open roles` / `Follow`**, as DESIGN.md §4 and this brief say, not "I'm interested" (Map.dc.html and CLAUDE.md F2). The interest endpoints are not used yet; tell me if you want "I'm interested" back somewhere.
-2. **Students land on Jobs, everyone else on People.** DESIGN.md lists People first; the reference shows Jobs. Easy to change in `Discover.tsx`.
-3. **Discover's section headings are 17px semibold** as in Discover.dc.html and People.dc.html (DESIGN.md §5 says Title 3); the pushed pages use Title 3.
+2. **Students land on Jobs, everyone else on People.** Decided (your OK): written into DESIGN.md §4 "Discover".
+3. **Discover's section headings are 17px semibold** as in Discover.dc.html and People.dc.html; the pushed pages use Title 3. Decided (your OK): written into DESIGN.md §4 "Discover" as the one exception to Title 3 headers.
 4. **Verified startup = claimed** (claiming needs the company email domain, CLAUDE.md F3). There is no separate startup verification level in the API.
 5. **Map tiles:** `NEXT_PUBLIC_MAP_TILES_URL` (default: the OpenStreetMap tile server, as CLAUDE.md names it). It is read in `lib/env.ts`; please add it to `.env.example` (I don't edit env files). OpenStreetMap's own tile servers are for light use only: before public launch pick a tile provider (or self-host) and set this variable. Attribution "© OpenStreetMap contributors" is on the map.
 6. **MapLibre 6 needs its worker file**; the app points MapLibre at it with `new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url)`, which the bundler copies. Works in the dev server (all the map tests); `next build` emits the worker and references it, but I have not opened a production build in a browser.
