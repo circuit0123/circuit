@@ -104,7 +104,7 @@ timeout_seconds = 300
 # its own start/end/skipped lines and has its own lease, and is also a job of its own below so `make jobs-run` can run it alone.
 [jobs.every-5-min]
 command = "run_jobs"
-args = ["expire_items", "send_emails", "build_exports", "delete_accounts"]
+args = ["expire_items", "send_emails", "build_exports", "delete_accounts", "check_jobs"]
 schedule = "*/5 * * * *"
 timeout_seconds = 600
 
@@ -123,3 +123,7 @@ bundled = true
 [jobs.delete-accounts]
 command = "delete_accounts"
 bundled = true
+
+[jobs.check-jobs]
+command = "check_jobs"
+bundled = true                # the job watcher: logs job.overdue for any job with no success for twice its interval. Its job.end line is the heartbeat the alert waits for

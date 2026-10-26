@@ -24,6 +24,17 @@ def _weak_secret(key: str) -> bool:
     )
 
 
+def parse_job_intervals(text: str) -> dict[str, int]:
+    """'compute_matches:1440,expire_items:5' -> {...}. A malformed entry raises: a typo would silently switch a job's alert off."""
+    out: dict[str, int] = {}
+    for part in (p.strip() for p in text.split(",") if p.strip()):
+        name, _, minutes = part.partition(":")
+        if not name or not minutes.isdigit() or int(minutes) < 1:
+            raise ValueError(f"JOB_INTERVALS entry '{part}' must look like name:minutes")
+        out[name] = int(minutes)
+    return out
+
+
 def _check_preview_regex(pattern: str) -> None:
     """django-cors-headers uses re.match, which anchors the start only: the end must be anchored by us."""
     try:
@@ -75,6 +86,9 @@ class Config(BaseSettings):
     log_level: str = "INFO"
     sentry_dsn: str = ""  # empty = Sentry off (dev, tests). A secret in production: it identifies our project
     sentry_traces_sample_rate: float = Field(0.0, ge=0, le=1)  # performance traces; 0 keeps us inside Sentry's free quota
+    job_intervals: str = (
+        ""  # "compute_matches:1440,expire_items:5": how often each scheduled job should succeed. Written by scripts/gcp.py
+    )
     release: str = ""  # the git tag of the running image, set by the deploy script; tags every Sentry event
     features: str = ""  # default audience per flag, e.g. "pulse:everyone,circuits:testers" (PRODUCTION.md §2b)
     beta_mode: bool = False
@@ -128,6 +142,7 @@ class Config(BaseSettings):
             if not re.fullmatch(r"https?://[^\s<>]+", url):
                 # catches an unfilled <placeholder> or the word "auto" that the deploy script was meant to replace
                 raise ValueError(f"{label} must be a full address starting with http:// or https:// (got '{url}')")
+        parse_job_intervals(self.job_intervals)
         self._check_flags()
         self._check_beta_and_email()
         self._check_database()

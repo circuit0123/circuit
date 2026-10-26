@@ -156,6 +156,40 @@ def load_config(env: str, deploy_dir: Path | None = None) -> Cfg:
     )
 
 
+def cron_interval_minutes(schedule: str) -> int:
+    """How often a Scheduler cron fires, in minutes, for the shapes app.toml uses: "*/N * * * *", "M * * * *", "M */N * * *",
+    "M H * * *" (daily) and "M H * * D" (weekly). Anything else stops with a message, so a job can never silently lose its watcher."""
+    fields = schedule.split()
+    if len(fields) != 5:
+        raise DeployError(f"'{schedule}' is not a 5-field cron")
+    minute, hour, dom, mon, dow = fields
+    if dom == "*" and mon == "*":
+        if minute.startswith("*/") and hour == "*" and dow == "*":
+            return int(minute[2:])
+        if minute.isdigit() and hour == "*" and dow == "*":
+            return 60
+        if minute.isdigit() and hour.startswith("*/") and dow == "*":
+            return int(hour[2:]) * 60
+        if minute.isdigit() and hour.isdigit() and dow == "*":
+            return 1440
+        if minute.isdigit() and hour.isdigit() and dow.isdigit():
+            return 10080
+    raise DeployError(f"Cannot work out how often '{schedule}' runs. Teach cron_interval_minutes() this shape.")
+
+
+def job_intervals(cfg: Cfg) -> dict[str, int]:
+    """{command: minutes between runs} for every scheduled job in this environment; the commands a bundle runs get the bundle's.
+    Becomes JOB_INTERVALS, which job health (backend/core/jobhealth.py) compares each job's last success against."""
+    out: dict[str, int] = {}
+    for job in cfg.active_jobs():
+        if not job.schedule:
+            continue
+        minutes = cron_interval_minutes(job.schedule)
+        for command in job.args if job.command == "run_jobs" else [job.command]:
+            out[command] = minutes
+    return dict(sorted(out.items()))
+
+
 def find_placeholders(cfg: Cfg) -> list[str]:
     """Every <angle bracket> value still waiting for you, so a half-filled file never reaches gcloud."""
     found = []
@@ -255,6 +289,7 @@ def container_env(cfg: Cfg, project_number: str, release: str = "") -> list[dict
     values = dict(cfg.env_vars)
     if release:
         values["RELEASE"] = release
+    values["JOB_INTERVALS"] = ",".join(f"{name}:{minutes}" for name, minutes in job_intervals(cfg).items())
     if values.get("API_URL") == "auto":
         values["API_URL"] = api_url(cfg, project_number)
     values["GOOGLE_CLOUD_PROJECT"] = cfg.project  # lets log lines link to Cloud Trace

@@ -70,3 +70,10 @@ def test_local_file_storage_refused_when_deployed(env):
 def test_supabase_storage_needs_the_service_role_key_outside_dev():
     with pytest.raises(ValidationError, match="SERVICE_ROLE_KEY"):
         make(env="demo", supabase_url="https://x.supabase.co", storage_provider="supabase")
+
+
+def test_job_intervals_must_be_name_colon_minutes():
+    assert Config(**BASE, job_intervals="expire_items:5,compute_matches:1440").job_intervals
+    for bad in ("expire_items", "expire_items:0", "expire_items:x", ":5"):
+        with pytest.raises(ValidationError, match="JOB_INTERVALS"):
+            Config(**BASE, job_intervals=bad)

@@ -2,7 +2,7 @@ import os
 from typing import Any
 from urllib.parse import unquote, urlparse
 
-from circuit.config import ROOT, load_config
+from circuit.config import ROOT, load_config, parse_job_intervals
 
 cfg = load_config()
 
@@ -287,4 +287,5 @@ from core.monitoring import init_sentry  # noqa: E402
 
 configure_logging(cfg.log_level)
 RELEASE = cfg.release
+JOB_INTERVALS = parse_job_intervals(cfg.job_intervals)  # job health: minutes between successes, per scheduled job
 init_sentry(cfg.sentry_dsn, environment=cfg.env, release=cfg.release, traces_sample_rate=cfg.sentry_traces_sample_rate)

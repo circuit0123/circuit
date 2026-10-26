@@ -323,3 +323,42 @@ def test_the_deploy_plan_creates_one_trigger_for_every_scheduled_job_and_none_fo
     expected = {prod.job_name(j.key) for j in prod.active_jobs() if j.schedule}
     assert triggers == expected
     assert prod.job_name("every-5-min") in triggers and prod.job_name("send-emails") not in triggers
+
+
+@pytest.mark.parametrize(
+    ("cron", "minutes"),
+    [
+        ("*/5 * * * *", 5),
+        ("*/10 * * * *", 10),
+        ("30 7 * * *", 1440),
+        ("0 9 * * 1", 10080),
+        ("15 * * * *", 60),
+        ("0 */6 * * *", 360),
+    ],
+)
+def test_cron_interval_minutes(cron, minutes):
+    assert gcp.cron_interval_minutes(cron) == minutes
+
+
+def test_an_unknown_cron_shape_stops_instead_of_going_unwatched():
+    with pytest.raises(gcp.DeployError):
+        gcp.cron_interval_minutes("0 9 1 * *")
+
+
+def test_every_scheduled_or_bundled_job_gets_an_interval_for_job_health(prod):
+    intervals = gcp.job_intervals(prod)
+    watched = {j.command for j in prod.active_jobs() if j.schedule and j.command != "run_jobs"} | set(
+        prod.jobs["every-5-min"].args
+    )
+    assert set(intervals) == watched
+    assert set(job_commands()) - {"reset_demo"} <= set(intervals), "a JobCommand that nothing watches"
+    assert intervals["expire_items"] == 5 and intervals["check_jobs"] == 5
+    assert intervals["compute_matches"] == 1440 and intervals["run_circuit_round"] == 10080
+
+
+def test_the_interval_list_reaches_the_service_and_every_job(prod):
+    env = {e["name"]: e.get("value") for e in gcp.container_env(prod, "123456789", "abc123")}
+    assert "expire_items:5" in env["JOB_INTERVALS"] and env["RELEASE"] == "abc123"
+    from circuit.config import parse_job_intervals
+
+    assert parse_job_intervals(env["JOB_INTERVALS"]) == gcp.job_intervals(prod)
