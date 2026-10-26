@@ -585,3 +585,23 @@ def test_links_built_from_the_production_app_url_land_inside_the_app(prod, setti
     assert invite_link("ABCD2345").startswith("https://circuit-phi.vercel.app/app/join?")
     assert page_url("t").startswith("https://circuit-phi.vercel.app/app/unsubscribe?")
     assert not prod.env_vars["LANDING_URL"].endswith("/app")
+
+
+def test_production_mounts_no_redis_secret_for_the_beta_but_staging_and_demo_do():
+    prod_cfg = gcp.load_config("production", REPO / "deploy" / "gcp")
+    assert "REDIS_URL" not in prod_cfg.secrets
+    for env in ("staging", "demo"):
+        assert "REDIS_URL" in gcp.load_config(env, REPO / "deploy" / "gcp").secrets
+
+
+def test_a_real_sender_with_angle_brackets_is_not_mistaken_for_a_placeholder(prod):
+    prod.env_vars["EMAIL_FROM"] = "Circuit <support@circuitapp.net>"
+    assert gcp.find_placeholders(prod) == []
+    prod.env_vars["EMAIL_FROM"] = "Circuit <hello@<yourdomain>>"
+    assert len(gcp.find_placeholders(prod)) == 1
+
+
+def test_the_committed_production_file_has_no_placeholders_left_for_a_deploy():
+    """Unlike the other tests this does not fill anything in: it is the file as committed, which `make deploy` will read."""
+    cfg = gcp.load_config("production", REPO / "deploy" / "gcp")
+    assert gcp.find_placeholders(cfg, "deploy") == []

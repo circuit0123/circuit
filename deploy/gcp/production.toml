@@ -12,7 +12,7 @@ min_instances = 0                        # raise to 1 (about $8-12/month more) w
 max_instances = 3
 
 # Only the names of extra secrets (the email key now; later the LLM key for the provider chosen below, the Sentry address, REDIS_URL and BACKUP_DATABASE_URL). Their values go in with `make secret`.
-secrets = ["RESEND_API_KEY"]
+secrets = ["RESEND_API_KEY"]   # add "REDIS_URL" when you create the Upstash database (then `make secret NAME=REDIS_URL`)
 
 [env]
 ENV = "production"

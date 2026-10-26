@@ -66,7 +66,8 @@ def check_rate(who: int | str, action: str) -> None:
     cache = get_cache()
     count = cache.incr_window(key, window)
     if count is None:
-        log.warning("rate_limit_postgres_fallback", action=action)
+        if cache.configured:  # with no Redis configured, Postgres counting is the normal path and not worth a warning per request
+            log.warning("rate_limit_postgres_fallback", action=action)
         count = _count_in_postgres(key, window, limit)
     if count > limit:
         raise RateLimited(retry_after=cache.ttl(key) or window)

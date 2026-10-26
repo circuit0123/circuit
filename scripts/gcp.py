@@ -39,6 +39,7 @@ DEPLOY_DIR = REPO / "deploy" / "gcp"
 RENDERED = DEPLOY_DIR / ".rendered"  # manifests written for gcloud to read; gitignored, safe to delete
 ENVS = ("production", "staging", "demo")
 PLACEHOLDER = re.compile(r"<[^<>]+>")
+SENDER = re.compile(r"[^<>]+<[^<>@\s]+@[^<>@\s]+>")  # "Circuit <support@example.com>": angle brackets that are part of a real sender
 APIS = [
     "run.googleapis.com",
     "artifactregistry.googleapis.com",
@@ -244,7 +245,7 @@ def find_placeholders(cfg: Cfg, command: str = "deploy") -> list[str]:
         if PLACEHOLDER.search(value):
             found.append((label, value))
     for key, value in sorted(cfg.env_vars.items()):
-        if PLACEHOLDER.search(value):
+        if PLACEHOLDER.search(value) and not SENDER.fullmatch(value):
             found.append((f"env.{key}", value))
     if command == "monitoring":
         for channel in cfg.monitoring.get("notification_channels", []):
@@ -1332,7 +1333,7 @@ def main(
         if args.command == "secret":
             out("Cloud Run reads secrets when an instance starts: run `make deploy` for the new value to take effect.")
         return 0
-    except DeployError as exc:
+    except (DeployError, gcp_monitoring.MonitoringError) as exc:
         out(f"\nStopped: {exc}")
         return 1
 

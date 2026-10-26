@@ -26,9 +26,11 @@ startup_probe_path = "/health"    # the process is up. NOT /ready: if Supabase b
 liveness_probe_path = "/health"   # same reason: a database outage must not make Cloud Run restart healthy instances in a loop
 
 # Secret Manager secrets mounted as environment variables, for every environment. <env>.toml adds the LLM key (and the email key where email is on).
+# REDIS_URL is not here: production runs without Redis for the beta (Postgres fallback); staging and demo add it in their own file, and
+# production adds it to its `secrets` the day you create the Upstash database.
 # Each one is created empty by `make gcp-setup`; you fill it with `make secret NAME=...` (the value is never typed into a command line).
 # `make deploy` refuses to start while any of them has no value, because Cloud Run cannot start a revision that mounts an empty secret.
-secrets = ["SECRET_KEY", "DATABASE_URL", "REDIS_URL", "SUPABASE_SERVICE_ROLE_KEY"]
+secrets = ["SECRET_KEY", "DATABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"]
 
 # Non-secret defaults for every environment; <env>.toml wins. PORT is set by Cloud Run itself.
 [env]

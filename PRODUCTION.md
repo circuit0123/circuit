@@ -18,7 +18,7 @@ infrastructure, this file wins.
 | Auth | Supabase Auth | Google + email OTP; JWT verified in Django via JWKS |
 | Files | Supabase Storage | `avatars` (public), `private` (reports, exports) |
 | Realtime | Supabase Realtime | Notifications, circuit status; RLS-scoped |
-| Cache + rate limits | Redis (Upstash), free tier to start | Disposable; Postgres fallback. Free tier = 500K commands/month; pay-as-you-go is $0.20 per 100K commands. If the limit is hit the app reads Postgres, slower but correct |
+| Cache + rate limits | Redis (Upstash), free tier to start. Optional for the beta: with `REDIS_URL` empty production runs on Postgres alone (one startup warning) | Disposable; Postgres fallback. Free tier = 500K commands/month; pay-as-you-go is $0.20 per 100K commands. If the limit is hit the app reads Postgres, slower but correct |
 | Graph | Recursive SQL + networkx (core/graph) | Neo4j only if a BACKLOG.md trigger is hit |
 | Secrets | Google Secret Manager | Never in repo, image or frontend. One secret per value, mounted as an environment variable; only the API's own service account can read them (`make secret`) |
 | Images | Artifact Registry (asia-south1) | Built by the deploy workflow (x86_64 and ARM64, tagged with the commit), or on your laptop by `make deploy`; the newest 5 are kept |
