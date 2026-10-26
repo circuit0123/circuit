@@ -67,3 +67,8 @@ def test_dockerfile_does_not_hard_code_a_domain():
     assert not re.search(
         r"https?://(?!app\.invalid|www\.invalid|api\.invalid|localhost|127\.0\.0\.1)[a-z0-9.-]+\.(com|in|app|dev)\b", DOCKERFILE
     )
+
+
+def test_image_can_make_the_encrypted_backup():
+    runtime = DOCKERFILE.split("FROM python:3.12-slim-trixie\n", 2)[-1]
+    assert "postgresql-client-17" in runtime and re.search(r"\bage\b", runtime)  # pg_dump and age, in the stage that ships

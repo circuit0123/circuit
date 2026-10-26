@@ -287,5 +287,9 @@ from core.monitoring import init_sentry  # noqa: E402
 
 configure_logging(cfg.log_level)
 RELEASE = cfg.release
+BACKUP_BUCKET = cfg.backup_bucket
+BACKUP_DATABASE_URL = cfg.backup_database_url
+BACKUP_AGE_RECIPIENT = cfg.backup_age_recipient
+BACKUP_DIR = BASE_DIR / ".backups"  # BACKUP_BUCKET empty (a laptop): `make backup-now` writes here; gitignored
 JOB_INTERVALS = parse_job_intervals(cfg.job_intervals)  # job health: minutes between successes, per scheduled job
 init_sentry(cfg.sentry_dsn, environment=cfg.env, release=cfg.release, traces_sample_rate=cfg.sentry_traces_sample_rate)

@@ -86,6 +86,11 @@ class Config(BaseSettings):
     log_level: str = "INFO"
     sentry_dsn: str = ""  # empty = Sentry off (dev, tests). A secret in production: it identifies our project
     sentry_traces_sample_rate: float = Field(0.0, ge=0, le=1)  # performance traces; 0 keeps us inside Sentry's free quota
+    backup_bucket: str = ""  # private bucket for the nightly encrypted dump; empty = write to backend/.backups/ (a laptop)
+    backup_database_url: str = (
+        ""  # secret: the Supabase SESSION pooler (or direct) address; pg_dump cannot use the transaction pooler
+    )
+    backup_age_recipient: str = ""  # the age PUBLIC key the dump is encrypted to. The private key stays offline
     job_intervals: str = (
         ""  # "compute_matches:1440,expire_items:5": how often each scheduled job should succeed. Written by scripts/gcp.py
     )
@@ -143,6 +148,10 @@ class Config(BaseSettings):
                 # catches an unfilled <placeholder> or the word "auto" that the deploy script was meant to replace
                 raise ValueError(f"{label} must be a full address starting with http:// or https:// (got '{url}')")
         parse_job_intervals(self.job_intervals)
+        if self.backup_age_recipient and not re.fullmatch(r"age1[0-9a-z]{58}", self.backup_age_recipient):
+            raise ValueError(
+                "BACKUP_AGE_RECIPIENT must be an age PUBLIC key (age1...). Never put the private key (AGE-SECRET-KEY-...) here"
+            )
         self._check_flags()
         self._check_beta_and_email()
         self._check_database()

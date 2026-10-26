@@ -34,8 +34,9 @@ RUN ENV=demo SECRET_KEY=build-only-0123456789-abcdefghijklmnopqrstuvwxyz DATABAS
 # ---- runtime: only what is needed to run --------------------------------------------------------------------------------
 FROM python:3.12-slim-trixie
 # libgdal36 + libgeos-c1t64: GeoDjango (PostGIS). libgomp1: LightGBM's OpenMP runtime (train_ranker, compute_matches).
+# postgresql-client-17 (pg_dump; version 17 can dump Supabase's Postgres 15-17) + age: the nightly encrypted backup (core/backup.py).
 RUN apt-get update \
- && apt-get install -y --no-install-recommends libgdal36 libgeos-c1t64 libgomp1 \
+ && apt-get install -y --no-install-recommends libgdal36 libgeos-c1t64 libgomp1 postgresql-client-17 age \
  && rm -rf /var/lib/apt/lists/* \
  && useradd --system --uid 10001 --no-create-home --shell /usr/sbin/nologin circuit
 

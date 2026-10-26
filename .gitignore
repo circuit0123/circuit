@@ -25,3 +25,4 @@ coverage/
 /apps/landing/.out-*/
 /deploy/gcp/.rendered/
 /backend/staticfiles/
+/backend/.backups/

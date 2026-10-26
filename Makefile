@@ -18,7 +18,7 @@ endef
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
-	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring
+	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill
 
 help: ## List every command
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  \033[1m%-22s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -123,6 +123,17 @@ daily: ## The 08:00 set: matches, then the Daily Drop (investor picks arrive wit
 
 circuit-round: ## Run an exchange circuit round now
 	$(MANAGE) run_circuit_round
+
+backup-now: ## Take an encrypted database backup now. Locally into backend/.backups/ (needs pg_dump, age and BACKUP_AGE_RECIPIENT in .env); in the cloud: make backup-now ENV=production
+ifeq ($(ENV),local)
+	$(MANAGE) backup_db
+else
+	$(call need_env,backup-now)
+	$(GCP) jobs-run --env $(ENV) --job backup_db
+endif
+
+restore-drill: ## Restore the newest backup into a throwaway LOCAL database and check the row counts: AGE_KEY_FILE=~/backup.key make restore-drill [ENV=production]
+	python3 scripts/restore_drill.py $(if $(filter-out local,$(ENV)),--env $(ENV))
 
 retention: ## Run the daily clean-up now: stale accounts, expired export files, old rejected waitlist entries
 	$(MANAGE) retention_cleanup

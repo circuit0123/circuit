@@ -11,6 +11,25 @@ services:
       test: ["CMD-SHELL", "pg_isready -U circuit"]
       interval: 5s
       retries: 10
+  # The restore drill's scratch database (scripts/restore_drill.py, `make restore-drill`): empty, no volume, gone when stopped.
+  # Same image as `db`, so PostGIS and pgvector are there. Only started with --profile drill, never by `make up`.
+  # DRILL_PG_MAJOR must be >= the pg_dump version that made the backup: pg_restore cannot read an archive from a newer pg_dump.
+  restore-db:
+    build:
+      context: docker/postgres
+      args:
+        PG_MAJOR: ${DRILL_PG_MAJOR:-17}
+    profiles: ["drill"]
+    environment:
+      POSTGRES_USER: circuit
+      POSTGRES_PASSWORD: circuit
+      POSTGRES_DB: postgres
+    ports: ["127.0.0.1:5433:5432"]
+    tmpfs: ["/var/lib/postgresql"]   # the parent folder: Postgres 18 images refuse a mount on .../data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U circuit"]
+      interval: 3s
+      retries: 20
   redis:
     image: redis:7
     ports: ["6379:6379"]

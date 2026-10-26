@@ -81,6 +81,13 @@ timeout_seconds = 1800
 command = "retention_cleanup"
 schedule = "0 3 * * *"
 
+[jobs.backup-db]
+command = "backup_db"
+schedule = "30 2 * * *"       # 02:30 IST, the quietest hour: pg_dump | age -> the private backup bucket (production only; staging and demo data is disposable)
+envs = ["production"]
+memory = "2Gi"                # the encrypted dump is staged on Cloud Run's in-memory disk until it is uploaded
+timeout_seconds = 1800
+
 [jobs.train-ranker]
 command = "train_ranker"
 schedule = "0 2 * * 0"        # Sundays 02:00 IST; only saves a candidate, a super admin promotes it

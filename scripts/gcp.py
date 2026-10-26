@@ -108,6 +108,15 @@ class Cfg:
         return f"circuit-sched-{self.env}@{self.project}.iam.gserviceaccount.com"
 
     @property
+    def has_backups(self) -> bool:
+        return any(j.command == "backup_db" for j in self.active_jobs())
+
+    @property
+    def backup_bucket(self) -> str:
+        """Bucket names are global; the project id is unique, so it is the prefix."""
+        return f"{self.project}-circuit-{self.env}-backups"
+
+    @property
     def registry_host(self) -> str:
         return f"{self.region}-docker.pkg.dev"
 
@@ -289,6 +298,8 @@ def container_env(cfg: Cfg, project_number: str, release: str = "") -> list[dict
     values = dict(cfg.env_vars)
     if release:
         values["RELEASE"] = release
+    if cfg.has_backups:
+        values["BACKUP_BUCKET"] = cfg.backup_bucket
     values["JOB_INTERVALS"] = ",".join(f"{name}:{minutes}" for name, minutes in job_intervals(cfg).items())
     if values.get("API_URL") == "auto":
         values["API_URL"] = api_url(cfg, project_number)
@@ -473,6 +484,8 @@ def plan_setup(cfg: Cfg) -> list[Step]:
                 f"Let the runtime service account read {name}, and no other secret.",
             )
         )
+    if cfg.has_backups:
+        steps += plan_backup_bucket(cfg)
     budget_name = f"circuit-{cfg.env}-budget"
     steps.append(
         Step(
@@ -542,6 +555,45 @@ def plan_monitoring(cfg: Cfg, project_number: str, lenient: bool = False) -> lis
             f"{', '.join(cfg.monitoring.get('notification_channels', []))}; a channel that does not exist stops the run.",
             local=True,
             files={folder / name: text for name, text in rendered.items()},
+        ),
+    ]
+
+
+def plan_backup_bucket(cfg: Cfg) -> list[Step]:
+    """The private bucket for the nightly encrypted dump. The API's service account can ADD files and nothing else (it cannot read, list,
+    overwrite or delete), so a stolen job cannot touch earlier backups. You read them with your own login."""
+    p = _p(cfg)
+    gs = f"gs://{cfg.backup_bucket}"
+    return [
+        Step(
+            gcloud(
+                "storage",
+                "buckets",
+                "create",
+                gs,
+                f"--location={cfg.region}",
+                "--uniform-bucket-level-access",
+                "--public-access-prevention",
+                *p,
+            ),
+            f"Create the private backup bucket {cfg.backup_bucket} in {cfg.region} (India). No public access is possible, ever.",
+            skip_if=gcloud("storage", "buckets", "describe", gs, *p, "--format=value(name)"),
+        ),
+        Step(
+            gcloud("storage", "buckets", "update", gs, f"--lifecycle-file={DEPLOY_DIR / 'backup-lifecycle.json'}", *p),
+            "Delete every backup after 30 days, so old copies of member data do not pile up (DPDP retention) or cost storage.",
+        ),
+        Step(
+            gcloud(
+                "storage",
+                "buckets",
+                "add-iam-policy-binding",
+                gs,
+                f"--member=serviceAccount:{cfg.runtime_sa}",
+                "--role=roles/storage.objectCreator",
+                *p,
+            ),
+            "Let the API's service account add backups to this bucket and do nothing else with it.",
         ),
     ]
 
