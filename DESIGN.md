@@ -486,7 +486,7 @@ mock is the "Circuit app design" canvas (Home, Discover, Inbox, Profile, desktop
   hairline. Only the Daily Drop card, sheets and grouped settings lists get a surface.
   Never a border AND a background on the same element.
 - **Section spacing:** 40px between sections on mobile, 56px on desktop. Section headers
-  are Title 3 with 12px below. Inside a surface: 20px padding mobile, 24px desktop.
+  are Title 3 with 12px below (Discover's segment headings are Headline, see §4). Inside a surface: 20px padding mobile, 24px desktop.
 - **Rows:** list rows min 56px tall (64px with a subtitle), 16px between avatar and text.
 - **Line length:** body text max 60 characters per line (centre column max 600px, text
   max 540px); reasons and bios never truncate mid-sentence: show 2 full lines, then
