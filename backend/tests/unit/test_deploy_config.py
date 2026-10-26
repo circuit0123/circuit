@@ -465,3 +465,36 @@ def test_cli_without_gcloud_installed_says_how_to_install_it(cli, monkeypatch):
     out: list[str] = []
     assert gcp.main(["setup", "--env", "production"], out=out.append) == 1
     assert any("google-cloud-cli" in line for line in out)
+
+
+# ---- the deploy files agree with the app's own startup checks ------------------------------------------------------------------
+
+SECRET_SAMPLES = {
+    "SECRET_KEY": "aB3dE5fG7hJ9kL1mN3pQ5rS7tU9vW1xY3zA5",
+    "DATABASE_URL": "postgres://u:p@aws-0.pooler.supabase.com:6543/postgres",
+    "REDIS_URL": "rediss://default:p@x.upstash.io:6379",
+}
+
+
+def test_each_environment_file_produces_a_config_the_app_accepts(cfg):
+    """Fill the placeholders and the secrets, as deployment would, and let the real startup checks judge the result."""
+    from circuit.config import Config
+
+    values = {e["name"]: e["value"] for e in gcp.container_env(cfg, "123456789") if "value" in e}
+    for name in cfg.secrets:
+        values[name] = SECRET_SAMPLES.get(name, "sample-value")
+    config = Config(_env_file=None, **{k.lower(): v for k, v in values.items()})
+    assert config.env == cfg.env
+    assert config.database_pooler == "transaction"  # Cloud Run + Supabase pooler
+
+
+def test_a_secret_the_deploy_mounts_is_a_variable_the_app_reads(cfg):
+    from circuit.config import Config
+
+    for name in cfg.secrets:
+        assert name.lower() in Config.model_fields, f"{name} is mounted but the app never reads it"
+
+
+def test_the_llm_key_mounted_is_the_one_for_the_provider_in_use(cfg):
+    provider = cfg.env_vars["LLM_PROVIDER"]
+    assert f"{provider.upper()}_API_KEY" in cfg.secrets

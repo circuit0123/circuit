@@ -21,6 +21,21 @@ BASE = dict(
 )
 
 
+# What a staging/production Config needs on top of BASE: the "required when deployed" rules (circuit/config.py).
+DEPLOYED = dict(
+    supabase_url="https://x.supabase.co",
+    storage_provider="supabase",
+    supabase_service_role_key="k",
+    email_backend="resend",
+    resend_api_key="re_x",
+    embedding_provider="fastembed",
+    llm_provider="groq",
+    groq_api_key="g",
+    csrf_trusted_origins="https://api.example.com",
+    redis_url="rediss://h",
+)
+
+
 def make(**over):
     return Config(_env_file=None, **{**BASE, **over})
 

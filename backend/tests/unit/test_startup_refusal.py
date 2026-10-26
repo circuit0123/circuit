@@ -20,6 +20,14 @@ VALID = {
     "RAZORPAY_KEY_ID": "",
     "TRUSTED_PROXY_HOPS": "1",  # deployed envs refuse 0
     "EMAIL_FROM": "Circuit <hello@example.com>",  # production refuses Resend's test sender
+    # the "required when deployed" rules (circuit/config.py)
+    "EMAIL_BACKEND": "resend",
+    "RESEND_API_KEY": "re_x",
+    "EMBEDDING_PROVIDER": "fastembed",
+    "LLM_PROVIDER": "groq",
+    "GROQ_API_KEY": "g",
+    "CSRF_TRUSTED_ORIGINS": "https://api.example.com",
+    "REDIS_URL": "rediss://localhost:6379",
 }
 
 
