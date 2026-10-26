@@ -1,0 +1,1404 @@
+{
+  "calls": [
+    {
+      "hook": "useLiveWire",
+      "request": {
+        "method": "GET",
+        "path": "/api/livewire"
+      },
+      "response": [
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 6
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Divya Menon",
+            "headline": "",
+            "id": 6,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          },
+          "created_at": "2026-03-01T23:00:00Z",
+          "headline": "We are hiring a frontend intern at Pixelwave. React, a designer next to you, real users by week three.",
+          "image": {
+            "alt": "Phone screen, Set up your studio, with two of four steps done and Pick your first campaign next",
+            "w1440": "https://storage.test/read/posts/post/6/seed4/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/post/6/seed4/w480.webp?token=t"
+          },
+          "key": "post:5",
+          "kind": "shipped",
+          "reason": "You both work with UI design · 14 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 65
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Yamini Patel",
+            "headline": "",
+            "id": 65,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-01T12:00:00Z",
+          "headline": "Needs help with Mentoring: Looking for help with mentoring",
+          "image": null,
+          "key": "need:188",
+          "kind": "needs",
+          "reason": "You both need Mentoring · 1 mutual connection · 1 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 97
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Balaji Thomas",
+            "headline": "",
+            "id": 97,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T00:00:00Z",
+          "headline": "Needs help with Mentoring: Looking for help with mentoring",
+          "image": null,
+          "key": "need:245",
+          "kind": "needs",
+          "reason": "You both need Mentoring · 2 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 79
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Harini Pillai",
+            "headline": "",
+            "id": 79,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T00:00:00Z",
+          "headline": "Needs help with Mentoring: Looking for help with mentoring",
+          "image": null,
+          "key": "need:214",
+          "kind": "needs",
+          "reason": "You both need Mentoring · 3 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 106
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Imran Shaikh",
+            "headline": "",
+            "id": 106,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T00:00:00Z",
+          "headline": "Tried Figma for the first time. The auto layout clicked on day two.",
+          "image": {
+            "alt": "Figma window with a profile card selected and its auto layout settings: vertical, gap 8, padding 16",
+            "w1440": "https://storage.test/read/posts/post/106/seed14/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/post/106/seed14/w480.webp?token=t"
+          },
+          "key": "post:22",
+          "kind": "shipped",
+          "reason": "You both work with UI design · 12 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "view_role",
+            "target_id": 43
+          },
+          "actor": null,
+          "created_at": "2026-03-01T21:00:00Z",
+          "headline": "Sutragrid is hiring: Trainee – Backend development",
+          "image": null,
+          "key": "job:43",
+          "kind": "hiring",
+          "reason": "Matches your skills in Frontend development · 20 km away",
+          "seen": false,
+          "startup": {
+            "id": 100,
+            "name": "Sutragrid"
+          }
+        },
+        {
+          "action": {
+            "kind": "view_role",
+            "target_id": 22
+          },
+          "actor": null,
+          "created_at": "2026-03-01T13:00:00Z",
+          "headline": "Tatvagrid is hiring: Associate – Frontend development",
+          "image": null,
+          "key": "job:22",
+          "kind": "hiring",
+          "reason": "Matches your skills in Frontend development · 9 km away",
+          "seen": false,
+          "startup": {
+            "id": 41,
+            "name": "Tatvagrid"
+          }
+        },
+        {
+          "action": {
+            "kind": "view_role",
+            "target_id": 16
+          },
+          "actor": null,
+          "created_at": "2026-03-01T13:00:00Z",
+          "headline": "Zetapulse is hiring: Intern – Frontend development",
+          "image": null,
+          "key": "job:16",
+          "kind": "hiring",
+          "reason": "Matches your skills in Frontend development · 7 km away",
+          "seen": false,
+          "startup": {
+            "id": 31,
+            "name": "Zetapulse"
+          }
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 103
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Suriya Nair",
+            "headline": "",
+            "id": 103,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-01T08:00:00Z",
+          "headline": "Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.",
+          "image": null,
+          "key": "post:11",
+          "kind": "shipped",
+          "reason": "You both work with Frontend development · 8 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 60
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Gokul Patel",
+            "headline": "",
+            "id": 60,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-01T19:00:00Z",
+          "headline": "Finished the sensor wiring for our Arduino soil-moisture project. The pump switches on below 35%.",
+          "image": {
+            "alt": "Serial monitor log of soil moisture readings; the pump turns on when moisture falls to 34%",
+            "w1440": "https://storage.test/read/posts/post/60/seed8/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/post/60/seed8/w480.webp?token=t"
+          },
+          "key": "post:10",
+          "kind": "shipped",
+          "reason": "1 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 73
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Lavanya Reddy",
+            "headline": "",
+            "id": 73,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T04:00:00Z",
+          "headline": "Joined Kaveri Institute of Technology",
+          "image": null,
+          "key": "joined:1",
+          "kind": "joined",
+          "reason": "14 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 64
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Priyanka Venkatesh",
+            "headline": "",
+            "id": 64,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T04:00:00Z",
+          "headline": "Joined Kaveri Institute of Technology",
+          "image": null,
+          "key": "joined:2",
+          "kind": "joined",
+          "reason": "13 km away",
+          "seen": false,
+          "startup": null
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useMarkUpdateSeen",
+      "request": {
+        "body": {
+          "key": "post:5"
+        },
+        "method": "POST",
+        "path": "/api/livewire/seen"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useDailyDrop",
+      "request": {
+        "method": "GET",
+        "path": "/api/drop/today"
+      },
+      "response": {
+        "cards": [
+          {
+            "help_with": null,
+            "image": null,
+            "is_bridge": false,
+            "member": {
+              "city": "Chennai",
+              "display_name": "Lavanya Srinivasan",
+              "headline": "",
+              "id": 99,
+              "photo": null,
+              "role": "student",
+              "verification_level": 1
+            },
+            "offers_you_need": [],
+            "outcome": null,
+            "reason": "You offer frontend development, which they need. You both deal with student-friendly, builds for tier 2/3 cities. You have a mutual connection.",
+            "strength": "good",
+            "via": {
+              "city": "Chennai",
+              "display_name": "Ishaan Fernandes",
+              "headline": "",
+              "id": 172,
+              "photo": null,
+              "role": "student",
+              "verification_level": 1
+            }
+          },
+          {
+            "help_with": "Mentoring",
+            "image": null,
+            "is_bridge": false,
+            "member": {
+              "city": "Chennai",
+              "display_name": "Jayanth Natarajan",
+              "headline": "",
+              "id": 42,
+              "photo": null,
+              "role": "mentor",
+              "verification_level": 3
+            },
+            "offers_you_need": [
+              "Mentoring"
+            ],
+            "outcome": null,
+            "reason": "You can help each other: they offer mentoring and you offer ui design.",
+            "strength": "good",
+            "via": null
+          },
+          {
+            "help_with": "Mentoring",
+            "image": null,
+            "is_bridge": false,
+            "member": {
+              "city": "Chennai",
+              "display_name": "Rajesh Venkatesh",
+              "headline": "",
+              "id": 13,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "offers_you_need": [
+              "Mentoring"
+            ],
+            "outcome": null,
+            "reason": "You can help each other: they offer mentoring and you offer frontend development.",
+            "strength": "good",
+            "via": null
+          }
+        ],
+        "date": "2026-03-02",
+        "done": false,
+        "next_drop_at": "2026-03-03T08:00:00+05:30"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useSkip",
+      "request": {
+        "body": {
+          "direction": "skip"
+        },
+        "method": "POST",
+        "path": "/api/drop/today/99/swipe"
+      },
+      "response": {
+        "cards": [
+          {
+            "help_with": null,
+            "image": null,
+            "is_bridge": false,
+            "member": {
+              "city": "Chennai",
+              "display_name": "Lavanya Srinivasan",
+              "headline": "",
+              "id": 99,
+              "photo": null,
+              "role": "student",
+              "verification_level": 1
+            },
+            "offers_you_need": [],
+            "outcome": "skip",
+            "reason": "You offer frontend development, which they need. You both deal with student-friendly, builds for tier 2/3 cities. You have a mutual connection.",
+            "strength": "good",
+            "via": {
+              "city": "Chennai",
+              "display_name": "Ishaan Fernandes",
+              "headline": "",
+              "id": 172,
+              "photo": null,
+              "role": "student",
+              "verification_level": 1
+            }
+          },
+          {
+            "help_with": "Mentoring",
+            "image": null,
+            "is_bridge": false,
+            "member": {
+              "city": "Chennai",
+              "display_name": "Jayanth Natarajan",
+              "headline": "",
+              "id": 42,
+              "photo": null,
+              "role": "mentor",
+              "verification_level": 3
+            },
+            "offers_you_need": [
+              "Mentoring"
+            ],
+            "outcome": null,
+            "reason": "You can help each other: they offer mentoring and you offer ui design.",
+            "strength": "good",
+            "via": null
+          },
+          {
+            "help_with": "Mentoring",
+            "image": null,
+            "is_bridge": false,
+            "member": {
+              "city": "Chennai",
+              "display_name": "Rajesh Venkatesh",
+              "headline": "",
+              "id": 13,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "offers_you_need": [
+              "Mentoring"
+            ],
+            "outcome": null,
+            "reason": "You can help each other: they offer mentoring and you offer frontend development.",
+            "strength": "good",
+            "via": null
+          }
+        ],
+        "date": "2026-03-02",
+        "done": false,
+        "next_drop_at": "2026-03-03T08:00:00+05:30"
+      },
+      "status": 200
+    },
+    {
+      "hook": "usePulse",
+      "request": {
+        "method": "GET",
+        "path": "/api/pulse"
+      },
+      "response": {
+        "caught_up": true,
+        "items": [
+          {
+            "activity": null,
+            "created_at": "2026-03-02T00:00:00Z",
+            "key": "post:22",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Imran Shaikh",
+                "headline": "",
+                "id": 106,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Tried Figma for the first time. The auto layout clicked on day two.",
+              "capabilities": [
+                {
+                  "name": "UI design",
+                  "slug": "ui-design"
+                }
+              ],
+              "created_at": "2026-03-02T00:00:00Z",
+              "id": 22,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Figma window with a profile card selected and its auto layout settings: vertical, gap 8, padding 16",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/106/seed14/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/106/seed14/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-02T00:00:00Z",
+            "key": "post:15",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Bhavna Gupta",
+                "headline": "",
+                "id": 71,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Finished the sensor wiring for our Arduino soil-moisture project. The pump switches on below 35%.",
+              "capabilities": [
+                {
+                  "name": "Embedded systems",
+                  "slug": "embedded-systems"
+                }
+              ],
+              "created_at": "2026-03-02T00:00:00Z",
+              "id": 15,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T23:00:00Z",
+            "key": "post:5",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Divya Menon",
+                "headline": "",
+                "id": 6,
+                "photo": null,
+                "role": "founder",
+                "verification_level": 2
+              },
+              "body": "We are hiring a frontend intern at Pixelwave. React, a designer next to you, real users by week three.",
+              "capabilities": [
+                {
+                  "name": "UI design",
+                  "slug": "ui-design"
+                },
+                {
+                  "name": "Frontend development",
+                  "slug": "frontend-dev"
+                }
+              ],
+              "created_at": "2026-03-01T23:00:00Z",
+              "id": 5,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Phone screen, Set up your studio, with two of four steps done and Pick your first campaign next",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/6/seed4/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/6/seed4/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T21:00:00Z",
+            "key": "role:43",
+            "kind": "role",
+            "post": null,
+            "role": {
+              "applied": false,
+              "capabilities": [
+                {
+                  "name": "Backend development",
+                  "required": true,
+                  "slug": "backend-dev",
+                  "your_level": null
+                },
+                {
+                  "name": "Frontend development",
+                  "required": false,
+                  "slug": "frontend-dev",
+                  "your_level": null
+                },
+                {
+                  "name": "Cybersecurity",
+                  "required": false,
+                  "slug": "cybersecurity",
+                  "your_level": null
+                }
+              ],
+              "contact": null,
+              "created_at": "2026-03-01T21:00:00Z",
+              "description": "",
+              "distance_km": 19.89,
+              "duration_weeks": null,
+              "id": 43,
+              "is_open": true,
+              "is_team": false,
+              "kind": "part_time",
+              "lat": 13.15238462627868,
+              "lng": 80.16912204679547,
+              "location": "Ambattur, Chennai",
+              "sector": "fintech",
+              "skill_match": 0.1,
+              "starts_on": null,
+              "startup_id": 100,
+              "startup_logo": null,
+              "startup_name": "Sutragrid",
+              "startup_verified": false,
+              "stipend_max": 8000,
+              "stipend_min": 5000,
+              "title": "Trainee – Backend development"
+            },
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T19:00:00Z",
+            "key": "post:10",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Gokul Patel",
+                "headline": "",
+                "id": 60,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Finished the sensor wiring for our Arduino soil-moisture project. The pump switches on below 35%.",
+              "capabilities": [
+                {
+                  "name": "Embedded systems",
+                  "slug": "embedded-systems"
+                }
+              ],
+              "created_at": "2026-03-01T19:00:00Z",
+              "id": 10,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Serial monitor log of soil moisture readings; the pump turns on when moisture falls to 34%",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/60/seed8/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/60/seed8/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-02T00:00:00+05:30",
+            "key": "skills_in_demand:0",
+            "kind": "skills_in_demand",
+            "post": null,
+            "role": null,
+            "seen": false,
+            "skills_in_demand": {
+              "skills": [
+                {
+                  "name": "Backend development",
+                  "open_roles": 28,
+                  "slug": "backend-dev"
+                },
+                {
+                  "name": "Frontend development",
+                  "open_roles": 23,
+                  "slug": "frontend-dev"
+                },
+                {
+                  "name": "Embedded systems",
+                  "open_roles": 13,
+                  "slug": "embedded-systems"
+                }
+              ]
+            }
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T13:00:00Z",
+            "key": "role:22",
+            "kind": "role",
+            "post": null,
+            "role": {
+              "applied": false,
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "required": true,
+                  "slug": "frontend-dev",
+                  "your_level": null
+                },
+                {
+                  "name": "Content marketing",
+                  "required": false,
+                  "slug": "content-marketing",
+                  "your_level": null
+                },
+                {
+                  "name": "UX design",
+                  "required": false,
+                  "slug": "ux-design",
+                  "your_level": null
+                }
+              ],
+              "contact": null,
+              "created_at": "2026-03-01T13:00:00Z",
+              "description": "",
+              "distance_km": 8.71,
+              "duration_weeks": null,
+              "id": 22,
+              "is_open": true,
+              "is_team": false,
+              "kind": "part_time",
+              "lat": 13.082512314751224,
+              "lng": 80.26395004091755,
+              "location": "Nungambakkam, Chennai",
+              "sector": "edtech",
+              "skill_match": 0.8,
+              "starts_on": null,
+              "startup_id": 41,
+              "startup_logo": null,
+              "startup_name": "Tatvagrid",
+              "startup_verified": false,
+              "stipend_max": 15000,
+              "stipend_min": 10000,
+              "title": "Associate – Frontend development"
+            },
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T13:00:00Z",
+            "key": "role:16",
+            "kind": "role",
+            "post": null,
+            "role": {
+              "applied": false,
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "required": true,
+                  "slug": "frontend-dev",
+                  "your_level": null
+                },
+                {
+                  "name": "Content marketing",
+                  "required": false,
+                  "slug": "content-marketing",
+                  "your_level": null
+                },
+                {
+                  "name": "UX design",
+                  "required": false,
+                  "slug": "ux-design",
+                  "your_level": null
+                }
+              ],
+              "contact": null,
+              "created_at": "2026-03-01T13:00:00Z",
+              "description": "",
+              "distance_km": 6.52,
+              "duration_weeks": null,
+              "id": 16,
+              "is_open": true,
+              "is_team": false,
+              "kind": "internship",
+              "lat": 13.06330571797163,
+              "lng": 80.27306216852651,
+              "location": "Nungambakkam, Chennai",
+              "sector": "edtech",
+              "skill_match": 0.8,
+              "starts_on": null,
+              "startup_id": 31,
+              "startup_logo": null,
+              "startup_name": "Zetapulse",
+              "startup_verified": false,
+              "stipend_max": 25000,
+              "stipend_min": 15000,
+              "title": "Intern – Frontend development"
+            },
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T08:00:00Z",
+            "key": "post:14",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Elango Pandian",
+                "headline": "",
+                "id": 111,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Wrote my first cold email to a startup. Got a reply in an hour.",
+              "capabilities": [
+                {
+                  "name": "B2B / technical marketing",
+                  "slug": "b2b-marketing"
+                }
+              ],
+              "created_at": "2026-03-01T08:00:00Z",
+              "id": 14,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Email reply from a startup founder asking for a 20 minute call tomorrow at 4 pm",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/111/seed10/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/111/seed10/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T08:00:00Z",
+            "key": "post:11",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Suriya Nair",
+                "headline": "",
+                "id": 103,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.",
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "slug": "frontend-dev"
+                }
+              ],
+              "created_at": "2026-03-01T08:00:00Z",
+              "id": 11,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T03:00:00Z",
+            "key": "role:28",
+            "kind": "role",
+            "post": null,
+            "role": {
+              "applied": false,
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "required": true,
+                  "slug": "frontend-dev",
+                  "your_level": null
+                },
+                {
+                  "name": "Content marketing",
+                  "required": false,
+                  "slug": "content-marketing",
+                  "your_level": null
+                },
+                {
+                  "name": "UX design",
+                  "required": false,
+                  "slug": "ux-design",
+                  "your_level": null
+                }
+              ],
+              "contact": null,
+              "created_at": "2026-03-01T03:00:00Z",
+              "description": "",
+              "distance_km": 4.77,
+              "duration_weeks": null,
+              "id": 28,
+              "is_open": true,
+              "is_team": false,
+              "kind": "part_time",
+              "lat": 13.02735673119612,
+              "lng": 80.23521343292563,
+              "location": "Guindy, Chennai",
+              "sector": "edtech",
+              "skill_match": 0.8,
+              "starts_on": null,
+              "startup_id": 51,
+              "startup_logo": null,
+              "startup_name": "Ojasbridge",
+              "startup_verified": false,
+              "stipend_max": 20000,
+              "stipend_min": 12000,
+              "title": "Associate – Frontend development"
+            },
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T03:00:00Z",
+            "key": "role:3",
+            "kind": "role",
+            "post": null,
+            "role": {
+              "applied": false,
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "required": true,
+                  "slug": "frontend-dev",
+                  "your_level": null
+                },
+                {
+                  "name": "Content marketing",
+                  "required": false,
+                  "slug": "content-marketing",
+                  "your_level": null
+                },
+                {
+                  "name": "UX design",
+                  "required": false,
+                  "slug": "ux-design",
+                  "your_level": null
+                }
+              ],
+              "contact": {
+                "display_name": "Rahul Srinivasan",
+                "id": 16,
+                "photo": null,
+                "role": "founder",
+                "verification_level": 2
+              },
+              "created_at": "2026-03-01T03:00:00Z",
+              "description": "",
+              "distance_km": 4.71,
+              "duration_weeks": null,
+              "id": 3,
+              "is_open": true,
+              "is_team": false,
+              "kind": "full_time",
+              "lat": 13.044996191655521,
+              "lng": 80.25928477786206,
+              "location": "T. Nagar, Chennai",
+              "sector": "edtech",
+              "skill_match": 0.8,
+              "starts_on": null,
+              "startup_id": 11,
+              "startup_logo": null,
+              "startup_name": "Tatvabridge",
+              "startup_verified": true,
+              "stipend_max": 8000,
+              "stipend_min": 5000,
+              "title": "Intern – Frontend development"
+            },
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T02:00:00Z",
+            "key": "post:7",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Dr. Lakshmi Narayanan",
+                "headline": "",
+                "id": 8,
+                "photo": null,
+                "role": "mentor",
+                "verification_level": 3
+              },
+              "body": "Office hours this Thursday at the incubator. Bring one question about your first customer, not your whole deck.",
+              "capabilities": [
+                {
+                  "name": "Mentoring",
+                  "slug": "mentoring"
+                }
+              ],
+              "created_at": "2026-03-01T02:00:00Z",
+              "id": 7,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-28T02:00:00Z",
+            "key": "post:19",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Karthik Chandrasekar",
+                "headline": "",
+                "id": 93,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Wrote my first cold email to a startup. Got a reply in an hour.",
+              "capabilities": [
+                {
+                  "name": "B2B / technical marketing",
+                  "slug": "b2b-marketing"
+                }
+              ],
+              "created_at": "2026-02-28T02:00:00Z",
+              "id": 19,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-28T02:00:00Z",
+            "key": "post:16",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Saravanan Thomas",
+                "headline": "",
+                "id": 89,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.",
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "slug": "frontend-dev"
+                }
+              ],
+              "created_at": "2026-02-28T02:00:00Z",
+              "id": 16,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "App screen listing the next five buses at Hostel Gate with minutes to arrival",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/89/seed11/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/89/seed11/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-28T02:00:00Z",
+            "key": "post:13",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Varun Annamalai",
+                "headline": "",
+                "id": 55,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Learning SQL by cleaning our college library's CSV. 400 duplicate rows so far.",
+              "capabilities": [],
+              "created_at": "2026-02-28T02:00:00Z",
+              "id": 13,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-26T10:00:00Z",
+            "key": "post:12",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Yamini Krishnan",
+                "headline": "",
+                "id": 54,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Tried Figma for the first time. The auto layout clicked on day two.",
+              "capabilities": [
+                {
+                  "name": "UI design",
+                  "slug": "ui-design"
+                }
+              ],
+              "created_at": "2026-02-26T10:00:00Z",
+              "id": 12,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Figma window with a profile card selected and its auto layout settings: vertical, gap 8, padding 16",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/54/seed9/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/54/seed9/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-25T04:00:00Z",
+            "key": "post:17",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Harini Pillai",
+                "headline": "",
+                "id": 79,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Tried Figma for the first time. The auto layout clicked on day two.",
+              "capabilities": [
+                {
+                  "name": "UI design",
+                  "slug": "ui-design"
+                }
+              ],
+              "created_at": "2026-02-25T04:00:00Z",
+              "id": 17,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          }
+        ],
+        "next_cursor": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMarkPulseSeen",
+      "request": {
+        "method": "POST",
+        "path": "/api/pulse/seen"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useReport",
+      "request": {
+        "body": {
+          "reason": "Spam or a scam",
+          "target_id": 1,
+          "target_type": "post"
+        },
+        "method": "POST",
+        "path": "/api/reports"
+      },
+      "response": {
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 1,
+        "status": "open",
+        "target_id": 1,
+        "target_type": "post"
+      },
+      "status": 201
+    },
+    {
+      "hook": "useReact",
+      "request": {
+        "method": "PUT",
+        "path": "/api/posts/1/reactions/helpful"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useReact",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/posts/1/reactions/helpful"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useMatches",
+      "request": {
+        "method": "GET",
+        "path": "/api/matches?limit=5"
+      },
+      "response": {
+        "count": 20,
+        "items": [
+          {
+            "candidate_id": 99,
+            "capabilities": [
+              "Machine learning",
+              "UX design"
+            ],
+            "city": "Chennai",
+            "display_name": "Lavanya Srinivasan",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You offer frontend development, which they need. You both deal with student-friendly, builds for tier 2/3 cities. You have a mutual connection.",
+            "role": "student",
+            "sector": null,
+            "strength": "good",
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 42,
+            "capabilities": [
+              "Pitch coaching",
+              "Mentoring"
+            ],
+            "city": "Chennai",
+            "display_name": "Jayanth Natarajan",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer mentoring and you offer ui design.",
+            "role": "mentor",
+            "sector": null,
+            "strength": "good",
+            "verification_level": 3
+          },
+          {
+            "candidate_id": 13,
+            "capabilities": [
+              "Data science",
+              "Mentoring"
+            ],
+            "city": "Chennai",
+            "display_name": "Rajesh Venkatesh",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer mentoring and you offer frontend development.",
+            "role": "founder",
+            "sector": "biotech",
+            "strength": "good",
+            "verification_level": 2
+          },
+          {
+            "candidate_id": 15,
+            "capabilities": [
+              "Fintech domain",
+              "Mentoring"
+            ],
+            "city": "Chennai",
+            "display_name": "Bhavna Annamalai",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer mentoring and you offer ui design.",
+            "role": "founder",
+            "sector": "fintech",
+            "strength": "good",
+            "verification_level": 2
+          },
+          {
+            "candidate_id": 29,
+            "capabilities": [
+              "Backend development",
+              "Mentoring"
+            ],
+            "city": "Chennai",
+            "display_name": "Deepak Annamalai",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer mentoring and you offer frontend development.",
+            "role": "founder",
+            "sector": "saas",
+            "strength": "good",
+            "verification_level": 2
+          }
+        ],
+        "next_offset": 5
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "default",
+  "screen": "home"
+}

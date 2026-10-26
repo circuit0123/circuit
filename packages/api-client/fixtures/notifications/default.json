@@ -1,0 +1,81 @@
+{
+  "calls": [
+    {
+      "hook": "useUnreadCount",
+      "request": {
+        "method": "GET",
+        "path": "/api/notifications/unread-count"
+      },
+      "response": {
+        "count": 1
+      },
+      "status": 200
+    },
+    {
+      "hook": "useNotifications",
+      "request": {
+        "method": "GET",
+        "path": "/api/notifications"
+      },
+      "response": {
+        "count": 1,
+        "items": [
+          {
+            "actor": null,
+            "created_at": "2026-03-02T04:00:00Z",
+            "id": 1,
+            "kind": "circuit.proposed",
+            "payload": {
+              "circuit_id": 1
+            },
+            "read": false,
+            "target": {
+              "id": 1,
+              "type": "circuit"
+            },
+            "text": "A new circuit is waiting for your answer."
+          }
+        ],
+        "next_offset": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMarkRead",
+      "request": {
+        "method": "POST",
+        "path": "/api/notifications/1/read"
+      },
+      "response": {
+        "actor": null,
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 1,
+        "kind": "circuit.proposed",
+        "payload": {
+          "circuit_id": 1
+        },
+        "read": true,
+        "target": {
+          "id": 1,
+          "type": "circuit"
+        },
+        "text": "A new circuit is waiting for your answer."
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMarkRead",
+      "request": {
+        "method": "POST",
+        "path": "/api/notifications/read-all"
+      },
+      "response": {
+        "count": 0
+      },
+      "status": 200
+    }
+  ],
+  "persona": "asha",
+  "scenario": "default",
+  "screen": "notifications"
+}

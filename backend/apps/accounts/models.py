@@ -44,6 +44,12 @@ class Member(models.Model):
     notification_prefs = models.JSONField(
         default=dict, blank=True
     )  # type -> {in_app, email}; missing keys mean the defaults (prefs.py)
+    photo_path = models.CharField(
+        max_length=200, blank=True, db_default=""
+    )  # folder of the profile photo in the avatars bucket (MediaUpload.path); blank = the circuit-pattern avatar
+    read_receipts = models.BooleanField(
+        default=False, db_default=False
+    )  # show read ticks on my messages; each person sees them only when both have it on (messaging/services.py)
     allow_requests = models.BooleanField(default=True)  # False: strangers cannot send message requests or connection requests
     deletion_requested_at = models.DateTimeField(
         null=True, blank=True

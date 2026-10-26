@@ -1,0 +1,41 @@
+{
+  "calls": [
+    {
+      "hook": "useIntroCapacity",
+      "request": {
+        "method": "GET",
+        "path": "/api/intros/capacity"
+      },
+      "response": {
+        "allowed": false,
+        "left": 0,
+        "next_frees_at": null,
+        "used": 0,
+        "weekly_limit": 3
+      },
+      "status": 200
+    },
+    {
+      "hook": "useRequestIntro",
+      "request": {
+        "body": {
+          "message": "",
+          "target_id": 8
+        },
+        "method": "POST",
+        "path": "/api/intros"
+      },
+      "response": {
+        "error": {
+          "code": "forbidden",
+          "details": null,
+          "message": "Introductions are not available for under-18 accounts"
+        }
+      },
+      "status": 403
+    }
+  ],
+  "persona": "custom",
+  "scenario": "under_18",
+  "screen": "intros"
+}

@@ -91,7 +91,7 @@ def test_read_marks_only_the_other_persons_messages_and_clears_unread(make_membe
     assert client_for(b).get("/api/conversations").json()[0]["unread"] == 0
     assert client_for(a).get("/api/conversations").json()[0]["unread"] == 1
     sent = client_for(a).get(f"/api/conversations/{cid}/messages").json()["items"]
-    assert all("read_at" not in m for m in sent)  # read receipts are off
+    assert all(m["read_at"] is None for m in sent)  # read receipts are off (see test_b7_messaging for the on case)
 
 
 def test_blocking_ends_the_conversation_and_blocks_everything_else(make_member, connect, client_for, make_post):
@@ -177,7 +177,10 @@ def test_each_message_broadcasts_ids_only_to_the_conversation_channel(
     chat = [e for e in broadcasts if e[0].startswith("conversation:")]
     assert chat == [(f"conversation:{cid}", "message", {"message_id": mid, "conversation_id": cid})]
     nudges = [e for e in broadcasts if e[0].startswith("member:")]  # and b's notification channel hears a notification id
-    assert [(t, ev, list(p)) for t, ev, p in nudges] == [(f"member:{b.pk}", "notification", ["notification_id"])]
+    assert sorted((t, ev, list(p)) for t, ev, p in nudges) == [  # a notification id, and "a new conversation" (ids only)
+        (f"member:{b.pk}", "conversation", ["conversation_id"]),
+        (f"member:{b.pk}", "notification", ["notification_id"]),
+    ]
     assert "secret" not in str(broadcasts)
 
 

@@ -19,7 +19,9 @@ from apps.notifications.unsubscribe_api import router as unsubscribe_router
 from apps.organisations.api import router as organisations_router
 from apps.social.api import router as social_router
 from apps.startups.api import router as startups_router
+from apps.startups.search_api import router as search_router
 from core.auth import SupabaseAuth
+from core.cities import router as cities_router
 from core.config_api import router as config_router
 from core.demo import router as demo_router
 from core.errors import install_handlers
@@ -35,6 +37,7 @@ api = NinjaAPI(
 )
 install_handlers(api)
 api.add_router("/config", config_router, tags=["config"])
+api.add_router("/cities", cities_router, tags=["config"])
 api.add_router("", beta_router, tags=["beta"])
 api.add_router("/health", health_router, tags=["health"])
 api.add_router("/demo", demo_router, tags=["demo"])
@@ -44,6 +47,7 @@ api.add_router("", onboarding_router, tags=["accounts"])
 api.add_router("", privacy_router, tags=["privacy"])
 api.add_router("/organisations", organisations_router, tags=["organisations"])
 api.add_router("/startups", startups_router, tags=["startups"])
+api.add_router("/search", search_router, tags=["startups"])
 api.add_router("", jobs_router, tags=["jobs"])
 api.add_router("/notifications", notifications_router, tags=["notifications"])
 api.add_router("", unsubscribe_router, tags=["notifications"])

@@ -20,7 +20,7 @@ Visibility = Literal["everyone", "connections", "organisation"]
 
 # -- media -----------------------------------------------------------------------------------------
 class UploadIn(Schema):
-    purpose: Literal["post", "message"]
+    purpose: Literal["post", "message", "avatar", "startup_logo"]  # avatar: my profile photo; startup_logo: founders only
     content_type: Literal["image/jpeg", "image/png", "image/webp"]
     size: int = Field(gt=0)
 
@@ -96,6 +96,11 @@ class PostMediaOut(Schema):
     height: int | None
 
 
+class BuildLogTileOut(Schema):
+    post_id: int
+    image: PostMediaOut  # the first picture of that build log
+
+
 class PrivateStatsOut(Schema):
     reactions: dict[str, int]
     replies: int
@@ -111,7 +116,7 @@ class PostOut(Schema):
     created_at: datetime
     capabilities: list[CapabilityTagOut]
     media: list[PostMediaOut]
-    my_reactions: list[str]
+    my_reactions: list[Literal["helpful", "intro_me", "lets_talk"]]
     private_stats: PrivateStatsOut | None = None  # the author's own totals; always None for everyone else
 
 

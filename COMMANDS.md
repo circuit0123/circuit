@@ -107,9 +107,10 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 | Command | What it does |
 |---|---|
 | `make api-client` | Export openapi.json from Django and regenerate packages/api-client (`make openapi` is an alias) |
+| `make contract-fixtures` | Rewrite `packages/api-client/fixtures/` from the real API: the demo world is seeded at a frozen clock, every screen's calls are made as `FRONTEND_HANDOFF.md` describes, each response is checked against openapi.json and written as JSON. Run it after a deliberate API change and commit the diff. Success: it ends with `1 passed`; `git diff packages/api-client/fixtures` shows exactly what changed for the frontend. Needs the test database (`make up`). The frontend's mock mode serves these same files |
 
-Run it after any endpoint change; commit openapi.json, the client, the handoff and the
-contract test together.
+Run both after any endpoint change; commit openapi.json, the client, the fixtures, `FRONTEND_HANDOFF.md` and the
+contract tests together. `make check` fails when they disagree, so a changed endpoint cannot be committed alone.
 
 ## 8. Build (the backend image)
 | Command | What it does, when to run it, what success looks like |

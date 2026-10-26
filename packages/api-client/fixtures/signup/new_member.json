@@ -1,0 +1,1132 @@
+{
+  "calls": [
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "method": "GET",
+        "path": "/api/onboarding/state"
+      },
+      "response": {
+        "answers": {},
+        "branch": "default",
+        "completed_at": null,
+        "current_step": null,
+        "signup_source": "",
+        "skip": [
+          "invite",
+          "safety"
+        ],
+        "steps": [
+          "invite",
+          "name",
+          "role",
+          "age",
+          "safety",
+          "where",
+          "work",
+          "offers",
+          "needs",
+          "organisation",
+          "photo",
+          "colour",
+          "ready"
+        ]
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "answers": {
+            "name": {
+              "display_name": "Meera Rao"
+            }
+          },
+          "current_step": "name",
+          "signup_source": "landing-students"
+        },
+        "method": "PATCH",
+        "path": "/api/onboarding/state"
+      },
+      "response": {
+        "answers": {
+          "name": {
+            "display_name": "Meera Rao"
+          }
+        },
+        "branch": "default",
+        "completed_at": null,
+        "current_step": "name",
+        "signup_source": "landing-students",
+        "skip": [
+          "invite",
+          "safety"
+        ],
+        "steps": [
+          "invite",
+          "name",
+          "role",
+          "age",
+          "safety",
+          "where",
+          "work",
+          "offers",
+          "needs",
+          "organisation",
+          "photo",
+          "colour",
+          "ready"
+        ]
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "display_name": "Meera Rao",
+          "role": "student"
+        },
+        "method": "PATCH",
+        "path": "/api/me"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "",
+        "college": "",
+        "display_name": "Meera Rao",
+        "has_needs_and_offers": false,
+        "id": 302,
+        "is_minor": false,
+        "lat": null,
+        "lng": null,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": null,
+        "photo": null,
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": false
+      },
+      "status": 200
+    },
+    {
+      "hook": "useWhere",
+      "request": {
+        "method": "GET",
+        "path": "/api/cities"
+      },
+      "response": [
+        {
+          "lat": 13.0827,
+          "lng": 80.2707,
+          "name": "Chennai",
+          "pilot": true
+        },
+        {
+          "lat": 12.9716,
+          "lng": 77.5946,
+          "name": "Bengaluru",
+          "pilot": false
+        },
+        {
+          "lat": 19.076,
+          "lng": 72.8777,
+          "name": "Mumbai",
+          "pilot": false
+        },
+        {
+          "lat": 28.6139,
+          "lng": 77.209,
+          "name": "Delhi",
+          "pilot": false
+        },
+        {
+          "lat": 17.385,
+          "lng": 78.4867,
+          "name": "Hyderabad",
+          "pilot": false
+        },
+        {
+          "lat": 18.5204,
+          "lng": 73.8567,
+          "name": "Pune",
+          "pilot": false
+        },
+        {
+          "lat": 22.5726,
+          "lng": 88.3639,
+          "name": "Kolkata",
+          "pilot": false
+        },
+        {
+          "lat": 23.0225,
+          "lng": 72.5714,
+          "name": "Ahmedabad",
+          "pilot": false
+        },
+        {
+          "lat": 26.9124,
+          "lng": 75.7873,
+          "name": "Jaipur",
+          "pilot": false
+        },
+        {
+          "lat": 11.0168,
+          "lng": 76.9558,
+          "name": "Coimbatore",
+          "pilot": false
+        },
+        {
+          "lat": 9.9312,
+          "lng": 76.2673,
+          "name": "Kochi",
+          "pilot": false
+        },
+        {
+          "lat": 8.5241,
+          "lng": 76.9366,
+          "name": "Thiruvananthapuram",
+          "pilot": false
+        },
+        {
+          "lat": 9.9252,
+          "lng": 78.1198,
+          "name": "Madurai",
+          "pilot": false
+        },
+        {
+          "lat": 10.7905,
+          "lng": 78.7047,
+          "name": "Tiruchirappalli",
+          "pilot": false
+        },
+        {
+          "lat": 12.2958,
+          "lng": 76.6394,
+          "name": "Mysuru",
+          "pilot": false
+        },
+        {
+          "lat": 12.9141,
+          "lng": 74.856,
+          "name": "Mangaluru",
+          "pilot": false
+        },
+        {
+          "lat": 15.3647,
+          "lng": 75.124,
+          "name": "Hubballi",
+          "pilot": false
+        },
+        {
+          "lat": 17.6868,
+          "lng": 83.2185,
+          "name": "Visakhapatnam",
+          "pilot": false
+        },
+        {
+          "lat": 16.5062,
+          "lng": 80.648,
+          "name": "Vijayawada",
+          "pilot": false
+        },
+        {
+          "lat": 22.7196,
+          "lng": 75.8577,
+          "name": "Indore",
+          "pilot": false
+        },
+        {
+          "lat": 23.2599,
+          "lng": 77.4126,
+          "name": "Bhopal",
+          "pilot": false
+        },
+        {
+          "lat": 26.8467,
+          "lng": 80.9462,
+          "name": "Lucknow",
+          "pilot": false
+        },
+        {
+          "lat": 30.7333,
+          "lng": 76.7794,
+          "name": "Chandigarh",
+          "pilot": false
+        },
+        {
+          "lat": 21.1458,
+          "lng": 79.0882,
+          "name": "Nagpur",
+          "pilot": false
+        },
+        {
+          "lat": 21.1702,
+          "lng": 72.8311,
+          "name": "Surat",
+          "pilot": false
+        },
+        {
+          "lat": 22.3072,
+          "lng": 73.1812,
+          "name": "Vadodara",
+          "pilot": false
+        },
+        {
+          "lat": 20.2961,
+          "lng": 85.8245,
+          "name": "Bhubaneswar",
+          "pilot": false
+        },
+        {
+          "lat": 26.1445,
+          "lng": 91.7362,
+          "name": "Guwahati",
+          "pilot": false
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "city": "Chennai",
+          "lat": 13.0827,
+          "lng": 80.2707
+        },
+        "method": "PATCH",
+        "path": "/api/me"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "Chennai",
+        "college": "",
+        "display_name": "Meera Rao",
+        "has_needs_and_offers": false,
+        "id": 302,
+        "is_minor": false,
+        "lat": 13.0827,
+        "lng": 80.2707,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": null,
+        "photo": null,
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": false
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOrganisationSearch",
+      "request": {
+        "method": "GET",
+        "path": "/api/organisations/search?q=kav"
+      },
+      "response": [
+        {
+          "city": "Chennai",
+          "id": 1,
+          "kind": "college",
+          "name": "Kaveri Institute of Technology"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "bio": "Third year CSE student. I build web apps and want to learn sales."
+        },
+        "method": "POST",
+        "path": "/api/onboarding/extract"
+      },
+      "response": {
+        "source": "llm",
+        "suggestions": {
+          "needs": [
+            "performance-marketing"
+          ],
+          "offers": [
+            "frontend-dev"
+          ],
+          "skills": [
+            "frontend-dev"
+          ],
+          "traits": []
+        }
+      },
+      "status": 200
+    },
+    {
+      "hook": "useCapabilities",
+      "request": {
+        "method": "GET",
+        "path": "/api/capabilities"
+      },
+      "response": [
+        {
+          "category": "design",
+          "name": "Graphic design",
+          "slug": "graphic-design"
+        },
+        {
+          "category": "design",
+          "name": "UI design",
+          "slug": "ui-design"
+        },
+        {
+          "category": "design",
+          "name": "UX design",
+          "slug": "ux-design"
+        },
+        {
+          "category": "design",
+          "name": "Video production",
+          "slug": "video-production"
+        },
+        {
+          "category": "domain",
+          "name": "Agritech domain",
+          "slug": "agritech-domain"
+        },
+        {
+          "category": "domain",
+          "name": "Biotech lab work",
+          "slug": "biotech-lab"
+        },
+        {
+          "category": "domain",
+          "name": "Clinical research",
+          "slug": "clinical-research"
+        },
+        {
+          "category": "domain",
+          "name": "Edtech domain",
+          "slug": "edtech-domain"
+        },
+        {
+          "category": "domain",
+          "name": "Export and trade",
+          "slug": "export-trade"
+        },
+        {
+          "category": "domain",
+          "name": "Fintech domain",
+          "slug": "fintech-domain"
+        },
+        {
+          "category": "domain",
+          "name": "Government and policy liaison",
+          "slug": "government-liaison"
+        },
+        {
+          "category": "domain",
+          "name": "Healthcare domain",
+          "slug": "healthcare-domain"
+        },
+        {
+          "category": "engineering",
+          "name": "Backend development",
+          "slug": "backend-dev"
+        },
+        {
+          "category": "engineering",
+          "name": "Cybersecurity",
+          "slug": "cybersecurity"
+        },
+        {
+          "category": "engineering",
+          "name": "Data engineering",
+          "slug": "data-engineering"
+        },
+        {
+          "category": "engineering",
+          "name": "Data science",
+          "slug": "data-science"
+        },
+        {
+          "category": "engineering",
+          "name": "DevOps and cloud",
+          "slug": "devops"
+        },
+        {
+          "category": "engineering",
+          "name": "Embedded systems",
+          "slug": "embedded-systems"
+        },
+        {
+          "category": "engineering",
+          "name": "Frontend development",
+          "slug": "frontend-dev"
+        },
+        {
+          "category": "engineering",
+          "name": "Hardware design",
+          "slug": "hardware-design"
+        },
+        {
+          "category": "engineering",
+          "name": "Machine learning",
+          "slug": "machine-learning"
+        },
+        {
+          "category": "engineering",
+          "name": "Mobile development",
+          "slug": "mobile-dev"
+        },
+        {
+          "category": "engineering",
+          "name": "QA and testing",
+          "slug": "qa-testing"
+        },
+        {
+          "category": "finance",
+          "name": "Accounting and bookkeeping",
+          "slug": "accounting"
+        },
+        {
+          "category": "finance",
+          "name": "Financial modelling",
+          "slug": "financial-modelling"
+        },
+        {
+          "category": "finance",
+          "name": "Fundraising",
+          "slug": "fundraising"
+        },
+        {
+          "category": "finance",
+          "name": "Grants and non-dilutive funding",
+          "slug": "grants-funding"
+        },
+        {
+          "category": "finance",
+          "name": "Investor introductions",
+          "slug": "investor-intros"
+        },
+        {
+          "category": "legal",
+          "name": "Company registration and tax",
+          "slug": "company-registration"
+        },
+        {
+          "category": "legal",
+          "name": "Compliance and data protection",
+          "slug": "compliance"
+        },
+        {
+          "category": "legal",
+          "name": "Contracts and corporate law",
+          "slug": "legal-contracts"
+        },
+        {
+          "category": "legal",
+          "name": "IP and patents",
+          "slug": "ip-patents"
+        },
+        {
+          "category": "legal",
+          "name": "Regulatory affairs",
+          "slug": "regulatory-affairs"
+        },
+        {
+          "category": "marketing",
+          "name": "B2B / technical marketing",
+          "slug": "b2b-marketing"
+        },
+        {
+          "category": "marketing",
+          "name": "Brand marketing",
+          "slug": "brand-marketing"
+        },
+        {
+          "category": "marketing",
+          "name": "Content marketing",
+          "slug": "content-marketing"
+        },
+        {
+          "category": "marketing",
+          "name": "Performance marketing",
+          "slug": "performance-marketing"
+        },
+        {
+          "category": "marketing",
+          "name": "Product marketing",
+          "slug": "product-marketing"
+        },
+        {
+          "category": "marketing",
+          "name": "Public relations",
+          "slug": "public-relations"
+        },
+        {
+          "category": "marketing",
+          "name": "SEO",
+          "slug": "seo"
+        },
+        {
+          "category": "marketing",
+          "name": "Social media",
+          "slug": "social-media"
+        },
+        {
+          "category": "operations",
+          "name": "Manufacturing",
+          "slug": "manufacturing"
+        },
+        {
+          "category": "operations",
+          "name": "Operations",
+          "slug": "operations"
+        },
+        {
+          "category": "operations",
+          "name": "Procurement",
+          "slug": "procurement"
+        },
+        {
+          "category": "operations",
+          "name": "Quality systems",
+          "slug": "quality-systems"
+        },
+        {
+          "category": "operations",
+          "name": "Supply chain and logistics",
+          "slug": "supply-chain"
+        },
+        {
+          "category": "people",
+          "name": "Hiring and recruiting",
+          "slug": "recruiting"
+        },
+        {
+          "category": "people",
+          "name": "HR operations",
+          "slug": "hr-ops"
+        },
+        {
+          "category": "people",
+          "name": "Mentoring",
+          "slug": "mentoring"
+        },
+        {
+          "category": "people",
+          "name": "Team building",
+          "slug": "team-building"
+        },
+        {
+          "category": "product",
+          "name": "Product management",
+          "slug": "product-management"
+        },
+        {
+          "category": "product",
+          "name": "User research",
+          "slug": "user-research"
+        },
+        {
+          "category": "sales",
+          "name": "B2B sales",
+          "slug": "b2b-sales"
+        },
+        {
+          "category": "sales",
+          "name": "Customer success",
+          "slug": "customer-success"
+        },
+        {
+          "category": "sales",
+          "name": "Enterprise sales",
+          "slug": "enterprise-sales"
+        },
+        {
+          "category": "sales",
+          "name": "Inside sales",
+          "slug": "inside-sales"
+        },
+        {
+          "category": "sales",
+          "name": "Partnerships and channels",
+          "slug": "partnerships"
+        },
+        {
+          "category": "strategy",
+          "name": "Business strategy",
+          "slug": "business-strategy"
+        },
+        {
+          "category": "strategy",
+          "name": "Market research",
+          "slug": "market-research"
+        },
+        {
+          "category": "strategy",
+          "name": "Pitch coaching",
+          "slug": "pitch-coaching"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": [
+          {
+            "capability": "frontend-dev",
+            "description": ""
+          }
+        ],
+        "method": "PUT",
+        "path": "/api/me/offers"
+      },
+      "response": [
+        {
+          "capability": "frontend-dev",
+          "description": ""
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": [
+          {
+            "capability": "performance-marketing",
+            "description": ""
+          }
+        ],
+        "method": "PUT",
+        "path": "/api/me/needs"
+      },
+      "response": [
+        {
+          "capability": "performance-marketing",
+          "description": ""
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": [
+          {
+            "capability": "frontend-dev",
+            "level": 2,
+            "proof_url": "https://github.com/meera/shop"
+          }
+        ],
+        "method": "PUT",
+        "path": "/api/me/skills"
+      },
+      "response": [
+        {
+          "capability": "frontend-dev",
+          "level": 2,
+          "proof_url": "https://github.com/meera/shop"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": [
+          "long-sales-cycle"
+        ],
+        "method": "PUT",
+        "path": "/api/me/traits"
+      },
+      "response": [
+        "long-sales-cycle"
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/offers"
+      },
+      "response": [
+        {
+          "capability": "frontend-dev",
+          "description": ""
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/needs"
+      },
+      "response": [
+        {
+          "capability": "performance-marketing",
+          "description": ""
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/skills"
+      },
+      "response": [
+        {
+          "capability": "frontend-dev",
+          "level": 2,
+          "proof_url": "https://github.com/meera/shop"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/traits"
+      },
+      "response": [
+        "long-sales-cycle"
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useCapabilities",
+      "request": {
+        "method": "GET",
+        "path": "/api/traits"
+      },
+      "response": [
+        {
+          "name": "Bootstrapped",
+          "slug": "bootstrapped"
+        },
+        {
+          "name": "Builds for tier 2/3 cities",
+          "slug": "tier2-3-focus"
+        },
+        {
+          "name": "Data-intensive",
+          "slug": "data-intensive"
+        },
+        {
+          "name": "Deep tech",
+          "slug": "deep-tech"
+        },
+        {
+          "name": "Early stage",
+          "slug": "early-stage"
+        },
+        {
+          "name": "Enterprise customers",
+          "slug": "enterprise-customers"
+        },
+        {
+          "name": "Export-oriented",
+          "slug": "export-oriented"
+        },
+        {
+          "name": "Fast iteration",
+          "slug": "fast-iteration"
+        },
+        {
+          "name": "First-time founder",
+          "slug": "first-time-founder"
+        },
+        {
+          "name": "Government customers",
+          "slug": "government-customers"
+        },
+        {
+          "name": "Hardware product",
+          "slug": "hardware-product"
+        },
+        {
+          "name": "High compliance burden",
+          "slug": "high-compliance"
+        },
+        {
+          "name": "Impact-driven",
+          "slug": "impact-driven"
+        },
+        {
+          "name": "Long sales cycle",
+          "slug": "long-sales-cycle"
+        },
+        {
+          "name": "Regulated industry",
+          "slug": "regulated-industry"
+        },
+        {
+          "name": "Remote-friendly",
+          "slug": "remote-friendly"
+        },
+        {
+          "name": "Research-heavy",
+          "slug": "research-heavy"
+        },
+        {
+          "name": "Seeking mentors",
+          "slug": "mentor-seeking"
+        },
+        {
+          "name": "Sells to businesses",
+          "slug": "b2b-customers"
+        },
+        {
+          "name": "Sells to consumers",
+          "slug": "consumer-product"
+        },
+        {
+          "name": "Software product",
+          "slug": "software-product"
+        },
+        {
+          "name": "Student-friendly",
+          "slug": "student-friendly"
+        },
+        {
+          "name": "Technical buyers",
+          "slug": "technical-buyers"
+        },
+        {
+          "name": "VC-backed",
+          "slug": "vc-backed"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "upload_id": 22
+        },
+        "method": "PUT",
+        "path": "/api/me/photo"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "Chennai",
+        "college": "",
+        "display_name": "Meera Rao",
+        "has_needs_and_offers": true,
+        "id": 302,
+        "is_minor": false,
+        "lat": 13.0827,
+        "lng": 80.2707,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": null,
+        "photo": "https://storage.test/read/avatars/avatar/302/<hex>/w480.webp?token=t",
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": false
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/me/photo"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "Chennai",
+        "college": "",
+        "display_name": "Meera Rao",
+        "has_needs_and_offers": true,
+        "id": 302,
+        "is_minor": false,
+        "lat": 13.0827,
+        "lng": 80.2707,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": null,
+        "photo": null,
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": false
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "upload_id": 23
+        },
+        "method": "PUT",
+        "path": "/api/me/photo"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "Chennai",
+        "college": "",
+        "display_name": "Meera Rao",
+        "has_needs_and_offers": true,
+        "id": 302,
+        "is_minor": false,
+        "lat": 13.0827,
+        "lng": 80.2707,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": null,
+        "photo": "https://storage.test/read/avatars/avatar/302/<hex>/w480.webp?token=t",
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": false
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "accent": "emerald"
+        },
+        "method": "PATCH",
+        "path": "/api/me/appearance"
+      },
+      "response": {
+        "accent": "emerald",
+        "swipe_tabs": true,
+        "theme": "system"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "completed": true
+        },
+        "method": "PATCH",
+        "path": "/api/onboarding/state"
+      },
+      "response": {
+        "answers": {
+          "name": {
+            "display_name": "Meera Rao"
+          }
+        },
+        "branch": "default",
+        "completed_at": "2026-03-02T04:00:00+00:00",
+        "current_step": "name",
+        "signup_source": "landing-students",
+        "skip": [
+          "invite",
+          "name",
+          "safety",
+          "where"
+        ],
+        "steps": [
+          "invite",
+          "name",
+          "role",
+          "age",
+          "safety",
+          "where",
+          "work",
+          "offers",
+          "needs",
+          "organisation",
+          "photo",
+          "colour",
+          "ready"
+        ]
+      },
+      "status": 200
+    },
+    {
+      "hook": "useDailyDrop",
+      "request": {
+        "method": "GET",
+        "path": "/api/drop/today"
+      },
+      "response": {
+        "cards": [],
+        "date": "2026-03-02",
+        "done": false,
+        "next_drop_at": "2026-03-02T04:05:00Z"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "new_member",
+  "screen": "signup"
+}

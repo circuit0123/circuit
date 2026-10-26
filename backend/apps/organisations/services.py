@@ -4,6 +4,7 @@ import secrets
 
 import structlog
 from django.db import transaction
+from django.db.models import Case, IntegerField, When
 
 from apps.accounts.models import Member, Role
 from apps.events.services import record
@@ -24,6 +25,20 @@ PUBLIC_EMAIL_DOMAINS = {
 }  # fmt: skip
 
 JOINABLE_ROLES = {Role.STUDENT, Role.FOUNDER, Role.MENTOR, Role.INVESTOR}
+
+
+def search(text: str, kind: str | None = None, limit: int = 10) -> list[dict]:
+    """Organisations whose name contains the text, names that start with it first. Public facts only (never join codes or domains)."""
+    text = text.strip()
+    if len(text) < 2:
+        return []
+    qs = Organisation.objects.filter(name__icontains=text)
+    if kind:
+        qs = qs.filter(kind=kind)
+    qs = qs.annotate(starts=Case(When(name__istartswith=text, then=0), default=1, output_field=IntegerField())).order_by(
+        "starts", "name", "id"
+    )
+    return [{"id": o.pk, "name": o.name, "kind": o.kind, "city": o.city} for o in qs[:limit]]
 
 
 def generate_join_code() -> str:

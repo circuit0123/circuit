@@ -1,0 +1,317 @@
+{
+  "calls": [
+    {
+      "hook": "usePostJob",
+      "request": {
+        "body": {
+          "capabilities": [
+            {
+              "capability": "biotech-lab",
+              "required": true
+            }
+          ],
+          "description": "Help run assays.",
+          "duration_weeks": 12,
+          "kind": "internship",
+          "location": "Chennai",
+          "starts_on": "2026-04-06",
+          "startup_id": 1,
+          "stipend_max": 12000,
+          "stipend_min": 8000,
+          "title": "Lab assistant"
+        },
+        "method": "POST",
+        "path": "/api/jobs"
+      },
+      "response": {
+        "applied": null,
+        "capabilities": [
+          {
+            "name": "Biotech lab work",
+            "required": true,
+            "slug": "biotech-lab",
+            "your_level": null
+          }
+        ],
+        "contact": {
+          "display_name": "Dr. Kavya Subramanian",
+          "id": 4,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "created_at": "2026-03-02T04:00:00Z",
+        "description": "Help run assays.",
+        "distance_km": null,
+        "duration_weeks": 12,
+        "id": 67,
+        "is_open": true,
+        "is_team": true,
+        "kind": "internship",
+        "lat": 13.066316919343375,
+        "lng": 80.26378505522642,
+        "location": "Chennai",
+        "sector": "biotech",
+        "skill_match": null,
+        "starts_on": "2026-04-06",
+        "startup_id": 1,
+        "startup_logo": null,
+        "startup_name": "Vitrix Biosciences",
+        "startup_verified": true,
+        "stipend_max": 12000,
+        "stipend_min": 8000,
+        "title": "Lab assistant"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useEditJob",
+      "request": {
+        "body": {
+          "is_open": false
+        },
+        "method": "PATCH",
+        "path": "/api/jobs/67"
+      },
+      "response": {
+        "applied": null,
+        "capabilities": [
+          {
+            "name": "Biotech lab work",
+            "required": true,
+            "slug": "biotech-lab",
+            "your_level": null
+          }
+        ],
+        "contact": {
+          "display_name": "Dr. Kavya Subramanian",
+          "id": 4,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "created_at": "2026-03-02T04:00:00Z",
+        "description": "Help run assays.",
+        "distance_km": null,
+        "duration_weeks": 12,
+        "id": 67,
+        "is_open": false,
+        "is_team": true,
+        "kind": "internship",
+        "lat": 13.066316919343375,
+        "lng": 80.26378505522642,
+        "location": "Chennai",
+        "sector": "biotech",
+        "skill_match": null,
+        "starts_on": "2026-04-06",
+        "startup_id": 1,
+        "startup_logo": null,
+        "startup_name": "Vitrix Biosciences",
+        "startup_verified": true,
+        "stipend_max": 12000,
+        "stipend_min": 8000,
+        "title": "Lab assistant"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useEditStartup",
+      "request": {
+        "body": {
+          "upload_id": 25
+        },
+        "method": "PUT",
+        "path": "/api/startups/1/logo"
+      },
+      "response": {
+        "address": "Nungambakkam, Chennai",
+        "build_logs": [
+          {
+            "image": {
+              "alt_text": "Plate reader chart of fluorescence over 60 minutes, sample rising to 9,400 against a flat blank, signal to noise 10.4",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/4/seed3/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/4/seed3/w480.webp?token=t",
+              "width": 1080
+            },
+            "post_id": 4
+          }
+        ],
+        "claimed": true,
+        "description": "Vitrix Biosciences builds biotech products for Indian customers.",
+        "founders": [
+          {
+            "connected": false,
+            "is_me": true,
+            "person": {
+              "display_name": "Dr. Kavya Subramanian",
+              "id": 4,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "role": "founder",
+            "via": null
+          }
+        ],
+        "hiring": false,
+        "id": 1,
+        "interest_count": 0,
+        "interested": false,
+        "is_team": true,
+        "lat": 13.066316919343375,
+        "lng": 80.26378505522642,
+        "logo": "https://storage.test/read/avatars/startup_logo/4/<hex>/w480.webp?token=t",
+        "match_pct": null,
+        "name": "Vitrix Biosciences",
+        "open_jobs": [],
+        "sector": "biotech",
+        "source": "seed",
+        "stage": "seed",
+        "team_size": null,
+        "tech_stack": [
+          "tensorflow",
+          "aws",
+          "react"
+        ],
+        "verified": true,
+        "view_count": 2,
+        "website_domain": "vitrixbiosciences.in"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useEditStartup",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/startups/1/logo"
+      },
+      "response": {
+        "address": "Nungambakkam, Chennai",
+        "build_logs": [
+          {
+            "image": {
+              "alt_text": "Plate reader chart of fluorescence over 60 minutes, sample rising to 9,400 against a flat blank, signal to noise 10.4",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/4/seed3/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/4/seed3/w480.webp?token=t",
+              "width": 1080
+            },
+            "post_id": 4
+          }
+        ],
+        "claimed": true,
+        "description": "Vitrix Biosciences builds biotech products for Indian customers.",
+        "founders": [
+          {
+            "connected": false,
+            "is_me": true,
+            "person": {
+              "display_name": "Dr. Kavya Subramanian",
+              "id": 4,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "role": "founder",
+            "via": null
+          }
+        ],
+        "hiring": false,
+        "id": 1,
+        "interest_count": 0,
+        "interested": false,
+        "is_team": true,
+        "lat": 13.066316919343375,
+        "lng": 80.26378505522642,
+        "logo": null,
+        "match_pct": null,
+        "name": "Vitrix Biosciences",
+        "open_jobs": [],
+        "sector": "biotech",
+        "source": "seed",
+        "stage": "seed",
+        "team_size": null,
+        "tech_stack": [
+          "tensorflow",
+          "aws",
+          "react"
+        ],
+        "verified": true,
+        "view_count": 2,
+        "website_domain": "vitrixbiosciences.in"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useEditStartup",
+      "request": {
+        "body": {
+          "description": "Biotech diagnostics for tier-2 hospitals.",
+          "team_size": 6
+        },
+        "method": "PATCH",
+        "path": "/api/startups/1"
+      },
+      "response": {
+        "address": "Nungambakkam, Chennai",
+        "build_logs": [
+          {
+            "image": {
+              "alt_text": "Plate reader chart of fluorescence over 60 minutes, sample rising to 9,400 against a flat blank, signal to noise 10.4",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/4/seed3/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/4/seed3/w480.webp?token=t",
+              "width": 1080
+            },
+            "post_id": 4
+          }
+        ],
+        "claimed": true,
+        "description": "Biotech diagnostics for tier-2 hospitals.",
+        "founders": [
+          {
+            "connected": false,
+            "is_me": true,
+            "person": {
+              "display_name": "Dr. Kavya Subramanian",
+              "id": 4,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "role": "founder",
+            "via": null
+          }
+        ],
+        "hiring": false,
+        "id": 1,
+        "interest_count": 0,
+        "interested": false,
+        "is_team": true,
+        "lat": 13.066316919343375,
+        "lng": 80.26378505522642,
+        "logo": null,
+        "match_pct": null,
+        "name": "Vitrix Biosciences",
+        "open_jobs": [],
+        "sector": "biotech",
+        "source": "seed",
+        "stage": "seed",
+        "team_size": 6,
+        "tech_stack": [
+          "tensorflow",
+          "aws",
+          "react"
+        ],
+        "verified": true,
+        "view_count": 2,
+        "website_domain": "vitrixbiosciences.in"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "kavya",
+  "scenario": "founder_posts",
+  "screen": "job"
+}

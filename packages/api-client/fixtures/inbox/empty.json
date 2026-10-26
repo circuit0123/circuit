@@ -1,0 +1,28 @@
+{
+  "calls": [
+    {
+      "hook": "useInbox",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations?folder=chats"
+      },
+      "response": [],
+      "status": 200
+    },
+    {
+      "hook": "useInboxDot",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations/unread-count"
+      },
+      "response": {
+        "chats": 0,
+        "requests": 0
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "empty",
+  "screen": "inbox"
+}

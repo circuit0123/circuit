@@ -15,6 +15,8 @@ class Job(models.Model):
     stipend_min = models.PositiveIntegerField(null=True, blank=True, help_text="INR per month")
     stipend_max = models.PositiveIntegerField(null=True, blank=True)
     location = models.CharField(max_length=200, blank=True)
+    duration_weeks = models.PositiveSmallIntegerField(null=True, blank=True)  # how long the role runs; blank = open-ended
+    starts_on = models.DateField(null=True, blank=True)
     is_open = models.BooleanField(default=True)
     posted_by = models.ForeignKey("accounts.Member", null=True, on_delete=models.SET_NULL, related_name="+")
     created_at = models.DateTimeField(auto_now_add=True)

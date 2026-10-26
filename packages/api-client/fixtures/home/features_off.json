@@ -1,0 +1,151 @@
+{
+  "calls": [
+    {
+      "hook": "useLiveWire",
+      "request": {
+        "method": "GET",
+        "path": "/api/livewire"
+      },
+      "response": {
+        "error": {
+          "code": "feature_off",
+          "details": null,
+          "message": "This feature is not available"
+        }
+      },
+      "status": 404
+    },
+    {
+      "hook": "useDailyDrop",
+      "request": {
+        "method": "GET",
+        "path": "/api/drop/today"
+      },
+      "response": {
+        "error": {
+          "code": "feature_off",
+          "details": null,
+          "message": "This feature is not available"
+        }
+      },
+      "status": 404
+    },
+    {
+      "hook": "usePulse",
+      "request": {
+        "method": "GET",
+        "path": "/api/pulse"
+      },
+      "response": {
+        "error": {
+          "code": "feature_off",
+          "details": null,
+          "message": "This feature is not available"
+        }
+      },
+      "status": 404
+    },
+    {
+      "hook": "useMatches",
+      "request": {
+        "method": "GET",
+        "path": "/api/matches?limit=5"
+      },
+      "response": {
+        "count": 20,
+        "items": [
+          {
+            "candidate_id": 99,
+            "capabilities": [
+              "Machine learning",
+              "UX design"
+            ],
+            "city": "Chennai",
+            "display_name": "Lavanya Srinivasan",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You offer frontend development, which they need. You both deal with student-friendly, builds for tier 2/3 cities. You have a mutual connection.",
+            "role": "student",
+            "sector": null,
+            "strength": "good",
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 42,
+            "capabilities": [
+              "Pitch coaching",
+              "Mentoring"
+            ],
+            "city": "Chennai",
+            "display_name": "Jayanth Natarajan",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer mentoring and you offer ui design.",
+            "role": "mentor",
+            "sector": null,
+            "strength": "good",
+            "verification_level": 3
+          },
+          {
+            "candidate_id": 13,
+            "capabilities": [
+              "Data science",
+              "Mentoring"
+            ],
+            "city": "Chennai",
+            "display_name": "Rajesh Venkatesh",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer mentoring and you offer frontend development.",
+            "role": "founder",
+            "sector": "biotech",
+            "strength": "good",
+            "verification_level": 2
+          },
+          {
+            "candidate_id": 15,
+            "capabilities": [
+              "Fintech domain",
+              "Mentoring"
+            ],
+            "city": "Chennai",
+            "display_name": "Bhavna Annamalai",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer mentoring and you offer ui design.",
+            "role": "founder",
+            "sector": "fintech",
+            "strength": "good",
+            "verification_level": 2
+          },
+          {
+            "candidate_id": 29,
+            "capabilities": [
+              "Backend development",
+              "Mentoring"
+            ],
+            "city": "Chennai",
+            "display_name": "Deepak Annamalai",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer mentoring and you offer frontend development.",
+            "role": "founder",
+            "sector": "saas",
+            "strength": "good",
+            "verification_level": 2
+          }
+        ],
+        "next_offset": 5
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "features_off",
+  "screen": "home"
+}

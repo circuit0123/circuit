@@ -5,6 +5,7 @@ from ninja import Query, Router, Schema
 from apps.accounts.models import Member
 from apps.notifications import copy, services
 from apps.notifications.models import Notification
+from apps.social import media
 from core.auth import current_member
 from core.pagination import Page, PageParams, paginate
 from core.schemas import PersonOut, person
@@ -28,7 +29,7 @@ class NotificationOut(Schema):
     created_at: datetime
 
 
-class CountOut(Schema):
+class UnreadCountOut(Schema):
     count: int
 
 
@@ -36,16 +37,67 @@ class NotificationParams(PageParams):
     unread: bool = False
 
 
+def _nameable(m: Member | None) -> str | None:
+    """A second person's name for a line of text. Deleted, suspended and under-18 members are never named."""
+    if m is None or m.deleted_at is not None or m.suspended_at is not None or m.is_minor or not m.display_name:
+        return None
+    return m.display_name
+
+
+def _ids(rows: list[Notification], key: str) -> set[int]:
+    return {n.payload[key] for n in rows if isinstance(n.payload.get(key), int)}
+
+
+def _lookups(rows: list[Notification]) -> dict:
+    """Everything the richer lines need, in one query per kind of thing (never one per row)."""
+    from apps.circuits.models import CircuitLeg
+    from apps.intros.models import IntroRequest
+    from apps.jobs.models import Job
+    from apps.startups.models import Startup
+
+    intros = IntroRequest.objects.select_related("requester", "target", "via").in_bulk(_ids(rows, "intro_id"))
+    jobs = dict(Job.objects.filter(pk__in=_ids(rows, "job_id")).values_list("pk", "title"))
+    startups = dict(Startup.objects.filter(pk__in=_ids(rows, "startup_id")).values_list("pk", "name"))
+    legs = dict(CircuitLeg.objects.filter(pk__in=_ids(rows, "leg_id")).values_list("pk", "capability__name"))
+    return {"intros": intros, "jobs": jobs, "startups": startups, "legs": legs}
+
+
+def _rich(n: Notification, look: dict) -> tuple[dict, str | None]:
+    """(placeholders, variant) for one notification: who else is involved and what it is about."""
+    p = n.payload
+    extra: dict = {}
+    variant = None
+    intro = look["intros"].get(p.get("intro_id"))
+    if intro is not None:
+        extra = {"target": _nameable(intro.target), "requester": _nameable(intro.requester), "via": _nameable(intro.via)}
+        if n.kind == "intro.accepted" and n.member_id == intro.via_id:
+            variant = "intro.accepted.broker"
+        elif n.kind == "intro.accepted" and p.get("actor_id") == intro.target_id:
+            extra = {}  # they accepted themselves: "{who} accepted your introduction." says it all
+        elif n.kind == "intro.received" and n.member_id != intro.target_id:
+            extra = {}
+    if n.kind == "application.status":
+        variant = f"application.status.{p.get('status')}"
+    extra["job"] = look["jobs"].get(p.get("job_id"))
+    extra["startup"] = look["startups"].get(p.get("startup_id"))
+    extra["capability"] = look["legs"].get(p.get("leg_id"))
+    return {k: v for k, v in extra.items() if v}, variant
+
+
 def _outs(rows: list[Notification]) -> list[dict]:
-    """Serialise a page. Actors are fetched in one query, so a card needs no follow-up request."""
+    """Serialise a page. Actors and everything the text names are fetched in a few bulk queries, so a card needs no follow-up request."""
     ids = {n.payload.get("actor_id") for n in rows}
     actors = {m.pk: m for m in Member.objects.filter(pk__in={i for i in ids if isinstance(i, int)})}
+    look = _lookups(rows)
+    media.prime_photos(actors.values())  # one storage call for the whole page
     result = []
     for n in rows:
         actor = actors.get(n.payload.get("actor_id"))
+        extra, variant = _rich(n, look)
         result.append(
             {
-                "id": n.pk, "kind": n.kind, "text": copy.text(n.kind, actor.display_name if actor else None),
+                "id": n.pk, "kind": n.kind,
+                "text": copy.text(n.kind, actor.display_name if actor else None, extra, variant),
                 "actor": person(actor) if actor else None, "target": copy.target(n.kind, n.payload),
                 "payload": n.payload, "read": n.read_at is not None, "created_at": n.created_at,
             }
@@ -70,14 +122,16 @@ def list_notifications(request, params: NotificationParams = Query(...)):
     return page
 
 
-@router.get("/unread-count", response=CountOut, summary="Unread count", description="How many notifications I have not read.")
+@router.get(
+    "/unread-count", response=UnreadCountOut, summary="Unread count", description="How many notifications I have not read."
+)
 def unread_count(request):
     return {"count": services.visible(current_member(request)).filter(read_at__isnull=True).count()}
 
 
 @router.post(
     "/read-all",
-    response=CountOut,
+    response=UnreadCountOut,
     summary="Mark all read",
     description="Marks all my notifications read. Returns how many changed.",
 )

@@ -139,11 +139,14 @@ MEDIA_ROOT = BASE_DIR / ".media"  # STORAGE_PROVIDER=local only (dev)
 STORAGE_BUCKETS = {
     "post": "posts",
     "message": "messages",
+    "avatar": "avatars",
+    "startup_logo": "avatars",
     "export": "private",
     "ml": "private",  # trained ranker files under ml/models/<version>/
 }  # private buckets; reads use short-lived signed URLs
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MEDIA_VARIANT_WIDTHS = (1440, 480)
+MEDIA_AVATAR_WIDTHS = (480,)  # profile photos and startup logos are only ever shown small: one size
 MEDIA_WEBP_QUALITY = cfg.media_webp_quality
 MEDIA_VARIANT_MAX_BYTES = {
     1440: 300_000,
@@ -207,6 +210,8 @@ RATE_LIMITS = {
     "report": (10, 86400),
     "claim": (5, 86400),
     "org_join": (10, 3600),
+    "org_search": (60, 3600),  # typing a college name in sign-up
+    "search": (120, 3600),  # Discover search across people, startups and roles
     "verify": (5, 86400),
     "post": (10, 86400),
     "reply": (60, 86400),

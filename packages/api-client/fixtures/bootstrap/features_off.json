@@ -1,0 +1,30 @@
+{
+  "calls": [
+    {
+      "hook": "useFeatures",
+      "request": {
+        "method": "GET",
+        "path": "/api/config"
+      },
+      "response": {
+        "beta_access": true,
+        "beta_mode": false,
+        "env": "dev",
+        "features": {
+          "circuits": false,
+          "daily_drop": false,
+          "investor_mode": false,
+          "partner_mode": false,
+          "payments": false,
+          "promotions": false,
+          "pulse": false
+        },
+        "llm_available": true
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "features_off",
+  "screen": "bootstrap"
+}

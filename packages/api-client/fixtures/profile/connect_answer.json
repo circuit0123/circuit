@@ -1,0 +1,167 @@
+{
+  "calls": [
+    {
+      "hook": "useConnectionRequests",
+      "request": {
+        "method": "GET",
+        "path": "/api/connections/requests?box=incoming"
+      },
+      "response": [
+        {
+          "created_at": "2026-03-02T04:00:00Z",
+          "id": 3,
+          "note": "Loved your hiring board.",
+          "recipient": {
+            "city": "Chennai",
+            "display_name": "Arjun Mehta",
+            "headline": "",
+            "id": 3,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          },
+          "sender": {
+            "city": "Chennai",
+            "display_name": "Ravi Kumar",
+            "headline": "",
+            "id": 10,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "status": "pending"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useConnect",
+      "request": {
+        "body": {
+          "accept": true
+        },
+        "method": "POST",
+        "path": "/api/connections/requests/3/respond"
+      },
+      "response": {
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 3,
+        "note": "Loved your hiring board.",
+        "recipient": {
+          "city": "Chennai",
+          "display_name": "Arjun Mehta",
+          "headline": "",
+          "id": 3,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "sender": {
+          "city": "Chennai",
+          "display_name": "Ravi Kumar",
+          "headline": "",
+          "id": 10,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        "status": "accepted"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useConnections",
+      "request": {
+        "method": "GET",
+        "path": "/api/connections"
+      },
+      "response": [
+        {
+          "city": "Chennai",
+          "display_name": "Divya Menon",
+          "headline": "",
+          "id": 176,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Harini Sundaram",
+          "headline": "",
+          "id": 174,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Karthik Nair",
+          "headline": "",
+          "id": 143,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Rajesh Venkatesh",
+          "headline": "",
+          "id": 13,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Ravi Kumar",
+          "headline": "",
+          "id": 10,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Shruti Patel",
+          "headline": "",
+          "id": 162,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Vignesh Natarajan",
+          "headline": "",
+          "id": 238,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Zoya Thomas",
+          "headline": "",
+          "id": 108,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useConnect",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/connections/10"
+      },
+      "response": null,
+      "status": 204
+    }
+  ],
+  "persona": "arjun",
+  "scenario": "connect_answer",
+  "screen": "profile"
+}

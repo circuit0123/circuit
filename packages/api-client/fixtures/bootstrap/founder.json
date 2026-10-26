@@ -1,0 +1,45 @@
+{
+  "calls": [
+    {
+      "hook": "useMe",
+      "request": {
+        "method": "GET",
+        "path": "/api/me"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": true,
+        "city": "Chennai",
+        "college": "",
+        "display_name": "Asha Raman",
+        "has_needs_and_offers": true,
+        "id": 1,
+        "is_minor": false,
+        "lat": 13.008200586367384,
+        "lng": 80.27120021510446,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": null,
+        "photo": null,
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "founder",
+        "startup_id": 4,
+        "verification_level": 2,
+        "visible_to_org": false
+      },
+      "status": 200
+    }
+  ],
+  "persona": "asha",
+  "scenario": "founder",
+  "screen": "bootstrap"
+}

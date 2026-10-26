@@ -7,13 +7,15 @@ class MediaUpload(models.Model):
     class Purpose(models.TextChoices):
         POST = "post"
         MESSAGE = "message"
+        AVATAR = "avatar"  # a member's profile photo
+        STARTUP_LOGO = "startup_logo"  # a startup's logo, set by its team
 
     class Status(models.TextChoices):
         PENDING = "pending"  # signed URL handed out, bytes not checked yet
         READY = "ready"  # verified, EXIF stripped, resized variants stored
 
     owner = models.ForeignKey("accounts.Member", on_delete=models.CASCADE, related_name="uploads")
-    purpose = models.CharField(max_length=8, choices=Purpose.choices)
+    purpose = models.CharField(max_length=16, choices=Purpose.choices)
     path = models.CharField(max_length=200, unique=True, help_text="folder in the bucket: <purpose>/<owner id>/<uuid>")
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.PENDING)
     width = models.PositiveIntegerField(null=True, blank=True)

@@ -1,0 +1,79 @@
+{
+  "calls": [
+    {
+      "hook": "useInterest",
+      "request": {
+        "method": "POST",
+        "path": "/api/startups/3/interest"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useInterest",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/startups/3/interest"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useFollow",
+      "request": {
+        "method": "POST",
+        "path": "/api/startups/3/follow"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useFollow",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/startups/3/follow"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useApply",
+      "request": {
+        "method": "POST",
+        "path": "/api/jobs/2/apply"
+      },
+      "response": {
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 6,
+        "job_id": 2,
+        "job_title": "Associate – Backend development",
+        "skill_match": 0.1,
+        "startup_id": 10,
+        "startup_name": "Kaviloop",
+        "status": "applied"
+      },
+      "status": 201
+    },
+    {
+      "hook": "useWithdraw",
+      "request": {
+        "method": "POST",
+        "path": "/api/applications/6/withdraw"
+      },
+      "response": {
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 6,
+        "job_id": 2,
+        "job_title": "Associate – Backend development",
+        "skill_match": 0.1,
+        "startup_id": 10,
+        "startup_name": "Kaviloop",
+        "status": "withdrawn"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "actions",
+  "screen": "startup"
+}

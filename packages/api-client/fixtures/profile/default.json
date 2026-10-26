@@ -1,0 +1,181 @@
+{
+  "calls": [
+    {
+      "hook": "useProfile",
+      "request": {
+        "method": "GET",
+        "path": "/api/members/8"
+      },
+      "response": {
+        "actions": {
+          "connect": false,
+          "intro": false,
+          "message": true
+        },
+        "bio": "",
+        "build_logs": [],
+        "circuits_closed": 0,
+        "city": "Chennai",
+        "college": "",
+        "connection": "connected",
+        "display_name": "Dr. Lakshmi Narayanan",
+        "headline": "",
+        "id": 8,
+        "is_me": false,
+        "mutual_count": 0,
+        "needs": [],
+        "offers": [
+          {
+            "capability": "mentoring",
+            "description": "Can help with mentoring"
+          },
+          {
+            "capability": "investor-intros",
+            "description": "Can help with investor introductions"
+          },
+          {
+            "capability": "business-strategy",
+            "description": "Can help with business strategy"
+          }
+        ],
+        "organisation": null,
+        "photo": null,
+        "role": "mentor",
+        "skills": [],
+        "strength": null,
+        "traits": [],
+        "verification_level": 3,
+        "via": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useProfile",
+      "request": {
+        "method": "GET",
+        "path": "/api/members/10"
+      },
+      "response": {
+        "actions": {
+          "connect": false,
+          "intro": false,
+          "message": false
+        },
+        "bio": "",
+        "build_logs": [
+          {
+            "image": {
+              "alt_text": "Attendance app showing today's four classes, two present, one absent, one not marked, and an offline banner",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/10/seed5/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/10/seed5/w480.webp?token=t",
+              "width": 1080
+            },
+            "post_id": 6
+          }
+        ],
+        "circuits_closed": 0,
+        "city": "Chennai",
+        "college": "Kaveri Institute of Technology",
+        "connection": "self",
+        "display_name": "Ravi Kumar",
+        "headline": "",
+        "id": 10,
+        "is_me": true,
+        "mutual_count": null,
+        "needs": [
+          {
+            "capability": "mentoring",
+            "description": "Looking for help with mentoring"
+          }
+        ],
+        "offers": [
+          {
+            "capability": "frontend-dev",
+            "description": "Can help with frontend development"
+          },
+          {
+            "capability": "ui-design",
+            "description": "Can help with ui design"
+          }
+        ],
+        "organisation": "Kaveri Institute of Technology",
+        "photo": null,
+        "role": "student",
+        "skills": [
+          {
+            "capability": "frontend-dev",
+            "level": 3,
+            "proof_url": "https://github.com/ravi-kumar-demo/portfolio"
+          },
+          {
+            "capability": "ui-design",
+            "level": 2,
+            "proof_url": ""
+          }
+        ],
+        "strength": {
+          "next_step": {
+            "key": "photo",
+            "text": "Add a photo"
+          },
+          "percent": 57
+        },
+        "traits": [
+          "student-friendly",
+          "tier2-3-focus"
+        ],
+        "verification_level": 1,
+        "via": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useProfile",
+      "request": {
+        "method": "GET",
+        "path": "/api/members/1/posts"
+      },
+      "response": [
+        {
+          "author": {
+            "city": "Chennai",
+            "display_name": "Asha Raman",
+            "headline": "",
+            "id": 1,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          },
+          "body": "Week 6 of the diagnostics dashboard: sample turnaround per lab, now with a late-sample flag. Looking for a marketer who has sold to labs.",
+          "capabilities": [
+            {
+              "name": "Brand marketing",
+              "slug": "brand-marketing"
+            }
+          ],
+          "created_at": "2026-03-02T01:00:00Z",
+          "id": 1,
+          "link": "",
+          "media": [
+            {
+              "alt_text": "Dashboard: 1,284 samples this week, 91.4% on time, 37 late, a bar chart of daily turnaround against a 6 hour limit, and a table of five labs",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/1/seed0/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/1/seed0/w480.webp?token=t",
+              "width": 1080
+            }
+          ],
+          "my_reactions": [],
+          "private_stats": null,
+          "status": "visible",
+          "visibility": "everyone"
+        }
+      ],
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "default",
+  "screen": "profile"
+}

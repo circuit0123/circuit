@@ -1,0 +1,228 @@
+{
+  "calls": [
+    {
+      "hook": "usePost",
+      "request": {
+        "method": "GET",
+        "path": "/api/posts/1"
+      },
+      "response": {
+        "author": {
+          "city": "Chennai",
+          "display_name": "Asha Raman",
+          "headline": "",
+          "id": 1,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "body": "Week 6 of the diagnostics dashboard: sample turnaround per lab, now with a late-sample flag. Looking for a marketer who has sold to labs.",
+        "capabilities": [
+          {
+            "name": "Brand marketing",
+            "slug": "brand-marketing"
+          }
+        ],
+        "created_at": "2026-03-02T01:00:00Z",
+        "id": 1,
+        "link": "",
+        "media": [
+          {
+            "alt_text": "Dashboard: 1,284 samples this week, 91.4% on time, 37 late, a bar chart of daily turnaround against a 6 hour limit, and a table of five labs",
+            "height": 1350,
+            "w1440": "https://storage.test/read/posts/post/1/seed0/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/post/1/seed0/w480.webp?token=t",
+            "width": 1080
+          }
+        ],
+        "my_reactions": [],
+        "private_stats": {
+          "reactions": {
+            "helpful": 2,
+            "intro_me": 1
+          },
+          "replies": 2
+        },
+        "status": "visible",
+        "visibility": "everyone"
+      },
+      "status": 200
+    },
+    {
+      "hook": "usePostReplies",
+      "request": {
+        "method": "GET",
+        "path": "/api/posts/1/replies"
+      },
+      "response": [
+        {
+          "author": {
+            "city": "Chennai",
+            "display_name": "Uma Iyer",
+            "headline": "",
+            "id": 104,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "body": "Would love to try this.",
+          "created_at": "2026-03-02T04:00:00Z",
+          "id": 1,
+          "replies": [
+            {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Asha Raman",
+                "headline": "",
+                "id": 1,
+                "photo": null,
+                "role": "founder",
+                "verification_level": 2
+              },
+              "body": "Thanks! Happy to share how, message me.",
+              "created_at": "2026-03-02T04:00:00Z",
+              "id": 2,
+              "replies": []
+            }
+          ]
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "usePostReplies",
+      "request": {
+        "body": {
+          "body": "Good progress."
+        },
+        "method": "POST",
+        "path": "/api/posts/1/replies"
+      },
+      "response": {
+        "author": {
+          "city": "Chennai",
+          "display_name": "Asha Raman",
+          "headline": "",
+          "id": 1,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "body": "Good progress.",
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 7,
+        "replies": []
+      },
+      "status": 201
+    },
+    {
+      "hook": "useMemberPosts",
+      "request": {
+        "method": "GET",
+        "path": "/api/members/1/posts"
+      },
+      "response": [
+        {
+          "author": {
+            "city": "Chennai",
+            "display_name": "Asha Raman",
+            "headline": "",
+            "id": 1,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          },
+          "body": "Week 6 of the diagnostics dashboard: sample turnaround per lab, now with a late-sample flag. Looking for a marketer who has sold to labs.",
+          "capabilities": [
+            {
+              "name": "Brand marketing",
+              "slug": "brand-marketing"
+            }
+          ],
+          "created_at": "2026-03-02T01:00:00Z",
+          "id": 1,
+          "link": "",
+          "media": [
+            {
+              "alt_text": "Dashboard: 1,284 samples this week, 91.4% on time, 37 late, a bar chart of daily turnaround against a 6 hour limit, and a table of five labs",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/1/seed0/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/1/seed0/w480.webp?token=t",
+              "width": 1080
+            }
+          ],
+          "my_reactions": [],
+          "private_stats": {
+            "reactions": {
+              "helpful": 2,
+              "intro_me": 1
+            },
+            "replies": 3
+          },
+          "status": "visible",
+          "visibility": "everyone"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "usePostComposer",
+      "request": {
+        "body": {
+          "body": "Shipped the first pilot report.",
+          "capabilities": [],
+          "link": "",
+          "visibility": "everyone"
+        },
+        "method": "POST",
+        "path": "/api/posts"
+      },
+      "response": {
+        "author": {
+          "city": "Chennai",
+          "display_name": "Asha Raman",
+          "headline": "",
+          "id": 1,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "body": "Shipped the first pilot report.",
+        "capabilities": [],
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 36,
+        "link": "",
+        "media": [],
+        "my_reactions": [],
+        "private_stats": {
+          "reactions": {},
+          "replies": 0
+        },
+        "status": "visible",
+        "visibility": "everyone"
+      },
+      "status": 201
+    },
+    {
+      "hook": "useMediaUpload",
+      "request": {
+        "body": {
+          "content_type": "image/png",
+          "purpose": "post",
+          "size": 1000
+        },
+        "method": "POST",
+        "path": "/api/media/uploads"
+      },
+      "response": {
+        "id": 24,
+        "status": "pending",
+        "upload_url": "<random>"
+      },
+      "status": 201
+    }
+  ],
+  "persona": "asha",
+  "scenario": "default",
+  "screen": "build_log"
+}

@@ -1,0 +1,70 @@
+{
+  "calls": [
+    {
+      "hook": "useStartup",
+      "request": {
+        "method": "GET",
+        "path": "/api/startups/1"
+      },
+      "response": {
+        "address": "Nungambakkam, Chennai",
+        "build_logs": [
+          {
+            "image": {
+              "alt_text": "Plate reader chart of fluorescence over 60 minutes, sample rising to 9,400 against a flat blank, signal to noise 10.4",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/4/seed3/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/4/seed3/w480.webp?token=t",
+              "width": 1080
+            },
+            "post_id": 4
+          }
+        ],
+        "claimed": true,
+        "description": "Vitrix Biosciences builds biotech products for Indian customers.",
+        "founders": [
+          {
+            "connected": false,
+            "is_me": true,
+            "person": {
+              "display_name": "Dr. Kavya Subramanian",
+              "id": 4,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "role": "founder",
+            "via": null
+          }
+        ],
+        "hiring": false,
+        "id": 1,
+        "interest_count": 0,
+        "interested": false,
+        "is_team": true,
+        "lat": 13.066316919343375,
+        "lng": 80.26378505522642,
+        "logo": null,
+        "match_pct": null,
+        "name": "Vitrix Biosciences",
+        "open_jobs": [],
+        "sector": "biotech",
+        "source": "seed",
+        "stage": "seed",
+        "team_size": null,
+        "tech_stack": [
+          "tensorflow",
+          "aws",
+          "react"
+        ],
+        "verified": true,
+        "view_count": 2,
+        "website_domain": "vitrixbiosciences.in"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "kavya",
+  "scenario": "team",
+  "screen": "startup"
+}

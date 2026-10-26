@@ -1,0 +1,68 @@
+{
+  "calls": [
+    {
+      "hook": "useFeatures",
+      "request": {
+        "method": "GET",
+        "path": "/api/config"
+      },
+      "response": {
+        "beta_access": true,
+        "beta_mode": false,
+        "env": "dev",
+        "features": {
+          "circuits": true,
+          "daily_drop": true,
+          "investor_mode": true,
+          "partner_mode": true,
+          "payments": true,
+          "promotions": true,
+          "pulse": true
+        },
+        "llm_available": true
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMe",
+      "request": {
+        "method": "GET",
+        "path": "/api/me"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "Chennai",
+        "college": "Kaveri Institute of Technology",
+        "display_name": "Balaji Fernandes",
+        "has_needs_and_offers": true,
+        "id": 59,
+        "is_minor": true,
+        "lat": 13.047915313912075,
+        "lng": 80.14702739691954,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": 1,
+        "photo": null,
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": false
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "under_18",
+  "screen": "bootstrap"
+}

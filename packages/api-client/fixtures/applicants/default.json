@@ -1,0 +1,106 @@
+{
+  "calls": [
+    {
+      "hook": "useApplicants",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs/66/applicants"
+      },
+      "response": {
+        "count": 4,
+        "items": [
+          {
+            "application_id": 4,
+            "applied_at": "2026-03-02T04:00:00Z",
+            "display_name": "Aditi Venkatesh",
+            "skill_match": 0.45,
+            "skills": [
+              {
+                "capability": "frontend-dev",
+                "level": 1,
+                "name": "Frontend development",
+                "proof_url": ""
+              }
+            ],
+            "status": "applied",
+            "student_id": 122
+          },
+          {
+            "application_id": 3,
+            "applied_at": "2026-03-02T04:00:00Z",
+            "display_name": "Hemalatha Pillai",
+            "skill_match": 0.4,
+            "skills": [
+              {
+                "capability": "frontend-dev",
+                "level": 1,
+                "name": "Frontend development",
+                "proof_url": ""
+              }
+            ],
+            "status": "applied",
+            "student_id": 120
+          },
+          {
+            "application_id": 2,
+            "applied_at": "2026-03-02T04:00:00Z",
+            "display_name": "Aditi Annamalai",
+            "skill_match": 0.35,
+            "skills": [
+              {
+                "capability": "frontend-dev",
+                "level": 1,
+                "name": "Frontend development",
+                "proof_url": ""
+              }
+            ],
+            "status": "applied",
+            "student_id": 116
+          },
+          {
+            "application_id": 1,
+            "applied_at": "2026-03-02T04:00:00Z",
+            "display_name": "Kavin Venkatesh",
+            "skill_match": 0.3,
+            "skills": [
+              {
+                "capability": "frontend-dev",
+                "level": 1,
+                "name": "Frontend development",
+                "proof_url": ""
+              }
+            ],
+            "status": "applied",
+            "student_id": 114
+          }
+        ],
+        "next_offset": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useSetApplicantStatus",
+      "request": {
+        "body": {
+          "status": "shortlisted"
+        },
+        "method": "PATCH",
+        "path": "/api/applications/1"
+      },
+      "response": {
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 1,
+        "job_id": 66,
+        "job_title": "Frontend Intern",
+        "skill_match": 0.3,
+        "startup_id": 3,
+        "startup_name": "Pixelwave Labs",
+        "status": "shortlisted"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "default",
+  "screen": "applicants"
+}

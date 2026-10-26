@@ -17,6 +17,8 @@ class Startup(models.Model):
     location = gis.PointField(srid=4326, null=True, blank=True)
     hiring = models.BooleanField(default=False)
     tech_stack = models.JSONField(default=list, blank=True)
+    team_size = models.PositiveSmallIntegerField(null=True, blank=True)  # set by the team; unknown until then
+    logo_path = models.CharField(max_length=200, blank=True, db_default="")  # folder of the logo in the avatars bucket
     claimed_by = models.ForeignKey(
         "accounts.Member", null=True, blank=True, on_delete=models.SET_NULL, related_name="claimed_startups"
     )

@@ -4,12 +4,15 @@ from django.conf import settings
 from ninja import Router, Schema
 from pydantic import ConfigDict, Field
 
-from apps.accounts import appearance, services
+from apps.accounts import appearance, photo, profile, services
 from apps.accounts.models import Member
 from apps.matching.models import Capability, MemberSkill, MemberTrait, Need, Offer, Trait
+from apps.social import media
+from apps.social.api import BuildLogTileOut
 from core import gate
 from core.auth import current_context, current_member
 from core.ratelimit import check_rate
+from core.schemas import PersonOut
 
 router = Router()
 RoleChoice = Literal["student", "founder", "mentor", "investor"]
@@ -17,13 +20,13 @@ RoleChoice = Literal["student", "founder", "mentor", "investor"]
 
 class AppearanceOut(Schema):
     theme: Literal["system", "dark", "light"]
-    accent: Literal["mint", "sky", "indigo", "rose", "lime", "mono"]
+    accent: Literal["emerald", "sky", "indigo", "rose", "lime", "mono"]
     swipe_tabs: bool
 
 
 class MeOut(Schema):
     id: int
-    role: str
+    role: Literal["student", "founder", "mentor", "investor", "partner_admin", "super_admin"]
     display_name: str
     bio: str
     city: str
@@ -38,6 +41,10 @@ class MeOut(Schema):
     circuits_opt_in: bool
     allow_requests: bool
     open_intro_slots: int
+    photo: str | None  # my own profile photo (signed link) or null; shown to nobody else if I am under 18
+    read_receipts: bool  # show read ticks on my messages (each person sees them only when both have it on)
+    startup_id: int | None  # the startup this founder is on (the first one), so Profile can link to its roles and applicants
+    has_needs_and_offers: bool  # false = not in this week's circuit round yet: the Circuits empty state says what to add
     beta_access: bool  # false while BETA_MODE is on and the member has not got in: show the invite-code screen
     needs_consent: bool  # true until the member accepts policy_version: show the consent screen (everything else answers 403 consent_required)
     policy_version: str
@@ -58,12 +65,16 @@ class MePatch(Schema):
 
 
 def _me(m: Member, beta_access: bool) -> dict:
+    from apps.startups.services import startup_id_of
+
     return {
         "id": m.pk, "role": m.role, "display_name": m.display_name, "bio": m.bio, "city": m.city, "college": m.college,
         "lat": m.location.y if m.location else None, "lng": m.location.x if m.location else None,
         "verification_level": m.verification_level, "organisation_id": m.organisation_id, "is_minor": m.is_minor,
         "profile_visibility": m.profile_visibility, "visible_to_org": m.visible_to_org, "circuits_opt_in": m.circuits_opt_in,
-        "allow_requests": m.allow_requests, "open_intro_slots": m.open_intro_slots, "beta_access": beta_access,
+        "allow_requests": m.allow_requests, "open_intro_slots": m.open_intro_slots, "read_receipts": m.read_receipts, "photo": media.own_photo(m),
+        "startup_id": startup_id_of(m), "has_needs_and_offers": Need.objects.filter(member=m).exists() and Offer.objects.filter(member=m).exists(),
+        "beta_access": beta_access,
         "needs_consent": gate.needs_consent(m), "policy_version": settings.POLICY_VERSION, "appearance": appearance.resolved(m),
     }  # fmt: skip
 
@@ -89,6 +100,36 @@ def me(request):
 def update_me(request, body: MePatch):
     member = current_member(request)
     return _me(services.update_profile(member, body.dict(exclude_unset=True)), beta_access=True)  # the gate let this call in
+
+
+class PhotoIn(Schema):
+    model_config = ConfigDict(extra="forbid")
+    upload_id: int
+
+
+@router.put(
+    "/me/photo",
+    response=MeOut,
+    summary="Set my profile photo",
+    description="Upload the image first (`POST /api/media/uploads` with purpose `avatar`, PUT the file, then complete) and send its "
+    "id here. The previous photo is deleted. Someone else's upload is a 404. Under-18 members' photos are shown to nobody but them.",
+)
+def set_my_photo(request, body: PhotoIn):
+    member = current_member(request)
+    check_rate(member.pk, "settings_write")
+    return _me(photo.set_photo(member, body.upload_id), beta_access=True)
+
+
+@router.delete(
+    "/me/photo",
+    response=MeOut,
+    summary="Remove my profile photo",
+    description="Back to the circuit-pattern avatar. Safe to repeat.",
+)
+def remove_my_photo(request):
+    member = current_member(request)
+    check_rate(member.pk, "settings_write")
+    return _me(photo.remove_photo(member), beta_access=True)
 
 
 # -- lists -------------------------------------------------------------------
@@ -213,8 +254,35 @@ def put_traits(request, body: list[str]):
 
 
 # -- public profile -------------------------------------------------------------------------
+class ProfileActionsOut(Schema):
+    connect: bool
+    message: bool
+    intro: bool  # a mutual connection can introduce me (not for members under 18)
+
+
+class StrengthStepOut(Schema):
+    key: str
+    text: str
+
+
+class StrengthOut(Schema):
+    percent: int
+    next_step: StrengthStepOut | None  # the one thing to do next
+
+
 class ProfileOut(Schema):
     id: int
+    is_me: bool
+    photo: str | None
+    headline: str
+    organisation: str | None  # their organisation's name, only for people in the same one (and for me)
+    connection: Literal["self", "connected", "requested", "requested_you", "none"]
+    actions: ProfileActionsOut
+    mutual_count: int | None  # "12 mutual connections"; null on my own profile. There are no public follower or connection counts
+    via: PersonOut | None  # who would introduce me, when there is a path and they are not yet a connection
+    build_logs: list[BuildLogTileOut]  # first picture of their latest build logs I may see; empty when Pulse is off
+    circuits_closed: int | None  # mine, or a connection's; null for everyone else and when circuits are off
+    strength: StrengthOut | None  # my own profile only: how complete it is
     role: str
     display_name: str
     bio: str
@@ -231,11 +299,16 @@ class ProfileOut(Schema):
     "/members/{member_id}",
     response=ProfileOut,
     summary="A member's profile",
-    description="Another member's profile. Hidden, under-18, suspended, blocked and admin accounts are a 404.",
+    description="The whole Profile screen in one call: header (photo, headline, organisation for people in mine), what I can do with them "
+    "(connect, message, intro via a mutual), mutual connections, needs and offers, skills, a grid of their build logs, closed circuits "
+    "(mine or a connection's) and, on my own profile, the strength meter with its next step. Hidden, under-18, suspended, blocked and "
+    "admin accounts are a 404. My own id works too.",
 )
 def member_profile(request, member_id: int):
-    target = services.visible_member(current_member(request), member_id)
+    viewer = current_member(request)
+    target = services.visible_member(viewer, member_id)
     return {
+        **profile.header(viewer, target),
         "id": target.pk, "role": target.role, "display_name": target.display_name, "bio": target.bio, "city": target.city,
         "college": target.college, "verification_level": target.verification_level,
         "needs": _no(Need.objects.filter(member=target, is_active=True).select_related("capability").order_by("id")),

@@ -1,0 +1,96 @@
+{
+  "calls": [
+    {
+      "hook": "useLiveWire",
+      "request": {
+        "method": "GET",
+        "path": "/api/livewire"
+      },
+      "response": [],
+      "status": 200
+    },
+    {
+      "hook": "useDailyDrop",
+      "request": {
+        "method": "GET",
+        "path": "/api/drop/today"
+      },
+      "response": {
+        "cards": [],
+        "date": "2026-03-02",
+        "done": false,
+        "next_drop_at": "2026-03-03T08:00:00+05:30"
+      },
+      "status": 200
+    },
+    {
+      "hook": "usePulse",
+      "request": {
+        "method": "GET",
+        "path": "/api/pulse"
+      },
+      "response": {
+        "caught_up": true,
+        "items": [
+          {
+            "activity": null,
+            "created_at": "2026-03-02T00:00:00+05:30",
+            "key": "skills_in_demand:0",
+            "kind": "skills_in_demand",
+            "post": null,
+            "role": null,
+            "seen": false,
+            "skills_in_demand": {
+              "skills": [
+                {
+                  "name": "Backend development",
+                  "open_roles": 28,
+                  "slug": "backend-dev"
+                },
+                {
+                  "name": "Frontend development",
+                  "open_roles": 23,
+                  "slug": "frontend-dev"
+                },
+                {
+                  "name": "Embedded systems",
+                  "open_roles": 13,
+                  "slug": "embedded-systems"
+                }
+              ]
+            }
+          }
+        ],
+        "next_cursor": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMatches",
+      "request": {
+        "method": "GET",
+        "path": "/api/matches"
+      },
+      "response": {
+        "count": 0,
+        "items": [],
+        "next_offset": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useUnreadCount",
+      "request": {
+        "method": "GET",
+        "path": "/api/notifications/unread-count"
+      },
+      "response": {
+        "count": 0
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "empty",
+  "screen": "home"
+}

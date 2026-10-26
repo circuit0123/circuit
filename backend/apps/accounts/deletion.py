@@ -144,6 +144,7 @@ def _erase_rows(member: Member) -> None:
     member.circuits_opt_in = member.visible_to_org = member.is_tester = member.allow_requests = False
     member.profile_visibility = Member.Visibility.HIDDEN if member.is_minor else Member.Visibility.MEMBERS
     member.appearance, member.notification_prefs, member.pulse_seen_at = {}, {}, None
+    member.photo_path = ""  # the files were removed above
     member.onboarding = {}  # their answers are personal; signup_source stays, it is only a landing-page label
     member.deleted_at = timezone.now()
     member.save()

@@ -43,7 +43,7 @@ class MemberAdmin(AuditedAdmin):
         "updated_at",
     ]
 
-    actions = ["suspend_members", "reinstate_members"]
+    actions = ["suspend_members", "reinstate_members", "confirm_adult"]
 
     @admin.action(description="Suspend selected members (locked out of the API at once)")
     def suspend_members(self, request, queryset):
@@ -65,6 +65,16 @@ class MemberAdmin(AuditedAdmin):
             audit(request, "reinstate", m)
             n += 1
         self.message_user(request, f"Reinstated {n} member(s)")
+
+    @admin.action(description="Confirm as an adult (age checked: clears the under-18 flag; privacy settings stay as they are)")
+    def confirm_adult(self, request, queryset):
+        n = 0
+        for m in queryset.filter(is_minor=True):
+            m.is_minor = False
+            m.save(update_fields=["is_minor", "updated_at"])
+            audit(request, "confirm_adult", m)
+            n += 1
+        self.message_user(request, f"Cleared the under-18 flag on {n} member(s)")
 
     def has_add_permission(self, request):
         return False

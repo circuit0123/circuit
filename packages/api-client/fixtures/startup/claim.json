@@ -1,0 +1,22 @@
+{
+  "calls": [
+    {
+      "hook": "useStartClaim",
+      "request": {
+        "body": {
+          "email": "founder@zetapulse.in"
+        },
+        "method": "POST",
+        "path": "/api/startups/31/claim"
+      },
+      "response": {
+        "dev_code": "<random>",
+        "sent": true
+      },
+      "status": 200
+    }
+  ],
+  "persona": "asha",
+  "scenario": "claim",
+  "screen": "startup"
+}

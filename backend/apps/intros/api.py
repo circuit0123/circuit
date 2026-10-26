@@ -6,6 +6,7 @@ from ninja import Field, Query, Router, Schema, Status
 from apps.accounts.models import Member
 from apps.intros import services
 from apps.intros.models import IntroRequest
+from apps.social import media
 from core.auth import current_member
 from core.errors import Forbidden
 from core.pagination import Page, PageParams, paginate
@@ -33,6 +34,14 @@ class RatingIn(Schema):
     rating: int = Field(ge=1, le=5)
 
 
+class CapacityOut(Schema):
+    allowed: bool  # false for under-18 members and roles that cannot ask for intros
+    weekly_limit: int
+    used: int
+    left: int
+    next_frees_at: datetime | None  # when the next one frees up; set only when none are left
+
+
 class IntroOut(Schema):
     id: int
     my_role: Literal["requester", "broker", "target"]
@@ -53,6 +62,7 @@ class IntroParams(PageParams):
 
 
 def _out(i: IntroRequest, me: Member) -> dict:
+    media.prime_photos([i.requester, i.target, *([i.via] if i.via else [])])
     return {
         "id": i.pk, "my_role": "requester" if i.requester_id == me.pk else "broker" if i.via_id == me.pk else "target",
         "status": services.effective_status(i), "stage": i.stage, "can_respond": services.can_respond(i, me),
@@ -68,6 +78,17 @@ def _fresh(i: IntroRequest) -> IntroRequest:
 def _check_role(member: Member) -> None:
     if member.role not in NETWORK_ROLES:
         raise Forbidden()
+
+
+@router.get(
+    "/capacity",
+    response=CapacityOut,
+    summary="Introductions left this week",
+    description="How many of this week's introductions I have used and left, and when the next one frees up, so the request sheet "
+    "can say '2 left' before I press Send. Only about me; how full another person is stays private.",
+)
+def capacity(request):
+    return services.capacity(current_member(request))
 
 
 @router.get(
