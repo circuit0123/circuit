@@ -758,6 +758,29 @@ def print_plan(steps: list[Step], out=print, show_files: bool = False) -> None:
                 out("  ----")
 
 
+def in_repo(run: Runner) -> Runner:
+    """Run every command from the repository root, whatever folder `make` was started in: the docker build uses relative paths."""
+
+    def wrapped(argv, **kwargs):
+        kwargs.setdefault("cwd", REPO)
+        return run(argv, **kwargs)
+
+    return wrapped
+
+
+def list_jobs(cfg: Cfg, out=print) -> None:
+    """The schedule, straight from deploy/gcp/app.toml, so what `make jobs` shows can never drift from what is deployed."""
+    out(f"Jobs in {cfg.env} (schedules are India time, Asia/Kolkata):\n")
+    out(f"  {'JOB':<22} {'RUNS':<24} {'COMMAND'}")
+    for job in cfg.jobs.values():
+        if job.envs is not None and cfg.env not in job.envs:
+            continue
+        when = job.schedule or ("with every-5-min" if job.bundled else "on demand")
+        note = "" if job.enabled else "   (not built yet: switched off in app.toml)"
+        out(f"  {job.key:<22} {when:<24} manage.py {' '.join([job.command, *job.args])}{note}")
+    out("\nRun one now: make jobs-run ENV=production JOB=compute_matches")
+
+
 def run_plan(
     steps: list[Step], run: Runner = subprocess.run, ask_secret: Callable[[str], str] = getpass.getpass, out=print
 ) -> None:
@@ -879,7 +902,7 @@ def git_tag(run: Runner = subprocess.run, allow_dirty: bool = False) -> str:
 
 def main(argv: list[str] | None = None, run: Runner = subprocess.run, input_fn: Callable[[str], str] = input, out=print) -> int:
     ap = argparse.ArgumentParser(prog="gcp.py", description=__doc__.split("\n\n")[0])
-    ap.add_argument("command", choices=["setup", "deploy", "rollback", "secret", "jobs-run", "logs"])
+    ap.add_argument("command", choices=["setup", "deploy", "rollback", "secret", "jobs-run", "logs", "jobs"])
     ap.add_argument("--env", required=True, choices=ENVS)
     ap.add_argument("--dry-run", action="store_true", help="print the plan (and the files it writes) and stop; needs no gcloud")
     ap.add_argument("--name", help="secret: which secret, e.g. SECRET_KEY")
@@ -889,8 +912,12 @@ def main(argv: list[str] | None = None, run: Runner = subprocess.run, input_fn: 
     ap.add_argument("--allow-dirty", action="store_true", help="deploy --dry-run only: tolerate uncommitted changes")
     args = ap.parse_args(argv)
 
+    run = in_repo(run)
     try:
         cfg = load_config(args.env)
+        if args.command == "jobs":
+            list_jobs(cfg, out)
+            return 0
         left = find_placeholders(cfg)
         if left and not args.dry_run:
             raise DeployError(

@@ -6,6 +6,11 @@ MANAGE  = $(BACKEND) python manage.py
 ENV    ?= local
 unexport ENV   # ENV here means "which deployment" for these targets; Django's own ENV comes from .env
 
+GCP = python3 scripts/gcp.py   # standard library only; talks to Google Cloud through the gcloud command
+define need_env
+	@case "$(ENV)" in production|staging|demo) ;; *) echo "usage: make $(1) ENV=production|staging|demo"; exit 1;; esac
+endef
+
 define not_yet
 	@echo "'$(1)' is not available until $(2)."; exit 1
 endef
@@ -13,7 +18,7 @@ endef
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
-	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback
+	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run
 
 help: ## List every command
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  \033[1m%-22s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -54,8 +59,13 @@ up: ## Start Postgres + Redis containers
 down: ## Stop Postgres + Redis containers
 	docker compose down
 
-logs: ## Follow container logs
+logs: ## Local: follow container logs. In the cloud: make logs ENV=production [JOB=compute_matches] [LIMIT=50] shows the newest log lines
+ifeq ($(ENV),local)
 	docker compose logs -f
+else
+	$(call need_env,logs)
+	$(GCP) logs --env $(ENV) $(if $(JOB),--job $(JOB)) $(if $(LIMIT),--limit $(LIMIT))
+endif
 
 shell: ## Django shell
 	$(MANAGE) shell
@@ -74,7 +84,7 @@ reset-demo: ## Wipe local data and reload the seed + five demo stories
 ifeq ($(ENV),local)
 	$(MANAGE) reset_demo
 else ifeq ($(ENV),demo)
-	$(call not_yet,reset-demo ENV=demo,Stage 5 (deploy staging and demo))
+	$(GCP) jobs-run --env demo --job reset_demo
 else
 	@echo "reset-demo refuses to run on ENV=$(ENV)."; exit 1
 endif
@@ -96,7 +106,7 @@ flag: ## Change one flag: make flag NAME=circuits TO=testers
 ifeq ($(ENV),local)
 	$(MANAGE) flags set $(NAME) $(TO)
 else
-	$(call not_yet,flag ENV=$(ENV),Stage 5 (deploy staging and demo))
+	@echo "In staging and production, change flags in Django admin (Core -> Feature flags): it is audit-logged and needs no deploy."; exit 1
 endif
 
 # -- background jobs -----------------------------------------------------------------------
@@ -104,19 +114,8 @@ job: ## Run any management command: make job NAME=compute_matches
 	@test -n "$(NAME)" || { echo "usage: make job NAME=compute_matches"; exit 1; }
 	$(MANAGE) $(NAME)
 
-jobs: ## List the jobs and when they should run in the cloud
-	@printf '%s\n' \
-	  'compute_matches      daily' \
-	  'build_daily_drops    08:00 IST, after compute_matches' \
-	  'run_circuit_round    weekly' \
-	  'expire_items         every 15 minutes' \
-	  'send_emails          every 5 minutes (retries emails the provider refused)' \
-	  'build_exports        every 5 minutes (builds the data exports members asked for)' \
-	  'delete_accounts      every 5 minutes (finishes the account deletions members asked for)' \
-	  'retention_cleanup    daily (purges stale accounts, export files, old waitlist entries, old ranker snapshots)' \
-	  'train_ranker         weekly (trains a candidate ranker; a super admin promotes it in Django admin)' \
-	  '(build_investor_picks, reconcile_payments: added by their stages)' \
-	  'Cloud schedules are created in Stage 5.'
+jobs: ## List every scheduled job, when it runs (India time) and what it runs, read from deploy/gcp/app.toml
+	@$(GCP) jobs --env $(if $(filter production staging demo,$(ENV)),$(ENV),production)
 
 daily: ## The 08:00 set: matches, then the Daily Drop (investor picks arrive with Stage 4f)
 	$(MANAGE) compute_matches
@@ -176,8 +175,9 @@ fmt: ## Auto-format Python (prettier is not installed yet)
 
 check: lint test test-web test-landing ## Everything: lint, tests with demo story PASS/FAIL, frontend types, landing tests. Green before any push
 
-smoke: ## Check a deployed environment (not built yet)
-	$(call not_yet,smoke,Stage 5 (deploy staging and demo))
+smoke: ## Check a running API: make smoke URL=https://api.example.com [ORIGIN=https://app.example.com] [EXPECT_ENV=production]
+	@test -n "$(URL)" || { echo "usage: make smoke URL=https://... [ORIGIN=https://app.example.com] [EXPECT_ENV=production]"; exit 1; }
+	python3 scripts/smoke.py "$(URL)" $(if $(ORIGIN),--origin "$(ORIGIN)") $(if $(EXPECT_ENV),--expect-env $(EXPECT_ENV))
 
 # -- API client ----------------------------------------------------------------------------
 api-client: ## Export openapi.json from Django and regenerate packages/api-client
@@ -207,9 +207,25 @@ run-prod-local: ## Run the built backend image against the local Postgres/Redis 
 	@f=$$(mktemp) && sed -E 's/[[:space:]]+#.*$$//' .env > $$f && \
 	  docker run --rm --network host --env-file $$f -e DEBUG=false -e PORT=$(or $(PORT),8080) $(IMAGE):local; rc=$$?; rm -f $$f; exit $$rc
 
-# -- deploy (no production target: production deploys only through CI with approval) -------
-deploy: ## Deploy staging or demo (not built yet)
-	$(call not_yet,deploy,Stage 5 (deploy staging and demo))
+# -- Google Cloud (PRODUCTION.md, RUNBOOK.md "First production deploy"). Each prints its gcloud commands and asks you to type the environment name
+gcp-setup: ## One-time per environment: turn on Google Cloud services, create the image repository, service accounts, empty secrets, budget alerts
+	$(call need_env,gcp-setup)
+	$(GCP) setup --env $(ENV)
 
-rollback: ## Route traffic to the previous revision (not built yet)
-	$(call not_yet,rollback,Stage 5 (deploy staging and demo))
+deploy: ## Build the image, run migrations, deploy a new revision, smoke-test it, switch traffic: make deploy ENV=production (add DRY=1 to only print the plan)
+	$(call need_env,deploy)
+	$(GCP) deploy --env $(ENV) $(if $(DRY),--dry-run)
+
+rollback: ## Send traffic back to the previous revision (or REVISION=name): make rollback ENV=production
+	$(call need_env,rollback)
+	$(GCP) rollback --env $(ENV) $(if $(REVISION),--revision $(REVISION)) $(if $(DRY),--dry-run)
+
+secret: ## Store a new value for one secret (typed at a hidden prompt): make secret ENV=production NAME=SECRET_KEY
+	$(call need_env,secret)
+	@test -n "$(NAME)" || { echo "usage: make secret ENV=production NAME=SECRET_KEY"; exit 1; }
+	$(GCP) secret --env $(ENV) --name $(NAME)
+
+jobs-run: ## Run one job in the cloud now and wait: make jobs-run ENV=production JOB=compute_matches
+	$(call need_env,jobs-run)
+	@test -n "$(JOB)" || { echo "usage: make jobs-run ENV=production JOB=compute_matches   (make jobs lists them)"; exit 1; }
+	$(GCP) jobs-run --env $(ENV) --job $(JOB)

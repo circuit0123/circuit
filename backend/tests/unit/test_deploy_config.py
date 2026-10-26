@@ -351,10 +351,12 @@ class FakeRun:
 
     def __init__(self, fail_on: str | None = None, silent_probes: bool = False):
         self.calls: list[tuple[list[str], str | None]] = []
+        self.cwds: list = []
         self.fail_on, self.silent_probes = fail_on, silent_probes
 
     def __call__(self, argv, input=None, capture_output=False, text=False, cwd=None):
         self.calls.append((list(argv), input))
+        self.cwds.append(cwd)
         failing = self.fail_on is not None and self.fail_on in " ".join(argv)
         out = "" if self.silent_probes else "something"
         return subprocess.CompletedProcess(argv, 1 if failing else 0, stdout=out, stderr="boom" if failing else "")
@@ -498,3 +500,20 @@ def test_a_secret_the_deploy_mounts_is_a_variable_the_app_reads(cfg):
 def test_the_llm_key_mounted_is_the_one_for_the_provider_in_use(cfg):
     provider = cfg.env_vars["LLM_PROVIDER"]
     assert f"{provider.upper()}_API_KEY" in cfg.secrets
+
+
+def test_cli_runs_every_command_from_the_repository_root(cli):
+    run = FakeRun()
+    gcp.main(["setup", "--env", "production"], run=run, input_fn=lambda _: "production", out=lambda *_: None)
+    assert run.cwds and all(cwd == gcp.REPO for cwd in run.cwds)  # the docker build uses relative paths
+
+
+def test_the_jobs_listing_shows_every_job_and_marks_the_unbuilt_ones(cli):
+    lines: list[str] = []
+    assert gcp.main(["jobs", "--env", "production"], out=lines.append) == 0
+    text = "\n".join(lines)
+    config = gcp.load_config("production", gcp.DEPLOY_DIR)
+    for job in config.active_jobs():
+        assert job.key in text
+    assert "reset-demo" not in text  # demo only
+    assert "build-investor-picks" in text and "not built yet" in text
