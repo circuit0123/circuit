@@ -22,6 +22,8 @@ export type WireUpdate = {
   seen: boolean;
   /** Short relative time such as "4h". */
   when: string;
+  /** Who they are, under the name in the Update view, e.g. "Founder, Tatvagrid". The time is added after it. */
+  meta: string;
   /** One line of what happened. */
   headline: string;
   /** Why it matters to you, e.g. "You both build with Kotlin · 3 km away". */

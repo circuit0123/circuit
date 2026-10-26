@@ -3,7 +3,7 @@
 import { LiveWire, LiveWireSkeleton, UpdateView, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { composeHref, loadFailed, useLiveWire, useMarkUpdateSeen, useRequestIntro, wireActionHref } from "@/data";
+import { composeHref, loadFailed, useHome, useLiveWire, useMarkUpdateSeen, useRequestIntro, wireActionHref } from "@/data";
 
 export function LiveWireSection() {
   const wire = useLiveWire();
@@ -11,6 +11,7 @@ export function LiveWireSection() {
   const intro = useRequestIntro();
   const router = useRouter();
   const toast = useToast();
+  const { minor } = useHome();
   const [open, setOpen] = useState<number | null>(null);
   const items = wire.data ?? [];
   const current = open === null ? undefined : items[open];
@@ -31,6 +32,7 @@ export function LiveWireSection() {
         index={open ?? 0}
         onIndex={show}
         onClose={() => setOpen(null)}
+        hideAction={(u) => minor && items.find((x) => x.key === u.key)?.action.kind === "intro"}
         onAction={(u) => {
           const { action } = items.find((x) => x.key === u.key)!;
           const href = wireActionHref(action);

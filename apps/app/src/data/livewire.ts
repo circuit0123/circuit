@@ -1,6 +1,6 @@
 import type { Schemas } from "@circuit/api-client";
 import type { WireUpdate } from "@circuit/ui";
-import { ago } from "@/lib/format";
+import { ago, roleLabel } from "@/lib/format";
 
 type Item = Schemas["WireItemOut"];
 export type LiveWireItem = WireUpdate & { action: Item["action"] };
@@ -27,6 +27,7 @@ export function toUpdate(it: Item): LiveWireItem {
     person: who,
     seen: it.seen,
     when: ago(it.created_at),
+    meta: it.actor ? it.actor.headline || roleLabel(it.actor.role) : "Startup",
     headline: it.headline,
     reason: it.reason,
     actionLabel: LABEL[it.action.kind],

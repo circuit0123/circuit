@@ -77,6 +77,102 @@ test.describe("Home: the Daily Drop", () => {
   });
 });
 
+const wireNode = (page: Page, i: number) => page.getByRole("list", { name: "Live wire" }).getByRole("button").nth(i);
+const update = (page: Page) => page.getByRole("dialog", { name: "Update" });
+
+test.describe("Update view", () => {
+  test("opens full screen with who, what, why and one action; the picture is 66% of the height", async ({ page }) => {
+    await open(page);
+    await wireNode(page, 0).click();
+    const v = update(page);
+    await expect(v).toBeVisible();
+    await expect(v.getByText("1 of 5", { exact: true })).toBeVisible();
+    await expect(v.getByRole("heading", { level: 2 })).toContainText("Arjun shipped");
+    await expect(v.getByText("He builds with the same tools you do.")).toBeVisible();
+    await expect(v.getByRole("button", { name: "Reply" })).toBeVisible();
+    await expect(v.locator("button.bg-primary")).toHaveCount(1); // one action
+    await expect(v.getByRole("button", { name: "Previous update" })).toBeDisabled();
+    const vb = (await v.boundingBox())!;
+    const pic = (await v.getByRole("button", { name: "Next update" }).boundingBox())!; // the tap zone sits on the picture
+    expect(pic.y + pic.height).toBeLessThan(vb.height * 0.66);
+  });
+
+  test("the picture's edges, the arrow keys and Esc move and close", async ({ page }) => {
+    await open(page);
+    await wireNode(page, 0).click();
+    const v = update(page);
+    await v.getByRole("button", { name: "Next update" }).click();
+    await expect(v.getByText("2 of 5", { exact: true })).toBeVisible();
+    await page.keyboard.press("ArrowRight");
+    await expect(v.getByText("3 of 5", { exact: true })).toBeVisible();
+    await page.keyboard.press("ArrowLeft");
+    await expect(v.getByText("2 of 5", { exact: true })).toBeVisible();
+    await v.getByRole("button", { name: "Previous update" }).click();
+    await expect(v.getByText("1 of 5", { exact: true })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(v).toHaveCount(0);
+  });
+
+  test("Next on the last update closes it", async ({ page }) => {
+    await open(page);
+    await wireNode(page, 4).click();
+    await expect(update(page).getByText("5 of 5", { exact: true })).toBeVisible();
+    await update(page).getByRole("button", { name: "Close" }).first().click();
+    await expect(update(page)).toHaveCount(0);
+  });
+
+  test("an opened node is marked seen (no longer \"new\")", async ({ page }) => {
+    await open(page);
+    await expect(wireNode(page, 0)).toContainText(", new");
+    await wireNode(page, 0).click();
+    await page.keyboard.press("Escape");
+    await expect(wireNode(page, 0)).not.toContainText(", new");
+  });
+
+  test("the action does what it says: Reply opens Inbox, View role opens Discover", async ({ page }) => {
+    await open(page);
+    await wireNode(page, 0).click();
+    await update(page).getByRole("button", { name: "Reply" }).click();
+    await expect(page).toHaveURL(/\/inbox$/);
+    await open(page);
+    await wireNode(page, 1).click();
+    await update(page).getByRole("button", { name: "View role" }).click();
+    await expect(page).toHaveURL(/\/discover$/);
+  });
+
+  test("under 18: an intro update has no action", async ({ page }) => {
+    await open(page, "under18");
+    await wireNode(page, 2).click();
+    await expect(update(page).getByRole("heading", { level: 2 })).toContainText("Kavya needs");
+    await expect(update(page).getByRole("button", { name: "Intro me" })).toHaveCount(0);
+  });
+
+  test.describe("by touch", () => {
+    test.use({ reducedMotion: "no-preference", hasTouch: true });
+    test("swipe left goes to the next update, swipe down closes", async ({ page }, info) => {
+      test.skip(!isPhone(info), "swiping is a phone gesture");
+      await open(page);
+      await wireNode(page, 0).click();
+      const v = update(page);
+      await expect(v).toBeVisible();
+      await page.waitForTimeout(600);
+      const box = (await v.boundingBox())!;
+      await drag(page, { x: box.width * 0.75, y: box.height * 0.45 }, { x: box.width * 0.1, y: box.height * 0.45 });
+      await expect(v.getByText("2 of 5", { exact: true })).toBeVisible();
+      await drag(page, { x: box.width * 0.5, y: box.height * 0.3 }, { x: box.width * 0.5, y: box.height * 0.8 });
+      await expect(v).toHaveCount(0);
+    });
+  });
+
+  test("axe is clean in both themes", async ({ page }) => {
+    await open(page);
+    await wireNode(page, 1).click();
+    await expect(update(page)).toBeVisible();
+    await page.waitForTimeout(500);
+    await inBothThemes(page, async (theme) => { await checkPage(page, `update ${theme}`); });
+  });
+});
+
 test.describe("Home: Pulse", () => {
   test("has a visible header, text reactions, ends with \"You're caught up.\", and promoted slots are labelled and never first", async ({ page }) => {
     await open(page);

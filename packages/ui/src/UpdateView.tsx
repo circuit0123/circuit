@@ -1,12 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { Avatar } from "./Avatar";
 import { VerifiedBadge } from "./Badge";
 import { Button } from "./Button";
-import { WireVisual, firstName, whenSpoken, type WireUpdate } from "./LiveWire";
+import { WireVisual, whenSpoken, type WireUpdate } from "./LiveWire";
 import { useOverlay } from "./overlay";
 import { fade, sheetSpring, spring } from "./theme";
 
@@ -17,15 +17,18 @@ type Props = {
   onIndex: (i: number) => void;
   onClose: () => void;
   onAction: (u: WireUpdate) => void;
+  /** Leave the action out for an update (an intro, for an under-18 member). */
+  hideAction?: (u: WireUpdate) => boolean;
 };
 
 const SWIPE = 80;
 
 /**
- * Full-screen Update view (DESIGN.md §4): the picture, what happened, why it matters to you, one action.
- * Swipe sideways between updates, down to close. Buttons do the same, so no gesture is required.
+ * Full-screen Update view (DESIGN.md §4, Update.dc.html): the picture, who and when, what happened, why it matters to you, one action.
+ * Swipe sideways between updates, down to close; the left and right edges of the picture, the arrow keys and Esc do the same, so no
+ * gesture is required.
  */
-export function UpdateView({ open, updates, index, onIndex, onClose, onAction }: Props) {
+export function UpdateView({ open, updates, index, onIndex, onClose, onAction, hideAction }: Props) {
   const reduce = useReducedMotion();
   const ref = useOverlay(open, onClose);
   const u = updates[index];
@@ -67,36 +70,32 @@ export function UpdateView({ open, updates, index, onIndex, onClose, onAction }:
               else if (d.offset.x > SWIPE || d.velocity.x > 600) prev();
             }}
           >
-            <p className="t-footnote px-4 pt-3 text-text-muted" aria-live="polite">{index + 1} of {updates.length}</p>
-            <div className="flex items-center gap-3 px-4 py-2">
-              <Avatar id={u.person.id} name={u.person.name} src={u.person.photo} size={40} />
-              <div className="min-w-0 flex-1">
-                <p className="t-body truncate font-semibold">{u.person.name} <VerifiedBadge level={u.person.level} /></p>
-                <p className="t-footnote truncate text-text-muted">{whenSpoken(u.when)}</p>
-              </div>
-              <button onClick={onClose} aria-label="Close" className="flex h-11 w-11 items-center justify-center rounded-full text-text">
-                <X size={24} strokeWidth={1.75} />
-              </button>
-            </div>
             <AnimatePresence mode="wait" initial={false}>
-              <motion.div key={u.key} className="flex min-h-0 flex-1 flex-col overflow-y-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={fade}>
-                <div className="relative w-full overflow-hidden bg-surface-2" style={{ aspectRatio: "4 / 5", maxHeight: "55dvh" }}>
-                  <WireVisual visual={u.visual} />
+              <motion.div key={u.key} className="flex min-h-0 flex-1 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={fade}>
+                <div className="relative h-[66%] min-h-[180px] shrink bg-surface">
+                  <div className="h-full w-full"><WireVisual visual={u.visual} className={u.visual.kind === "pattern" ? "opacity-30" : undefined} /></div>
+                  <button type="button" onClick={prev} disabled={index === 0} aria-label="Previous update" className="absolute inset-y-20 left-0 w-[30%] disabled:pointer-events-none" />
+                  <button type="button" onClick={next} aria-label={index + 1 >= updates.length ? "Close" : "Next update"} className="absolute inset-y-20 right-0 w-[30%]" />
                 </div>
-                <div className="flex flex-col gap-1 px-4 py-4">
-                  <h2 className="t-title2">{u.headline}</h2>
-                  <p className="t-body text-text-muted">{u.reason}</p>
+                <div className="shrink-0 px-4 pb-[calc(24px+env(safe-area-inset-bottom))] pt-6">
+                  <div className="flex items-center gap-3">
+                    <Avatar id={u.person.id} name={u.person.name} src={u.person.photo} size={40} />
+                    <div className="min-w-0">
+                      <p className="t-headline">{u.person.name} <VerifiedBadge level={u.person.level} /></p>
+                      <p className="t-subhead text-text-muted">{u.meta} · <span aria-label={whenSpoken(u.when)}>{u.when}</span></p>
+                    </div>
+                  </div>
+                  <h2 className="mt-4 text-[22px] font-medium leading-[1.25] tracking-[-0.012em]">{u.headline}</h2>
+                  <p className="t-subhead mt-2 text-text-muted">{u.reason}</p>
+                  {!hideAction?.(u) && <Button variant="primary" className="mt-5 w-full" onClick={() => onAction(u)}>{u.actionLabel}</Button>}
                 </div>
               </motion.div>
             </AnimatePresence>
-            <div className="flex items-center gap-3 px-4 pb-6 pt-2">
-              <button onClick={prev} disabled={index === 0} aria-label={`Previous update, ${firstName(updates[Math.max(0, index - 1)].person.name)}`} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-2 text-text disabled:opacity-40">
-                <ChevronLeft size={24} strokeWidth={1.75} />
+            <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-4 pt-[calc(20px+env(safe-area-inset-top))]">
+              <button onClick={onClose} aria-label="Close" className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-surface/60 text-text backdrop-blur-[20px] backdrop-saturate-[1.8]">
+                <X size={20} strokeWidth={2} />
               </button>
-              <Button variant="primary" className="flex-1" onClick={() => onAction(u)}>{u.actionLabel}</Button>
-              <button onClick={next} aria-label={index + 1 >= updates.length ? "Close" : "Next update"} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-2 text-text">
-                <ChevronRight size={24} strokeWidth={1.75} />
-              </button>
+              <span className="num rounded-full bg-surface/60 px-3 py-1.5 t-subhead text-text-muted backdrop-blur-[20px] backdrop-saturate-[1.8]" aria-live="polite">{index + 1} of {updates.length}</span>
             </div>
           </motion.div>
         </motion.div>
