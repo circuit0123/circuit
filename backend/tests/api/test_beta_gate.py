@@ -48,6 +48,7 @@ def test_public_routes_stay_open_without_a_token(beta_on):
     needs_input = {
         ("POST", "/api/demo/token"),
         ("POST", "/api/waitlist"),
+        ("POST", "/api/join/visit"),
         ("GET", "/api/unsubscribe"),
         ("POST", "/api/unsubscribe"),
     }

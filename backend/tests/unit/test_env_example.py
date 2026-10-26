@@ -23,4 +23,6 @@ def test_every_config_field_is_in_env_example():
 
 def test_every_documented_variable_is_read_by_something():
     fields = {name.upper() for name in Config.model_fields}
-    assert not _documented() - fields - READ_ELSEWHERE, f"in .env.example but not read: {sorted(_documented() - fields - READ_ELSEWHERE)}"
+    assert not _documented() - fields - READ_ELSEWHERE, (
+        f"in .env.example but not read: {sorted(_documented() - fields - READ_ELSEWHERE)}"
+    )

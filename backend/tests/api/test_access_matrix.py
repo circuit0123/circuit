@@ -18,6 +18,7 @@ PUBLIC = {
     ("GET", "/api/demo/personas"),
     ("POST", "/api/demo/token"),
     ("POST", "/api/waitlist"),
+    ("POST", "/api/join/visit"),
     ("GET", "/api/support/contact"),
     ("GET", "/api/unsubscribe"),
     ("POST", "/api/unsubscribe"),

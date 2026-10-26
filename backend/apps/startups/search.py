@@ -8,7 +8,7 @@ finds only their own connections. The rate limit and the 10-per-kind cap keep it
 from django.db.models import Q
 
 from apps.accounts.models import Member, Role
-from apps.jobs.services import list_jobs
+from apps.jobs.services import list_jobs_page
 from apps.social import media
 from apps.social.relations import blocked_ids, connected_ids
 from apps.social.schemas import author
@@ -44,7 +44,7 @@ def startups(member: Member, text: str) -> list[dict]:
 
 
 def jobs(member: Member, text: str) -> list[dict]:
-    return list_jobs(member, {"q": text})[:LIMIT]
+    return list_jobs_page(member, {"q": text}, 0, LIMIT)["items"]
 
 
 def search(member: Member, text: str) -> dict:

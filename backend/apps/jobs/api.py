@@ -98,8 +98,7 @@ class JobFilters(PageParams):
     "Students get skill_match (0 to 1) and the best match first; everyone else gets newest first.",
 )
 def list_jobs(request, params: JobFilters = Query(...)):
-    rows = services.list_jobs(current_member(request), params.dict(exclude={"limit", "offset"}))
-    return paginate(rows, params)
+    return services.list_jobs_page(current_member(request), params.dict(exclude={"limit", "offset"}), params.offset, params.limit)
 
 
 class SkillDemandOut(Schema):

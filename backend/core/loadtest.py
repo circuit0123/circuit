@@ -14,6 +14,7 @@ import math
 import random
 import sys
 import time
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -21,6 +22,8 @@ import httpx
 
 CACHED_TARGET_MS = 300
 OTHER_TARGET_MS = 800
+# Answers that are normal for the test, not errors: the first message may find an old request (409) or a hidden member (404)
+EXPECTED = {"POST /api/conversations": {201, 404, 409}}
 CACHED = {"GET /api/config", "GET /api/matches"}  # served from Redis or precomputed rows
 BOX = 0.1  # map box half-size in degrees; a phone shows about this much
 
@@ -53,7 +56,12 @@ def summarise(stats: dict[str, Stats]) -> list[dict]:
         ms = [s.ms for s in st.samples]
         n = len(st.samples)
         limited = sum(1 for s in st.samples if s.status == 429)
-        errors = sum(1 for s in st.samples if s.status == 0 or s.status >= 500 or (400 <= s.status < 500 and s.status != 429))
+        ok = EXPECTED.get(name, set())
+        errors = sum(
+            1
+            for s in st.samples
+            if s.status not in ok and (s.status == 0 or s.status >= 500 or (400 <= s.status < 500 and s.status != 429))
+        )
         target = CACHED_TARGET_MS if name in CACHED else OTHER_TARGET_MS
         p95 = percentile(ms, 95)
         rows.append(
@@ -65,6 +73,9 @@ def summarise(stats: dict[str, Stats]) -> list[dict]:
                 "target_ms": target,
                 "error_pct": round(100 * errors / n, 2) if n else 0.0,
                 "rate_limited": limited,
+                "statuses": {
+                    str(k): v for k, v in sorted(Counter(x.status for x in st.samples).items()) if k != 200 and k != 204
+                },
                 "pass": bool(n) and p95 < target and errors == 0,
             }
         )
@@ -80,6 +91,9 @@ def render(users: int, seconds: float, rows: list[dict]) -> str:
             f"{r['endpoint']:42} {r['requests']:>6} {r['p50_ms']:>6} {r['p95_ms']:>6} {r['target_ms']:>6} "
             f"{r['error_pct']:>6} {r['rate_limited']:>5}  {'PASS' if r['pass'] else 'FAIL'}"
         )
+    odd = [f"  {r['endpoint']}: {r['statuses']}" for r in rows if r["statuses"]]
+    if odd:
+        out.append("Other statuses (0 = connection error or timeout):\n" + "\n".join(odd))
     return "\n".join(out)
 
 
@@ -111,6 +125,8 @@ class User:
         self.h = {"Authorization": f"Bearer {token}"}
         self.job_id: int | None = None
         self.conversation_id: int | None = None
+        self.peer: int | None = None  # someone from my matches, to start a first conversation with
+        self.started = False
         self.role = ""
 
     async def call(self, method: str, path: str, label: str | None = None, **kw) -> httpx.Response | None:
@@ -145,7 +161,10 @@ class User:
         await self.pause()
 
     async def discover(self) -> None:
-        await self.call("GET", "/api/matches?limit=20")
+        matches = await self.json(await self.call("GET", "/api/matches?limit=20"))
+        people = (matches or {}).get("items") or []
+        if people and self.peer is None:
+            self.peer = people[0]["candidate_id"]
         jobs = await self.json(await self.call("GET", "/api/jobs?limit=20"))
         await self.call("GET", "/api/startups/nearby")
         await self.call("GET", f"/api/search?q={self.rnd.choice(['ai', 'design', 'data', 'market', 'app'])}")
@@ -182,6 +201,12 @@ class User:
 
     async def message(self) -> None:
         if self.conversation_id is None:
+            if (
+                self.peer is not None and not self.started
+            ):  # a member with no chats yet: say hello once (a request allows one message)
+                self.started = True
+                await self.call("POST", "/api/conversations", json={"member_id": self.peer, "body": "load test hello"})
+                await self.pause()
             return
         await self.call(
             "POST",

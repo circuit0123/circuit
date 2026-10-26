@@ -208,6 +208,7 @@ smoke: ## Check a running API: make smoke URL=https://api.example.com [ORIGIN=ht
 	@test -n "$(URL)" || { echo "usage: make smoke URL=https://... [ORIGIN=https://app.example.com] [EXPECT_ENV=production]"; exit 1; }
 	python3 scripts/smoke.py "$(URL)" $(if $(ORIGIN),--origin "$(ORIGIN)") $(if $(EXPECT_ENV),--expect-env $(EXPECT_ENV))
 
+USERS ?= 50,200
 load-test: ## Beta-mix load test at 50 and 200 users, p50/p95/errors vs PRODUCTION.md section 9: make load-test URL=http://localhost:8080 [USERS=50,200] [SECONDS=60] [TOKENS=file]. Refuses to run against production
 	@test -n "$(URL)" || { echo "usage: make load-test URL=http://localhost:8080 [USERS=50,200] [SECONDS=60] [TOKENS=file with one token per line]"; exit 1; }
 	@tokens="$(TOKENS)"; \
@@ -215,7 +216,7 @@ load-test: ## Beta-mix load test at 50 and 200 users, p50/p95/errors vs PRODUCTI
 	  tokens=$$(mktemp); $(MANAGE) load_test_tokens --count 200 --out $$tokens || exit 1; \
 	fi; \
 	lat=$$(sed -n 's/^SEED_CITY_LAT=\([^ #]*\).*/\1/p' .env); lng=$$(sed -n 's/^SEED_CITY_LNG=\([^ #]*\).*/\1/p' .env); \
-	$(BACKEND) python -m core.loadtest --url "$(URL)" --tokens "$$tokens" --users $(or $(USERS),50,200) --seconds $(or $(SECONDS),60) \
+	$(BACKEND) python -m core.loadtest --url "$(URL)" --tokens "$$tokens" --users $(USERS) --seconds $(or $(SECONDS),60) \
 	  --lat "$${lat:-13.0827}" --lng "$${lng:-80.2707}" $(if $(JSON),--json "$(JSON)")
 
 funnel: ## Sign-up funnel per source (landing click, signed up, beta access, onboarding done, first match action); counts under 5 are hidden: make funnel [DAYS=30]

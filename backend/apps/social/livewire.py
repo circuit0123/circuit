@@ -19,7 +19,7 @@ from apps.matching.models import Need, Offer
 from apps.matching.scoring import haversine_km
 from apps.social import media, pulse, services
 from apps.social.models import UpdateView
-from apps.social.relations import blocked_ids, connected_ids, org_mate_ids, visible_posts
+from apps.social.relations import blocked_ids, connected_ids, mutual_counts, org_mate_ids, visible_posts
 from apps.social.schemas import author
 from core import ist
 from core.errors import NotFound
@@ -51,7 +51,7 @@ def _mine(member: Member) -> dict[str, dict[str, str]]:
     }
 
 
-def _reason(cand: Candidate, mine: dict[str, dict[str, str]], friends: set[int], me: Member) -> tuple[float, str]:
+def _reason(cand: Candidate, mine: dict[str, dict[str, str]], mutual: dict[int, int], me: Member) -> tuple[float, str]:
     """(relevance, one line on why this matters to me). The line never names anyone I could not already see."""
     parts: list[str] = []
     score = 0.0
@@ -74,7 +74,7 @@ def _reason(cand: Candidate, mine: dict[str, dict[str, str]], friends: set[int],
     score += 3 * min(len(set(shared_do) | set(shared_need)), 2)
     actor = cand.get("member")
     if actor is not None:
-        mutuals = len((connected_ids(actor.pk) & friends) - {me.pk, actor.pk})
+        mutuals = mutual.get(actor.pk, 0)
         if mutuals:
             parts.append(f"{mutuals} mutual connection{'s' if mutuals > 1 else ''}")
         score += min(mutuals, 3)
@@ -218,8 +218,9 @@ def live_wire(member: Member) -> list[dict]:
         + _circuits(member, since, friends)
     )
     mine = _mine(member)
+    mutual = mutual_counts(friends, {c["member"].pk for c in candidates if c.get("member") is not None})
     for c in candidates:
-        c["score"], c["reason"] = _reason(c, mine, friends, member)
+        c["score"], c["reason"] = _reason(c, mine, mutual, member)
     viewed = set(UpdateView.objects.filter(viewer=member, key__in=[c["key"] for c in candidates]).values_list("key", flat=True))
     candidates.sort(key=lambda c: (c["key"] in viewed, -c["score"], -c["at"].timestamp()))
     picked: list[Candidate] = []

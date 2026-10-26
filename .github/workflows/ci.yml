@@ -47,7 +47,9 @@ jobs:
       - name: mypy
         run: uv run --directory backend mypy .
       - name: API freeze (openapi.json needs a version bump and a FRONTEND_HANDOFF.md change)
-        run: python3 scripts/check_api_freeze.py --base "${{ github.event.pull_request.base.sha || github.event.before }}"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: python3 scripts/check_api_freeze.py --base "$BASE_SHA"
 
   check:
     runs-on: ubuntu-latest

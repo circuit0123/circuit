@@ -1,5 +1,6 @@
 """Jobs and applications (F11). Skill match decides ranking: the applicant's college is never used."""
 
+from collections.abc import Callable
 from typing import cast
 
 from django.contrib.gis.db.models.functions import Distance
@@ -82,8 +83,8 @@ def _check_stipend(lo, hi) -> None:
 
 
 # -- listing ---------------------------------------------------------------------------------
-def list_jobs(member: Member, f: dict) -> list[dict]:
-    """Open jobs, filtered. Students get a match score and the best match first; everyone else gets newest first."""
+def _open_jobs(member: Member, f: dict) -> tuple[list[Job], dict[int, int] | None]:
+    """Open jobs, filtered, in the order members see them: students best skill match first, everyone else newest first."""
     qs: QuerySet[Job] = (
         Job.objects.filter(is_open=True, startup__hidden_at__isnull=True)
         .select_related("startup__claimed_by")
@@ -95,6 +96,8 @@ def list_jobs(member: Member, f: dict) -> list[dict]:
         qs = qs.filter(kind=f["kind"])
     if f.get("startup_id"):
         qs = qs.filter(startup_id=f["startup_id"])
+    if f.get("since"):
+        qs = qs.filter(created_at__gte=f["since"])
     if f.get("q"):
         qs = qs.filter(
             Q(title__icontains=f["q"]) | Q(startup__name__icontains=f["q"]) | Q(capabilities__capability__name__icontains=f["q"])
@@ -110,8 +113,15 @@ def list_jobs(member: Member, f: dict) -> list[dict]:
         from django.contrib.gis.measure import D
 
         qs = qs.filter(startup__location__isnull=False, dist__lte=D(km=f["max_distance_km"]))
-    jobs = list(qs.order_by("-created_at", "-id").distinct()[:MAX_LISTED_JOBS])
+    jobs: list[Job] = list(qs.order_by("-created_at", "-id").distinct()[:MAX_LISTED_JOBS])
     skills = student_skills(member) if member.role == Role.STUDENT else None
+    if skills is not None:
+        jobs.sort(key=lambda j: -job_match(skills, j))  # stable: ties keep newest first
+    return jobs, skills
+
+
+def _job_rows(member: Member, jobs: list[Job], skills: dict[int, int] | None) -> list[dict]:
+    """The full rows, built only for the jobs that are going to be shown."""
     applied = (
         set(Application.objects.filter(student=member, job__in=jobs).exclude(status="withdrawn").values_list("job_id", flat=True))
         if skills is not None
@@ -120,10 +130,28 @@ def list_jobs(member: Member, f: dict) -> list[dict]:
     team = _team_startups(member)
     media.prime_logos(j.startup for j in jobs)
     media.prime_photos(j.startup.claimed_by for j in jobs if j.startup.claimed_by is not None)
-    rows = [_job_row(j, skills, applied, team) for j in jobs]
-    if skills is not None:
-        rows.sort(key=lambda r: -r["skill_match"])  # stable: ties keep newest first
-    return rows
+    return [_job_row(j, skills, applied, team) for j in jobs]
+
+
+def list_jobs(member: Member, f: dict, keep: Callable[[Job, dict[int, int] | None], bool] | None = None) -> list[dict]:
+    """Every open job matching the filters as full rows (for callers that look at all of them: Pulse, Live wire).
+
+    `keep(job, skills)` drops jobs before their rows are built, so a caller that wants a handful does not pay for hundreds."""
+    jobs, skills = _open_jobs(member, f)
+    if keep is not None:
+        jobs = [j for j in jobs if keep(j, skills)]
+    return _job_rows(member, jobs, skills)
+
+
+def list_jobs_page(member: Member, f: dict, offset: int, limit: int) -> dict:
+    """One page of the jobs list. The order and the count cover every match, but rows are built for the page only."""
+    jobs, skills = _open_jobs(member, f)
+    nxt = offset + limit
+    return {
+        "items": _job_rows(member, jobs[offset:nxt], skills),
+        "count": len(jobs),
+        "next_offset": nxt if nxt < len(jobs) else None,
+    }
 
 
 def _team_startups(member: Member) -> set[int]:
