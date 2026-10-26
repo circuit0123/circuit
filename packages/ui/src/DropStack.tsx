@@ -78,11 +78,11 @@ export function DropStack({ cards, onAnswer, doneText, className }: Props) {
 }
 
 /** The card's content without the gesture: used by the Daily Drop stack and by the last onboarding screen (static). */
-export function DropCardFace({ card, overlay }: { card: DropCard; overlay?: React.ReactNode }) {
+export function DropCardFace({ card, overlay, compact }: { card: DropCard; overlay?: React.ReactNode; /** The reveal at the end of sign-up (Ready.dc.html): the reason, the mutual and one line about the person; no picture, chips or detail. */ compact?: boolean }) {
   const p = card.person;
   return (
     <>
-      <div className="flex flex-col gap-3 px-surface pb-4 pt-surface">
+      <div className={cx("flex flex-col gap-3 px-surface pt-surface", compact ? "pb-surface" : "pb-4")}>
         <h2 className="t-title3">
           {card.helpWith ? (
             <>{firstName(p.name)} can help you with <span className="font-semibold">{card.helpWith}</span></>
@@ -99,7 +99,17 @@ export function DropCardFace({ card, overlay }: { card: DropCard; overlay?: Reac
             via {firstName(card.via.name)}, {card.via.role}
           </p>
         )}
+        {compact && (
+          <div className="mt-2 flex items-center gap-3">
+            <Avatar id={p.id} name={p.name} src={p.photo} size={44} />
+            <div className="min-w-0">
+              <h3 className="t-headline min-w-0">{p.name}</h3>
+              <p className="t-footnote text-text-muted">{[p.headline || p.role, p.place].filter(Boolean).join(" · ")}</p>
+            </div>
+          </div>
+        )}
       </div>
+      {!compact && (<>
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2 lg:aspect-auto lg:h-[200px]">
         {p.photo || card.image ? (
           <img src={p.photo ?? card.image!.src} alt={p.photo ? "" : card.image!.alt} className="h-full w-full object-cover" />
@@ -125,6 +135,7 @@ export function DropCardFace({ card, overlay }: { card: DropCard; overlay?: Reac
           </div>
         )}
       </div>
+      </>)}
     </>
   );
 }

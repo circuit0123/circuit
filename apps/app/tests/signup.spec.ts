@@ -302,12 +302,17 @@ async function onScreen(page: import("@playwright/test").Page, title: string) {
 }
 
 /** Name → Role → Age → Where (Madurai): ends on the Work screen. */
-async function toWork(page: import("@playwright/test").Page, opts: { role?: string; scenario?: string } = {}) {
+async function toWork(page: import("@playwright/test").Page, opts: { role?: string; scenario?: string; minor?: boolean } = {}) {
   await intoOnboarding(page, "/", { scenario: opts.scenario });
   await page.getByLabel("First name").fill("Ravi");
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: opts.role ?? "Find work and internships" }).click();
-  await page.getByRole("button", { name: "Yes", exact: true }).click();
+  if (opts.minor) {
+    await page.getByRole("button", { name: "Not yet" }).click();
+    await page.getByRole("button", { name: "Got it" }).click();
+  } else {
+    await page.getByRole("button", { name: "Yes", exact: true }).click();
+  }
   await page.getByRole("button", { name: "Choose a city" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "Madurai" }).click();
   await onScreen(page, "What are you working on?");
@@ -443,7 +448,7 @@ test.describe("onboarding: work, offers, needs, organisation", () => {
     await checkStep(page, info, "organisation", { primary: 0 });
     await page.getByLabel("Search colleges").fill("thia");
     await page.getByRole("button", { name: "Thiagarajar College of Engineering" }).click();
-    await onScreen(page, "Almost there");
+    await onScreen(page, "Add a photo.");
     expect((await serverState(page)).me.college).toBe("Thiagarajar College of Engineering");
   });
 
@@ -452,7 +457,7 @@ test.describe("onboarding: work, offers, needs, organisation", () => {
     await throughPickers(page);
     await page.getByLabel("Search colleges").fill("Kamaraj Engineering College");
     await page.getByRole("button", { name: "Use “Kamaraj Engineering College”" }).click();
-    await onScreen(page, "Almost there");
+    await onScreen(page, "Add a photo.");
     expect((await serverState(page)).me.college).toBe("Kamaraj Engineering College");
   });
 
@@ -460,7 +465,7 @@ test.describe("onboarding: work, offers, needs, organisation", () => {
     await toWork(page);
     await throughPickers(page);
     await page.getByRole("button", { name: "Skip" }).click();
-    await onScreen(page, "Almost there");
+    await onScreen(page, "Add a photo.");
     const s = await serverState(page);
     expect(s.me.college).toBe("");
     expect(s.onboarding.answers.organisation).toEqual({ skipped: true });
@@ -480,14 +485,14 @@ test.describe("onboarding: work, offers, needs, organisation", () => {
     await page.getByRole("button", { name: "Choose a city" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Madurai" }).click();
     await throughPickers(page);
-    await onScreen(page, "Almost there");
+    await onScreen(page, "Add a photo.");
     expect((await serverState(page)).me.college).toBe("Sri Venkateswara Institute of Technology");
   });
 
   test("a founder is never asked where they study", async ({ page }) => {
     await toWork(page, { role: "Build a startup" });
     await throughPickers(page);
-    await onScreen(page, "Almost there");
+    await onScreen(page, "Add a photo.");
   });
 
   test("Back keeps what was chosen, and a reload resumes on Needs", async ({ page }) => {
@@ -505,5 +510,166 @@ test.describe("onboarding: work, offers, needs, organisation", () => {
     await onScreen(page, "And what you need right now.");
     await page.reload();
     await onScreen(page, "And what you need right now.");
+  });
+});
+
+/** Work → … → Needs → (Organisation, for students) → Photo. */
+async function toPhoto(page: import("@playwright/test").Page, opts: { role?: string; scenario?: string; minor?: boolean } = {}) {
+  await toWork(page, opts);
+  await throughPickers(page);
+  if (!opts.role) { await onScreen(page, "Where do you study?"); await page.getByRole("button", { name: "Skip" }).click(); }
+  await onScreen(page, "Add a photo.");
+}
+
+/** …→ Photo (skipped) → Colour. */
+async function toColour(page: import("@playwright/test").Page, opts: { role?: string; scenario?: string; minor?: boolean } = {}) {
+  await toPhoto(page, opts);
+  await page.getByRole("button", { name: "Skip" }).click();
+  await onScreen(page, "Pick your colour.");
+}
+
+const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
+const accentSaved = (page: import("@playwright/test").Page) => page.evaluate(() => JSON.parse(localStorage.getItem("circuit.mock.appearance") ?? "{}").accent as string | undefined);
+
+test.describe("onboarding: photo, colour, ready", () => {
+  test("Photo: a chosen picture previews and is noted; Continue waits for one", async ({ page }, info) => {
+    await toPhoto(page);
+    await expect(page.getByRole("button", { name: "Continue" })).toBeDisabled();
+    await checkStep(page, info, "photo");
+    await page.getByLabel("Photo file").setInputFiles({ name: "me.png", mimeType: "image/png", buffer: PNG });
+    await expect(page.getByRole("button", { name: "Choose a different photo" }).locator("img")).toBeVisible();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "Pick your colour.");
+    expect((await serverState(page)).onboarding.answers.photo).toEqual({ chosen: true, type: "image/png", size: PNG.length });
+  });
+
+  test("Photo: something that isn't a picture gets one sentence; Skip notes nothing", async ({ page }) => {
+    await toPhoto(page);
+    await page.getByLabel("Photo file").setInputFiles({ name: "cv.txt", mimeType: "text/plain", buffer: Buffer.from("hello") });
+    await expect(alertOf(page)).toHaveText("That isn't a photo. Choose a JPG, PNG or WebP.");
+    await expect(page.getByRole("button", { name: "Continue" })).toBeDisabled();
+    await page.getByRole("button", { name: "Skip" }).click();
+    await onScreen(page, "Pick your colour.");
+    expect((await serverState(page)).onboarding.answers.photo).toEqual({ skipped: true });
+  });
+
+  test("Colour: a tap recolours at once and saves; the arrow keys move the choice; all six pass axe", async ({ page }, info) => {
+    await toColour(page);
+    await checkStep(page, info, "colour");
+    await page.getByRole("radio", { name: "Sky" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-accent", "sky");
+    await expect.poll(() => accentSaved(page)).toBe("sky");
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator("html")).toHaveAttribute("data-accent", "indigo");
+    for (const name of ["Emerald", "Sky", "Indigo", "Rose", "Lime", "Mono"]) {
+      await page.getByRole("radio", { name }).click();
+      await page.waitForTimeout(350);
+      const axe = await new (await import("@axe-core/playwright")).default({ page }).analyze();
+      expect(axe.violations.map((v) => v.id), `${name}: axe`).toEqual([]);
+    }
+  });
+
+  test("Colour: Skip puts back the colour you started with", async ({ page }) => {
+    await toColour(page);
+    await page.getByRole("radio", { name: "Rose" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-accent", "rose");
+    await page.getByRole("button", { name: "Skip" }).click();
+    await onScreen(page, "You're on the circuit.");
+    await expect(page.locator("html")).not.toHaveAttribute("data-accent", /.+/);
+    await expect.poll(() => accentSaved(page)).toBe("mint");
+  });
+
+  test("a reload on Colour resumes on Colour with the colour you tried", async ({ page }) => {
+    await toColour(page);
+    await page.getByRole("radio", { name: "Lime" }).click();
+    await expect.poll(() => accentSaved(page)).toBe("lime");
+    await page.reload();
+    await expect(heading(page, "Pick your colour.")).toBeVisible();
+    await expect(page.getByRole("radio", { name: "Lime" })).toHaveAttribute("aria-checked", "true");
+  });
+
+  test("Ready: the first person in today's drop, then the app opens on the Daily Drop", async ({ page }, info) => {
+    await toColour(page);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "You're on the circuit.");
+    const card = page.getByRole("article", { name: "First in today's drop" });
+    await expect(card).toContainText("can help you with");
+    await expect(card).toContainText("frontend development");
+    await expect(page.getByRole("button", { name: "Back", exact: true })).toHaveCount(0);
+    await checkStep(page, info, "ready");
+    await page.getByRole("button", { name: "See today's drop" }).click();
+    await expect(page.getByRole("region", { name: "Daily Drop" })).toBeVisible();
+    expect((await serverState(page)).onboarding.completed_at).not.toBeNull();
+  });
+
+  test("Ready with no drop yet says tomorrow and still lets you in", async ({ page }, info) => {
+    await toColour(page);
+    await page.evaluate(() => localStorage.setItem("circuit.mock.empty", "drop"));
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "You're on the circuit.");
+    await expect(page.getByText("Your first drop arrives tomorrow at 8.")).toBeVisible();
+    await expect(page.getByRole("article")).toHaveCount(0);
+    await checkStep(page, info, "ready-empty");
+    await page.getByRole("button", { name: "See today's drop" }).click();
+    await expect.poll(async () => (await serverState(page)).onboarding.completed_at).not.toBeNull();
+  });
+
+  test("Welcome to the first drop card in under two minutes", async ({ page }, info) => {
+    test.skip(!isPhone(info), "the timing is the same at both widths; measured once, on the phone");
+    const started = Date.now();
+    await intoOnboarding(page, "/", { google: true });
+    await page.getByRole("button", { name: "Continue" }).click(); // the name Google gave
+    await page.getByRole("button", { name: "Find work and internships" }).click();
+    await page.getByRole("button", { name: "Yes", exact: true }).click();
+    await page.getByRole("button", { name: "Choose a city" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Madurai" }).click();
+    await onScreen(page, "What are you working on?");
+    await page.getByLabel("About your work").fill(BIO);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "Here's what you can offer.");
+    await page.getByRole("button", { name: "Continue" }).click(); // the offers we suggested
+    await onScreen(page, "And what you need right now.");
+    await page.getByRole("button", { name: "Continue" }).click(); // the needs we suggested
+    await onScreen(page, "Where do you study?");
+    await page.getByLabel("Search colleges").fill("thia");
+    await page.getByRole("button", { name: "Thiagarajar College of Engineering" }).click();
+    await onScreen(page, "Add a photo.");
+    await page.getByRole("button", { name: "Skip" }).click();
+    await onScreen(page, "Pick your colour.");
+    await page.getByRole("button", { name: "Continue" }).click(); // keep Emerald
+    await expect(page.getByRole("article", { name: "First in today's drop" })).toBeVisible();
+    const seconds = (Date.now() - started) / 1000;
+    info.annotations.push({ type: "sign-up time", description: `${seconds.toFixed(1)}s from Welcome to the first drop card` });
+    expect(seconds).toBeLessThan(120);
+  });
+
+  test("a role link skips Role, keeps the source and gets all the way in", async ({ page }) => {
+    await intoOnboarding(page, "/join?role=student&src=landing-students");
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "Are you 18 or older?"); // Role was answered by the link
+    await page.getByRole("button", { name: "Yes", exact: true }).click();
+    await page.getByRole("button", { name: "Choose a city" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Madurai" }).click();
+    await throughPickers(page);
+    await page.getByRole("button", { name: "Skip" }).click(); // college
+    await page.getByRole("button", { name: "Skip" }).click(); // photo
+    await page.getByRole("button", { name: "Skip" }).click(); // colour
+    await page.getByRole("button", { name: "See today's drop" }).click();
+    await expect(page.getByRole("region", { name: "Daily Drop" })).toBeVisible();
+    const s = await serverState(page);
+    expect(s.signup_source).toBe("landing-students");
+    expect(s.me.role).toBe("student");
+    expect(s.onboarding.completed_at).not.toBeNull();
+  });
+
+  test("under 18: the whole way through keeps the private defaults", async ({ page }) => {
+    await toColour(page, { minor: true });
+    await page.getByRole("button", { name: "Skip" }).click();
+    await page.getByRole("button", { name: "See today's drop" }).click();
+    await expect.poll(async () => (await serverState(page)).onboarding.completed_at).not.toBeNull();
+    const s = await serverState(page);
+    expect(s.me.profile_visibility).toBe("hidden");
+    expect(s.me.allow_requests).toBe(false);
   });
 });

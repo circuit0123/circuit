@@ -15,6 +15,8 @@ type StepProps = {
   onBack?: () => void;
   /** "Skip" as a text button top-right, only on optional steps. */
   onSkip?: () => void;
+  /** Something above the title, e.g. the logo mark on the last screen (Ready.dc.html). */
+  lead?: React.ReactNode;
   /** The one primary button, pinned to the bottom (50px, full width), plus anything small under it. */
   footer?: React.ReactNode;
   children?: React.ReactNode;
@@ -26,7 +28,7 @@ type StepProps = {
  * title, one short subhead, the single input or choice, then the primary button at the bottom.
  * A centred 440px column on desktop.
  */
-export function Step({ title, subhead, progress, onBack, onSkip, footer, children, className }: StepProps) {
+export function Step({ title, subhead, progress, onBack, onSkip, lead, footer, children, className }: StepProps) {
   const ref = useEdgeSwipeBack(onBack);
   return (
     <main ref={ref} className="mx-auto flex min-h-dvh w-full max-w-[440px] flex-col px-4 lg:justify-center lg:pb-12">
@@ -39,7 +41,8 @@ export function Step({ title, subhead, progress, onBack, onSkip, footer, childre
         {onBack ? <BarButton label="Back" onClick={onBack}><ChevronLeft size={24} strokeWidth={1.75} /></BarButton> : <span className="h-11 w-11" aria-hidden />}
         {onSkip && <button type="button" onClick={onSkip} className="min-h-11 px-3 t-body text-text-muted active:opacity-80">Skip</button>}
       </header>
-      <h1 className="t-large mt-4">{title}</h1>
+      {lead && <div className="mt-8">{lead}</div>}
+      <h1 className={cx("t-large", lead ? "mt-6" : "mt-4")}>{title}</h1>
       {subhead && <p className="t-callout mt-2 text-text-muted">{subhead}</p>}
       <div className={cx("mt-6 flex-1 lg:flex-none", className)}>{children}</div>
       {footer && <footer className="sticky bottom-0 -mx-4 flex flex-col gap-2 bg-bg px-4 lg:mt-8 pb-[max(16px,env(safe-area-inset-bottom))] pt-3">{footer}</footer>}

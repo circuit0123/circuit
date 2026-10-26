@@ -78,6 +78,15 @@ export function useRoleChoices() {
 }
 
 export const LIMITS = { offers: 5, needs: 3 } as const;
+
+const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const PHOTO_MAX = 10 * 1024 * 1024;
+/** One sentence saying why a chosen file can't be the profile photo, or null when it can. */
+export function photoProblem(file: File): string | null {
+  if (!PHOTO_TYPES.includes(file.type)) return "That isn't a photo. Choose a JPG, PNG or WebP.";
+  if (file.size > PHOTO_MAX) return "That photo is over 10 MB. Choose a smaller one.";
+  return null;
+}
 const MIN_BIO = 10;
 
 type Answers = Record<string, Record<string, unknown> | undefined>;
@@ -266,7 +275,8 @@ export function useOnboarding() {
         await patchMe({ college: name.trim().slice(0, 200) });
         return { name: name.trim() };
       }),
-    photo: (chosen: boolean) => run("photo", async () => (chosen ? { chosen: true } : { skipped: true })),
+    // API needed (PROGRESS.md): there is no avatar upload endpoint, so the photo is only noted (type and size), never sent anywhere.
+    photo: (file: File | null) => run("photo", async () => (file ? { chosen: true, type: file.type, size: file.size } : { skipped: true })),
     colour: (skip: boolean) =>
       run("colour", async () => {
         if (skip) saveAppearance.mutate({ accent: startAccent.current ?? "emerald" });

@@ -56,8 +56,17 @@ export async function checkStep(page: Page, info: TestInfo, screen: string, opts
   // One thing per screen: at most one primary button (DESIGN.md §1a). A chosen chip wears the brand fill too, but it is a choice, not an action.
   const primaries = await page.evaluate(() => [...document.querySelectorAll("button")].filter((b) => b.className.includes("bg-primary") && !b.hasAttribute("aria-pressed") && b.offsetParent !== null).length);
   expect(primaries, `${screen}: primary buttons`).toBeLessThanOrEqual(opts.primary ?? 1);
-  const sizes = await page.evaluate(() => new Set([...document.querySelectorAll("body *")].filter((e) => e.childNodes.length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent?.trim())).map((e) => getComputedStyle(e).fontSize)).size);
-  expect(sizes, `${screen}: font sizes`).toBeLessThanOrEqual(5);
+  // The screen only: the dev environment banner is chrome, as in premium.spec.ts.
+  const found = await page.evaluate(() => {
+    const by = new Map<string, string>();
+    for (const e of document.querySelectorAll("body *")) {
+      if (e.closest("svg, script, style, [aria-label=Environment]") || !e.childNodes.length || ![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent?.trim())) continue;
+      const size = getComputedStyle(e).fontSize;
+      if (!by.has(size)) by.set(size, `${e.tagName.toLowerCase()}.${String(e.className).split(" ").slice(0, 2).join(".")} "${(e.textContent ?? "").trim().slice(0, 24)}"`);
+    }
+    return [...by.entries()];
+  });
+  expect(found.length, `${screen}: font sizes ${found.map(([k, v]) => `${k} ${v}`).join(" | ")}`).toBeLessThanOrEqual(5);
 }
 
 /** The inline error on the screen (Next adds its own role=alert route announcer, which is not it). */

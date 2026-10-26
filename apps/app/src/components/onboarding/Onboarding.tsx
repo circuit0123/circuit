@@ -1,13 +1,16 @@
 "use client";
 
-import { Skeleton, Step, StepTransition } from "@circuit/ui";
+import { Skeleton, StepTransition } from "@circuit/ui";
 import { useOnboarding } from "@/data";
 import { Centered } from "../Centered";
 import { Age } from "./Age";
+import { Colour } from "./Colour";
 import { Name } from "./Name";
 import { Needs } from "./Needs";
 import { Offers } from "./Offers";
 import { Organisation } from "./Organisation";
+import { Photo } from "./Photo";
+import { Ready } from "./Ready";
 import { Role } from "./Role";
 import { Safety } from "./Safety";
 import { Where } from "./Where";
@@ -28,7 +31,9 @@ export function Onboarding() {
       case "offers": return <Offers flow={flow} />;
       case "needs": return <Needs flow={flow} />;
       case "organisation": return <Organisation flow={flow} />;
-      default: return <Step title="Almost there" progress={flow.progress} onBack={flow.canGoBack ? flow.back : undefined} />; // photo, colour and ready arrive in F2 part 4
+      case "photo": return <Photo flow={flow} />;
+      case "colour": return <Colour flow={flow} />;
+      default: return <Ready flow={flow} />; // "ready", and anything the flow doesn't know ends here rather than on a blank screen
     }
   })();
   return <StepTransition stepKey={flow.current} direction={flow.direction}>{screen}</StepTransition>;

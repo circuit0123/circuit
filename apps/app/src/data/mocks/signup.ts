@@ -7,7 +7,7 @@
 import { http, HttpResponse, type HttpHandler } from "msw";
 import type { Schemas } from "@circuit/api-client";
 import { currentScenario } from "./config";
-import { CONFIG, ME } from "./fixtures";
+import { CONFIG, ME, dropOf } from "./fixtures";
 
 export const isSignup = () => currentScenario() === "signup" || currentScenario() === "signup_ai_down";
 
@@ -281,6 +281,12 @@ export const signupHandlers: HttpHandler[] = [
   }),
   http.put(`${API}/me/skills`, async ({ request }) => HttpResponse.json(((await request.json()) as Schemas["SkillIn"][]).map((x) => ({ capability: x.capability, level: x.level ?? 1, proof_url: x.proof_url ?? "" })))),
   http.put(`${API}/me/traits`, async ({ request }) => HttpResponse.json(await request.json())),
+
+  // Test hook: `localStorage["circuit.mock.empty"] = "drop"` means no drop has been built for this member yet (the Ready screen's "tomorrow" path).
+  http.get(`${API}/drop/today`, () => {
+    if (!isSignup()) return;
+    try { if (localStorage.getItem("circuit.mock.empty") === "drop") return HttpResponse.json(dropOf([])); } catch { /* the normal drop */ }
+  }),
 
   // Test hook: lets Playwright read what the "server" holds (never called by the app).
   http.get("*/mock-supabase/_state", () => HttpResponse.json(read())),

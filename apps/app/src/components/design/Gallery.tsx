@@ -2,15 +2,21 @@
 
 import { Bell, Plus, Search } from "lucide-react";
 import {
-  ACCENTS, AddChip, Avatar, BarButton, BridgeBadge, Button, Card, Chip, DistanceBadge, EmptyState, ErrorState, GroupedList, HiringBadge, LargeTitleHeader,
+  ACCENTS, AccentPicker, AddChip, Avatar, BarButton, BridgeBadge, Button, Card, Chip, DistanceBadge, DropCardFace, EmptyState, ErrorState, GroupedList, HiringBadge, LargeTitleHeader,
   ListRow, Logo, MatchStrength, PrivateBadge, SegmentedControl, Sheet, Skeleton, TabBar, TextArea, TopBar, VerifiedBadge, memberTabs, partnerTabs, useToast,
-  type Accent, type ButtonVariant, type Detent,
+  type Accent, type ButtonVariant, type Detent, type DropCard,
 } from "@circuit/ui";
 import { useMotionValue } from "motion/react";
 import Link from "next/link";
 import { createContext, useContext, useState } from "react";
 
 const PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect width="128" height="128" fill="#6b8f7f"/><circle cx="64" cy="50" r="22" fill="#d9c7b0"/><path d="M20 128c4-30 24-44 44-44s40 14 44 44z" fill="#2c4a3d"/></svg>')}`;
+
+const SAKTHI = { id: 41, name: "Sakthi Vel", role: "Mentor", headline: "Backend mentor", place: "Chennai", level: 3 };
+const SAMPLE_DROP: DropCard = {
+  id: 41, person: SAKTHI, reason: "Sakthi can help you with backend.", detail: "You both build for small teams. 3 km away.", helpWith: "backend",
+  via: { id: 7, name: "Meera Krishnan", role: "mentor" }, offers: ["Backend", "APIs", "Mentoring"], strength: "strong", bridge: false, answered: null,
+};
 
 const Theme = createContext<"dark" | "light">("dark");
 
@@ -96,6 +102,17 @@ function Panel({ theme, accent }: { theme: "dark" | "light"; accent: Accent }) {
 
       <Block title="Text area">
         <TextArea label="About your work" placeholder="I'm a third-year student who builds…" className="max-w-[440px]" />
+      </Block>
+
+      <Block title="Accent picker">
+        <AccentPicker value={accent} onChange={() => {}} className="max-w-[440px]" />
+      </Block>
+
+      <Block title="Drop card face">
+        <Row label="full (Daily Drop) · compact (end of sign-up)">
+          <div className="w-full max-w-[400px] overflow-hidden rounded-card bg-surface"><DropCardFace card={SAMPLE_DROP} /></div>
+          <div className="w-full max-w-[400px] overflow-hidden rounded-card bg-surface"><DropCardFace card={SAMPLE_DROP} compact /></div>
+        </Row>
       </Block>
 
       <Block title="Card">
