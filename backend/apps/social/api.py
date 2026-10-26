@@ -20,7 +20,9 @@ Visibility = Literal["everyone", "connections", "organisation"]
 
 # -- media -----------------------------------------------------------------------------------------
 class UploadIn(Schema):
-    purpose: Literal["post", "message", "avatar", "startup_logo", "highlight"]  # avatar: my profile photo; startup_logo: founders only; highlight: a pinned project
+    purpose: Literal[
+        "post", "message", "avatar", "startup_logo", "highlight"
+    ]  # avatar: my profile photo; startup_logo: founders only; highlight: a pinned project
     content_type: Literal["image/jpeg", "image/png", "image/webp"]
     size: int = Field(gt=0)
 

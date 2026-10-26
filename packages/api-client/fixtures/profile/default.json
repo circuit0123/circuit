@@ -15,11 +15,13 @@
         "bio": "",
         "build_logs": [],
         "circuits_closed": 0,
+        "circuits_together": [],
         "city": "Chennai",
         "college": "",
         "connection": "connected",
         "display_name": "Dr. Lakshmi Narayanan",
         "headline": "",
+        "highlights": [],
         "id": 8,
         "is_me": false,
         "mutual_count": 0,
@@ -75,11 +77,13 @@
           }
         ],
         "circuits_closed": 0,
+        "circuits_together": null,
         "city": "Chennai",
         "college": "Kaveri Institute of Technology",
         "connection": "self",
         "display_name": "Ravi Kumar",
         "headline": "",
+        "highlights": [],
         "id": 10,
         "is_me": true,
         "mutual_count": null,
@@ -119,7 +123,7 @@
             "key": "photo",
             "text": "Add a photo"
           },
-          "percent": 57
+          "percent": 50
         },
         "traits": [
           "student-friendly",
@@ -136,42 +140,88 @@
         "method": "GET",
         "path": "/api/members/1/posts"
       },
+      "response": {
+        "items": [
+          {
+            "author": {
+              "city": "Chennai",
+              "display_name": "Asha Raman",
+              "headline": "",
+              "id": 1,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "body": "Week 6 of the diagnostics dashboard: sample turnaround per lab, now with a late-sample flag. Looking for a marketer who has sold to labs.",
+            "capabilities": [
+              {
+                "name": "Brand marketing",
+                "slug": "brand-marketing"
+              }
+            ],
+            "created_at": "2026-03-02T01:00:00Z",
+            "id": 1,
+            "link": "",
+            "media": [
+              {
+                "alt_text": "Dashboard: 1,284 samples this week, 91.4% on time, 37 late, a bar chart of daily turnaround against a 6 hour limit, and a table of five labs",
+                "height": 1350,
+                "w1440": "https://storage.test/read/posts/post/1/seed0/w1440.webp?token=t",
+                "w480": "https://storage.test/read/posts/post/1/seed0/w480.webp?token=t",
+                "width": 1080
+              }
+            ],
+            "my_reactions": [],
+            "private_stats": null,
+            "status": "visible",
+            "visibility": "everyone"
+          }
+        ],
+        "next_cursor": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useProfile",
+      "request": {
+        "body": {
+          "items": [
+            {
+              "alt_text": "The shop",
+              "title": "Shop",
+              "upload_id": 24
+            }
+          ]
+        },
+        "method": "PUT",
+        "path": "/api/me/highlights"
+      },
       "response": [
         {
-          "author": {
-            "city": "Chennai",
-            "display_name": "Asha Raman",
-            "headline": "",
-            "id": 1,
-            "photo": null,
-            "role": "founder",
-            "verification_level": 2
-          },
-          "body": "Week 6 of the diagnostics dashboard: sample turnaround per lab, now with a late-sample flag. Looking for a marketer who has sold to labs.",
-          "capabilities": [
-            {
-              "name": "Brand marketing",
-              "slug": "brand-marketing"
-            }
-          ],
-          "created_at": "2026-03-02T01:00:00Z",
           "id": 1,
+          "image": {
+            "alt_text": "The shop",
+            "height": 320,
+            "w1440": "https://storage.test/read/posts/highlight/10/<hex>/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/highlight/10/<hex>/w480.webp?token=t",
+            "width": 320
+          },
           "link": "",
-          "media": [
-            {
-              "alt_text": "Dashboard: 1,284 samples this week, 91.4% on time, 37 late, a bar chart of daily turnaround against a 6 hour limit, and a table of five labs",
-              "height": 1350,
-              "w1440": "https://storage.test/read/posts/post/1/seed0/w1440.webp?token=t",
-              "w480": "https://storage.test/read/posts/post/1/seed0/w480.webp?token=t",
-              "width": 1080
-            }
-          ],
-          "my_reactions": [],
-          "private_stats": null,
-          "status": "visible",
-          "visibility": "everyone"
+          "title": "Shop"
         }
       ],
+      "status": 200
+    },
+    {
+      "hook": "useProfile",
+      "request": {
+        "body": {
+          "items": []
+        },
+        "method": "PUT",
+        "path": "/api/me/highlights"
+      },
+      "response": [],
       "status": 200
     }
   ],

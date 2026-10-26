@@ -3,6 +3,9 @@
 Every method swallows Redis errors, logs a warning and behaves like a cache miss,
 so callers fall back to Postgres (the source of truth).
 
+NO REDIS (REDIS_URL empty, the beta default): the same path as "Redis is down", without the noise. Reads miss, writes do nothing,
+`incr_window` returns None so rate limits count in Postgres (core/ratelimit.py). `core.apps` logs one `redis_not_configured` warning at start.
+
 LEAN MODE (REDIS_LEAN=true, for Upstash's free plan: 500,000 commands a month). Redis only ever holds copies of what Postgres
 knows, so lean mode simply keeps fewer copies:
   - `get_json` / `set_json` do nothing (no Redis command at all) unless the caller says `essential=True`;
@@ -26,7 +29,13 @@ class Cache:
     def __init__(self, client):
         self.client = client
 
+    @property
+    def configured(self) -> bool:
+        return self.client is not None
+
     def _safe(self, op: str, fn, default=None):
+        if self.client is None:  # no REDIS_URL: behave like a miss, silently (the one warning is logged at startup)
+            return default
         try:
             return fn()
         except redis.RedisError as exc:
@@ -34,7 +43,7 @@ class Cache:
             return default
 
     def ping(self) -> bool:
-        return bool(self._safe("ping", self.client.ping, False))
+        return bool(self._safe("ping", lambda: self.client.ping(), False))
 
     @staticmethod
     def lean() -> bool:
@@ -86,7 +95,8 @@ _cache: Cache | None = None
 def get_cache() -> Cache:
     global _cache
     if _cache is None:
-        _cache = Cache(redis.Redis.from_url(settings.REDIS_URL, socket_timeout=1, socket_connect_timeout=1))
+        url = settings.REDIS_URL
+        _cache = Cache(redis.Redis.from_url(url, socket_timeout=1, socket_connect_timeout=1) if url else None)
     return _cache
 
 

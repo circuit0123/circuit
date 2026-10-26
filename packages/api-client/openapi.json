@@ -609,11 +609,16 @@
           "in_app": {
             "title": "In App",
             "type": "boolean"
+          },
+          "push": {
+            "title": "Push",
+            "type": "boolean"
           }
         },
         "required": [
           "in_app",
-          "email"
+          "email",
+          "push"
         ],
         "title": "ChannelsOut",
         "type": "object"
@@ -642,6 +647,17 @@
               }
             ],
             "title": "In App"
+          },
+          "push": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Push"
           }
         },
         "title": "ChannelsPatch",
@@ -738,6 +754,29 @@
           "legs"
         ],
         "title": "CircuitOut",
+        "type": "object"
+      },
+      "CircuitTogetherOut": {
+        "properties": {
+          "completed": {
+            "title": "Completed",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "month": {
+            "title": "Month",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "month",
+          "completed"
+        ],
+        "title": "CircuitTogetherOut",
         "type": "object"
       },
       "CityOut": {
@@ -1565,6 +1604,86 @@
           "cells"
         ],
         "title": "HeatmapOut",
+        "type": "object"
+      },
+      "HighlightIn": {
+        "additionalProperties": false,
+        "properties": {
+          "alt_text": {
+            "description": "What the picture shows, for people using a screen reader",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Alt Text",
+            "type": "string"
+          },
+          "link": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Link",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "upload_id": {
+            "title": "Upload Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "upload_id",
+          "title",
+          "alt_text"
+        ],
+        "title": "HighlightIn",
+        "type": "object"
+      },
+      "HighlightOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "image": {
+            "$ref": "#/components/schemas/PostMediaOut"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "link",
+          "image"
+        ],
+        "title": "HighlightOut",
+        "type": "object"
+      },
+      "HighlightsIn": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HighlightIn"
+            },
+            "maxItems": 6,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "HighlightsIn",
         "type": "object"
       },
       "IntroIn": {
@@ -2685,6 +2804,10 @@
             "title": "Has Needs And Offers",
             "type": "boolean"
           },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -2733,6 +2856,17 @@
               }
             ],
             "title": "Organisation Id"
+          },
+          "organisation_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organisation Name"
           },
           "photo": {
             "anyOf": [
@@ -2794,8 +2928,10 @@
           "role",
           "display_name",
           "bio",
+          "headline",
           "city",
           "college",
+          "organisation_name",
           "lat",
           "lng",
           "verification_level",
@@ -2869,6 +3005,18 @@
               }
             ],
             "title": "Display Name"
+          },
+          "headline": {
+            "anyOf": [
+              {
+                "maxLength": 140,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headline"
           },
           "lat": {
             "anyOf": [
@@ -2949,6 +3097,34 @@
           "alt_text"
         ],
         "title": "MediaIn",
+        "type": "object"
+      },
+      "MemberPostsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PostOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "MemberPostsOut",
         "type": "object"
       },
       "MemberStatusOut": {
@@ -3358,6 +3534,17 @@
           },
           "pulse_replies": {
             "$ref": "#/components/schemas/ChannelsOut"
+          },
+          "push_daily_cap": {
+            "title": "Push Daily Cap",
+            "type": "integer"
+          },
+          "quiet_hours": {
+            "$ref": "#/components/schemas/QuietHours"
+          },
+          "quiet_hours_locked": {
+            "title": "Quiet Hours Locked",
+            "type": "boolean"
           }
         },
         "required": [
@@ -3366,7 +3553,10 @@
           "circuits",
           "messages",
           "pulse_replies",
-          "announcements"
+          "announcements",
+          "quiet_hours",
+          "push_daily_cap",
+          "quiet_hours_locked"
         ],
         "title": "NotificationPrefsOut",
         "type": "object"
@@ -3428,6 +3618,27 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/ChannelsPatch"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "push_daily_cap": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Push Daily Cap"
+          },
+          "quiet_hours": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuietHours"
               },
               {
                 "type": "null"
@@ -4610,6 +4821,20 @@
             ],
             "title": "Circuits Closed"
           },
+          "circuits_together": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CircuitTogetherOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Circuits Together"
+          },
           "city": {
             "title": "City",
             "type": "string"
@@ -4636,6 +4861,13 @@
           "headline": {
             "title": "Headline",
             "type": "string"
+          },
+          "highlights": {
+            "items": {
+              "$ref": "#/components/schemas/HighlightOut"
+            },
+            "title": "Highlights",
+            "type": "array"
           },
           "id": {
             "title": "Id",
@@ -4748,6 +4980,8 @@
           "build_logs",
           "circuits_closed",
           "strength",
+          "circuits_together",
+          "highlights",
           "role",
           "display_name",
           "bio",
@@ -4940,6 +5174,24 @@
           }
         },
         "title": "PulseParams",
+        "type": "object"
+      },
+      "QuietHours": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "QuietHours",
         "type": "object"
       },
       "RatingIn": {
@@ -6049,7 +6301,8 @@
               "post",
               "message",
               "avatar",
-              "startup_logo"
+              "startup_logo",
+              "highlight"
             ],
             "title": "Purpose",
             "type": "string"
@@ -6379,7 +6632,7 @@
   "info": {
     "description": "Circuit backend. Errors always use {error: {code, message, details}}; lists use {items, count, next_offset}.",
     "title": "Circuit API",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -9140,6 +9393,48 @@
         ]
       }
     },
+    "/api/me/highlights": {
+      "put": {
+        "description": "Replaces my pinned projects (up to 6, in the order sent; an empty list clears them). Upload each picture first (`POST /api/media/uploads` with purpose `highlight`, PUT the file, then complete) and send its id with a title (80), an optional http(s) link and the picture's description. An upload already pinned can stay by sending it again; one that drops out is deleted. Someone else's upload is a 404. Everyone who may see my profile sees them in `ProfileOut.highlights`, except that an under-18 member's highlights are shown to nobody but themselves.",
+        "operationId": "apps_accounts_api_put_highlights",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HighlightsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/HighlightOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Set my highlights",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
     "/api/me/needs": {
       "get": {
         "description": "What I am looking for help with.",
@@ -9218,7 +9513,7 @@
     },
     "/api/me/notification-preferences": {
       "patch": {
-        "description": "Per type (intros, applications, circuits, messages, pulse_replies, announcements) and channel (in_app, email). Send only what changes, e.g. {\"intros\": {\"email\": false}}. Account notices (a warning from a moderator) are always shown in the app and cannot be turned off.",
+        "description": "Per type (intros, applications, circuits, messages, pulse_replies, announcements) and channel (in_app, email, push), plus quiet_hours {start, end} (IST hours, default 22 to 8) and push_daily_cap (1 to 10, default 3). Push is stored only: nothing sends a push yet. Members under 18 cannot change quiet hours or raise the cap above 3 (403 `under_18_restricted`). Send only what changes, e.g. {\"intros\": {\"email\": false}}. Account notices (a warning from a moderator) are always shown in the app and cannot be turned off.",
         "operationId": "apps_accounts_settings_api_patch_notification_preferences",
         "parameters": [],
         "requestBody": {
@@ -9864,7 +10159,7 @@
     },
     "/api/members/{member_id}/posts": {
       "get": {
-        "description": "Newest first, only the ones I am allowed to see. 404 for members I cannot see.",
+        "description": "Newest first, 20 at a time (`cursor` from `next_cursor`, `limit` up to 100), only the ones I am allowed to see. No total is sent. 404 for members I cannot see; a bad cursor is a 422 `bad_cursor`.",
         "operationId": "apps_social_api_member_posts",
         "parameters": [
           {
@@ -9875,6 +10170,34 @@
               "title": "Member Id",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -9882,11 +10205,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/PostOut"
-                  },
-                  "title": "Response",
-                  "type": "array"
+                  "$ref": "#/components/schemas/MemberPostsOut"
                 }
               }
             },

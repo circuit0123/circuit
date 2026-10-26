@@ -11,7 +11,7 @@ budget = "2000INR"
 min_instances = 0
 max_instances = 2
 
-secrets = ["GROQ_API_KEY"]
+secrets = ["REDIS_URL", "GROQ_API_KEY"]
 
 [env]
 ENV = "demo"

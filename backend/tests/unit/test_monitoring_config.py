@@ -194,6 +194,7 @@ def test_a_google_error_is_reported_with_its_message():
 
 
 def test_plan_monitoring_writes_every_file_and_names_them(prod):
+    prod.monitoring["notification_channels"] = ["Circuit on-call email", "Circuit on-call phone"]
     steps = gcp.plan_monitoring(prod, "123456789")
     assert steps[0].argv[:4] == ["gcloud", "services", "enable", "monitoring.googleapis.com"]
     apply_step = steps[1]
@@ -205,15 +206,25 @@ def test_plan_monitoring_writes_every_file_and_names_them(prod):
     assert any(api_host in text for text in apply_step.files.values())  # API_URL=auto resolved with the project number
 
 
-def test_unfilled_placeholders_block_a_real_run_but_not_a_dry_run(capsys):
+def test_monitoring_with_no_channels_stops_with_a_message_not_a_traceback():
     out: list[str] = []
-    assert gcp.main(["monitoring", "--env", "production", "--dry-run"], out=out.append) == 0
+    assert gcp.main(["monitoring", "--env", "production"], out=out.append) == 1
+    assert "No notification channels" in "\n".join(out)
+
+
+def test_a_placeholder_channel_blocks_a_real_monitoring_run(prod, monkeypatch):
+    prod.monitoring["notification_channels"] = ["<Circuit production on-call email>"]
+    monkeypatch.setattr(gcp, "load_config", lambda env: prod)
+    out: list[str] = []
     assert gcp.main(["monitoring", "--env", "production"], out=out.append) == 1
     assert "notification_channels" in "\n".join(out)
 
 
-def test_all_environments_declare_channels(cfg):
-    assert len(cfg.monitoring["notification_channels"]) >= 2
+def test_staging_and_demo_declare_channels_production_may_leave_them_empty(cfg):
+    if cfg.env != "production":
+        assert len(cfg.monitoring["notification_channels"]) >= 2
+    else:
+        assert cfg.monitoring["notification_channels"] == []  # beta week 1: no alerts yet
 
 
 def test_apply_script_rejects_a_file_that_is_not_there(tmp_path, capsys):

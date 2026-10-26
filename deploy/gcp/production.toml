@@ -11,38 +11,40 @@ budget="8000INR"# amount + the CURRENCY OF YOUR BILLING ACCOUNT (INR or USD). Al
 min_instances = 0                        # raise to 1 (about $8-12/month more) when cold starts of 5-10 s start to annoy real users
 max_instances = 3
 
-# Only the names of extra secrets (the LLM key for the provider chosen below, the email key, the Sentry address, and the database address used for backups). Their values go in with `make secret`.
-secrets = ["RESEND_API_KEY"]
+# Only the names of extra secrets (the email key now; later the LLM key for the provider chosen below, the Sentry address, REDIS_URL and BACKUP_DATABASE_URL). Their values go in with `make secret`.
+secrets = ["RESEND_API_KEY"]   # add "REDIS_URL" when you create the Upstash database (then `make secret NAME=REDIS_URL`)
 
 [env]
-ENV = "production"            # AI calls per day; past it onboarding uses the manual pickers until tomorrow. 0 = no cap
-APP_URL = "https://circuit-phi.vercel.app/"     # the Vercel production app (https://circuit-app-production.vercel.app until the domain exists)
-LANDING_URL = "https://circuit-phi.vercel.app/"
+ENV = "production"
+APP_URL = "https://circuit-phi.vercel.app/app"   # the app lives under /app (vercel.json). Invite, export and unsubscribe links are built from this
+LANDING_URL = "https://circuit-phi.vercel.app"    # the landing site is the root of the same Vercel project; no path
 API_URL = "auto"                         # auto = https://circuit-production-api-<project number>.<region>.run.app. After mapping a custom domain, write it here
-ALLOWED_HOSTS = ".run.app"               # add api.<domain> once it is mapped. Probes and the smoke test reach the service through *.run.app addresses         # the Django admin's login form posts from the API origin; add https://api.<domain> later
+ALLOWED_HOSTS = ".run.app"               # add api.<domain> once it is mapped. Probes and the smoke test reach the service through *.run.app addresses
 ADMIN_PATH = "xY3k_9fQ2bLm/"     # the admin's address. This file is public, so choose your own: python -c "import secrets; print(secrets.token_urlsafe(12))"
 SUPABASE_URL = "https://hhnyfsvhupdijzvemeaj.supabase.co"
-CORS_ALLOWED_ORIGINS = "https://circuit-app.vercel.app"
-EMAIL_FROM = "support@circuitapp.net"
-SUPPORT_EMAIL = "support@circuitapp.net"
+CSRF_TRUSTED_ORIGINS = "https://*.run.app"   # the Django admin login posts from the API origin. Add https://api.<domain> once it is mapped
+CORS_ALLOWED_ORIGINS = "https://circuit-phi.vercel.app"   # exactly the app's origin: no path, no slash (it must match APP_URL's host)
 GRIEVANCE_OFFICER_NAME = "G Lokesh Kumar"
 GRIEVANCE_EMAIL = "support@circuitapp.net"
 GRIEVANCE_ADDRESS = "pondicherry,India"
-BACKUP_AGE_RECIPIENT = "age1...your public key..."
+LLM_PROVIDER = "none"                    # no AI in the beta: onboarding uses the manual pickers. To switch on: set gemini|groq|anthropic here AND add <NAME>_API_KEY to `secrets` above
 STORAGE_PROVIDER = "supabase"
 EMAIL_BACKEND = "resend"
 EMAIL_FROM = "Circuit <support@circuitapp.net>"   # production refuses Resend's @resend.dev test sender: verify your domain in Resend first
-SUPPORT_EMAIL = "<support@circuitapp.net>"
+SUPPORT_EMAIL = "support@circuitapp.net"
 SEED_CITY_NAME = "Chennai"
 SEED_CITY_LAT = "13.0827"
 SEED_CITY_LNG = "80.2707"
 BETA_MODE = "true"                       # invite-only until public launch
 TRUSTED_PROXY_HOPS = "1"                 # Cloud Run's front end is one hop
 FEATURES = "pulse:everyone,daily_drop:everyone,circuits:testers"   # PRODUCTION.md §2b, beta start
-POLICY_VERSION = "2026-01"        # the PUBLIC key of your backup key pair (`age-keygen -o backup.key` prints it). Keep backup.key itself offline. The bucket is created by `make gcp-setup`
+POLICY_VERSION = "2026-01"
+# Backups are off until you add BACKUP_DATABASE_URL (a secret) and BACKUP_AGE_RECIPIENT (the PUBLIC key from `age-keygen -o backup.key`; keep
+# backup.key offline). Until then the nightly backup-db job logs "skipped: not configured". Turn this on before real data matters (RUNBOOK).
 
-# Alerts go to these Cloud Monitoring notification channels, by display name. You create them once in the Cloud Console
-# (Monitoring > Alerting > Edit notification channels): an email one, and an SMS or Cloud Console mobile-app one so it reaches your phone.
-# `make monitoring ENV=production` stops with a clear message if a name here does not exist. infra/monitoring/README.md.
+# Alerts go to these Cloud Monitoring notification channels, by display name. Empty is fine for the first weeks: only
+# `make monitoring ENV=production` needs them, and it stops with a clear message while the list is empty. To switch alerts on, create an email
+# channel and an SMS or Cloud Console mobile-app channel (Monitoring > Alerting > Edit notification channels) and list their names here.
+# infra/monitoring/README.md.
 [monitoring]
-notification_channels = ["<Circuit production on-call email>", "<Circuit production on-call phone>"]
+notification_channels = []

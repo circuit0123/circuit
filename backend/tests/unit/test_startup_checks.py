@@ -55,7 +55,7 @@ def test_a_flag_without_its_dependency_refuses_to_start(features, dependency):
 
 
 REQUIRED = [
-    "env", "secret_key", "database_url", "redis_url", "allowed_hosts", "cors_allowed_origins",
+    "env", "secret_key", "database_url", "allowed_hosts", "cors_allowed_origins",
     "app_url", "landing_url", "api_url", "seed_city_name", "seed_city_lat", "seed_city_lng",
 ]  # fmt: skip
 

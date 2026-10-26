@@ -23,28 +23,40 @@
         "notifications": {
           "announcements": {
             "email": false,
-            "in_app": true
+            "in_app": true,
+            "push": false
           },
           "applications": {
             "email": true,
-            "in_app": true
+            "in_app": true,
+            "push": true
           },
           "circuits": {
             "email": true,
-            "in_app": true
+            "in_app": true,
+            "push": true
           },
           "intros": {
             "email": true,
-            "in_app": true
+            "in_app": true,
+            "push": true
           },
           "messages": {
             "email": false,
-            "in_app": true
+            "in_app": true,
+            "push": true
           },
           "pulse_replies": {
             "email": false,
-            "in_app": true
-          }
+            "in_app": true,
+            "push": true
+          },
+          "push_daily_cap": 3,
+          "quiet_hours": {
+            "end": 8,
+            "start": 22
+          },
+          "quiet_hours_locked": false
         },
         "privacy": {
           "allow_requests": true,
@@ -123,28 +135,40 @@
       "response": {
         "announcements": {
           "email": false,
-          "in_app": true
+          "in_app": true,
+          "push": false
         },
         "applications": {
           "email": true,
-          "in_app": true
+          "in_app": true,
+          "push": true
         },
         "circuits": {
           "email": true,
-          "in_app": true
+          "in_app": true,
+          "push": true
         },
         "intros": {
           "email": false,
-          "in_app": true
+          "in_app": true,
+          "push": true
         },
         "messages": {
           "email": false,
-          "in_app": true
+          "in_app": true,
+          "push": true
         },
         "pulse_replies": {
           "email": false,
-          "in_app": true
-        }
+          "in_app": true,
+          "push": true
+        },
+        "push_daily_cap": 3,
+        "quiet_hours": {
+          "end": 8,
+          "start": 22
+        },
+        "quiet_hours_locked": false
       },
       "status": 200
     },

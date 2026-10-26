@@ -53,7 +53,7 @@ class Config(BaseSettings):
     debug: bool = False
     secret_key: str = Field(min_length=16)
     database_url: str = Field(min_length=1)
-    redis_url: str = Field(min_length=1)
+    redis_url: str = ""  # empty = no Redis at all: cache reads miss and rate limits count in Postgres (the "Redis is down" path)
     media_webp_quality: int = Field(
         82, ge=40, le=95
     )  # first-try quality of uploaded images; 75 saves a fifth of the storage (free plan: 1 GB)
@@ -227,7 +227,7 @@ class Config(BaseSettings):
             )
         if any(not re.fullmatch(r"https://[^/\s]+", o) for o in origins):
             raise ValueError("CSRF_TRUSTED_ORIGINS must be https:// origins without a path (a leading *. wildcard is allowed)")
-        if not self.redis_url.startswith("rediss://"):
+        if self.redis_url and not self.redis_url.startswith("rediss://"):
             raise ValueError(
                 "REDIS_URL must start with rediss:// (TLS) in staging and production; plain redis:// would cross the internet unencrypted"
             )

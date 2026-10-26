@@ -30,7 +30,7 @@ def test_the_link_in_a_real_email_works_once_signed_out(make_member):
     r = post(token)
     assert r.status_code == 200 and r.json() == {"type": "intros", "label": "introductions", "email_on": False}
     m.refresh_from_db()
-    assert prefs.resolved(m)["intros"] == {"in_app": True, "email": False}  # only the email channel changed
+    assert prefs.resolved(m)["intros"] == {"in_app": True, "email": False, "push": True}  # only the email channel changed
     assert Event.objects.filter(actor=m, type="email.unsubscribed", payload__notification_type="intros").count() == 1
 
 
@@ -40,8 +40,8 @@ def test_only_that_type_is_switched_off(make_member):
     m.refresh_from_db()
     resolved = prefs.resolved(m)
     assert resolved["intros"]["email"] is False
-    assert resolved["applications"] == {"in_app": True, "email": True}
-    assert resolved["circuits"] == {"in_app": True, "email": True}
+    assert resolved["applications"] == {"in_app": True, "email": True, "push": True}
+    assert resolved["circuits"] == {"in_app": True, "email": True, "push": True}
 
 
 def test_it_is_safe_to_click_twice(make_member):
