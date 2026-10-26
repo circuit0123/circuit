@@ -66,7 +66,8 @@ export function AddMedia({ onClick, compact, aspect = "4:5", label = "Add up to 
     <button
       type="button"
       onClick={onClick}
-      className={cx("flex w-full flex-col items-center justify-center gap-3 rounded-card text-text-muted active:opacity-80", compact ? "bg-surface-2" : "h-[300px] bg-surface")}
+      // `text-muted` on `surface-2` is under 4.5:1 in the light theme, so the small tile uses `text`.
+      className={cx("flex w-full flex-col items-center justify-center gap-3 rounded-card active:opacity-80", compact ? "bg-surface-2 text-text" : "h-[300px] bg-surface text-text-muted")}
       style={compact ? { aspectRatio: RATIO[aspect] } : undefined}
     >
       <ImagePlus size={compact ? 24 : 32} strokeWidth={1.5} aria-hidden />
