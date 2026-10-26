@@ -44,6 +44,7 @@ Stop everything with Ctrl+C, then `make down`.
 | `make api` | Only the Django API on :8000 |
 | `make app` | Only the product app on :3000 |
 | `make landing` | Only the landing site on :3001 |
+| `make landing-screens [SCREENS="map job"]` | Re-renders the phone pictures on the landing site (`apps/landing/public/screens/<name>.{avif,webp,png}`, each at most 150 KB) from the screens in `docs/design-reference`. Replaces startup and people names with sample ones and adds a "Sample data" label. Needs `pnpm install` and Python with Pillow. Run it when a reference screen changes; commit the pictures |
 | `make mock` | App on :3000 against mock data: no backend, no login, you are signed in as Ravi Kumar. The banner at the top switches scenario (default, empty, loading, error, slow 3G, beta access missing, features off, under 18) and theme; `?scenario=empty` in the address does the same. The data is temporary and typed against openapi.json (`apps/app/src/data/mocks/`; B7 replaces it with the contract fixtures). `/design` shows every component in both themes and all six accents |
 | `make up` / `make down` | Start / stop Postgres + Redis containers |
 | `make logs` | Follow the local container logs. In the cloud: `make logs ENV=production` prints the newest log lines (add `JOB=compute_matches` for one job, `LIMIT=100` for more) |

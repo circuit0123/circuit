@@ -1,3 +1,4 @@
+import { SCREEN_SIZE, SCREENS } from "@/content/screens";
 import type { Step } from "@/content/types";
 
 /** The shape of an app screenshot: a phone screen, 39:64. Placeholders use the same frame so a page doesn't shift when the real image arrives. */
@@ -14,7 +15,19 @@ export function ShotPlaceholder({ screen, wide }: { screen: string; wide?: boole
 }
 
 /** A real app screenshot (dark and light versions, AVIF with a WebP fallback), or a labelled placeholder when that screen isn't built yet. */
-export function Shot({ step }: { step: Pick<Step, "shot" | "alt" | "missing"> }) {
+export function Shot({ step }: { step: Pick<Step, "shot" | "alt" | "missing" | "screen"> }) {
+  if (step.screen) {
+    const s = `/screens/${step.screen}`;
+    return (
+      <div className={SHOT_FRAME}>
+        <picture>
+          <source srcSet={`${s}.avif`} type="image/avif" />
+          <source srcSet={`${s}.webp`} type="image/webp" />
+          <img src={`${s}.png`} width={SCREEN_SIZE.width} height={SCREEN_SIZE.height} alt={SCREENS[step.screen].alt} loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
+        </picture>
+      </div>
+    );
+  }
   if (!step.shot) return <ShotPlaceholder screen={step.missing} />;
   const s = `/shots/${step.shot}`;
   return (

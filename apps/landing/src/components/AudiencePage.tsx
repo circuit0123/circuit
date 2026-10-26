@@ -16,6 +16,7 @@ import { MentorsProof } from "./proof/MentorsProof";
 import { PartnersProof } from "./proof/PartnersProof";
 import { StudentsProof } from "./proof/StudentsProof";
 import { PartnerForm } from "./PartnerForm";
+import { ScreenTour } from "./Screens";
 import { Waitlist } from "./Waitlist";
 
 /** The proof section of each page: a labelled example or a labelled placeholder, never invented numbers or people. */
@@ -25,6 +26,12 @@ const PROOF: Partial<Record<Slug, React.ReactNode>> = {
   mentors: <MentorsProof />,
   investors: <InvestorsProof />,
   partners: <PartnersProof />,
+};
+
+/** Extra screens that sit between the three steps and the proof. Students, investors and partners show theirs inside their proof section instead. */
+const TOUR: Partial<Record<Slug, React.ReactNode>> = {
+  founders: <ScreenTour heading="What founders see" lede="A match with the reason, people near you, and the conversation that turns it into an introduction." ids={["home-match", "people", "inbox"]} />,
+  mentors: <ScreenTour heading="What mentors see" lede="People who need what you know, circuits that need your yes, and the conversation that starts it." ids={["people", "circuits", "chat"]} />,
 };
 
 const closing = "inline-flex min-h-11 items-center t-body font-medium underline underline-offset-4";
@@ -65,6 +72,7 @@ export async function AudiencePage({ slug }: { slug: Slug }) {
           }
         />
         <HowItWorks steps={p.steps} />
+        {TOUR[slug]}
         {PROOF[slug]}
         {contactOnly ? <PartnerForm intro={JOIN_LIVE ? undefined : INVITE_ONLY.heading + "."} /> : null}
         {waitlistSection ? <Waitlist src={src} role={p.role} heading={INVITE_ONLY.heading} copy={INVITE_ONLY.copy} /> : null}

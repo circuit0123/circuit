@@ -1,9 +1,12 @@
+import type { ScreenId } from "./screens";
 import type { AudiencePageContent, Slug, Step } from "./types";
 
 /** The same real screenshot as the home page (public/shots/daily-drop-*). */
 const DAILY_DROP_ALT = "The Daily Drop in the Circuit app: a person to meet, with the reason they match you and an Intro me button.";
 const dailyDrop = (n: string, title: string, body: string): Step => ({ n, title, body, shot: "daily-drop", alt: DAILY_DROP_ALT, missing: "Daily Drop" });
 const coming = (n: string, title: string, body: string, missing: string): Step => ({ n, title, body, shot: null, alt: "", missing });
+/** A step shown with one of the rendered app screens in public/screens. */
+const screen = (n: string, title: string, body: string, id: ScreenId): Step => ({ n, title, body, shot: null, alt: "", missing: "", screen: id });
 
 const DATA_FAQ = { q: "What do you do with my data?", a: "We use it to match you. We never sell it, and you can export or delete it any time from Settings." };
 const INVITE_FAQ = { q: "Why is it invite-only?", a: "We are starting with one city and one partner college so every match is worth your time." };
@@ -22,7 +25,7 @@ const ALL: ReadonlyArray<AudiencePageContent> = [
     steps: [
       coming("01", "Say what you can do", "Paste a bio. We suggest your skills from a fixed list; you confirm them in a few taps.", "You offer"),
       dailyDrop("02", "Get three matches a day", "Each one comes with the reason, and the mutual connection who can introduce you."),
-      coming("03", "Apply in one tap", "Your profile is your application. Founders see applicants ranked by skill match, not by college.", "Apply"),
+      screen("03", "Apply in one tap", "Your profile is your application. Founders see applicants ranked by skill match, not by college.", "job"),
     ],
     faq: [
       { q: "Is Circuit free for students?", a: "Yes. Students never pay. Startups can pay to promote a role, always labelled as promoted, and promotion never changes your matches." },
@@ -68,7 +71,7 @@ const ALL: ReadonlyArray<AudiencePageContent> = [
     steps: [
       coming("01", "Say what you can offer", "Pick from a fixed list of skills and topics. Add what you would like help with too.", "You offer"),
       dailyDrop("02", "See why someone matches", "Each introduction shows the reason before you decide anything."),
-      coming("03", "Join a circuit", "Three people, each helping the next. Nothing starts without your yes.", "Circuit ring"),
+      screen("03", "Join a circuit", "Three people, each helping the next. Nothing starts without your yes.", "circuits"),
     ],
     faq: [
       { q: "How much time does it take?", a: "You set how many introductions you accept each week, and you can turn it off any time. A circuit asks for one specific favour, and you have 72 hours to say yes or no." },
