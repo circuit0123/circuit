@@ -4,7 +4,8 @@ import { Bell, Plus, Search } from "lucide-react";
 import {
   ACCENTS, AccentPicker, AddChip, Avatar, BarButton, BridgeBadge, Button, Card, Chip, DistanceBadge, DropCardFace, EmptyState, ErrorState, GroupedList, HiringBadge, LargeTitleHeader,
   ListRow, Logo, MatchStrength, PrivateBadge, SegmentedControl, Sheet, Skeleton, TabBar, TextArea, TopBar, VerifiedBadge, memberTabs, partnerTabs, useToast,
-  type Accent, type ButtonVariant, type Detent, type DropCard,
+  AddMedia, CharCounter, CropFrame, MediaSlot, ReplyThread, Toggle,
+  type Accent, type ButtonVariant, type Detent, type DropCard, type ReplyView,
 } from "@circuit/ui";
 import { useMotionValue } from "motion/react";
 import Link from "next/link";
@@ -19,6 +20,32 @@ const SAMPLE_DROP: DropCard = {
 };
 
 const Theme = createContext<"dark" | "light">("dark");
+
+/** F6 pieces: Toggle, the composer's MediaSlot / AddMedia / CharCounter / CropFrame, and ReplyThread. */
+function F6Blocks() {
+  const [on, setOn] = useState(true);
+  const [focus, setFocus] = useState({ x: 0.5, y: 0.5 });
+  const reply = (id: number, name: string, body: string, replies: ReplyView[] = []): ReplyView => ({ id, author: { id, name, role: "Mentor", headline: "", place: "Chennai", level: 3 }, body, when: "2h", mine: false, replies });
+  return (
+    <>
+      <Block title="Toggle">
+        <Row><Toggle label="Swipe between tabs" checked={on} onChange={setOn} /><Toggle label="Off and locked" checked={false} onChange={() => {}} disabled /></Row>
+      </Block>
+      <Block title="PostComposer pieces">
+        <div className="grid grid-cols-3 gap-2">
+          <MediaSlot src={PHOTO} label="Photo 1 of 3" state="uploading" progress={0.6} needsAlt aspect="1:1" focus={focus} onOpen={() => {}} onRemove={() => {}} onRetry={() => {}} />
+          <MediaSlot src={PHOTO} label="Photo 2 of 3" state="failed" progress={0} needsAlt={false} aspect="1:1" focus={focus} onOpen={() => {}} onRemove={() => {}} onRetry={() => {}} />
+          <AddMedia compact aspect="1:1" label="Add photo" onClick={() => {}} />
+        </div>
+        <CharCounter count={128} max={500} />
+        <div className="w-40"><CropFrame src={PHOTO} aspect="4:5" focus={focus} onChange={setFocus} /></div>
+      </Block>
+      <Block title="ReplyThread">
+        <ReplyThread replies={[reply(1, "Meera Krishnan", "The offline part is the hard bit. Nicely done.", [reply(2, "Arjun Mehta", "Agreed, it loads in a second now.")])]} onReply={() => {}} onMore={() => {}} />
+      </Block>
+    </>
+  );
+}
 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   const theme = useContext(Theme);
@@ -137,6 +164,8 @@ function Panel({ theme, accent }: { theme: "dark" | "light"; accent: Accent }) {
           <ListRow title="Messages from strangers" value="Off" onClick={() => {}} />
         </GroupedList>
       </Block>
+
+      <F6Blocks />
 
       <Block title="SegmentedControl">
         <SegmentedControl label="Discover" value={seg} onChange={setSeg} items={[{ id: "people", label: "People" }, { id: "startups", label: "Startups" }, { id: "jobs", label: "Jobs" }, { id: "map", label: "Map" }]} />

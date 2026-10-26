@@ -3,8 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
-- B7 part 2 — load test, cleanup, funnel, RUNBOOK and API freeze, backend (branch `backend-b7-2`, from `main` after B7 part 1): **done, waiting for your OK** (details in "B7 part 2" below; one decision for you about the 200-user result)
-- B7 part 1 — API handoff and frontend gaps, backend (branch `backend-b7`, from `main` after F5): **done, waiting for your OK** (every "Frontend → API needed" entry built or explained, FRONTEND_HANDOFF.md, contract tests with fixtures; one thing needs the frontend session first: the app's type check, see "B7 part 1" below)
+- F6 — profiles, build log composer and post view, Settings (Appearance, privacy, notifications, export, delete, help, legal): **done, waiting for your OK** (branch `frontend-f6`, from `main` after F3–F5; frontend only, mock mode; details in "F6" below)
 - B6 — monitoring, job health, backups, free-tier guards, CI/CD, backend (Stages 8 + 9, backend boxes): **done, waiting for your OK** (branch `backend-b6`; code only, nothing deployed; "Cloud setup I must run later" and the decisions are in "B6" below)
 - B5 — deployment code for Google Cloud, backend (Stage 5, backend boxes): **done, waiting for your OK** (branch `backend-b5`; code only, nothing deployed; staging and demo postponed until before payments or public launch; details in "B5" below)
 - F3 — Home (Live wire, Update view, Daily Drop, Pulse, Notifications, desktop Home, intro request flow), **done, waiting for your OK** (branch `frontend-f3`, from `frontend-F2`; details in "F3" below)
@@ -299,6 +298,130 @@ Follow RUNBOOK.md "First production deploy on Google Cloud" from step 1: account
 
 ### Frontend remaining (from B5)
 Nothing new. `NEXT_PUBLIC_API_URL` must point at the deployed API address once it exists (RUNBOOK step 15). "Frontend → API needed" above is untouched.
+
+## F6 — Profiles, posting and settings (branch `frontend-f6`, from `main` after F3, F4 and F5): done, waiting for your OK
+Frontend only, mock mode only (no backend, keys or login). Screenshots per screen in `screenshots/f6/<screen>/` (375px dark and light, 1280px, and `side-375-dark.png` with the reference on the left where one exists); `node screenshots/f6/shots.mjs` makes them again.
+
+**What it is, in plain language.** **Your profile** shows who you are, what you offer and need, your highlights and your build logs. A small "Profile strength" box (only you see it) says how complete your profile is and gives one next step, then disappears once everything is filled in. **Someone else's profile** has one main button, `Connect`, plus `Message` and "Intro via Meera, mentor" when you share a connection. It shows only "12 mutual connections", never followers. Under-18 members are private to strangers, and strangers can't message them. **The composer** puts photos first: add up to 4, each one is cropped to the build log's frame and shrunk on the phone, then uploads at once with its own progress bar and a Retry if it fails. Then you write (500 characters, with a counter), tag up to 3 skills, add a link and choose who can see it. **A build log's page** has the picture pager, the three reactions with no counts (the author sees their own totals, privately), replies one level deep, and Report (or Delete for your own). **Settings** has everything in one place: edit profile, privacy, notifications per type and channel, Appearance (theme, your colour with a live preview, swipe between tabs), blocked people, export, delete account (type DELETE, then confirm), help, legal pages and Sign out.
+
+- **Profile** (`/profile`, `components/profile/Profile.tsx`, Profile.dc.html):
+  - Large title with your name, then the circuit-pattern avatar, "Frontend developer · Chennai", the badge and your organisation, then your bio.
+  - `Edit profile` and `Share` (share sheet, or "Link copied."). The settings gear is in the bar on a phone and is a third button on desktop.
+  - The strength meter (`StrengthMeter`): bio, offers, needs, a skill with a proof link, first build log (that step only while `pulse` is on). "Only you see this." It hides itself at 100%.
+  - "What I offer and need": chips plus highlights (up to 6 tiles).
+  - `Build logs · Circuits · About` as a segmented control. Build logs is a 3-column grid of first pictures, and a text-only log shows its first words. Circuits are your current and past circuits. About has the bio, organisation, and skills with level words and "Proof" links.
+  - Empty states: "Add what you can offer…" with `Add them`, and "Your build logs show here…" with `New build log`.
+  - Under 18: a Private badge and "Your profile is private. Only your connections and people in your organisation can see it."
+- **Person** (`/members/[id]`, `components/profile/Person.tsx`, Person.dc.html):
+  - 96px avatar, name with badge, "Building a Kannada voice assistant · Chennai · 4 mutual connections".
+  - `Connect` (primary). After you tap it: "Request sent", disabled, with a toast. A person you're connected to shows "Connected", and then no intro row.
+  - `Message` opens the draft conversation (F5).
+  - "Intro via Dr. Lakshmi Narayanan, mentor ›" when the warm path has a mutual. It opens the F3 intro sheet.
+  - Offers, Needs, Highlights, then the same three tabs.
+  - "…" gives Share profile, `Report Asha` (four reasons, then `Send report`) and `Block Asha` (confirm sheet).
+  - Your own id redirects to `/profile`; an unknown id shows the 404.
+  - A hidden under-18 profile shows only the name and "This profile is private.": no Connect, no Message, no chips. It doesn't say why, so a stranger isn't told the person's age.
+  - Pulse names, match cards and Discover → People tiles now link here.
+- **Composer** (`/compose`, `components/compose/Composer.tsx`, Composer.dc.html):
+  - Top row: `Cancel` · "New build log" · `Post` pill.
+  - "Add up to 4 photos" area (`AddMedia`), then a 2-column grid of `MediaSlot`s with progress, "Didn't upload" + `Retry`, and remove. The `Portrait / Square` frame control is set from the first photo.
+  - Tapping a photo opens "Crop and describe": `CropFrame` (drag or arrow keys, rule-of-thirds guide), a required Description (alt text, DESIGN.md §10) and Remove photo.
+  - "What did you build or learn?" with "0 / 500".
+  - Capability chips (up to 3, from the fixed list, with search).
+  - "Who can see this": a sheet with Everyone / Connections / My organisation. Under 18 it starts on My organisation, Everyone is disabled, and it says "Posting to everyone opens once your age is verified."
+  - "Add a link" (GitHub, demo, Figma); a bad link blocks Post with a sentence saying why.
+  - Under the form, one line says why Post is off (still uploading, a photo failed, a description missing, a bad link).
+  - Cancel with something written asks "Discard this build log?".
+  - Posting opens the new build log with "Posted.".
+- **Post view** (`/posts/[id]`, `components/posts/PostScreen.tsx`):
+  - The F3 `PostCard` with the `MediaPager`.
+  - `Helpful · Intro me · Let's talk`, with no counts anywhere. "Intro me" opens the intro sheet; "Let's talk" saves the reaction and opens a message. Under 18 there is no "Intro me", as in Pulse.
+  - Your own post has no reactions and shows "Only you see this: 4 found it helpful, 1 asked for an intro, 1 reply." `More` gives "Delete this build log?".
+  - Replies (`ReplyThread`, one level, `Reply` only on top-level replies; "…" gives Report or Delete).
+  - A pinned "Add a reply" box (300 characters; the counter appears near the end) with "Replying to Dr. Lakshmi Narayanan ×".
+- **Settings** (`/settings` and nine screens, `components/settings/`, Settings.dc.html):
+  - Hub groups: Account (Edit profile with "Ravi Kumar · r•••@gmail.com", Privacy "Members", Notifications "All on", Blocked people), Appearance ("System · Emerald"), Your data (Export my data, Delete account in red), Help (Help and FAQ, Contact support, Privacy policy, Terms, Community guidelines), then `Sign out` and "Circuit beta · Version dev · Policy 2026-10". The version comes from `NEXT_PUBLIC_APP_VERSION`, otherwise "dev".
+  - **Edit profile:** Name, About you, City, College or organisation, What I offer (5), What I need (3), Skills with "Proof of work for …" links. `Save` is pinned at the bottom and only works when something changed; Discard changes asks first. The strength meter's steps land on `#bio`, `#offers`, `#needs`, `#skills`.
+  - **Privacy:** Everyone / Members / Hidden with what each means; toggles for Visible to my organisation, Show me in circuits and Message requests; Blocked people. Show me in circuits is locked below level 2 once off, "Circuits need a verified work email (level 2)". Under 18, Everyone and Message requests are locked, and each says why.
+  - **Notifications:** one grid, a row per type (Intros, Messages, Applications, Circuits, Replies, Announcements, each with a line of what it covers) and a switch per channel (App, Email). Screen readers hear "Intros by email". The note covers account notices, the 3-a-day push cap and quiet hours.
+  - **Appearance** (Appearance.dc.html): Theme segmented control, "Your colour" with "Marks what's live and new. Buttons stay neutral.", the F1 `AccentPicker` (six accents, arrow keys, live preview) and "Swipe between tabs" as a `Toggle`. Every change applies at once and is saved on the member through `useAppearance`, so it follows you to every device.
+  - **Blocked people:** each with `Unblock`; empty is "You haven't blocked anyone."
+  - **Export my data:** `Ask for my data`, then "We're preparing your file…", then "Your file is ready. Open the link we emailed you… It works until 1 November." The email link `/settings/export?token=` downloads, or says the link expired (410) or belongs to another account (404).
+  - **Delete account:** what happens (profile gone, posts and messages stay as "Deleted member", signed out everywhere), a link to export first, "Type DELETE to confirm", `Delete my account`, then a confirm sheet; after that you're signed out.
+  - **Help:** six FAQs (the answer fades in and rises 8px, DESIGN.md §7), Contact support (kind, message, Send, then "Sent. Your reference is CIR-2026-0042."), Grievance Officer (from the settings call) and Policies.
+  - **Legal pages** (`/settings/legal/privacy|terms|guidelines`): the same holding text as the landing site ("We're finishing this document with our lawyer…") plus the policy version you accepted, and a link to the landing page once `NEXT_PUBLIC_LANDING_URL` is set. Unknown names show the 404.
+  - **Sign out.**
+- **New in `packages/ui`** (new files only; no existing component changed): `Toggle` (role switch, 51×31), `ReplyThread` (+ `ReplyView`), and `PostComposer.tsx` with `MediaSlot`, `AddMedia`, `CharCounter` and `CropFrame` (+ `MediaAspect`). These are the PostComposer and ReplyThread from DESIGN.md §6. All are on `/design`.
+- **Data layer:**
+  - `data/profile.ts` (`useMyProfile` with `strength`, `useProfile` with connect/report/block, `useMemberPosts`, `useProfileDraft`, `useSaveProfile`).
+  - `data/posts.ts` (`usePost`, `usePostReact`, which updates the post and Pulse caches, `useReplies` with send/remove/report, `useDeletePost`).
+  - `data/compose.ts` (`useComposer`: photos, crop, upload with XHR progress since fetch can't report it, retry, text, tags, link, visibility, `blocker`, publish).
+  - `data/settings.ts` (`useSettings` with ready row values, `usePrivacy`, `useNotificationPrefs`, `useBlocks`, `useExport`, `useExportDownload`, `useDeleteAccount`, `useSupport`, `useSignOut`).
+  - `lib/image.ts` (crop rectangle, shrink to 1440px, JPEG). The upload is in `data/` because it uses the network.
+  - `links.ts`: `memberHref`, `postHref`, `settingsHref`, `composeHref = "/compose"`; post notifications go to `/posts/<id>`.
+- **Mock mode:**
+  - `data/mocks/profile.ts`: your lists, people 2–11, connect.
+  - `data/mocks/posts.ts`: posts 101, 201, 202, 301, replies, create/delete.
+  - `data/mocks/settings.ts`: settings, privacy, notifications, blocks, export, delete, support.
+  - Uploads are shared with chat (`mocks/inbox.ts`): each PUT takes about half a second so progress shows.
+  - New scenarios: **Profile to fill in**, **Uploads fail once**, **Data export ready**, **Profile, posts and Settings loading / fail to load** (only those calls hang or fail, so each screen's own states show inside a working app, as F4/F5 did).
+  - `GET /api/members/<id>` moved from `mocks/inbox.ts` to `mocks/profile.ts`.
+- **Tests:**
+  - `tests/profile.spec.ts`, `tests/compose.spec.ts` and `tests/settings.spec.ts`, each at 375px and 1280px.
+  - What they cover: everything above, plus every scenario (empty, loading, error, slow 3G, under-18, features off, Pulse off, uploads failing) and axe in dark and light on every new screen.
+  - A touch test closes the last TabPager item (LAUNCH.md): a sideways swipe on a post's pictures stays with the pictures.
+  - `premium.spec.ts` already measured `/profile`; it now measures the real screen.
+  - Updated because links now go somewhere real: `discover.spec.ts` (People tiles open the profile; the intro is one tap away there), `home.spec.ts` (the intro from Discover goes through the profile), `notifications.spec.ts` (a reply to your build log opens `/posts/201`).
+- **Test results.**
+  - Type check, ESLint, the boundary rule (20 passed) and the UI package's type check and lint are all clean.
+  - New specs: `profile.spec.ts` 50, `compose.spec.ts` 46 (1 skipped on desktop: the touch test), `settings.spec.ts` 62. All pass.
+  - Whole mock suite, one full run: **562 passed, 10 failed, 36 skipped**.
+    - Eight failures were the four tests above, which still expected the old links (both widths). One was a 39px gap on the profile (premium rule needs 40). All are fixed.
+    - The tenth was a `/design` sheet-detent test that passed on the re-run.
+  - Re-run of every touched spec file (discover, home, notifications, premium, tabpager, profile, compose, settings): **365 passed, 2 failed, 35 skipped**. The two failures were Home's Update view arrow keys and the pager's scroll position (F4 already noted that one as flaky). Neither is F6 code, and both passed 3 out of 3 when run alone.
+  - `foundation.spec.ts` after adding the F6 components to `/design`: 44 passed.
+  - `make check` (backend) was not run: this session touched no backend code.
+  - As in F4 and F5, Playwright ran with the pre-installed Chromium through a local, uncommitted config.
+
+### Frontend → API needed (F6)
+Served from clearly marked mocks (`data/missing.ts`, `PROFILE_EXTRAS` / `ME_EXTRAS`); never an invented endpoint in a real build.
+1. **Profile fields on `ProfileOut`.** These are needed by the Person screen:
+   - `headline`, `organisation_name` and `photo`
+   - `is_minor` together with `hidden_from_me` (under-18 and not connected), so the app shows "This profile is private." instead of a full profile
+   - `connection: none | pending | connected`, so the button shows Request sent / Connected
+   - `mutual_count`
+   - `can_message` (false for under-18s and people with requests off, when you're not connected)
+
+   A real build today shows a full profile with Connect and Message and lets the server refuse.
+2. **Highlights.** No model or endpoint. Needs `GET /api/members/{id}/highlights` and the same for me → `[{id, title, image: {w480, w1440, alt}, link}]` (max 6), plus a way to pin them (`PUT /api/me/highlights`). Profile and Person. Mock mode only.
+3. **Someone's circuits.** `GET /api/circuits` is mine only. The Person screen's Circuits tab needs "circuits we closed together" → `GET /api/members/{id}/circuits` → `[{id, month, completed}]`. In a real build the tab is left out on other people's profiles.
+4. **`headline` and `organisation_name` on `MeOut`, and `headline` on `MePatch`.** Own profile line and Edit profile. Today the line is role · city, and the headline step is left out of the strength meter.
+5. **Paging on `GET /api/members/{id}/posts`** (`cursor`, `limit`). The grid loads everything today.
+6. **Typed `GET /api/me/export`.** It answers an untyped object in openapi.json; the app casts it to `ExportStatus`.
+7. **Avatar upload** (repeats the global item): `POST /api/media/uploads` needs a `purpose: avatar`, then Edit profile gets a photo row.
+8. **Read receipts setting** (F5 #4): not shown in Privacy until the member has a `read_receipts` field.
+9. **Alt-text suggestion** (DESIGN.md §10 "the composer suggests it"). Nothing suggests one; the author always types it. Could come back from `/complete` (`suggested_alt`).
+10. **Link card metadata** (title, image) for a build log's link. The card shows the host name only.
+11. **Notification channel `push`, quiet hours and the daily cap** (DESIGN.md §8). `NotificationPrefsOut` has in-app and email only; the screen says the push rules in a note.
+
+### Shared UI changes needed (F6)
+1. **`GroupedList` double-indents rows after the first.** Each `li` after the first gets `ml-4` (for the hairline) and `ListRow` brings its own `px-4`, so the text sits 32px in instead of 16px (visible on every grouped list, F1's `/design` sample too). Worked around with `ROW_INSET` (`[li+li>&]:pl-0`) on each row in F6 screens (`components/sheets.tsx`). Fix in GroupedList (e.g. `[&>*]:pl-0` on inset rows), then remove `ROW_INSET`.
+2. **`Avatar` has no 72px or 88px size** (Profile.dc.html 72, Person.dc.html 88). The screens use 64 and 96.
+3. **`AccentPicker` preview** has the Live wire node and dot but not the "View role" link and the "Bridge match" pill that Appearance.dc.html shows, and its swatches are a 3×2 grid of 64px where the reference uses one row of six 44px swatches. Used as is.
+4. **`PostCard` hides reactions on your own post** (right), but the post view also needs the author's private totals under it; drawn by the screen below the card.
+5. **`PushScreen` has no `h1` unless `largeTitle`**: the post view adds a screen-reader-only "Build log by …" heading for axe.
+
+### Decisions and things to know (F6)
+1. **Resize target is 1440px** (DESIGN.md §11 and PRODUCTION.md §14), not the 2000px PROGRESS B6 mentions, because the server keeps 1440 and 480 anyway. Output is JPEG at quality 0.86, which also drops EXIF/GPS and turns a HEIC the browser can read into JPEG. A HEIC the browser can't read says "Couldn't read that photo. Try a JPEG or PNG."
+2. **One frame per build log.** All photos in a post share 4:5 or square (set from the first photo, changeable), because the media pager draws one shape. Changing the frame or a crop uploads that photo again.
+3. **Photos upload when added** (not on Post), so progress and Retry happen while you write. Post waits until every photo is up and described.
+4. **Descriptions are required** before Post (the API refuses media without `alt_text`). The tile says "Add description" until there is one.
+5. **The strength meter** counts bio (20+ characters), offers, needs, a skill with a proof link, and a first build log (only with `pulse` on). It uses neutral colours (it isn't a score to chase, §8) and hides at 100%.
+6. **A hidden under-18 profile doesn't say why** it's private, so strangers don't learn the person's age.
+7. **Block from a profile goes Home** with "Blocked Asha." (the profile can't be shown any more).
+8. **Legal pages** show the same holding text as the landing site until the lawyer-approved text is published (`docs/legal` are drafts).
+9. **Sign out** clears the session and the cache; the sign-in screen follows. **Delete** signs out after the 202.
+10. **Settings rows navigate inside the app** (not plain links), so the cache and the mock's in-memory changes survive moving between screens.
 
 ## F5 — Circuits and Inbox (branch `frontend-f5`, from `main` after F4): done, waiting for your OK
 Frontend only, mock mode only (no backend, keys or login). Screenshots per screen in `screenshots/f5/<screen>/` (375px dark and light, 1280px, and `side-375-dark.png` with the reference on the left where one exists); `node screenshots/f5/shots.mjs` makes them again.
