@@ -7,6 +7,7 @@ instead of failing later in a request.
 import re
 from pathlib import Path
 from typing import Literal
+from urllib.parse import urlparse
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -39,15 +40,18 @@ class Config(BaseSettings):
     env: Literal["dev", "demo", "staging", "production"]
     debug: bool = False
     secret_key: str = Field(min_length=16)
-    database_url: str
-    redis_url: str
-    allowed_hosts: str
-    cors_allowed_origins: str
+    database_url: str = Field(min_length=1)
+    redis_url: str = Field(min_length=1)
+    database_pooler: Literal["direct", "transaction"] = (
+        "direct"  # "transaction" = Supabase's transaction pooler (port 6543), PRODUCTION.md "Database connections"
+    )
+    allowed_hosts: str = Field(min_length=1)
+    cors_allowed_origins: str = Field(min_length=1)
     cors_preview_regex: str = ""
     csrf_trusted_origins: str = ""
-    app_url: str
-    landing_url: str
-    api_url: str
+    app_url: str = Field(min_length=1)
+    landing_url: str = Field(min_length=1)
+    api_url: str = Field(min_length=1)
     admin_path: str = "circuit-admin-x7k2/"
     demo_auth: bool = False
     demo_public: bool = False
@@ -65,7 +69,7 @@ class Config(BaseSettings):
     email_from: str = "Circuit <onboarding@resend.dev>"
     support_email: str = "support@example.com"
     resend_api_key: str = ""
-    seed_city_name: str
+    seed_city_name: str = Field(min_length=1)
     seed_city_lat: float
     seed_city_lng: float
     log_level: str = "INFO"
@@ -117,8 +121,14 @@ class Config(BaseSettings):
             if self.env not in ("dev", "staging"):
                 raise ValueError("CORS_PREVIEW_REGEX is for staging only and must be empty elsewhere")
             _check_preview_regex(self.cors_preview_regex)
+        for label, url in (("APP_URL", self.app_url), ("LANDING_URL", self.landing_url), ("API_URL", self.api_url)):
+            if not re.fullmatch(r"https?://[^\s<>]+", url):
+                # catches an unfilled <placeholder> or the word "auto" that the deploy script was meant to replace
+                raise ValueError(f"{label} must be a full address starting with http:// or https:// (got '{url}')")
         self._check_flags()
         self._check_beta_and_email()
+        self._check_database()
+        self._check_deployed_requirements()
         return self
 
     def _check_flags(self) -> None:
@@ -141,6 +151,38 @@ class Config(BaseSettings):
             raise ValueError("EMAIL_BACKEND=resend needs RESEND_API_KEY")
         if self.env == "production" and "@resend.dev" in self.email_from:
             raise ValueError("EMAIL_FROM is still Resend's test sender; verify the domain and set EMAIL_FROM in production")
+
+    def _check_database(self) -> None:
+        port = urlparse(self.database_url).port
+        if port == 6543 and self.database_pooler != "transaction":
+            # 6543 is the port of Supabase's transaction pooler. Without this setting Django would use server-side cursors, which
+            # the pooler cannot keep alive between statements, and the first big list query would fail at random.
+            raise ValueError("DATABASE_URL uses port 6543 (Supabase transaction pooler): set DATABASE_POOLER=transaction")
+
+    def _check_deployed_requirements(self) -> None:
+        """What staging and production need that a laptop does not. Checked last, so the more specific errors above come first."""
+        if self.env not in ("staging", "production"):
+            return
+        if self.email_backend != "resend":
+            raise ValueError("EMAIL_BACKEND must be resend in staging and production (console and disabled send nothing)")
+        if self.embedding_provider != "fastembed":
+            raise ValueError("EMBEDDING_PROVIDER must be fastembed in staging and production (fake vectors would ruin matching)")
+        keys = {"gemini": self.gemini_api_key, "groq": self.groq_api_key, "anthropic": self.anthropic_api_key}
+        if not keys.get(self.llm_provider):
+            raise ValueError(
+                f"LLM_PROVIDER={self.llm_provider} needs {self.llm_provider.upper()}_API_KEY in staging and production"
+            )
+        origins = self.csv(self.csrf_trusted_origins)
+        if not origins:
+            raise ValueError(
+                "CSRF_TRUSTED_ORIGINS is required in staging and production: the Django admin login posts from the API origin"
+            )
+        if any(not re.fullmatch(r"https://[^/\s]+", o) for o in origins):
+            raise ValueError("CSRF_TRUSTED_ORIGINS must be https:// origins without a path (a leading *. wildcard is allowed)")
+        if not self.redis_url.startswith("rediss://"):
+            raise ValueError(
+                "REDIS_URL must start with rediss:// (TLS) in staging and production; plain redis:// would cross the internet unencrypted"
+            )
 
     def csv(self, value: str) -> list[str]:
         return [v.strip() for v in value.split(",") if v.strip()]

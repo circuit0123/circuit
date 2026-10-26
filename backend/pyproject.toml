@@ -13,6 +13,7 @@ dependencies = [
     "fastembed>=0.9.0",
     "google-genai>=2.32.0",
     "groq>=1.7.0",
+    "gunicorn>=26.2.0",
     "httpx>=0.28.1",
     "lightgbm>=4.7.0",
     "networkx>=3.7",
@@ -27,6 +28,7 @@ dependencies = [
     "resend>=2.50.0",
     "sentry-sdk>=2.72.0",
     "structlog>=26.1.0",
+    "whitenoise>=6.12.0",
 ]
 
 [tool.uv]

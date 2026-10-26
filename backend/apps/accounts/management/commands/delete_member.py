@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from apps.accounts import deletion
 from apps.accounts.models import Member
+from core.devguard import require_local_database
 
 
 class Command(BaseCommand):
@@ -15,6 +16,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if settings.ENV != "dev":
             raise CommandError("delete_member is for local development only. Members delete their account in the app.")
+        require_local_database("delete_member")
         member = Member.objects.filter(pk=options["member"]).first()
         if member is None:
             raise CommandError(f"No member with id {options['member']}")

@@ -53,3 +53,18 @@ class OutboundEmail(models.Model):
 
     def __str__(self) -> str:
         return f"Email #{self.pk} ({self.kind}, {self.status})"
+
+
+class JobRun(models.Model):
+    """One row per scheduled job: is it running right now, and how did its last run end.
+
+    The row is also the job's LEASE. A run starts only if it can move `running_until` from the past to the future in one UPDATE
+    (core/jobs.py), so when the scheduler retries or two runs overlap, exactly one does the work. A normal UPDATE works through
+    Supabase's transaction pooler; session-level advisory locks would not, because the pooler hands out a different server
+    connection for every transaction. A run that is killed (out of memory, timeout) never releases the lease, which simply expires."""
+
+    name = models.CharField(max_length=60, primary_key=True)
+    running_until = models.DateTimeField()
+    last_started_at = models.DateTimeField(null=True, blank=True)
+    last_finished_at = models.DateTimeField(null=True, blank=True)
+    last_status = models.CharField(max_length=10, blank=True, default="")  # running | ok | skipped | failed

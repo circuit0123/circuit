@@ -3,38 +3,44 @@ import json
 
 import structlog
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apps.events.services import record
 from apps.matching.models import ModelVersion
 from apps.matching.ranker import training
+from core.jobs import JobCommand
 from core.storage import get_storage
 
 log = structlog.get_logger("jobs")
 
 
-class Command(BaseCommand):
+class Command(JobCommand):
     help = (
         "Train a candidate ranker from the feature snapshots, evaluate it against the rule ranker, and save it (private bucket + "
         "model_versions). It never changes what members see: a super admin promotes it in Django admin. Safe to run again."
     )
 
-    def handle(self, *args, **options):
+    lock_minutes = 70  # the job's timeout is an hour
+
+    def summary(self, result: dict) -> str:
+        return result["message"]
+
+    def run(self) -> dict:
         ds = training.build_training_set()
         if ds.groups < settings.RANKER_MIN_GROUPS:
-            log.info("train_ranker", skipped="not enough data", groups=ds.groups)
-            self.stdout.write(f"skipped: not enough data ({ds.groups} lists, need {settings.RANKER_MIN_GROUPS})")
-            return
+            return {
+                "skip_reason": "not enough data",
+                "groups": ds.groups,
+                "message": f"skipped: not enough data ({ds.groups} lists, need {settings.RANKER_MIN_GROUPS})",
+            }
         if not any(ds.labels):
-            log.info("train_ranker", skipped="no positive labels")
-            self.stdout.write("skipped: nobody has asked for an intro yet, so there is nothing to learn from")
-            return
+            return {
+                "skip_reason": "no positive labels",
+                "message": "skipped: nobody has asked for an intro yet, so there is nothing to learn from",
+            }
         data_hash = ds.data_hash()
         if ModelVersion.objects.filter(data_hash=data_hash).exists():
-            log.info("train_ranker", skipped="same data")
-            self.stdout.write("skipped: a model was already trained on exactly this data")
-            return
+            return {"skip_reason": "same data", "message": "skipped: a model was already trained on exactly this data"}
         trained = training.train(ds)
         now = timezone.now()
         version = f"v{now:%Y%m%d%H%M%S}-{data_hash[:6]}"
@@ -62,8 +68,9 @@ class Command(BaseCommand):
         )
         log.info("train_ranker", version=version, data_source=source, beats_rule=mv.beats_rule, fairness=mv.fairness_passed)
         m, r = trained.metrics["model"], trained.metrics["rule"]
-        self.stdout.write(
+        message = (
             f"trained {version} on {source} data ({ds.groups} lists): ndcg@10 {m['ndcg@10']} vs rule {r['ndcg@10']}, "
             f"acceptance@3 {m['acceptance@3']} vs {r['acceptance@3']}, eval agreement {m['eval_agreement']} vs {r['eval_agreement']}; "
             f"beats rule: {mv.beats_rule}, fairness: {mv.fairness_passed}. Saved as a candidate."
         )
+        return {"groups": ds.groups, "beats_rule": mv.beats_rule, "fairness_passed": mv.fairness_passed, "message": message}

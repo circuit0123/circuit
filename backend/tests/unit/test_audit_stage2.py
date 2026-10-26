@@ -36,6 +36,13 @@ BASE = dict(
 )  # fmt: skip
 
 
+# the "required when deployed" rules (circuit/config.py), for tests that build a valid staging/production Config
+DEPLOYED = dict(
+    email_backend="resend", resend_api_key="re_x", embedding_provider="fastembed", llm_provider="groq", groq_api_key="g",
+    csrf_trusted_origins="https://api.example.com", redis_url="rediss://h",
+)  # fmt: skip
+
+
 def cfg(**over):
     return Config(_env_file=None, **{**BASE, **over})
 
@@ -60,7 +67,7 @@ def test_f01_dev_may_keep_a_simple_key():
 
 
 def test_f01_strong_key_ok_in_production():
-    assert cfg(env="production").env == "production"
+    assert cfg(env="production", **DEPLOYED).env == "production"
 
 
 @pytest.mark.parametrize("env", ["demo", "staging", "production"])
@@ -109,7 +116,7 @@ def test_f10_preview_regex_must_be_anchored_https_and_valid(regex):
 
 def test_f10_good_preview_regex_ok_on_staging_only():
     good = r"^https://circuit-app-staging-git-[a-z0-9-]+-myteam\.vercel\.app$"
-    assert cfg(env="staging", cors_preview_regex=good).cors_preview_regex == good
+    assert cfg(env="staging", cors_preview_regex=good, **DEPLOYED).cors_preview_regex == good
     with pytest.raises(ValidationError, match="CORS_PREVIEW_REGEX"):
         cfg(env="demo", cors_preview_regex=good)
 

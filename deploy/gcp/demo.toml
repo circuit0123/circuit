@@ -1,0 +1,36 @@
+# Demo on Google Cloud (sample data, persona switcher). Postponed, but ready: same code, same scripts.
+# Values in <angle brackets> are yours to fill in.
+
+[project]
+id = "<your-gcp-project-id>"
+region = "asia-south1"
+billing_account = "<XXXXXX-XXXXXX-XXXXXX>"
+budget = "2000INR"
+
+[service]
+min_instances = 0
+max_instances = 2
+
+secrets = ["GROQ_API_KEY"]
+
+[env]
+ENV = "demo"
+DEMO_AUTH = "true"                       # personas; the app refuses this in staging and production
+DEMO_PUBLIC = "true"
+LLM_PROVIDER = "groq"
+APP_URL = "<https://circuit-app-demo.vercel.app>"
+LANDING_URL = "<https://circuit-landing.vercel.app>"
+API_URL = "auto"
+ALLOWED_HOSTS = ".run.app"
+CORS_ALLOWED_ORIGINS = "<https://circuit-app-demo.vercel.app>"
+CSRF_TRUSTED_ORIGINS = "https://*.run.app"
+SUPABASE_URL = "<https://xxxx.supabase.co>"
+STORAGE_PROVIDER = "supabase"
+EMAIL_BACKEND = "disabled"
+SEED_CITY_NAME = "Chennai"
+SEED_CITY_LAT = "13.0827"
+SEED_CITY_LNG = "80.2707"
+BETA_MODE = "false"
+TRUSTED_PROXY_HOPS = "1"
+FEATURES = "pulse:everyone,daily_drop:everyone,circuits:everyone,investor_mode:everyone,partner_mode:everyone,promotions:everyone,payments:everyone"
+RAZORPAY_KEY_ID = ""

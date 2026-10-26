@@ -18,7 +18,7 @@ from apps.beta.admin import AllowlistForm, InviteCodeForm
 from apps.beta.models import AllowlistEntry, BetaAccess, InviteCode, WaitlistEntry
 from apps.moderation.models import AuditLog
 from circuit.config import Config
-from tests.unit.test_config import BASE
+from tests.unit.test_config import BASE, DEPLOYED
 
 pytestmark = pytest.mark.django_db
 
@@ -200,9 +200,6 @@ def test_command_org_code_and_bad_arguments(make_org):
 # -- startup rules ----------------------------------------------------------------------------------
 def make_config(**over):
     return Config(_env_file=None, **{**BASE, **over})
-
-
-DEPLOYED = dict(supabase_url="https://x.supabase.co", storage_provider="supabase", supabase_service_role_key="k")
 
 
 @pytest.mark.parametrize("env", ["staging", "production"])

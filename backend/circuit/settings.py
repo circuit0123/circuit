@@ -1,3 +1,5 @@
+import os
+from typing import Any
 from urllib.parse import unquote, urlparse
 
 from circuit.config import ROOT, load_config
@@ -20,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.staticfiles",  # collectstatic gathers the Django admin's CSS/JS for WhiteNoise
     "django.contrib.gis",
     "django.contrib.postgres",
     "corsheaders",
@@ -44,8 +47,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "core.health.ProbeMiddleware",  # /health and /ready answer before host checks, redirects and request logging
     "core.logging.RequestLogMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # serves the Django admin's CSS/JS from the container (collectstatic runs at image build)
     # Security headers sit outside everything that can answer early (CORS preflight, redirects, errors).
     "core.security.SecurityHeadersMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -75,7 +80,7 @@ TEMPLATES = [
 ]
 
 _db = urlparse(cfg.database_url)
-DATABASES = {
+DATABASES: dict[str, dict[str, Any]] = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": _db.path.lstrip("/"),
@@ -83,9 +88,19 @@ DATABASES = {
         "PASSWORD": unquote(_db.password or ""),
         "HOST": _db.hostname,
         "PORT": _db.port or 5432,
-        "CONN_MAX_AGE": 60,
+        "CONN_MAX_AGE": 60,  # one connection per gunicorn thread, reused for a minute: Cloud Run keeps few, busy instances
+        "CONN_HEALTH_CHECKS": True,  # a connection the pooler dropped while the instance was idle is replaced, not used
+        "OPTIONS": {"connect_timeout": 5},  # a database that does not answer must fail /ready quickly, not hang the probe
     }
 }
+if ENV != "dev" and _db.hostname not in ("localhost", "127.0.0.1"):
+    DATABASES["default"]["OPTIONS"]["sslmode"] = "require"  # the default (prefer) would silently fall back to plain text
+if cfg.database_pooler == "transaction":
+    # Supabase's transaction pooler hands out a different server connection for every transaction. Two things break on that:
+    #  - server-side cursors (QuerySet.iterator() on Postgres) live on one connection: switched off here;
+    #  - prepared statements are per connection: Django's psycopg 3 backend leaves them off unless prepare_threshold is set,
+    #    which tests/unit/test_database_pooler.py asserts so nobody turns it on by accident.
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 12}},
@@ -95,6 +110,17 @@ USE_TZ = True
 TIME_ZONE = "UTC"
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+if ENV == "dev":
+    import warnings
+
+    # WhiteNoise looks for the collected admin files; on a laptop nobody has run collectstatic and runserver serves them itself.
+    warnings.filterwarnings("ignore", message="No directory at")
+else:
+    # Hashed file names + gzip/brotli copies, so the admin's static files can be cached for a year.
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
 
 # Circuit-specific settings -------------------------------------------------
 APP_URL = cfg.app_url
@@ -133,6 +159,7 @@ TRUSTED_PROXY_HOPS = cfg.trusted_proxy_hops
 RESEND_API_KEY = cfg.resend_api_key
 POLICY_VERSION = cfg.policy_version
 GRIEVANCE = {"name": cfg.grievance_officer_name, "email": cfg.grievance_email, "address": cfg.grievance_address}
+GOOGLE_CLOUD_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "")  # set by deploy/gcp; only used to link log lines to traces
 SEED_CITY = {"name": cfg.seed_city_name, "lat": cfg.seed_city_lat, "lng": cfg.seed_city_lng}
 CSRF_TRUSTED_ORIGINS = cfg.csv(cfg.csrf_trusted_origins)
 
@@ -156,7 +183,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_AGE = 8 * 3600
 if ENV != "dev":  # demo is on the public internet too
     SECURE_SSL_REDIRECT = True
-    SECURE_REDIRECT_EXEMPT = [r"^api/health"]  # Cloud Run health checks arrive over plain HTTP
+    SECURE_REDIRECT_EXEMPT = [r"^api/health"]  # /health and /ready are answered before this (core.health.ProbeMiddleware)
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # Cloud Run terminates TLS
     SECURE_HSTS_SECONDS = 31_536_000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True

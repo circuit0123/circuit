@@ -4,6 +4,8 @@ status=0
 for tool in git make docker uv node pnpm; do
   if command -v "$tool" >/dev/null 2>&1; then echo "OK       tool $tool"; else echo "MISSING  tool $tool"; status=1; fi
 done
+# Only needed to deploy to Google Cloud (RUNBOOK.md "First production deploy"); not a failure when missing.
+if command -v gcloud >/dev/null 2>&1; then echo "OK       tool gcloud (optional, for deploying)"; else echo "OPTIONAL tool gcloud (only to deploy: yay -S google-cloud-cli)"; fi
 if docker compose version >/dev/null 2>&1; then echo "OK       tool docker compose"; else echo "MISSING  tool docker compose"; status=1; fi
 if [ ! -f .env ]; then echo "MISSING  .env (copy .env.example to .env)"; exit 1; fi
 # Required = the app refuses to start without it. Anything else has a default and is reported as DEFAULT.
