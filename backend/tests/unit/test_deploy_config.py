@@ -40,6 +40,7 @@ def filled(env: str, tmp_path):
         text = text.replace("Circuit <hello@<yourdomain>>", "Circuit <hello@circuit.example>")
         text = re.sub(r"<(https://[^>]+)>", r"\1", text)
         text = re.sub(r"<([a-z]+@[^>]+)>", r"\1", text)
+        text = re.sub(r"<(Circuit [a-z]+ on-call [a-z]+)>", r"\1", text)
         text = text.replace("<name>", "Asha Rao").replace("<postal address>", "1 Example Road, Chennai")
         toml.write_text(text)
     return tmp_path / env

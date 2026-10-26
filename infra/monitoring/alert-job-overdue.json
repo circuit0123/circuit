@@ -1,0 +1,22 @@
+{
+  "kind": "alertPolicy",
+  "displayName": "Circuit ${ENV}: a scheduled job is overdue",
+  "documentation": {"mimeType": "text/markdown", "content": "check_jobs found a job with no success for twice its interval (it logs job.overdue with the job's name). RUNBOOK.md, section \"A job is overdue\"; the same list is at GET /api/health/jobs for super admins."},
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "job.overdue logged",
+      "conditionThreshold": {
+        "filter": "metric.type=\"logging.googleapis.com/user/circuit_${ENV}_job_overdue\" AND resource.type=\"cloud_run_job\"",
+        "aggregations": [{"alignmentPeriod": "300s", "perSeriesAligner": "ALIGN_DELTA", "crossSeriesReducer": "REDUCE_SUM"}],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0,
+        "duration": "0s",
+        "trigger": {"count": 1}
+      }
+    }
+  ],
+  "alertStrategy": {"autoClose": "86400s"},
+  "notificationChannels": ${CHANNELS},
+  "enabled": true
+}

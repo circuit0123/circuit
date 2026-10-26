@@ -11,8 +11,8 @@ budget = "5000INR"                       # amount + the CURRENCY OF YOUR BILLING
 min_instances = 0                        # raise to 1 (about $8-12/month more) when cold starts of 5-10 s start to annoy real users
 max_instances = 3
 
-# Only the names of extra secrets (the LLM key for the provider chosen below, and the email key). Their values go in with `make secret`.
-secrets = ["ANTHROPIC_API_KEY", "RESEND_API_KEY"]
+# Only the names of extra secrets (the LLM key for the provider chosen below, the email key, and the Sentry address). Their values go in with `make secret`.
+secrets = ["ANTHROPIC_API_KEY", "RESEND_API_KEY", "SENTRY_DSN"]
 
 [env]
 ENV = "production"
@@ -39,3 +39,9 @@ POLICY_VERSION = "2026-01"
 GRIEVANCE_OFFICER_NAME = "<name>"        # DPDP: shown to members. Fill in before real users
 GRIEVANCE_EMAIL = "<grievance@yourdomain>"
 GRIEVANCE_ADDRESS = "<postal address>"
+
+# Alerts go to these Cloud Monitoring notification channels, by display name. You create them once in the Cloud Console
+# (Monitoring > Alerting > Edit notification channels): an email one, and an SMS or Cloud Console mobile-app one so it reaches your phone.
+# `make monitoring ENV=production` stops with a clear message if a name here does not exist. infra/monitoring/README.md.
+[monitoring]
+notification_channels = ["<Circuit production on-call email>", "<Circuit production on-call phone>"]

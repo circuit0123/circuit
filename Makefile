@@ -18,7 +18,7 @@ endef
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
-	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run
+	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring
 
 help: ## List every command
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  \033[1m%-22s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -224,6 +224,10 @@ secret: ## Store a new value for one secret (typed at a hidden prompt): make sec
 	$(call need_env,secret)
 	@test -n "$(NAME)" || { echo "usage: make secret ENV=production NAME=SECRET_KEY"; exit 1; }
 	$(GCP) secret --env $(ENV) --name $(NAME)
+
+monitoring: ## Create or update the uptime checks, log metrics and alert policies in infra/monitoring/: make monitoring ENV=production (add DRY=1 to only print them)
+	$(call need_env,monitoring)
+	$(GCP) monitoring --env $(ENV) $(if $(DRY),--dry-run)
 
 jobs-run: ## Run one job in the cloud now and wait: make jobs-run ENV=production JOB=compute_matches
 	$(call need_env,jobs-run)

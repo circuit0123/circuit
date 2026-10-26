@@ -22,6 +22,7 @@ from django.utils import timezone
 
 from core import flags
 from core.models import JobRun
+from core.monitoring import capture_job_failure
 
 log = structlog.get_logger("jobs")
 
@@ -79,6 +80,7 @@ class JobCommand(BaseCommand):
         except BaseException as exc:  # includes a timeout signal: free the lease so the retry is not turned away
             release(name, "failed")
             log.error("job.failed", job=name, error=type(exc).__name__, ms=round((time.monotonic() - started) * 1000))
+            capture_job_failure(name, exc)
             raise
         ms = round((time.monotonic() - started) * 1000)
         if result.get("skip_reason"):  # the job looked and found nothing to do (e.g. not enough data to train on)

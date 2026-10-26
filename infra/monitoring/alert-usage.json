@@ -1,0 +1,22 @@
+{
+  "kind": "alertPolicy",
+  "displayName": "Circuit ${ENV}: a free-tier limit is at 70%",
+  "documentation": {"mimeType": "text/markdown", "content": "The weekly usage report found something at 70% or more of a free-tier limit. `make usage-report ENV=${ENV}` shows which. RUNBOOK.md, section \"A free-tier limit is nearly hit\"."},
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "usage.warning logged",
+      "conditionThreshold": {
+        "filter": "metric.type=\"logging.googleapis.com/user/circuit_${ENV}_usage_warning\" AND resource.type=\"cloud_run_job\"",
+        "aggregations": [{"alignmentPeriod": "3600s", "perSeriesAligner": "ALIGN_DELTA", "crossSeriesReducer": "REDUCE_SUM"}],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0,
+        "duration": "0s",
+        "trigger": {"count": 1}
+      }
+    }
+  ],
+  "alertStrategy": {"autoClose": "86400s"},
+  "notificationChannels": ${CHANNELS},
+  "enabled": true
+}

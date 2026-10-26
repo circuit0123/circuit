@@ -73,6 +73,9 @@ class Config(BaseSettings):
     seed_city_lat: float
     seed_city_lng: float
     log_level: str = "INFO"
+    sentry_dsn: str = ""  # empty = Sentry off (dev, tests). A secret in production: it identifies our project
+    sentry_traces_sample_rate: float = Field(0.0, ge=0, le=1)  # performance traces; 0 keeps us inside Sentry's free quota
+    release: str = ""  # the git tag of the running image, set by the deploy script; tags every Sentry event
     features: str = ""  # default audience per flag, e.g. "pulse:everyone,circuits:testers" (PRODUCTION.md §2b)
     beta_mode: bool = False
     invites_per_member: int = Field(3, ge=0, le=50)  # beta invite codes each member can hand out (super admins change it here)

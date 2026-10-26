@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deploy Circuit's backend to Google Cloud (Cloud Run + Cloud Scheduler + Secret Manager + Artifact Registry).
 
-Run it through make (COMMANDS.md): make gcp-setup | deploy | rollback | secret | jobs-run | logs, each with ENV=production.
+Run it through make (COMMANDS.md): make gcp-setup | deploy | rollback | secret | jobs-run | logs | monitoring, each with ENV=production.
 
 How it works, so it is never a black box:
   1. It reads deploy/gcp/app.toml (shared) and deploy/gcp/<env>.toml (yours) and builds a PLAN: an ordered list of steps.
@@ -32,6 +32,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # so the helper next to this file imports however this file was loaded
+import gcp_monitoring  # noqa: E402
 DEPLOY_DIR = REPO / "deploy" / "gcp"
 RENDERED = DEPLOY_DIR / ".rendered"  # manifests written for gcloud to read; gitignored, safe to delete
 ENVS = ("production", "staging", "demo")
@@ -45,6 +47,7 @@ APIS = [
     "cloudresourcemanager.googleapis.com",
     "billingbudgets.googleapis.com",
     "logging.googleapis.com",
+    "monitoring.googleapis.com",
 ]
 KEEP_IMAGES = 5
 
@@ -83,6 +86,7 @@ class Cfg:
     secrets: list[str]
     env_vars: dict[str, str]
     jobs: dict[str, Job]  # every job of the file, including disabled ones and ones for other environments
+    monitoring: dict = field(default_factory=dict)  # [monitoring] of <env>.toml: notification_channels = ["display name", ...]
 
     # -- names: one place, so every command and every test agrees --
     @property
@@ -148,6 +152,7 @@ def load_config(env: str, deploy_dir: Path | None = None) -> Cfg:
         secrets=secrets,
         env_vars={k: str(v) for k, v in env_vars.items()},
         jobs=jobs,
+        monitoring=mine.get("monitoring", {}),
     )
 
 
@@ -160,6 +165,9 @@ def find_placeholders(cfg: Cfg) -> list[str]:
     for key, value in sorted(cfg.env_vars.items()):
         if PLACEHOLDER.search(value):
             found.append(f"env.{key} = {value}")
+    for channel in cfg.monitoring.get("notification_channels", []):
+        if PLACEHOLDER.search(channel):
+            found.append(f"monitoring.notification_channels = {channel}")
     return found
 
 
@@ -241,15 +249,23 @@ def tagged_url(cfg: Cfg, project_number: str, tag: str) -> str:
     return f"https://{tag}---{cfg.service_name}-{project_number}.{cfg.region}.run.app"
 
 
-def container_env(cfg: Cfg, project_number: str) -> list[dict]:
-    """Plain variables, then the secrets. A value of "auto" for API_URL becomes the service's own address."""
+def container_env(cfg: Cfg, project_number: str, release: str = "") -> list[dict]:
+    """Plain variables, then the secrets. A value of "auto" for API_URL becomes the service's own address.
+    `release` (the image tag, i.e. the git commit) is what Sentry tags every error with."""
     values = dict(cfg.env_vars)
+    if release:
+        values["RELEASE"] = release
     if values.get("API_URL") == "auto":
         values["API_URL"] = api_url(cfg, project_number)
     values["GOOGLE_CLOUD_PROJECT"] = cfg.project  # lets log lines link to Cloud Trace
     out = [{"name": k, "value": v} for k, v in sorted(values.items()) if v != ""]
     out += [{"name": s, "valueFrom": {"secretKeyRef": {"name": cfg.secret_id(s), "key": "latest"}}} for s in cfg.secrets]
     return out
+
+
+def release_of(image: str) -> str:
+    """'.../circuit/api:1a2b3c4d5e6f' -> '1a2b3c4d5e6f'."""
+    return image.rpartition(":")[2]
 
 
 def service_manifest(cfg: Cfg, image: str, project_number: str, serving_revision: str | None) -> dict:
@@ -280,7 +296,7 @@ def service_manifest(cfg: Cfg, image: str, project_number: str, serving_revision
                         {
                             "image": image,
                             "ports": [{"containerPort": 8080}],
-                            "env": container_env(cfg, project_number),
+                            "env": container_env(cfg, project_number, release_of(image)),
                             "resources": {"limits": {"cpu": s["cpu"], "memory": s["memory"]}},
                             "startupProbe": {
                                 "httpGet": {"path": s["startup_probe_path"], **probe_port},
@@ -321,7 +337,7 @@ def job_manifest(cfg: Cfg, job: Job, image: str, project_number: str) -> dict:
                                     "image": image,
                                     "command": ["python", "manage.py", job.command],
                                     "args": list(job.args),
-                                    "env": container_env(cfg, project_number),
+                                    "env": container_env(cfg, project_number, release_of(image)),
                                     "resources": {"limits": {"cpu": job.cpu, "memory": job.memory}},
                                 }
                             ],
@@ -451,6 +467,48 @@ def plan_setup(cfg: Cfg) -> list[Step]:
         )
     )
     return steps
+
+
+def plan_monitoring(cfg: Cfg, project_number: str, lenient: bool = False) -> list[Step]:
+    """Uptime checks, log-based metrics and alert policies from infra/monitoring/, created or updated by name.
+    `lenient` (dry runs) lets an unfilled <placeholder> through so the plan can still be shown."""
+    api = cfg.env_vars.get("API_URL", "")
+    values = gcp_monitoring.variables(
+        project=cfg.project,
+        env=cfg.env,
+        service=cfg.service_name,
+        api_url=api_url(cfg, project_number) if api == "auto" else api,
+        app_url=cfg.env_vars.get("APP_URL", ""),
+        landing_url=cfg.env_vars.get("LANDING_URL", ""),
+        channels=list(cfg.monitoring.get("notification_channels", [])),
+        lenient=lenient,
+    )
+    rendered = gcp_monitoring.render(values)
+    folder = RENDERED / cfg.env / "monitoring"
+    return [
+        Step(
+            gcloud("services", "enable", "monitoring.googleapis.com", *_p(cfg)),
+            "Turn on Cloud Monitoring (free for what Circuit uses: a few uptime checks and alert policies).",
+        ),
+        Step(
+            [
+                sys.executable,
+                str(REPO / "scripts" / "gcp_monitoring.py"),
+                "apply",
+                "--project",
+                cfg.project,
+                "--dir",
+                str(folder),
+                "--files",
+                *rendered,
+            ],
+            f"Create or update {len(rendered)} monitoring objects in {cfg.env} (log-based metrics, uptime checks, alert policies), "
+            "found by name, so running this twice changes nothing the second time. It sends alerts to the notification channels "
+            f"{', '.join(cfg.monitoring.get('notification_channels', []))}; a channel that does not exist stops the run.",
+            local=True,
+            files={folder / name: text for name, text in rendered.items()},
+        ),
+    ]
 
 
 @dataclass
@@ -902,7 +960,7 @@ def git_tag(run: Runner = subprocess.run, allow_dirty: bool = False) -> str:
 
 def main(argv: list[str] | None = None, run: Runner = subprocess.run, input_fn: Callable[[str], str] = input, out=print) -> int:
     ap = argparse.ArgumentParser(prog="gcp.py", description=__doc__.split("\n\n")[0])
-    ap.add_argument("command", choices=["setup", "deploy", "rollback", "secret", "jobs-run", "logs", "jobs"])
+    ap.add_argument("command", choices=["setup", "deploy", "rollback", "secret", "jobs-run", "logs", "jobs", "monitoring"])
     ap.add_argument("--env", required=True, choices=ENVS)
     ap.add_argument("--dry-run", action="store_true", help="print the plan (and the files it writes) and stop; needs no gcloud")
     ap.add_argument("--name", help="secret: which secret, e.g. SECRET_KEY")
@@ -950,6 +1008,9 @@ def main(argv: list[str] | None = None, run: Runner = subprocess.run, input_fn: 
                     if not args.dry_run
                     else "Dry run: shown as a first deploy. A later deploy also adds a 0%-traffic test step first."
                 )
+        elif args.command == "monitoring":
+            state = placeholder_state if args.dry_run else read_state(cfg, run, out)
+            steps = plan_monitoring(cfg, state.project_number, lenient=args.dry_run)
         elif args.command == "rollback":
             if args.dry_run:
                 target = Revision(args.revision or "<previous-revision>", cfg.image("<its-tag>"))

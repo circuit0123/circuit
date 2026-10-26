@@ -1,0 +1,6 @@
+{
+  "kind": "logMetric",
+  "name": "circuit_${ENV}_jobs_heartbeat",
+  "description": "Circuit ${ENV}: check_jobs finished a run (it runs every 5 minutes; silence means the job runner is down)",
+  "filter": "resource.type=\"cloud_run_job\" AND resource.labels.job_name=~\"^circuit-${ENV}-\" AND jsonPayload.event=\"job.end\" AND jsonPayload.job=\"check_jobs\""
+}

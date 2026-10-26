@@ -283,5 +283,8 @@ CIRCUIT_MIN_LEG_SCORE = 0.2  # a loop is only proposed if even its weakest hando
 STUDENT_MAX_DISTANCE_KM = 25
 
 from core.logging import configure_logging  # noqa: E402
+from core.monitoring import init_sentry  # noqa: E402
 
 configure_logging(cfg.log_level)
+RELEASE = cfg.release
+init_sentry(cfg.sentry_dsn, environment=cfg.env, release=cfg.release, traces_sample_rate=cfg.sentry_traces_sample_rate)

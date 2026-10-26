@@ -1,0 +1,8 @@
+{
+  "kind": "uptimeCheck",
+  "displayName": "Circuit ${ENV} landing home page",
+  "monitoredResource": {"type": "uptime_url", "labels": {"project_id": "${PROJECT}", "host": "${LANDING_HOST}"}},
+  "httpCheck": {"path": "/", "port": 443, "useSsl": true, "validateSsl": true, "requestMethod": "GET"},
+  "period": "60s",
+  "timeout": "10s"
+}
