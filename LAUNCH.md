@@ -118,7 +118,7 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Mock mode: `pnpm dev:mock` with MSW handlers generated from contract fixtures and scenario switcher (empty, loading, error, slow 3G, under-18, partner, investor, features off) — F1 built `make mock` with temporary fixtures typed against openapi.json and the scenarios default, empty, loading, error, slow 3G, beta access missing, features off, under 18. Still open: partner and investor scenarios (their screens come later) and the B7 contract fixtures
 - [ ] apps/app shell: Supabase sign-in (Google + OTP), auth callback, navigation per DESIGN.md §3 (Home · Discover · Circuits · Inbox · Profile; create in top bar), environment banner, persona switcher (dev/demo)
 - [x] Sign-up and onboarding per DESIGN.md §4 "Sign-up and onboarding": one thing per screen (steps 1–14), resumable, inference before asking, under-18 defaults, measured time-to-first-drop < 2 min (Playwright test with timing) (F2; the investor and partner branches arrive with their flags, and the photo step is mock-only until an avatar upload endpoint exists)
-- [ ] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end
+- [x] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end (F3: mobile and desktop Home, Update view, Notifications, the intro confirm sheet; Pulse off / Daily Drop off / both off / under-18 states)
 - [ ] Build log composer and post view (media pager, reactions, replies, report)
 - [ ] Discover: People, Startups, Jobs (+ job page, apply), Map
 - [ ] Circuits: ring cards, live status, signature closing animation
