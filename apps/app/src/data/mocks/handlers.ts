@@ -5,6 +5,9 @@ import { isSignup, signupConfig, signupHandlers, signupMe } from "./signup";
 import { circuitHandlers } from "./circuits";
 import { discoverHandlers } from "./discover";
 import { inboxHandlers } from "./inbox";
+import { postHandlers } from "./posts";
+import { SHORT_BIO, mePatch, profileFirstHandlers, profileHandlers } from "./profile";
+import { privacyFor, settingsHandlers } from "./settings";
 import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, NOTIFICATIONS, ONBOARDING, PEOPLE, PERSONAS, PULSE, dropOf } from "./fixtures";
 
 /**
@@ -25,10 +28,11 @@ const answered = new Map<number, "intro" | "skip">();
 
 function me(s: Scenario): Schemas["MeOut"] {
   if (isSignup()) return signupMe();
-  const base = { ...ME, appearance: readAppearance() };
+  // Privacy and Edit profile changes (F6) show up here too, as they would from the real /api/me.
+  const base = { ...ME, appearance: readAppearance(), ...privacyFor(s), ...(s === "profile_empty" || s === "empty" ? { bio: SHORT_BIO } : {}), ...mePatch };
   if (s === "beta") return { ...base, beta_access: false };
   if (s === "founder") return { ...base, id: PEOPLE.priya.id, display_name: PEOPLE.priya.display_name, role: "founder", bio: "Co-founder of Aravind Pathology. Stock software for pharmacies." };
-  if (s === "under18") return { ...base, is_minor: true, allow_requests: false, profile_visibility: "organisation", bio: "Class 12 student. I build small apps for my school robotics club." };
+  if (s === "under18") return { ...base, is_minor: true, bio: "Class 12 student. I build small apps for my school robotics club.", ...mePatch };
   return base;
 }
 
@@ -73,6 +77,7 @@ function scenario(fn: (s: Scenario, info: Info) => Response | Promise<Response>)
 }
 
 export const handlers: HttpHandler[] = [
+  ...profileFirstHandlers, // your needs, offers and skills; they step aside in the New member scenarios
   ...signupHandlers, // each answers only in the New member scenarios and otherwise lets the handlers below take over
   http.get(`${API}/config`, scenario((s) => HttpResponse.json(config(s)))),
   http.get(`${API}/me`, scenario((s) => HttpResponse.json(me(s)))),
@@ -139,6 +144,9 @@ export const handlers: HttpHandler[] = [
   ...discoverHandlers,
   ...circuitHandlers,
   ...inboxHandlers,
+  ...profileHandlers,
+  ...postHandlers,
+  ...settingsHandlers(me),
 
   // Anything else: not mocked yet.
   http.all(`${API}/*`, ({ request }) => {

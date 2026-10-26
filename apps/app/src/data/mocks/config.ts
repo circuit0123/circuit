@@ -22,6 +22,11 @@ export const SCENARIOS = [
   { id: "connect_loading", label: "Circuits and Inbox loading" },
   { id: "connect_error", label: "Circuits and Inbox fail to load" },
   { id: "send_fails", label: "Messages fail to send" },
+  { id: "profile_empty", label: "Profile to fill in" },
+  { id: "you_loading", label: "Profile, posts and Settings loading" },
+  { id: "you_error", label: "Profile, posts and Settings fail to load" },
+  { id: "upload_fails", label: "Uploads fail once" },
+  { id: "export_ready", label: "Data export ready" },
   { id: "signup", label: "New member" },
   { id: "signup_ai_down", label: "New member, AI down" },
 ] as const;

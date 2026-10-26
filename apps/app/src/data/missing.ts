@@ -95,3 +95,54 @@ export const STARTUP_EXTRAS: Record<number, { teamSize: number; founders: Startu
     logs: [{ id: 121, src: screen("Today's soil reading", [["Moisture", "31%"], ["Nitrogen", "Low"], ["Next watering", "Thu"]]), alt: "One farm's soil reading with moisture, nitrogen and the next watering day" }],
   },
 };
+
+/* -- F6: profiles, posting, settings -------------------------------------------------------------------------------- */
+
+export type Highlight = { id: number; title: string; src: string; alt: string };
+export type Connection = "none" | "pending" | "connected";
+
+/**
+ * API needed (F6): what a profile page shows that `ProfileOut` and `MeOut` don't carry. A headline, organisation, whether the person is
+ * under 18 and hidden, whether you are connected, the mutual-connection count, whether you may message them, pinned highlights, and the
+ * circuits you closed with them. Mock mode reads this marked stand-in; a real build leaves those parts out (no highlights, no circuits
+ * tab, no mutual count) and lets the server refuse what isn't allowed.
+ */
+export type ProfileExtras = {
+  headline?: string;
+  org?: string;
+  minor?: boolean;
+  /** Under-18 profiles are hidden from people who aren't connected (DESIGN.md §8). */
+  hidden?: boolean;
+  connection?: Connection;
+  mutuals?: number;
+  /** Strangers can't message under-18s or people who turned requests off. */
+  canMessage?: boolean;
+  highlights?: Highlight[];
+  circuits?: string[];
+};
+
+export const PROFILE_EXTRAS: Record<number, ProfileExtras> = {
+  1: {
+    headline: "Frontend developer",
+    org: "Sri Venkateswara Institute of Technology",
+    highlights: [
+      { id: 1, title: "Farm map v2", src: screen("Farm map · Thiruvallur", [["Plots mapped", "126"], ["Wells", "18"], ["Soil tests", "41"]]), alt: "Farm map summary with plots, wells and soil tests counted" },
+      { id: 2, title: "Soil dashboard", src: screen("Soil this week", [["Moisture", "31%"], ["Nitrogen", "Low"], ["pH", "6.8"]]), alt: "Soil dashboard with moisture, nitrogen and pH" },
+    ],
+    circuits: ["Completed circuit, September 2026"],
+  },
+  2: { headline: "Building a Kannada voice assistant", connection: "none", mutuals: 4, canMessage: true, circuits: ["Completed circuit, August 2026"],
+    highlights: [{ id: 21, title: "Voice demo", src: screen("Kannada voice · test run", [["Words understood", "92%"], ["Speakers", "40"], ["Dialects", "3"]]), alt: "Test run summary for a Kannada voice assistant" }] },
+  3: { headline: "Running a lab-diagnostics startup", connection: "pending", mutuals: 2, canMessage: true },
+  4: { headline: "Hiring for an inventory platform", connection: "connected", mutuals: 9, canMessage: true, circuits: ["Completed circuit, September 2026"] },
+  5: { headline: "Biotech founder, assay kits", connection: "none", mutuals: 0, canMessage: true },
+  7: { headline: "Ex-VP sales, deep tech", connection: "connected", mutuals: 12, canMessage: true },
+  11: { headline: "Class 11, school robotics club", minor: true, hidden: true, connection: "none", mutuals: 1, canMessage: false },
+  21: { headline: "Ex-founder, offline-first apps", connection: "connected", mutuals: 12, canMessage: true },
+};
+
+/**
+ * API needed (F6): an `organisation_name` and a `headline` on `MeOut`. The own profile and its strength meter read this marked stand-in in
+ * mock mode; a real build shows the city and role line only and leaves the headline step out of the meter.
+ */
+export const ME_EXTRAS = PROFILE_EXTRAS[1];

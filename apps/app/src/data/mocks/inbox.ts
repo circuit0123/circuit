@@ -9,6 +9,8 @@
  *   `conversation:502` on the mock bus). After you send in a chat, the other person replies once, about 2 seconds later.
  * - "Messages fail to send" (send_fails): the first try of every message fails; Retry sends it.
  * - Connections ("New message"): the five chat people plus Dr. Lakshmi Narayanan (7), who has no conversation yet.
+ * - Uploads (shared with build logs, F6): each PUT takes about half a second; "Uploads fail once" (upload_fails) fails the first try of
+ *   each picture.
  * - Decline (POST …/decline) is a mock-only stand-in: the API has no such call yet (PROGRESS.md "Frontend → API needed").
  */
 import { delay, http, HttpResponse, type HttpHandler } from "msw";
@@ -69,6 +71,9 @@ const fresh = (): Conv[] => [
 
 let store: Conv[] = fresh();
 const uploads = new Map<number, { src: string; width: number; height: number }>();
+const failedUploads = new Set<number>();
+/** What an upload id holds (posts.ts builds post media from it). */
+export const uploadOf = (id: number) => uploads.get(id);
 const failedOnce = new Set<string>();
 const replied = new Set<number>();
 let liveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -215,13 +220,6 @@ export const inboxHandlers: HttpHandler[] = [
     return HttpResponse.json({ marked });
   })),
   http.get(`${API}/connections`, scenario((s) => HttpResponse.json(s === "empty" ? [] : CONNECTIONS))),
-  http.get(`${API}/members/:id`, scenario((_s, { params }) => {
-    const a = [...CONNECTIONS, ...Object.values(PEOPLE)].find((x) => x.id === Number(params.id));
-    if (!a) return notFound();
-    const profile: Schemas["ProfileOut"] = { id: a.id, role: a.role, display_name: a.display_name, bio: a.headline, city: a.city, college: "", verification_level: a.verification_level, needs: [], offers: [], skills: [], traits: [] };
-    return HttpResponse.json(profile);
-  })),
-
   // Image uploads: a signed URL that this mock answers, so the picture really shows.
   http.post(`${API}/media/uploads`, scenario(() => {
     const id = ++nextId;
@@ -229,6 +227,12 @@ export const inboxHandlers: HttpHandler[] = [
   })),
   http.put("*/mock-storage/uploads/:id", async ({ params, request }) => {
     const blob = await request.blob();
+    await delay(currentScenario() === "slow3g" ? 2500 : 500); // long enough to see the progress bar
+    // "Uploads fail once": the first try of each picture fails (the same picture comes back the same size), and Retry sends it.
+    if (currentScenario() === "upload_fails" && !failedUploads.has(blob.size)) {
+      failedUploads.add(blob.size);
+      return new HttpResponse(null, { status: 500 });
+    }
     const src = await new Promise<string>((resolve) => { const r = new FileReader(); r.onload = () => resolve(String(r.result)); r.readAsDataURL(blob); });
     let width = 4, height = 3;
     try { const bmp = await createImageBitmap(blob); width = bmp.width; height = bmp.height; bmp.close(); } catch { /* keep 4:3 */ }
