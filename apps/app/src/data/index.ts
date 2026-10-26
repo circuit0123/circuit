@@ -15,4 +15,4 @@ export * from "./organisations";
 export { DataProvider } from "./provider";
 export { useSession } from "./session";
 export * from "./where";
-export { MOCK, SCENARIOS, currentScenario, switchScenario, type Scenario } from "./mocks/config";
+export { MOCK, SCENARIOS, currentScenario, restartSignup, switchScenario, type Scenario } from "./mocks/config";
