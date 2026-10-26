@@ -9,3 +9,6 @@
 .map-pin[data-selected="true"]::after { width: 22px; height: 22px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--current) 30%, transparent); }
 .map-pin:focus-visible { outline: 2px solid var(--current); outline-offset: -4px; border-radius: 999px; }
 .maplibregl-ctrl-attrib { font-family: var(--font-sans); }
+
+/* Settings → Help: an FAQ answer fades in and rises 8px (DESIGN.md §7). */
+@keyframes faq { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

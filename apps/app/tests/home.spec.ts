@@ -440,9 +440,10 @@ test.describe("Intro request flow", () => {
     await expect(helpful).toHaveAttribute("aria-pressed", "true");
   });
 
-  test("in Discover's People grid too", async ({ page }) => {
+  test("from Discover's People grid, through the person's profile (F6)", async ({ page }) => {
     await page.goto("/discover?s=people");
-    await page.getByRole("list", { name: "People" }).getByRole("button", { name: /^Sneha Pillai/ }).click();
+    await page.getByRole("list", { name: "People" }).getByRole("link", { name: /^Sneha Pillai/ }).click();
+    await page.getByRole("button", { name: /^Intro via/ }).click();
     await sheet(page, "Intro to Sneha").getByRole("button", { name: "Send request" }).click();
     await expect(page.getByText("Intro requested. We'll tell you when they reply.")).toBeVisible();
   });

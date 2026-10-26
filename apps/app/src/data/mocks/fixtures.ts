@@ -191,7 +191,7 @@ export const NOTIFICATIONS = [
   note(1, "intro.accepted", `${PEOPLE.lakshmi.display_name} accepted your introduction.`, PEOPLE.lakshmi, { type: "intro", id: 501 }, 8, false),
   note(2, "application.status", "Your application has a new status.", null, { type: "application", id: 9 }, 30, false),
   note(3, "circuit.proposed", "A new circuit is waiting for your answer.", null, { type: "circuit", id: 12 }, 50, true),
-  note(4, "post.reply", `${PEOPLE.divya.display_name} replied to your build log.`, PEOPLE.divya, { type: "post", id: 101 }, 60 * 26, true),
+  note(4, "post.reply", `${PEOPLE.divya.display_name} replied to your build log.`, PEOPLE.divya, { type: "post", id: 201 }, 60 * 26, true),
   note(5, "message.new", "Farhan Ali sent you a message.", author(22, "Farhan Ali", "student", "Maps and mobile, final year"), { type: "conversation", id: 502 }, 60 * 28, true), // a chat in mocks/inbox.ts
   note(6, "startup.interest", "Someone showed interest in your startup.", null, { type: "startup", id: 41 }, 60 * 24 * 3, true),
   note(7, "intro.received", `${PEOPLE.kavya.display_name} would like to meet you.`, PEOPLE.kavya, { type: "intro", id: 502 }, 60 * 24 * 3 + 40, true),
