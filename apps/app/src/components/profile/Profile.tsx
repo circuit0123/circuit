@@ -63,7 +63,7 @@ export function Profile() {
         {q.strength && <div className="mt-5"><StrengthMeter strength={q.strength} /></div>}
       </Section>
 
-      <Section title="What I offer and need">
+      <Section title="What I offer and need" className="pt-1">
         <div className="flex flex-col gap-6">
           <OffersNeeds offers={p.offers} needs={p.needs} empty={<EmptyState text="Add what you can offer and what you need, so we can find your people." action={<Button onClick={() => router.push(settingsHref("profile"))}>Add them</Button>} />} />
           <Highlights items={p.highlights} />
