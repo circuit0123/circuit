@@ -23,7 +23,7 @@ const pill = "inline-flex items-center gap-1 rounded-full px-2 py-0.5 t-footnote
 
 export function BridgeBadge({ className }: { className?: string }) {
   return (
-    <span className={cx(pill, "bg-surface-2 text-bridge", className)}>
+    <span className={cx("inline-flex items-center gap-1 rounded-full border border-bridge/45 px-2 py-0.5 t-caption text-bridge", className)}>
       <Waypoints size={12} strokeWidth={1.75} aria-hidden />
       Bridge match
     </span>

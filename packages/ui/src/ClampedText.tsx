@@ -26,7 +26,7 @@ export function ClampedText({ text, lines = 2, className }: { text: string; line
         {text}
       </p>
       {cut && !open && (
-        <button type="button" className="t-footnote -mt-1 self-start py-2 font-semibold text-text-muted" onClick={() => setOpen(true)}>
+        <button type="button" className="t-subhead -mt-1 self-start py-2 font-semibold text-text-muted" onClick={() => setOpen(true)}>
           more
         </button>
       )}

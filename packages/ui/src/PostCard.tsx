@@ -16,22 +16,24 @@ type Props = {
   onMore: () => void;
   onOpenAuthor?: () => void;
   priority?: boolean;
+  /** Reactions to leave out ("intro_me" for under-18 members). */
+  hideReactions?: ReactionKind[];
   className?: string;
 };
 
 /** A build log. Media runs edge to edge; text shows two full lines until "more". Not a card: the feed (FeedItem) draws the hairline. */
-export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, className }: Props) {
+export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, hideReactions, className }: Props) {
   const a = post.author;
   let host = "";
   try { host = post.link ? new URL(post.link).hostname.replace(/^www\./, "") : ""; } catch { host = post.link; }
   return (
     <article className={cx("flex flex-col gap-3", className)}>
       <header className="flex items-center gap-4 px-4 lg:px-0">
-        <button onClick={onOpenAuthor} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+        <button onClick={onOpenAuthor} disabled={!onOpenAuthor} className="flex min-w-0 flex-1 items-center gap-3 text-left">
           <Avatar id={a.id} name={a.name} src={a.photo} size={40} />
           <span className="min-w-0">
             <span className="t-body block font-semibold">{a.name} <VerifiedBadge level={a.level} /></span>
-            <span className="t-footnote block text-text-muted">{[a.headline || a.role, a.place].filter(Boolean).join(", ")} · {post.when}</span>
+            <span className="t-subhead block text-text-muted">{[a.headline || a.role, a.place].filter(Boolean).join(", ")} · {post.when}</span>
           </span>
         </button>
         <button onClick={onMore} aria-label="More options" className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-text-muted lg:mr-0">
@@ -50,7 +52,7 @@ export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, classN
             <span className="t-body min-w-0 break-all">{host}</span>
           </a>
         )}
-        {!post.mine && <ReactionBar active={post.reactions} onToggle={onReact} />}
+        {!post.mine && <ReactionBar active={post.reactions} onToggle={onReact} hide={hideReactions} />}
       </div>
     </article>
   );

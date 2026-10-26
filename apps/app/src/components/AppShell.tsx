@@ -48,7 +48,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const panes: PagerTab[] = tabs.map((t) => ({ id: t.id, node: NODES[t.id] }));
   const pushed = active === null;
-  const rail = !pushed && desktop && active === "home" ? <HomeRail /> : null;
 
   return (
     <div id="app-root" className="min-h-dvh">
@@ -82,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <TabPager className="min-h-dvh overflow-x-clip" tabs={panes} value={active} progress={progress} swipe={!!me?.appearance.swipeTabs && !desktop && !pushed} onSwipe={(id) => select(id)} />
             {pushed && children}
           </main>
-          {rail && <aside aria-label="For you" className="sticky hidden w-[340px] shrink-0 self-start py-6 lg:block" style={{ top: "var(--dev-bar, 0px)" }}>{rail}</aside>}
+          {!pushed && desktop && active === "home" && <HomeRail />}
         </div>
       </div>
 

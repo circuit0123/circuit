@@ -31,6 +31,11 @@ function me(s: Scenario): Schemas["MeOut"] {
 function config(s: Scenario): Schemas["ConfigOut"] {
   if (isSignup()) return signupConfig();
   if (s === "beta") return { ...CONFIG, beta_mode: true, beta_access: false };
+  // With Pulse off, what depends on it (promotions, then payments) is off too: the server refuses a flag on without its dependency.
+  const off = (...names: string[]) => ({ ...CONFIG, features: { ...CONFIG.features, ...Object.fromEntries(names.map((n) => [n, false])) } });
+  if (s === "pulse_off") return off("pulse", "promotions", "payments");
+  if (s === "drop_off") return off("daily_drop");
+  if (s === "home_off") return off("pulse", "promotions", "payments", "daily_drop");
   if (s === "features_off") return { ...CONFIG, features: Object.fromEntries(Object.keys(CONFIG.features).map((k) => [k, false])) };
   return CONFIG;
 }

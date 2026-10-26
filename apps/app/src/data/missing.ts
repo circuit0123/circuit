@@ -1,3 +1,5 @@
+import type { RoleView } from "@circuit/ui";
+
 /**
  * Data the screens need that the API does not give yet. Never an invented endpoint: these are marked stand-ins, listed in PROGRESS.md
  * under "Frontend → API needed", and replaced when the endpoint exists.
@@ -28,3 +30,20 @@ export const ORGANISATIONS: readonly string[] = [
   "Madras Institute of Technology",
   "Government College of Technology, Coimbatore",
 ];
+
+/**
+ * API needed: Pulse items for partner calls/events and for promoted roles. `GET /api/pulse` returns neither today, so these two
+ * stand-ins exist for mock mode only (never in a real build, where a flag on with no item simply draws nothing). Marked, and listed in
+ * PROGRESS.md under "Frontend → API needed". Replace with real Pulse items and a "hide promotion" call.
+ */
+export const PROMOTED_STAND_IN: { key: string; startup: string; why: string; role: RoleView } = {
+  key: "promoted-stand-in",
+  startup: "Sutragrid",
+  why: "Promoted to people in Chennai interested in frontend development.",
+  role: { id: 302, title: "Backend engineer intern", startup: "Sutragrid", place: "Guindy, Chennai", km: 5.8, stipend: "₹15k/mo", match: 78, tags: ["Backend"] },
+};
+export const PARTNER_STAND_IN = {
+  key: "partner-stand-in",
+  org: "SVIT Incubation Cell",
+  text: "Demo day on 14 November. Eight student teams show what they built this term. Anyone can come.",
+} as const;

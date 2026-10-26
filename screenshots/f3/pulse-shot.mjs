@@ -1,0 +1,11 @@
+import { chromium } from "/home/klk/circuit/apps/app/node_modules/@playwright/test/index.mjs";
+const [w, scheme, out, scenario = "default"] = process.argv.slice(2);
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: +w, height: 844 }, colorScheme: scheme, reducedMotion: "reduce" });
+const p = await ctx.newPage();
+await p.goto(`http://localhost:3000/?scenario=${scenario}`); await p.waitForLoadState("networkidle"); await p.waitForTimeout(1000);
+await p.getByRole("heading", { name: "Pulse" }).scrollIntoViewIfNeeded();
+await p.evaluate(() => window.scrollBy(0, -60));
+await p.waitForTimeout(500);
+await p.screenshot({ path: out });
+await b.close();

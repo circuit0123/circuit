@@ -3,7 +3,7 @@
 import { LiveWire, LiveWireSkeleton, UpdateView, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { loadFailed, useLiveWire, useMarkUpdateSeen, useRequestIntro } from "@/data";
+import { composeHref, loadFailed, useLiveWire, useMarkUpdateSeen, useRequestIntro, wireActionHref } from "@/data";
 
 export function LiveWireSection() {
   const wire = useLiveWire();
@@ -24,7 +24,7 @@ export function LiveWireSection() {
   };
   return (
     <>
-      <LiveWire updates={items} onOpen={show} onEmptyAction={() => router.push("/discover")} />
+      <LiveWire updates={items} onOpen={show} onEmptyAction={() => (composeHref ? router.push(composeHref) : toast({ text: "The build log composer is coming next." }))} />
       <UpdateView
         open={current !== undefined}
         updates={items}
@@ -33,10 +33,10 @@ export function LiveWireSection() {
         onClose={() => setOpen(null)}
         onAction={(u) => {
           const { action } = items.find((x) => x.key === u.key)!;
-          if (action.kind === "view_role") router.push(`/discover/jobs/${action.target_id}`);
-          else if (action.kind === "reply") router.push("/inbox");
+          const href = wireActionHref(action);
+          if (href) router.push(href);
           else
-            intro.mutate(action.target_id, {
+            intro.mutate({ id: action.target_id }, {
               onSuccess: () => toast({ text: "Intro requested. We'll tell you when they reply." }),
               onError: () => toast({ text: "Couldn't send that. Try again." }),
             });

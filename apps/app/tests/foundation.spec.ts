@@ -170,7 +170,8 @@ test.describe("mock scenarios", () => {
   test("under 18: no Daily Drop", async ({ page }) => {
     await open(page, "under18");
     await expect(page.getByRole("heading", { name: "Today", level: 1 })).toBeVisible();
-    await expect(page.getByText("No new people for you today.")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Daily Drop" })).toHaveCount(0);
+    await expect(page.getByRole("list", { name: "Live wire" })).toBeVisible();
   });
 
   test("the banner switches scenario and remembers it", async ({ page }) => {

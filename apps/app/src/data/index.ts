@@ -7,6 +7,8 @@ export * from "./errors";
 export * from "./features";
 export * from "./gate";
 export * from "./home";
+export * from "./intros";
+export * from "./links";
 export * from "./join";
 export * from "./me";
 export * from "./notifications";

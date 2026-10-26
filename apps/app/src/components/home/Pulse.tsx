@@ -2,10 +2,10 @@
 
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { motion, useReducedMotion } from "motion/react";
-import { ActivityCard, Sheet, Button, CaughtUp, FeedItem, PostCard, RoleCard, Section, Skeleton, spring, useToast, type ReactionKind } from "@circuit/ui";
+import { ActivityCard, Sheet, Button, CaughtUp, FeedItem, PartnerItem, PostCard, PromotedItem, RoleCard, Section, Skeleton, spring, useToast, type ReactionKind } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadFailed, useMarkPulseSeen, usePulse, useReact, useReport, type PulseEntry } from "@/data";
+import { loadFailed, memberHref, roleHref, useHome, useMarkPulseSeen, usePulse, useReact, useReport, type PulseEntry } from "@/data";
 
 const REASONS = ["Spam or scam", "Harassment or hate", "Misleading or fake", "Something else"];
 
@@ -19,6 +19,8 @@ export function Pulse() {
   const markSeen = useMarkPulseSeen();
   const reduce = useReducedMotion();
   const [menu, setMenu] = useState<number | null>(null);
+  const [promo, setPromo] = useState<{ key: string; why: string } | null>(null);
+  const { minor } = useHome();
 
   // "Skills in demand" belongs at the top of Discover → Jobs (DESIGN.md §4), so it is left out of Pulse.
   const items = q.items.filter((it): it is Exclude<PulseEntry, { kind: "skills" }> => it.kind !== "skills");
@@ -55,15 +57,17 @@ export function Pulse() {
 
   const renderItem = (it: (typeof items)[number]) => {
     if (it.kind === "post") {
-      return <FeedItem><PostCard post={it.post} onReact={reactTo(it.post.id)} onMore={() => setMenu(it.post.id)} onOpenAuthor={() => router.push(`/members/${it.post.author.id}`)} priority={false} /></FeedItem>;
+      return <FeedItem><PostCard post={it.post} onReact={reactTo(it.post.id)} onMore={() => setMenu(it.post.id)} onOpenAuthor={memberHref(it.post.author.id) ? () => router.push(memberHref(it.post.author.id)!) : undefined} priority={false} hideReactions={minor ? ["intro_me"] : undefined} /></FeedItem>;
     }
-    if (it.kind === "role") return <FeedItem><RoleCard role={it.role} onOpen={() => router.push(`/discover/jobs/${it.role.id}`)} /></FeedItem>;
+    if (it.kind === "role") return <FeedItem><RoleCard role={it.role} onOpen={() => router.push(roleHref(it.role.id))} /></FeedItem>;
+    if (it.kind === "promoted") return <FeedItem><PromotedItem startup={it.startup} role={it.role} onOpen={() => router.push(roleHref(it.role.id))} onMenu={() => setPromo({ key: it.key, why: it.why })} /></FeedItem>;
+    if (it.kind === "partner") return <FeedItem><PartnerItem org={it.org} text={it.text} /></FeedItem>;
     return <FeedItem><ActivityCard type={it.type} text={it.text} /></FeedItem>;
   };
 
   return (
     <Section bleed label="Pulse">
-      <h2 className="sr-only">Pulse</h2>
+      <h2 className="t-headline mb-3 px-4 lg:px-0">Pulse</h2>
       <div ref={listRef} style={{ height: v.getTotalSize(), position: "relative" }}>
         {v.getVirtualItems().map((row) => (
           <div
@@ -84,6 +88,10 @@ export function Pulse() {
       </div>
       {q.isFetchingNextPage && <PulseSkeleton />}
       {caughtUp && <CaughtUp onDiscover={() => router.push("/discover")} onEarlier={earlier ? undefined : () => setEarlier(true)} />}
+      <Sheet open={promo !== null} onClose={() => setPromo(null)} title="Why am I seeing this?">
+        <p className="t-body text-text-muted">{promo?.why}</p>
+        <Button className="mt-6 w-full" onClick={() => { if (promo) q.hidePromotion(promo.key); setPromo(null); toast({ text: "Hidden. You won't see it again." }); }}>Hide this</Button>
+      </Sheet>
       <Sheet open={menu !== null} onClose={() => setMenu(null)} title="Report this post">
         <ul className="flex flex-col gap-2">
           {REASONS.map((r) => (

@@ -34,5 +34,7 @@ export function useFeatures() {
     betaAccess: q.data?.betaAccess ?? true,
     /** True only when the server flag is on for this member and the app has the screens. */
     on: (name: FeatureName) => !!flags?.[name] && BUILT.has(name),
+    /** The server flag alone, whether or not this build has the screens. Only for items that arrive inside a feed already built (partner and promoted slots in Pulse). */
+    raw: (name: FeatureName) => !!flags?.[name],
   };
 }

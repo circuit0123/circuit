@@ -111,7 +111,7 @@ export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
       outline.style.opacity = "0";
       animate(outline, { opacity: 1 }, { duration: 0.15, delay: delay + 0.6 });
       if (dot) {
-        const d = li.offsetLeft + 22;
+        const d = li.offsetLeft + 26;
         animate(dot, { x: [-d, 0], opacity: [1, 1, 0] }, { duration: 0.6, ease: "easeOut", delay, times: [0, 0.85, 1] });
       }
     });
@@ -129,24 +129,23 @@ export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
     );
   }
   return (
-    <div className={cx("fade-edge-x -mx-4 overflow-x-auto px-4 no-scrollbar lg:-mx-1 lg:px-1", className)}>
-      <ul ref={box} aria-label="Live wire" className="relative flex w-max min-w-full gap-4 pb-3 pt-1 pr-8">
-        <span className="pointer-events-none absolute inset-x-0 top-[26px] h-[1.5px] bg-separator" aria-hidden />
+    <div className={cx("fade-edge-x -mx-4 overflow-x-auto px-4 no-scrollbar lg:mx-0 lg:px-0", className)}>
+      <ul ref={box} aria-label="Live wire" className="relative flex w-max min-w-full gap-5 pr-8 lg:gap-7">
+        <span className="pointer-events-none absolute inset-x-0 top-[22px] h-[1.5px] bg-separator" aria-hidden />
         {nodes.map((u, i) => (
-          <li key={u.key} className="relative w-16 shrink-0">
-            <button className="group block w-full text-left" onClick={() => onOpen(i)}>
+          <li key={u.key} className="relative w-[52px] shrink-0 lg:w-14">
+            <button className="flex w-full flex-col items-center gap-2" onClick={() => onOpen(i)}>
               <span className={cx("relative block h-11 w-11 transition-opacity duration-300", u.seen && "opacity-60")}>
                 <span className="relative block h-full w-full overflow-hidden rounded-control bg-surface-2"><WireVisual visual={u.visual} /></span>
-                {!u.seen && <span data-lit className="pointer-events-none absolute -inset-0.5 rounded-[14px] border-2 border-live" aria-hidden />}
-                <span className="absolute -bottom-1.5 -right-1.5 rounded-full ring-2 ring-bg">
+                {!u.seen && <span data-lit className="pointer-events-none absolute inset-0 rounded-control border-2 border-live" aria-hidden />}
+                <span className="absolute -bottom-1 -right-1 rounded-full ring-2 ring-bg">
                   <Avatar id={u.person.id} name={u.person.name} src={u.person.photo} size={20} />
                 </span>
               </span>
-              <span className={cx("t-footnote mt-2 block leading-tight", u.seen && "text-text-muted")} aria-hidden>{u.verb}</span>
-              <span className="t-footnote block truncate text-text-muted" aria-hidden>{firstName(u.person.name)}</span>
+              <span className={cx("t-caption text-center leading-tight", u.seen ? "text-text-muted" : "text-text")} aria-hidden>{u.verb}</span>
               <span className="sr-only">{spokenUpdate(u)}{u.seen ? "" : ", new"}</span>
             </button>
-            {!u.seen && <span data-dot className="pointer-events-none absolute left-[19px] top-[19px] h-1.5 w-1.5 rounded-full bg-live opacity-0" aria-hidden />}
+            {!u.seen && <span data-dot className="pointer-events-none absolute left-[23px] top-[19px] h-1.5 w-1.5 rounded-full bg-live opacity-0" aria-hidden />}
           </li>
         ))}
       </ul>
@@ -156,11 +155,11 @@ export function LiveWire({ updates, onOpen, onEmptyAction, className }: Props) {
 
 export function LiveWireSkeleton() {
   return (
-    <div className="flex gap-4 py-3" aria-hidden>
+    <div className="flex gap-5 pb-3" aria-hidden>
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="w-16 shrink-0">
+        <div key={i} className="flex w-[52px] shrink-0 flex-col items-center">
           <Skeleton className="h-11 w-11 rounded-control" />
-          <Skeleton className="mt-2 h-3 w-12" />
+          <Skeleton className="mt-2 h-3 w-10" />
         </div>
       ))}
     </div>

@@ -1,13 +1,17 @@
 "use client";
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import type { DropCard, MatchView, PostView, RoleView } from "@circuit/ui";
 import { roleLabel } from "@/lib/format";
 import { api, unwrap } from "./client";
 import { useKey } from "./keys";
 import { toUpdate, type LiveWireItem } from "./livewire";
 import { toPerson, toPost, toRole } from "./mappers";
+import { useFeatures } from "./features";
 import { useMe } from "./me";
+import { PARTNER_STAND_IN, PROMOTED_STAND_IN } from "./missing";
+import { MOCK } from "./mocks/config";
 
 export type { LiveWireItem };
 
@@ -29,13 +33,25 @@ export function useMarkUpdateSeen() {
   });
 }
 
+export type DailyDrop = { cards: DropCard[]; nextDropAt: string };
+
+/** What Home draws. A feature that is off is simply absent (DESIGN.md §3); under-18 members get no Daily Drop (the backend builds none for them). */
+export function useHome() {
+  const features = useFeatures();
+  const me = useMe().data;
+  const pulse = features.on("pulse");
+  const minor = me?.isMinor ?? false;
+  const drop = features.on("daily_drop") && !minor;
+  return { ready: features.ready && !!me, pulse, drop, minor, empty: !pulse && !drop };
+}
+
 /** Today's three people, each with the reason first (DESIGN.md §4 Home). */
 export function useDailyDrop() {
   const { key, enabled } = useKey("drop");
   return useQuery({
     queryKey: key,
     enabled,
-    queryFn: async () => {
+    queryFn: async (): Promise<DailyDrop> => {
       const d = await unwrap(api.GET("/api/drop/today"));
       const cards: DropCard[] = d.cards.map((c) => {
         const [lead, ...rest] = c.reason.split(/(?<=\.)\s+/);
@@ -53,20 +69,17 @@ export function useDailyDrop() {
           answered: (c.outcome as "intro" | "skip" | null) ?? null,
         };
       });
-      return { cards };
+      return { cards, nextDropAt: d.next_drop_at };
     },
   });
 }
 
-/** Records the swipe; an "intro" swipe also asks for the intro (the backend routes it via a mutual if one exists). */
-export function useSwipe() {
+/** Records a skip. (An intro goes through `useRequestIntro`, which records its own swipe once the intro is sent.) */
+export function useSkip() {
   const qc = useQueryClient();
   const { key } = useKey("drop");
   return useMutation({
-    mutationFn: async ({ id, direction }: { id: number; direction: "intro" | "skip" }) => {
-      await unwrap(api.POST("/api/drop/today/{member_id}/swipe", { params: { path: { member_id: id } }, body: { direction } }));
-      if (direction === "intro") await unwrap(api.POST("/api/intros", { body: { target_id: id, message: "" } }));
-    },
+    mutationFn: (id: number) => unwrap(api.POST("/api/drop/today/{member_id}/swipe", { params: { path: { member_id: id } }, body: { direction: "skip" } })),
     onError: () => qc.invalidateQueries({ queryKey: key }),
   });
 }
@@ -75,7 +88,9 @@ export type PulseEntry =
   | { kind: "post"; key: string; post: PostView }
   | { kind: "role"; key: string; role: RoleView }
   | { kind: "activity"; key: string; type: "circuit_completed" | "intro_accepted" | "startup_claimed"; text: string }
-  | { kind: "skills"; key: string; skills: Array<{ name: string; roles: number }> };
+  | { kind: "skills"; key: string; skills: Array<{ name: string; roles: number }> }
+  | { kind: "partner"; key: string; org: string; text: string }
+  | { kind: "promoted"; key: string; startup: string; role: RoleView; why: string };
 
 function activityText(a: { type: string; startup_name?: string | null }): { type: "circuit_completed" | "intro_accepted" | "startup_claimed"; text: string } {
   if (a.type === "circuit_completed") return { type: "circuit_completed", text: "A circuit closed in your network. Three people helped each other." };
@@ -87,6 +102,8 @@ function activityText(a: { type: string; startup_name?: string | null }): { type
 export function usePulse(includeSeen: boolean) {
   const { key, enabled } = useKey("pulse", includeSeen);
   const meId = useMe().data?.id;
+  const features = useFeatures();
+  const [hidden, setHidden] = useState<string[]>([]);
   const q = useInfiniteQuery({
     queryKey: key,
     enabled,
@@ -103,8 +120,17 @@ export function usePulse(includeSeen: boolean) {
     }
     return [];
   });
+  // Partner and promoted slots exist only when their flag is on, never first, at most one promoted per 8 items and one partner per 10
+  // (DESIGN.md §4). The API sends neither yet, so mock mode shows stand-ins; a real build draws none.
+  if (MOCK && items.length >= 2 && features.raw("promotions") && !hidden.includes(PROMOTED_STAND_IN.key)) {
+    items.splice(2, 0, { kind: "promoted", key: PROMOTED_STAND_IN.key, startup: PROMOTED_STAND_IN.startup, role: PROMOTED_STAND_IN.role, why: PROMOTED_STAND_IN.why });
+  }
+  if (MOCK && items.length >= 4 && features.raw("partner_mode")) {
+    items.splice(4, 0, { kind: "partner", key: PARTNER_STAND_IN.key, org: PARTNER_STAND_IN.org, text: PARTNER_STAND_IN.text });
+  }
   const lastPage = q.data?.pages[q.data.pages.length - 1];
   return {
+    hidePromotion: (key: string) => setHidden((h) => [...h, key]),
     items,
     caughtUp: !!lastPage && !q.hasNextPage && lastPage.caught_up,
     isPending: q.isPending,
@@ -154,9 +180,4 @@ export function useMatches(opts: { limit?: number; offset?: number } = {}) {
       return { items };
     },
   });
-}
-
-/** Asks for an intro (the backend routes it via a mutual if one exists). */
-export function useRequestIntro() {
-  return useMutation({ mutationFn: (id: number) => unwrap(api.POST("/api/intros", { body: { target_id: id, message: "" } })) });
 }
