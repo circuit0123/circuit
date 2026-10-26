@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { SHOW_DEV_TOOLS } from "@/lib/env";
+import { BASE_PATH, SHOW_DEV_TOOLS } from "@/lib/env";
 import { roleLabel } from "@/lib/format";
 import { api, unwrap } from "./client";
 import { MOCK } from "./mocks/config";
@@ -29,7 +29,7 @@ export function usePersonaSignIn() {
   });
 }
 
-const callbackUrl = () => `${window.location.origin}/auth/callback`;
+const callbackUrl = () => `${window.location.origin}${BASE_PATH}/auth/callback`;
 
 /** Google and email-code sign-in through Supabase. `available` is false until the project keys are in .env. */
 export function useSupabaseSignIn() {
