@@ -33,6 +33,14 @@ class RatingIn(Schema):
     rating: int = Field(ge=1, le=5)
 
 
+class CapacityOut(Schema):
+    allowed: bool  # false for under-18 members and roles that cannot ask for intros
+    weekly_limit: int
+    used: int
+    left: int
+    next_frees_at: datetime | None  # when the next one frees up; set only when none are left
+
+
 class IntroOut(Schema):
     id: int
     my_role: Literal["requester", "broker", "target"]
@@ -68,6 +76,17 @@ def _fresh(i: IntroRequest) -> IntroRequest:
 def _check_role(member: Member) -> None:
     if member.role not in NETWORK_ROLES:
         raise Forbidden()
+
+
+@router.get(
+    "/capacity",
+    response=CapacityOut,
+    summary="Introductions left this week",
+    description="How many of this week's introductions I have used and left, and when the next one frees up, so the request sheet "
+    "can say '2 left' before I press Send. Only about me; how full another person is stays private.",
+)
+def capacity(request):
+    return services.capacity(current_member(request))
 
 
 @router.get(

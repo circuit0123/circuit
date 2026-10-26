@@ -23,7 +23,7 @@ def test_settings_returns_the_whole_screen_in_one_call(make_member, client_for, 
     assert set(body) == {"profile", "privacy", "appearance", "notifications", "blocked_count", "export", "consent", "support"}
     assert body["profile"]["email_hint"] == "a***@example.org"  # a hint, never the address
     assert "asha.rao" not in r.content.decode()
-    assert body["appearance"] == {"theme": "system", "accent": "mint", "swipe_tabs": True}
+    assert body["appearance"] == {"theme": "system", "accent": "emerald", "swipe_tabs": True}
     assert body["notifications"]["intros"] == {"in_app": True, "email": True}
     assert body["notifications"]["messages"] == {"in_app": True, "email": False}
     assert body["blocked_count"] == 0 and body["export"] is None
@@ -40,7 +40,7 @@ def test_settings_are_always_my_own(make_member, client_for):
     a, b = make_member("student", display_name="Alice"), make_member("student", display_name="Bob", city="Pune")
     patch(client_for(b), "/api/me/appearance", {"accent": "rose"})
     seen_by_a = client_for(a).get("/api/me/settings").json()
-    assert seen_by_a["profile"]["display_name"] == "Alice" and seen_by_a["appearance"]["accent"] == "mint"
+    assert seen_by_a["profile"]["display_name"] == "Alice" and seen_by_a["appearance"]["accent"] == "emerald"
 
 
 # -- privacy ---------------------------------------------------------------------------------------
@@ -105,12 +105,12 @@ def test_allow_requests_off_stops_strangers_but_not_connections_or_org_mates(mak
 
 def test_me_carries_allow_requests_appearance_and_consent_state(make_member, client_for):
     body = client_for(make_member()).get("/api/me").json()
-    assert body["allow_requests"] is True and body["appearance"]["accent"] == "mint"
+    assert body["allow_requests"] is True and body["appearance"]["accent"] == "emerald"
     assert body["needs_consent"] is False and body["policy_version"] == "2026-01"
 
 
 # -- appearance ------------------------------------------------------------------------------------
-@pytest.mark.parametrize("accent", ["mint", "sky", "indigo", "rose", "lime", "mono"])
+@pytest.mark.parametrize("accent", ["emerald", "sky", "indigo", "rose", "lime", "mono"])
 @pytest.mark.parametrize("theme", ["system", "dark", "light"])
 def test_every_allowed_theme_and_accent_is_accepted(make_member, client_for, theme, accent):
     m = make_member()
@@ -158,7 +158,7 @@ def test_appearance_is_a_partial_update_and_defaults_fill_the_rest(make_member, 
 
 def test_a_garbage_stored_appearance_never_reaches_the_client(make_member, client_for):
     m = make_member(appearance={"theme": "neon", "accent": "orange", "swipe_tabs": "maybe"})
-    assert client_for(m).get("/api/me").json()["appearance"] == {"theme": "system", "accent": "mint", "swipe_tabs": True}
+    assert client_for(m).get("/api/me").json()["appearance"] == {"theme": "system", "accent": "emerald", "swipe_tabs": True}
 
 
 def test_appearance_cannot_be_written_for_someone_else(make_member, client_for):

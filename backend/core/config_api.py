@@ -1,7 +1,7 @@
 from django.conf import settings
 from ninja import Router, Schema
 
-from core import flags
+from core import flags, llm
 
 router = Router()
 
@@ -11,6 +11,7 @@ class ConfigOut(Schema):
     beta_mode: bool
     beta_access: bool
     features: dict[str, bool]
+    llm_available: bool  # false when the AI is off or its daily cap is used up: skip the paste-your-bio box, show the pickers
 
 
 def _optional_context(request):
@@ -47,4 +48,5 @@ def get_config(request):
         "beta_mode": settings.BETA_MODE,
         "beta_access": gate.passes(ctx) if ctx else not settings.BETA_MODE,
         "features": flags.all_for(member),
+        "llm_available": llm.available(),
     }

@@ -136,6 +136,24 @@ def _within_daily_cap() -> bool:
     return True
 
 
+def available() -> bool:
+    """Would the bio extraction run right now? False for LLM_PROVIDER=none, a missing key or an used-up daily cap, so the app
+    can skip the paste-your-bio box and go straight to the manual pickers. Read-only: it never counts a call."""
+    if settings.LLM_PROVIDER == "none":
+        return False
+    if isinstance(get_llm(), (GroqLLM, GeminiLLM, AnthropicLLM)) and not _has_key():
+        return False
+    limit = settings.LLM_DAILY_CALL_LIMIT
+    if not limit:
+        return True
+    from core import usage
+
+    try:
+        return usage.count("llm_calls") < limit
+    except Exception:  # a database problem never hides the box
+        return True
+
+
 def extract_json(system: str, user: str, schema: type[T]) -> T | None:
     if settings.LLM_PROVIDER == "none":
         return None  # manual pickers; no key, no network, no database

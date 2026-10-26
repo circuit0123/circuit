@@ -43,6 +43,24 @@ TARGETS: dict[str, tuple[str, str]] = {
     "startup.": ("startup", "startup_id"),
 }
 
+# Richer in-app lines for when we know the other people and things involved (looked up when the list is read, in a few bulk
+# queries; ids only are stored). Used only when every {placeholder} could be filled, else the plain COPY line above is shown.
+# Email subjects stay on the plain lines on purpose: an email can sit in an inbox for years.
+RICH: dict[str, str] = {
+    "intro.accepted": "{who} accepted your intro request to {target}.",
+    "intro.accepted.broker": "{who} accepted the intro request from {requester} that you vouched for.",
+    "intro.vouched": "{who} vouched for your intro request to {target}.",
+    "intro.broker_request": "{who} asked you to vouch for an intro to {target}.",
+    "intro.received": "{who} would like to meet you, vouched for by {via}.",
+    "application.received": "{who} applied for {job}.",
+    "application.status.shortlisted": "You were shortlisted for {job}.",
+    "application.status.hired": "You got the {job} role.",
+    "application.status.rejected": "Your application for {job} was not selected.",
+    "circuit.leg_done": "{who} marked their help with {capability} as done.",
+    "startup.interest": "Someone showed interest in {startup}.",
+    "startup.claimed": "You claimed {startup}.",
+}
+
 TYPE_LABELS = {
     "intros": "introductions",
     "applications": "applications",
@@ -53,9 +71,17 @@ TYPE_LABELS = {
 }
 
 
-def text(kind: str, who: str | None) -> str:
+def text(kind: str, who: str | None, extra: dict | None = None, variant: str | None = None) -> str:
+    """The line to show. `extra` holds the other names and things ({target}, {job}...); `variant` picks a RICH line for the same kind."""
+    values = {"who": who or "Someone", **(extra or {})}
+    rich = RICH.get(variant or kind)
+    if rich is not None:
+        try:
+            return rich.format(**values)
+        except KeyError:  # something could not be looked up (deleted, hidden): say the plain thing instead
+            pass
     template = COPY.get(kind, ("You have a new notification.", "", ""))[0]
-    return template.format(who=who or "Someone")
+    return template.format(who=values["who"])
 
 
 def target(kind: str, payload: dict) -> dict | None:

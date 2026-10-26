@@ -13,7 +13,7 @@ import structlog
 from django.conf import settings
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-from apps.accounts.models import Member
+from apps.accounts.models import Member, Role
 from apps.events.services import record
 from apps.social.models import MediaUpload
 from apps.social.relations import MESSAGING_ROLES, SOCIAL_ROLES
@@ -28,12 +28,23 @@ URL_TTL = 3000  # cached signed URLs live 50 min; the signed URLs themselves las
 VARIANTS = {w: f"w{w}.webp" for w in settings.MEDIA_VARIANT_WIDTHS}
 
 
+PICTURE_PURPOSES = {MediaUpload.Purpose.AVATAR, MediaUpload.Purpose.STARTUP_LOGO}
+
+
 def bucket(purpose: str) -> str:
     return settings.STORAGE_BUCKETS[purpose]
 
 
+def widths(purpose: str) -> tuple[int, ...]:
+    return settings.MEDIA_AVATAR_WIDTHS if purpose in PICTURE_PURPOSES else settings.MEDIA_VARIANT_WIDTHS
+
+
 def create_upload(member: Member, purpose: str, content_type: str, size: int) -> tuple[MediaUpload, str]:
-    allowed = SOCIAL_ROLES if purpose == MediaUpload.Purpose.POST else MESSAGING_ROLES
+    allowed = {
+        MediaUpload.Purpose.POST: SOCIAL_ROLES,
+        MediaUpload.Purpose.AVATAR: MESSAGING_ROLES,  # every member who can use the app
+        MediaUpload.Purpose.STARTUP_LOGO: {Role.FOUNDER},
+    }.get(purpose, MESSAGING_ROLES)
     if member.role not in allowed:
         raise Forbidden()
     if content_type not in CONTENT_TYPES:
@@ -62,7 +73,7 @@ def _encode(img: Image.Image, max_bytes: int) -> bytes:
     return blob
 
 
-def _process(data: bytes) -> tuple[dict[int, bytes], tuple[int, int]]:
+def _process(data: bytes, sizes: tuple[int, ...]) -> tuple[dict[int, bytes], tuple[int, int]]:
     Image.MAX_IMAGE_PIXELS = settings.MEDIA_MAX_PIXELS
     try:
         probe = Image.open(io.BytesIO(data))
@@ -75,7 +86,7 @@ def _process(data: bytes) -> tuple[dict[int, bytes], tuple[int, int]]:
         raise ApiError(422, "invalid_image", "This file is not a usable image") from e
     img = img.convert("RGBA" if "A" in img.getbands() else "RGB")
     out: dict[int, bytes] = {}
-    for width in settings.MEDIA_VARIANT_WIDTHS:
+    for width in sizes:
         v = img if img.width <= width else img.resize((width, round(img.height * width / img.width)), Image.Resampling.LANCZOS)
         out[width] = _encode(v, settings.MEDIA_VARIANT_MAX_BYTES[width])
     return out, (img.width, img.height)
@@ -95,7 +106,7 @@ def complete_upload(member: Member, upload_id: int) -> MediaUpload:
     try:
         if len(data) > settings.MAX_UPLOAD_BYTES:
             raise ApiError(422, "image_too_large", "Images can be up to 5 MB")
-        variants, (w, h) = _process(data)
+        variants, (w, h) = _process(data, widths(upload.purpose))
     except ApiError:
         store.delete(b, [f"{upload.path}/original"])  # never keep a file we refused
         raise
@@ -136,7 +147,8 @@ def urls_for(uploads: Iterable[MediaUpload]) -> dict[int, dict]:
     missing: dict[str, list[str]] = {}
     for u in uploads:
         entry = {"width": u.width, "height": u.height}
-        for width, name in VARIANTS.items():
+        for width in widths(u.purpose):
+            name = VARIANTS[width]
             path = f"{u.path}/{name}"
             cached = cache.get_json(f"media:{path}")
             if cached:
@@ -150,7 +162,8 @@ def urls_for(uploads: Iterable[MediaUpload]) -> dict[int, dict]:
             signed[path] = url
             cache.set_json(f"media:{path}", url, URL_TTL)
     for u in uploads:
-        for width, name in VARIANTS.items():
+        for width in widths(u.purpose):
+            name = VARIANTS[width]
             result[u.pk].setdefault(f"w{width}", signed.get(f"{u.path}/{name}", ""))
     return result
 
@@ -164,3 +177,76 @@ def delete_files(uploads: Iterable[MediaUpload]) -> None:
             get_storage().delete(b, paths)
         except Exception:  # best effort: the rows are already gone, an orphan file is harmless and private
             log.warning("media_delete_failed", bucket=b)
+
+
+# -- profile photos and startup logos ---------------------------------------------------------------------
+# One small signed URL per picture. `person()` and `author()` ask `photo_of(member)`; a list endpoint calls `prime_photos(members)`
+# first so the whole list is signed in one storage call. Without priming a single lookup still works (cached, then one call).
+def small_urls(folders: Iterable[str]) -> dict[str, str]:
+    """{folder: signed w480 URL} for pictures in the avatars bucket. One storage call per bucket for the uncached ones."""
+    cache, store = get_cache(), get_storage()
+    name = VARIANTS[settings.MEDIA_AVATAR_WIDTHS[0]]
+    found: dict[str, str] = {}
+    missing: dict[str, list[str]] = {}
+    for folder in {f for f in folders if f}:
+        cached = cache.get_json(f"media:{folder}/{name}")
+        if cached:
+            found[folder] = cached
+        else:
+            missing.setdefault(bucket(folder.split("/", 1)[0]), []).append(folder)
+    for b, group in missing.items():
+        signed = store.signed_urls(b, [f"{f}/{name}" for f in group])
+        for folder in group:
+            url = signed.get(f"{folder}/{name}", "")
+            if url:
+                found[folder] = url
+                cache.set_json(f"media:{folder}/{name}", url, URL_TTL)
+    return found
+
+
+def prime_photos(members: Iterable[Member]) -> None:
+    """Sign every listed member's photo in one go. Under-18 members' photos are shown to nobody but themselves (`own_photo`)."""
+    members = [m for m in members if m is not None]
+    urls = small_urls(m.photo_path for m in members if m.photo_path and not m.is_minor)
+    for m in members:
+        m._photo_url = urls.get(m.photo_path) if m.photo_path and not m.is_minor else None
+
+
+def photo_of(member: Member) -> str | None:
+    if not hasattr(member, "_photo_url"):
+        prime_photos([member])
+    return member._photo_url
+
+
+def own_photo(member: Member) -> str | None:
+    """The member's own photo, also for an under-18 member (it is never shown to anyone else)."""
+    return small_urls([member.photo_path]).get(member.photo_path) if member.photo_path else None
+
+
+def prime_logos(startups: Iterable) -> None:
+    startups = list(startups)
+    urls = small_urls(s.logo_path for s in startups if s.logo_path)
+    for s in startups:
+        s._logo_url = urls.get(s.logo_path) if s.logo_path else None
+
+
+def logo_of(startup) -> str | None:
+    if not hasattr(startup, "_logo_url"):
+        prime_logos([startup])
+    return startup._logo_url
+
+
+def set_picture(member: Member, upload_id: int, purpose: str, old_folder: str) -> str:
+    """Take one of the member's finished uploads as a photo or logo and drop the previous picture. Returns the new folder."""
+    upload = claim_uploads(member, [upload_id], purpose)[0]
+    if old_folder and old_folder != upload.path:
+        delete_picture(old_folder)
+    return upload.path
+
+
+def delete_picture(folder: str) -> None:
+    """Remove a picture's files and its upload row (best effort on the files)."""
+    old = MediaUpload.objects.filter(path=folder).first()
+    if old is not None:
+        delete_files([old])
+        old.delete()

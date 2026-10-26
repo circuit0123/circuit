@@ -9,15 +9,16 @@ from apps.events.services import record
 from core.errors import ApiError
 
 THEMES = ("system", "dark", "light")
-ACCENTS = ("mint", "sky", "indigo", "rose", "lime", "mono")
-DEFAULTS = {"theme": "system", "accent": "mint", "swipe_tabs": True}
+ACCENTS = ("emerald", "sky", "indigo", "rose", "lime", "mono")
+LEGACY_ACCENTS = {"mint": "emerald"}  # the old name of the default accent: still accepted, always stored and sent as emerald
+DEFAULTS = {"theme": "system", "accent": "emerald", "swipe_tabs": True}
 
 
 def resolved(member: Member) -> dict:
     """The member's settings with defaults filled in. Unknown or invalid stored values fall back to the default."""
     stored = member.appearance if isinstance(member.appearance, dict) else {}
     theme = stored.get("theme")
-    accent = stored.get("accent")
+    accent = LEGACY_ACCENTS.get(stored.get("accent"), stored.get("accent"))
     swipe = stored.get("swipe_tabs")
     return {
         "theme": theme if theme in THEMES else DEFAULTS["theme"],
@@ -28,6 +29,7 @@ def resolved(member: Member) -> dict:
 
 def update(member: Member, changes: dict) -> dict:
     """Apply a partial change (only the keys the client sent). Raises 422 for an unknown key or value."""
+    changes = {k: LEGACY_ACCENTS.get(v, v) if k == "accent" else v for k, v in changes.items()}
     for key, value in changes.items():
         if key == "theme" and value in THEMES:
             continue

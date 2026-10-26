@@ -14,6 +14,9 @@ class Conversation(models.Model):
     member_b = models.ForeignKey("accounts.Member", on_delete=models.CASCADE, related_name="conversations_b")
     started_by = models.ForeignKey("accounts.Member", on_delete=models.CASCADE, related_name="+")
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.ACTIVE)
+    declined_by = models.ForeignKey(
+        "accounts.Member", null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )  # the person a request was sent to said "no thanks": gone for them, still a quiet request for the sender
     last_message_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

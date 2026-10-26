@@ -13,14 +13,22 @@ from core.pagination import CursorParams
 router = Router()
 
 
+class MessageImageOut(Schema):
+    width: int | None
+    height: int | None
+    w1440: str  # signed link, valid about an hour
+    w480: str
+
+
 class MessageOut(Schema):
     id: int
     conversation_id: int
     mine: bool
     body: str  # empty if a moderator removed the message
-    image: dict | None  # {width, height, w1440, w480} signed URLs, valid about an hour
+    image: MessageImageOut | None
     removed: bool
     created_at: datetime
+    read_at: datetime | None  # my own messages only, and only when both of us switched read receipts on (else null)
 
 
 class ConversationOut(Schema):
@@ -62,6 +70,11 @@ class UnreadOut(Schema):
     marked: int
 
 
+class UnreadCountsOut(Schema):
+    chats: int  # conversations with something I have not read
+    requests: int  # always 0 for members under 18
+
+
 def _conv(member, conv: Conversation) -> dict:
     return services.conversation_rows(member, [conv])[0]
 
@@ -75,6 +88,16 @@ def _conv(member, conv: Conversation) -> dict:
 )
 def list_conversations(request, params: FolderParams = Query(...)):
     return services.list_conversations(current_member(request), params.folder)
+
+
+@router.get(
+    "/unread-count",
+    response=UnreadCountsOut,
+    summary="Unread conversations",
+    description="How many chats and requests have something I have not read: for the Inbox tab dot and the desktop rail.",
+)
+def unread_count(request):
+    return services.unread_counts(current_member(request))
 
 
 @router.post(
@@ -106,7 +129,7 @@ def get_conversation(request, conversation_id: int):
     "/{conversation_id}/messages",
     response=MessagePage,
     summary="Messages in a conversation",
-    description="Newest first. Pass next_cursor as cursor to load older ones. Read receipts are not shown to senders.",
+    description="Newest first. Pass next_cursor as cursor to load older ones. `read_at` on my own messages is set only when both of us have read receipts on.",
 )
 def list_messages(request, conversation_id: int, params: CursorParams = Query(...)):
     from core.pagination import decode_cursor, encode_cursor
@@ -147,6 +170,18 @@ def send(request, conversation_id: int, body: SendIn):
 def accept(request, conversation_id: int):
     member = current_member(request)
     return _conv(member, services.accept(member, conversation_id))
+
+
+@router.post(
+    "/{conversation_id}/decline",
+    response={204: None},
+    summary="Decline a request",
+    description="'No thanks' to a request I received. It disappears for me; the sender is not told. Only the person the request "
+    "was sent to; a conversation that is not a request is a 409 `not_a_request`.",
+)
+def decline(request, conversation_id: int):
+    services.decline(current_member(request), conversation_id)
+    return Status(204, None)
 
 
 @router.post(

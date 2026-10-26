@@ -55,6 +55,7 @@ class PrivacyOut(Schema):
     visible_to_org: bool
     circuits_opt_in: bool
     allow_requests: bool  # strangers may send message and connection requests (always false for under-18s)
+    read_receipts: bool  # show read ticks on my messages; the other person sees them only when they have it on too
 
 
 class PrivacyPatch(Schema):
@@ -63,12 +64,13 @@ class PrivacyPatch(Schema):
     visible_to_org: StrictBool | None = None
     circuits_opt_in: StrictBool | None = None
     allow_requests: StrictBool | None = None
+    read_receipts: StrictBool | None = None
 
 
 class AppearancePatch(Schema):
     model_config = ConfigDict(extra="forbid")
     theme: Literal["system", "dark", "light"] | None = None
-    accent: Literal["mint", "sky", "indigo", "rose", "lime", "mono"] | None = None
+    accent: Literal["emerald", "mint", "sky", "indigo", "rose", "lime", "mono"] | None = None  # "mint" is the old name of emerald
     swipe_tabs: StrictBool | None = None
 
 
@@ -143,6 +145,7 @@ def _privacy(m: Member) -> dict:
     return {
         "profile_visibility": m.profile_visibility, "visible_to_org": m.visible_to_org,
         "circuits_opt_in": m.circuits_opt_in, "allow_requests": m.allow_requests,
+        "read_receipts": m.read_receipts,
     }  # fmt: skip
 
 
@@ -200,7 +203,7 @@ def patch_privacy(request, body: PrivacyPatch):
     "/me/appearance",
     response=AppearanceOut,
     summary="Update my appearance",
-    description="Theme (system, dark, light), personal accent (mint, sky, indigo, rose, lime, mono) and swipe between tabs. "
+    description="Theme (system, dark, light), personal accent (emerald, sky, indigo, rose, lime, mono; the old name 'mint' is still accepted and stored as emerald) and swipe between tabs. "
     "Send only the fields to change. Any other value or field is a 422. Stored on the member so it follows them across devices.",
 )
 def patch_appearance(request, body: AppearancePatch):

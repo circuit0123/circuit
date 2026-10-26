@@ -134,6 +134,16 @@ def team_member_ids(startup: Startup) -> list[int]:
     return sorted(ids)
 
 
+def startup_id_of(member: Member) -> int | None:
+    """The startup this member is on (a listed team member, else the one they claimed); the first if several."""
+    on_team = (
+        StartupMember.objects.filter(member=member).order_by("created_at", "id").values_list("startup_id", flat=True).first()
+    )
+    if on_team is not None:
+        return on_team
+    return Startup.objects.filter(claimed_by=member, hidden_at__isnull=True).order_by("id").values_list("pk", flat=True).first()
+
+
 def get_startup(startup_id: int) -> Startup:
     s = Startup.objects.filter(pk=startup_id, hidden_at__isnull=True).first()
     if s is None:
