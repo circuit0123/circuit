@@ -73,7 +73,7 @@ def _me(m: Member, beta_access: bool) -> dict:
 
     return {
         "id": m.pk, "role": m.role, "display_name": m.display_name, "bio": m.bio, "headline": m.headline_line(), "city": m.city, "college": m.college,
-        "organisation_name": m.organisation.name if m.organisation_id else None,
+        "organisation_name": m.organisation.name if m.organisation else None,
         "lat": m.location.y if m.location else None, "lng": m.location.x if m.location else None,
         "verification_level": m.verification_level, "organisation_id": m.organisation_id, "is_minor": m.is_minor,
         "profile_visibility": m.profile_visibility, "visible_to_org": m.visible_to_org, "circuits_opt_in": m.circuits_opt_in,
