@@ -71,7 +71,9 @@ function Page({ p, connect }: { p: PersonView; connect: (note: string) => void }
   const ask = useAskIntro();
   const features = useFeatures();
   const posts = useMemberPosts(p.id);
-  const path = useIntroPath(p.connection === "connected" ? null : p.id);
+  const me = useMe().data;
+  // Under-18 members can't start contact with people they don't know (DESIGN.md §8), so they get no intro row.
+  const path = useIntroPath(p.connection === "connected" || me?.isMinor ? null : p.id);
   const via = path.data?.via ?? null;
   const first = firstName(p.name);
 
