@@ -120,13 +120,13 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [x] Sign-up and onboarding per DESIGN.md §4 "Sign-up and onboarding": one thing per screen (steps 1–14), resumable, inference before asking, under-18 defaults, measured time-to-first-drop < 2 min (Playwright test with timing) (F2; the investor and partner branches arrive with their flags, and the photo step is mock-only until an avatar upload endpoint exists)
 - [x] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end (F3: mobile and desktop Home, Update view, Notifications, the intro confirm sheet; Pulse off / Daily Drop off / both off / under-18 states)
 - [ ] Build log composer and post view (media pager, reactions, replies, report)
-- [ ] Discover: People, Startups, Jobs (+ job page, apply), Map
+- [x] Discover: People, Startups, Jobs (+ job page, apply), Map (F4: search over all four, filters in a sheet, Skills in demand, the promoted slot, MapLibre map with the pin sheet and Back to the same pin and zoom, Startup page with Follow, founders and the claim flow; empty, loading, error, under-18 and features-off states)
 - [ ] Circuits: ring cards, live status, signature closing animation
 - [ ] Inbox: Chats + Requests, realtime messages, report/block
 - [ ] Profile: header, needs/offers, highlights, build log grid, circuits, about; connect/follow/message/intro via mutual
-- [ ] Founder applicants view, my applications, partner dashboard
+- [ ] Founder applicants view, my applications, partner dashboard — F4: founder applicant view (ranked by skill match, Shortlist / Not now / Hired) and "Your applications" are built. Still open: the partner dashboard
 - [ ] Every screen: loading, empty, error states; works at 375px and 1280px
-- [ ] TabPager: swipe between tabs per DESIGN.md §3 gesture rules (Playwright touch tests: swipe commits, vertical scroll wins, no conflict with Live wire, Daily Drop, media pager, map) — F1: touch tests for the swipe commit and snap-back, vertical scroll, Live wire, Daily Drop, chips rows, segmented control, a swipe lock for the Map, sheets, text fields, scroll position, reduced motion and the toggle. Still open: the media pager and the real Map (F4, F6)
+- [ ] TabPager: swipe between tabs per DESIGN.md §3 gesture rules (Playwright touch tests: swipe commits, vertical scroll wins, no conflict with Live wire, Daily Drop, media pager, map) — F1: touch tests for the swipe commit and snap-back, vertical scroll, Live wire, Daily Drop, chips rows, segmented control, a swipe lock for the Map, sheets, text fields, scroll position, reduced motion and the toggle. F4: the real Map holds the lock (touch test in discover.spec.ts). Still open: the media pager (F6)
 - [ ] ThemeProvider + AccentPicker: accent applied before first paint, all six accents pass contrast checks in both themes — F1 built ThemeProvider (first paint, 250ms crossfade) and tested contrast for all six accents in both themes; the AccentPicker is built and used on the sign-up Colour step (F2); Settings → Appearance arrives in F6
 - [ ] Playwright tests for the five demo stories at both widths; axe checks
 
