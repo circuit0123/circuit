@@ -3,6 +3,7 @@
     "beta_gate": [
       "useFeatures",
       "useHome",
+      "useJoinVisit",
       "useJoinWaitlist",
       "useMe",
       "useRedeem"

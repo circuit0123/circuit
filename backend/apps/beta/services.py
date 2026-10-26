@@ -4,14 +4,16 @@ import re
 import secrets
 from datetime import timedelta
 from urllib.parse import urlencode
+from zoneinfo import ZoneInfo
 
 import structlog
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.db.models import F
 from django.utils import timezone
 
 from apps.accounts.models import Member, Role
-from apps.beta.models import AllowlistEntry, BetaAccess, InviteCode, WaitlistEntry
+from apps.beta.models import AllowlistEntry, BetaAccess, InviteCode, JoinVisit, WaitlistEntry
 from apps.events.services import record
 from apps.moderation.models import AuditLog
 from core.codes import ALPHABET, plain_email
@@ -263,3 +265,12 @@ def reject_waitlist(entry: WaitlistEntry, staff) -> bool:
     entry.save(update_fields=["status", "reviewed_by", "reviewed_at"])
     AuditLog.objects.create(actor=staff, action="waitlist.reject", target_type="beta.waitlistentry", target_id=str(entry.pk))
     return True
+
+
+def count_visit(src: str) -> None:
+    """Add one to today's (India time) count for this source. Atomic, so concurrent visits are not lost."""
+    day = timezone.localtime(timezone=ZoneInfo(settings.NOTIFICATION_TZ)).date()
+    updated = JoinVisit.objects.filter(src=src, day=day).update(count=F("count") + 1)
+    if not updated:
+        JoinVisit.objects.bulk_create([JoinVisit(src=src, day=day, count=0)], ignore_conflicts=True)
+        JoinVisit.objects.filter(src=src, day=day).update(count=F("count") + 1)

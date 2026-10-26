@@ -95,6 +95,18 @@
       "status": 400
     },
     {
+      "hook": "useJoinVisit",
+      "request": {
+        "body": {
+          "src": "landing-students"
+        },
+        "method": "POST",
+        "path": "/api/join/visit"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
       "hook": "useJoinWaitlist",
       "request": {
         "body": {

@@ -223,6 +223,7 @@ RATE_LIMITS = {
     "redeem": (10, 3600),  # per member
     "redeem_ip": (30, 3600),  # per client address, so one network cannot grind through codes with many accounts
     "waitlist": (5, 3600),  # per client address; public endpoint
+    "join_visit": (120, 3600),  # per client address; public endpoint (a college can share one address)
     "settings_write": (60, 3600),  # profile privacy, appearance and notification preferences
     "block": (30, 86400),
     "export": (3, 86400),

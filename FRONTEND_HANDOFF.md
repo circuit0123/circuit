@@ -95,6 +95,7 @@ A missed event is harmless: refetch on reconnect and on a slow poll. Row-level p
 | `POST /api/conversations` (new) | 10 / day | `POST .../messages` | 300 / day |
 | `POST /api/connections/requests` | 20 / day | `POST /api/reports` | 10 / day |
 | `POST /api/beta/redeem` | 10 / hour (30 / hour per address) | `POST /api/waitlist` | 5 / hour per address |
+| `POST /api/join/visit` | 120 / hour per address | | |
 | `POST /api/me/export` | 3 / day | `POST /api/support` | 5 / day |
 
 ---
@@ -118,11 +119,12 @@ write but never sends it (drop the app's `mint` mapping). `role` is one of `stud
 **Fixtures:** `bootstrap/{signed_out,default,founder,partner,under_18,features_off}.json`.
 
 ### `access` — invite code, waitlist, consent
-**Hooks:** `useRedeem`, `useJoinWaitlist`, `useConsent`, `useInviteLink`.
+**Hooks:** `useRedeem`, `useJoinWaitlist`, `useJoinVisit`, `useConsent`, `useInviteLink`.
 | Call | Returns / errors |
 |---|---|
 | `POST /api/beta/redeem` `{code}` | `RedeemOut`. Any bad code is the same `400 invalid_code`. `429` after 10 tries an hour |
 | `POST /api/waitlist` (public) `{email, role, city, college, note, src}` | `202 {status: "ok"}` always (never say "already on the list") |
+| `POST /api/join/visit` (public) `{src}` | `204`. Call it once per browser session when `/join` opens with a `src`, for the per-source funnel (clicks next to sign-ups). Fire and forget: ignore errors. Stores only a per-day count; `422` for a `src` that is not lowercase letters, digits, `-` or `_` (max 40) |
 | `POST /api/me/consent` `{policy_version}` | `ConsentOut` |
 | `GET /api/invites` | `InvitesOut`: my invite codes and links (up to 3), used or available |
 
@@ -331,6 +333,8 @@ Fixtures `errors/{signed_out,default,rate_limited,beta_required}.json` show 401,
 | Profile highlights, GitHub summary | not scheduled | |
 
 ## 3. What changed in the API in B7 (for switching hooks from mocks)
+
+B7 part 2 (API 1.1.0): new `POST /api/join/visit` (above). Nothing else changed.
 
 New: `GET /api/cities`, `GET /api/organisations/search`, `GET /api/search`, `GET /api/intros/capacity`, `GET /api/jobs/skills-in-demand`,
 `GET /api/conversations/unread-count`, `POST /api/conversations/{id}/decline`, `PUT|DELETE /api/me/photo`, `PUT|DELETE /api/startups/{id}/logo`.

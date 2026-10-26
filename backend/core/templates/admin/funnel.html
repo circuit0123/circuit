@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Home</a> &rsaquo; Metrics</div>{% endblock %}
+{% block content %}
+<h1>Sign-up funnel by source</h1>
+<p>
+  Each step counts members who signed up in the window (clicks are landing links opened). Counts under {{ min_count }} show as
+  <b>&lt;5</b>. Real members only; nothing here identifies a person.
+  Window:
+  {% for d in windows %}{% if d.days == days %}<b>{{ d.label }}</b>{% else %}<a href="?days={{ d.days }}">{{ d.label }}</a>{% endif %}{% if not forloop.last %} · {% endif %}{% endfor %}
+</p>
+<table>
+  <thead><tr><th>Source</th><th>Clicks</th><th>Signed up</th><th>Beta access</th><th>Onboarding done</th><th>First match action</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{{ r.src }}</td>
+      {% for c in r.cells %}<td>{% if c.hidden %}&lt;5{% else %}{{ c.value }}{% endif %}</td>{% endfor %}
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">No sign-ups or clicks yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

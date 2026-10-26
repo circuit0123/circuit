@@ -928,6 +928,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/join/visit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Count a landing link opened
+         * @description Public. The app's /join page calls it once per browser session with the link's `src`, so the funnel can show clicks next to sign-ups. Adds 1 to a per-day count for that `src`; nothing about the visitor is stored. Answers 204. Rate limited per address.
+         */
+        post: operations["apps_beta_api_join_visit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/livewire": {
         parameters: {
             query?: never;
@@ -4211,6 +4231,14 @@ export interface components {
             /** Upload Url */
             upload_url: string;
         };
+        /** VisitIn */
+        VisitIn: {
+            /**
+             * Src
+             * @default
+             */
+            src: string;
+        };
         /** WaitlistIn */
         WaitlistIn: {
             /**
@@ -5504,6 +5532,28 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApplicationOut"];
                 };
+            };
+        };
+    };
+    apps_beta_api_join_visit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VisitIn"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
