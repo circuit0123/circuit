@@ -22,6 +22,18 @@ max_requests_jitter = 100
 
 worker_tmp_dir = "/dev/shm"  # heartbeat files in memory: the container's disk may be read-only or slow
 accesslog = None  # RequestLogMiddleware writes exactly one JSON line per request
-errorlog = "-"
+
+# gunicorn's own messages (starting, a worker restarting, a crash) go to stdout as JSON with a severity. By default they go to
+# stderr as plain text, which Cloud Run would show as ERROR even for "Booting worker".
+logconfig_dict = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"json": {"()": "core.logging.StdlibJsonFormatter"}},
+    "handlers": {"console": {"class": "logging.StreamHandler", "stream": "ext://sys.stdout", "formatter": "json"}},
+    "loggers": {
+        "gunicorn.error": {"level": "INFO", "handlers": ["console"], "propagate": False},
+        "gunicorn.access": {"level": "INFO", "handlers": [], "propagate": False},
+    },
+}
 
 control_socket_disable = True  # gunicorn 26's admin socket is not used here, and the app user has no home folder for it

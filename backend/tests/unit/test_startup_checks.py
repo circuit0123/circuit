@@ -179,9 +179,10 @@ def test_deployed_database_connections_require_tls_except_to_localhost():
     remote = _db_settings(
         DATABASE_URL="postgres://u:p@aws-0.pooler.supabase.com:6543/postgres", DATABASE_POOLER="transaction", ENV="production"
     )
-    assert remote["options"] == {"sslmode": "require"}
-    assert _db_settings(DATABASE_URL="postgres://u:p@localhost:5432/circuit", ENV="production")["options"] == {}
-    assert _db_settings(DATABASE_URL="postgres://u:p@db.example.com:5432/x", ENV="dev")["options"] == {}
+    assert remote["options"]["sslmode"] == "require"
+    assert "sslmode" not in _db_settings(DATABASE_URL="postgres://u:p@localhost:5432/circuit", ENV="production")["options"]
+    assert "sslmode" not in _db_settings(DATABASE_URL="postgres://u:p@db.example.com:5432/x", ENV="dev")["options"]
+    assert remote["options"]["connect_timeout"] == 5  # a dead database fails /ready in seconds instead of hanging it
 
 
 # ---- the committed deploy files and .env.example agree with the code ---------------------------------------------------------
