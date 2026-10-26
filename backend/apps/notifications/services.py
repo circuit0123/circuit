@@ -78,6 +78,9 @@ def email_send_time(recipient: Member, now: datetime | None = None) -> datetime:
 def _queue_email(recipient: Member, kind: str, actor: Member | None) -> bool:
     if not recipient.email:
         return False
+    if not outbox.has_room_for_optional():  # free-tier budget used up: in-app only, the notification row already exists
+        log.info("email.budget_skipped", kind=kind)
+        return False
     who = actor.display_name if actor and not actor.is_minor and actor.deleted_at is None and actor.display_name else None
     parts = copy.email_parts(kind, who)
     if parts is None:

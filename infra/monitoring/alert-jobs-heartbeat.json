@@ -1,0 +1,20 @@
+{
+  "kind": "alertPolicy",
+  "displayName": "Circuit ${ENV}: job watcher has stopped",
+  "documentation": {"mimeType": "text/markdown", "content": "check_jobs (part of the every-5-min job) has not finished for 30 minutes, so nothing is watching the other jobs. Check Cloud Scheduler and the circuit-${ENV}-every-5-min job. RUNBOOK.md, section \"A job is overdue\"."},
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "no check_jobs run for 30 minutes",
+      "conditionAbsent": {
+        "filter": "metric.type=\"logging.googleapis.com/user/circuit_${ENV}_jobs_heartbeat\" AND resource.type=\"cloud_run_job\"",
+        "aggregations": [{"alignmentPeriod": "300s", "perSeriesAligner": "ALIGN_DELTA", "crossSeriesReducer": "REDUCE_SUM"}],
+        "duration": "1800s",
+        "trigger": {"count": 1}
+      }
+    }
+  ],
+  "alertStrategy": {"autoClose": "3600s"},
+  "notificationChannels": ${CHANNELS},
+  "enabled": true
+}

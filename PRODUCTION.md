@@ -13,7 +13,7 @@ infrastructure, this file wins.
 | App | Next.js (apps/app) on Vercel | PWA, Supabase sign-in, calls the API |
 | API | Django 5 + Django Ninja on Cloud Run, asia-south1 | Stateless. gunicorn, 2 workers × 4 threads = 8 requests at once per instance. Min instances 0 during the closed beta (no cost while idle; the first request after a quiet spell takes ~5–10 s), max 3. Raise min to 1 (about $8–12/month) before public launch. Image: docker/backend/Dockerfile |
 | Admin | Django admin on the same service | Staff login + TOTP 2FA; super admins only; not in demo |
-| Background jobs | Django management commands as Cloud Run Jobs, started by Cloud Scheduler on India time | Schedule and settings: deploy/gcp/app.toml (`make jobs` lists it). The four frequent jobs (expire_items, send_emails, build_exports, delete_accounts) share one `every-5-min` job so the container starts once, not four times. Migrations are their own job, run before a new revision gets traffic |
+| Background jobs | Django management commands as Cloud Run Jobs, started by Cloud Scheduler on India time | Schedule and settings: deploy/gcp/app.toml (`make jobs` lists it). The five frequent jobs (expire_items, send_emails, build_exports, delete_accounts, check_jobs) share one `every-5-min` job so the container starts once, not four times. Migrations are their own job, run before a new revision gets traffic |
 | Database | Supabase Postgres + PostGIS + pgvector | Source of truth; connect via the pooler |
 | Auth | Supabase Auth | Google + email OTP; JWT verified in Django via JWKS |
 | Files | Supabase Storage | `avatars` (public), `private` (reports, exports) |
@@ -21,9 +21,9 @@ infrastructure, this file wins.
 | Cache + rate limits | Redis (Upstash), free tier to start | Disposable; Postgres fallback. Free tier = 500K commands/month; pay-as-you-go is $0.20 per 100K commands. If the limit is hit the app reads Postgres, slower but correct |
 | Graph | Recursive SQL + networkx (core/graph) | Neo4j only if a BACKLOG.md trigger is hit |
 | Secrets | Google Secret Manager | Never in repo, image or frontend. One secret per value, mounted as an environment variable; only the API's own service account can read them (`make secret`) |
-| Images | Artifact Registry (asia-south1) | Built on your laptop by `make deploy` until Stage 9 adds CI; the newest 5 are kept |
-| CI/CD | GitHub Actions | Temporary staging key until Stage 9, then Workload Identity Federation |
-| Errors | Sentry (backend + app) | PII scrubbed, releases + source maps |
+| Images | Artifact Registry (asia-south1) | Built by the deploy workflow (x86_64 and ARM64, tagged with the commit), or on your laptop by `make deploy`; the newest 5 are kept |
+| CI/CD | GitHub Actions | CI on every pull request; deploys log in with Workload Identity Federation (no key). RUNBOOK.md "Deploy" |
+| Errors | Sentry (backend; the app's part arrives with the frontend) | PII scrubbed, tagged with environment and release (the commit) |
 | Logs | Cloud Logging (structlog JSON) | Request IDs end to end |
 | Uptime | Better Stack or UptimeRobot | Alerts reach a phone |
 | Email | Resend (or Postmark) | Test sender until the domain is verified |
@@ -50,7 +50,7 @@ The landing site only links to the app; it never calls private API endpoints.
 | Django admin | On | Off | On (staff + 2FA) | On (staff + 2FA) |
 | Email | Console | Disabled | Test sender to team inboxes | Real sender |
 | Search engines | n/a | noindex | noindex | Landing indexed; app noindex except public pages |
-| Deploy | Manual | Manual, from a release tag | Auto on merge to main | Manual approval after staging passes (until Stage 9: `make deploy ENV=production` from the laptop, with a typed confirmation) |
+| Deploy | Manual | Manual, from a release tag | Auto on merge to main | Manual approval (GitHub Environment `production`) after a green `ci`; or `make deploy ENV=production` from the laptop, with a typed confirmation |
 | Banner | "Dev" | "Demo — sample data" | "Staging" | "Beta" while BETA_MODE is on |
 | BETA_MODE | off | off | on (to test the gate) | on until public launch |
 | FEATURES | all everyone | all everyone | all everyone | see §2b |
@@ -166,8 +166,8 @@ Aggregates hide counts under 5. Heatmaps use neighbourhood-sized cells.
 - Consent stored with policy version + timestamp.
 - Under-18 students: hidden profile by default; no messages from strangers.
 - Data requests: export, correction, deletion (deletes or anonymises).
-- Retention: events (pseudonymous, kept), request logs (30 days), unverified accounts
-  (purged after 30 days).
+- Retention: events (pseudonymous, 365 days), notifications (read 90 days, any 180), request logs (30 days), unverified accounts
+  (purged after 30 days), database backups (30 days). The daily `retention_cleanup` job does the database ones; RUNBOOK.md "Retention" lists every period.
 - Processors listed: Supabase, Google Cloud, Vercel, the active LLM provider, Resend, Sentry, Upstash, Razorpay.
 - Payments: refund and cancellation policy page; GST on invoices (accountant confirms
   GSTIN, rates and invoice format before live payments); Razorpay live activation
@@ -178,6 +178,11 @@ Aggregates hide counts under 5. Heatmaps use neighbourhood-sized cells.
   it is a paid add-on (about $100/month per 7 days of retention, check supabase.com/pricing).
   Decide before real users whether the beta needs it; daily backups lose up to a day. Restore
   drill to staging (or a scratch project) before launch, then quarterly.
+- Our own copy, on any plan: the `backup_db` job (02:30 IST) writes an encrypted `pg_dump` of the `public` and `auth` schemas to a
+  private bucket in our Google project, kept 30 days (RUNBOOK.md "Restore from a backup"). Encrypted with an `age` PUBLIC key:
+  the cloud holds no key that can open it; the private key is offline in a password manager. The job's service account can add files and
+  nothing else. `make restore-drill` restores the newest one into a throwaway local database and compares row counts. Files in Supabase
+  Storage are not part of it.
 - The free Supabase plan pauses a project after a week without activity and has no backups:
   fine for trying the deploy, not for real members.
 - Django migrations: reviewed, backwards-compatible (expand then contract), tested on a
@@ -194,7 +199,7 @@ Aggregates hide counts under 5. Heatmaps use neighbourhood-sized cells.
 - Logs are JSON with `severity` and `message` (Cloud Logging fields), plus the Cloud Trace link.
 - Timeouts + retries + fallbacks on every external call.
 - Jobs idempotent, retry-limited, alert on failure.
-- Expiry: `expire_items` job every 15 min, and reads treat past-deadline items as expired.
+- Expiry: `expire_items` job every 5 min, and reads treat past-deadline items as expired.
 - Supabase pooler; Django CONN_MAX_AGE and pool size × max instances under the limit.
 
 ## 7a. Database connections (Supabase pooler)
@@ -222,11 +227,16 @@ reach Supabase's direct database address (IPv6 only). So the API connects throug
 
 | Signal | Tool | Alert when |
 |---|---|---|
-| Errors | Sentry | New error type or error spike |
-| Uptime | Uptime monitor | Landing, app, API or sign-in down > 2 min |
+| Errors | Sentry (backend; names, emails, phones, tokens and request bodies removed before sending; tagged with environment and release) | New error type or error spike |
+| Uptime | Cloud Monitoring uptime checks (API `/ready`, app, landing) | Down for 2 min, from more than one place |
+| 5xx | Cloud Monitoring | More than 2% of API responses for 5 min (and at least 3) |
 | Latency | Cloud Monitoring | API p95 > 1s for 10 min |
-| Jobs | Cloud Monitoring + logs | Any job fails twice in a row |
+| Jobs | Cloud Monitoring + log metrics + `check_jobs` | A job fails (`job.failed`, or a Cloud Run Job execution fails); a job has no success for 2x its interval (`job.overdue`); the watcher itself has not run for 30 min |
+| Free-tier limits | Weekly `usage_report` job | Anything at 70% of a limit (`usage.warning`) |
 | Cost | GCP budget, Supabase, Anthropic limits | 50%, 80%, 100% of budget |
+
+All of it is code: `infra/monitoring/` and `make monitoring ENV=production`. Alerts go to the notification channels named in `deploy/gcp/<env>.toml`
+(email and a phone one). Each alert's text names the RUNBOOK.md section to open.
 
 ## 9. Performance targets
 - API p95 < 300ms for cached reads, < 800ms otherwise.
@@ -234,25 +244,33 @@ reach Supabase's direct database address (IPv6 only). So the API connects throug
 - Load test ~1,000 concurrent users on staging before public launch.
 
 ## 10. Deploy and release
-Target pipeline (Stage 9):
-1. Pull request → CI: ruff, mypy, pytest (unit, API, demo), tsc, ESLint, Playwright, axe.
-2. Merge to main → build image → migrate staging → deploy staging → `make smoke`.
-3. Release tag → deploy demo → `make reset-demo ENV=demo`.
-4. Manual approval → migrate production → deploy production → smoke → done.
-5. Rollback: previous Cloud Run revision + previous Vercel deployment (RUNBOOK.md).
+The pipeline (GitHub Actions, `.github/workflows/`):
+1. Pull request → `ci`: ruff, mypy, then `make check` (ESLint, every backend test, the app's types and Playwright design checks, the landing build and
+   Playwright). Branch protection on `main` requires the `ci` check, so a red pull request cannot merge. uv and pnpm downloads are cached.
+2. Merge to main → `ci` again → staging deploys by itself (once staging exists: repository variable `STAGING_DEPLOY_ENABLED`).
+3. Release tag `v*` → deploy demo → reset its data (once demo exists: `DEMO_DEPLOY_ENABLED`).
+4. Production: "deploy production" is started by hand and waits for the approval of a required reviewer (GitHub Environment `production`).
+5. Every deploy: confirm the commit is on `main` with a green `ci` → log in to Google Cloud with **Workload Identity Federation** (a signed token from GitHub;
+   no JSON key exists anywhere; the deploy account can only be used by a job in the environment of the same name, from our repository) → build the image for
+   x86_64 and ARM64 and push it → migrate as a job and wait → new revision at 0% traffic → smoke-test its private address → move traffic → smoke-test the
+   live address → update jobs and schedules. A failed migration or private smoke test leaves the old version serving; a failed live smoke test sends
+   traffic back to the previous revision automatically.
+6. Rollback by hand: `make rollback ENV=production` (previous Cloud Run revision) + previous Vercel deployment (RUNBOOK.md "Rollback").
 
-Until Stage 9, and for the first production deploy, steps 2–4 are `make deploy ENV=production`
-from the laptop. It does what the pipeline will do, in this order, and stops at the first failure:
-check secrets → build the image from a clean commit → run migrations as a job and wait → new
-revision at 0% traffic → smoke test its private address → move traffic → smoke test the live
-address → update jobs and schedules. A failed migration or smoke test leaves the old version
-serving. Rollback is `make rollback ENV=production`.
+From the laptop, `make deploy ENV=production` does the same steps (you type the environment name instead of a reviewer approving). It is the
+way to deploy if GitHub is unavailable. The deploy account may deploy, push images, edit schedules and see whether a secret has a value;
+it cannot read secret values or member data.
 
 ## 11. Cost guardrails (check current pricing)
 - Fixed: Supabase Pro (production), domain, Vercel Pro if needed.
 - Usage: Cloud Run, Upstash, Anthropic API, Resend. Monthly estimate per piece: RUNBOOK.md "What it costs".
 - `make gcp-setup` creates a budget with email alerts at 50/80/100% that counts real usage even while free credits pay the bill. It warns; it does not stop spending.
 - Budget alerts on every paid service from day one.
+- Free-tier guards in code (they keep a free plan from becoming a surprise bill or an outage): optional notification emails stop at 90/day and
+  2,800/month (Resend free is 100 and 3,000), the AI provider is capped per day (`LLM_DAILY_CALL_LIMIT`; `LLM_PROVIDER=none` runs with no AI),
+  Redis keeps fewer copies in lean mode (`REDIS_LEAN`, Upstash free is 500,000 commands a month), uploaded images are compressed before storage
+  (`MEDIA_WEBP_QUALITY`), old events, notifications and snapshots are removed daily, and the weekly `usage_report` job warns at 70% of a limit
+  (`make usage-report`). RUNBOOK.md "A free-tier limit is nearly hit" lists what happens at each limit.
 
 ## 12. Launch stages
 1. Closed beta: invite-only (F18, BETA_MODE=true) in the PRODUCTION environment, because

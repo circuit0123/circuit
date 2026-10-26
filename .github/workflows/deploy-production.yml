@@ -1,0 +1,28 @@
+# Production: started by hand (Actions > deploy production > Run workflow), and then waits for approval.
+#
+# The approval is the GitHub Environment "production" (Settings > Environments > production > Required reviewers). The deploy job does
+# not start, and cannot read the environment's variables, until a reviewer approves. Before that the commit must be on main with a green `ci`.
+# Default: the tip of main. Give a commit SHA to deploy an older one (only commits on main are accepted).
+name: deploy production
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit SHA to deploy (empty = the tip of main)
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  production:
+    permissions:
+      contents: read
+      checks: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+      ref: ${{ inputs.ref || 'main' }}

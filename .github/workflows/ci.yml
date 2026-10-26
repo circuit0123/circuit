@@ -1,0 +1,124 @@
+# CI: runs on every pull request and on every push to main. Branch protection on main should require ONE check, "ci" (the last job),
+# which is green only when lint and check are both green. RUNBOOK.md "Turn on branch protection".
+#
+#   lint   ruff (rules + format) and mypy for the backend. Fast, so a typo is reported in a minute.
+#   check  `make check`: the same lint again plus ESLint, every backend test (unit, API, demo stories), the app's type check and
+#          Playwright design checks on mock mode, and the landing site build and Playwright tests. Needs Postgres with PostGIS and
+#          pgvector, so it starts the same container as your laptop.
+#   ci     fails if either failed.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "24"
+  PYTHON_VERSION: "3.12"
+  COMPOSE_PROJECT_NAME: circuit # the image built below is tagged circuit-db, which is what `docker compose` looks for
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - name: Install backend dependencies
+        run: uv sync --directory backend --frozen
+      - name: ruff (rules)
+        run: uv run --directory backend ruff check .
+      - name: ruff (format)
+        run: uv run --directory backend ruff format --check .
+      - name: mypy
+        run: uv run --directory backend mypy .
+
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - uses: pnpm/action-setup@v4 # the version comes from "packageManager" in package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install backend dependencies
+        run: uv sync --directory backend --frozen
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache the Playwright browser
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Install the Playwright browser
+        run: |
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
+            pnpm --filter @circuit/app exec playwright install-deps chromium
+          else
+            pnpm --filter @circuit/app exec playwright install --with-deps chromium
+          fi
+
+      - uses: docker/setup-buildx-action@v3
+      - name: Build the database image (PostGIS + pgvector), cached
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/postgres
+          load: true
+          tags: circuit-db:latest
+          cache-from: type=gha,scope=circuit-db
+          cache-to: type=gha,scope=circuit-db,mode=max
+      - name: Start Postgres and Redis
+        run: docker compose up -d --wait --no-build db redis
+
+      - name: Environment file (the example values are the laptop values)
+        run: cp .env.example .env
+
+      - name: make check
+        run: make check
+
+      - name: Keep the Playwright reports when it fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-reports
+          path: |
+            apps/app/test-results
+            apps/app/playwright-report
+            apps/landing/test-results
+            apps/landing/playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
+
+  ci:
+    if: always()
+    needs: [lint, check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All required jobs passed
+        run: |
+          echo "lint: ${{ needs.lint.result }}   check: ${{ needs.check.result }}"
+          [ "${{ needs.lint.result }}" = "success" ] && [ "${{ needs.check.result }}" = "success" ]

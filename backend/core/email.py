@@ -9,7 +9,8 @@ staging/production use ResendBackend below. No address or message text is ever l
 """
 
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import httpx
 import structlog
@@ -65,6 +66,54 @@ class ResendBackend(BaseEmailBackend):
         raise last or RuntimeError("email send failed")
 
 
+# -- the free-tier budget ------------------------------------------------------------------------------------------------
+# Resend's free plan allows 100 emails a day and 3,000 a month (RUNBOOK.md "What it costs"). Two numbers per period:
+#   BUDGET  how many may be committed to (queued or sent) before OPTIONAL emails stop: notification emails. The in-app
+#           notification already exists, so the member loses a convenience, not the news.
+#   LIMIT   the provider's real ceiling. Between the two, only transactional email (sign-in codes, invites, data exports) still
+#           goes out; past it, those wait for the next period instead of failing. 0 means no limit (a paid plan).
+# Days and months are India days and months, the same calendar members see.
+
+
+def period_starts(now: datetime) -> tuple[datetime, datetime]:
+    local = now.astimezone(ZoneInfo(settings.NOTIFICATION_TZ))
+    day = local.replace(hour=0, minute=0, second=0, microsecond=0)
+    return day, day.replace(day=1)
+
+
+def usage(now: datetime | None = None) -> dict[str, int]:
+    """Emails committed to (queued or sent, not failed) and actually sent, today and this month."""
+    now = now or timezone.now()
+    day, month = period_starts(now)
+    committed = OutboundEmail.objects.exclude(status=OutboundEmail.Status.FAILED)
+    sent = OutboundEmail.objects.filter(status=OutboundEmail.Status.SENT)
+    return {
+        "queued_today": committed.filter(created_at__gte=day).count(),
+        "queued_month": committed.filter(created_at__gte=month).count(),
+        "sent_today": sent.filter(sent_at__gte=day).count(),
+        "sent_month": sent.filter(sent_at__gte=month).count(),
+    }
+
+
+def _reached(count: int, limit: int) -> bool:
+    return limit > 0 and count >= limit
+
+
+def has_room_for_optional(now: datetime | None = None) -> bool:
+    """May one more notification email be queued? False means: in-app only."""
+    used = usage(now)
+    return not (
+        _reached(used["queued_today"], settings.EMAIL_DAILY_BUDGET)
+        or _reached(used["queued_month"], settings.EMAIL_MONTHLY_BUDGET)
+    )
+
+
+def _next_try_after_limit(now: datetime) -> datetime:
+    """The provider's ceiling is reached: try again at the start of the next India day (the monthly ceiling then defers day by day)."""
+    day, _ = period_starts(now)
+    return day + timedelta(days=1, minutes=1)
+
+
 def queue_email(
     to: str, kind: str, subject: str, body: str, *, headers: dict | None = None, member=None, send_at=None
 ) -> OutboundEmail:
@@ -89,6 +138,20 @@ def deliver(email_id: int) -> bool:
                 .first()
             )
             if row is None:
+                return False
+            now = timezone.now()
+            used = usage(now)
+            if _reached(used["sent_today"], settings.EMAIL_DAILY_LIMIT) or _reached(
+                used["sent_month"], settings.EMAIL_MONTHLY_LIMIT
+            ):
+                if row.kind.startswith("notification."):  # optional: the in-app notification is the fallback, so drop it
+                    row.status, row.last_error = OutboundEmail.Status.FAILED, "BudgetExceeded"
+                    row.save(update_fields=["status", "last_error"])
+                    log.warning("email.budget_dropped", email_id=row.pk, kind=row.kind)
+                else:  # transactional: wait for tomorrow; this is not a failed attempt
+                    row.next_attempt_at = _next_try_after_limit(now)
+                    row.save(update_fields=["next_attempt_at"])
+                    log.warning("email.budget_deferred", email_id=row.pk, kind=row.kind)
                 return False
             row.attempts += 1
             try:

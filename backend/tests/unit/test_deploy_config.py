@@ -40,6 +40,8 @@ def filled(env: str, tmp_path):
         text = text.replace("Circuit <hello@<yourdomain>>", "Circuit <hello@circuit.example>")
         text = re.sub(r"<(https://[^>]+)>", r"\1", text)
         text = re.sub(r"<([a-z]+@[^>]+)>", r"\1", text)
+        text = re.sub(r"<(Circuit [a-z]+ on-call [a-z]+)>", r"\1", text)
+        text = text.replace("<age1...>", "age1" + "q" * 58)
         text = text.replace("<name>", "Asha Rao").replace("<postal address>", "1 Example Road, Chennai")
         toml.write_text(text)
     return tmp_path / env
@@ -188,11 +190,16 @@ def test_setup_creates_every_secret_and_lets_only_the_runtime_account_read_it(pr
         )
 
 
-def test_setup_grants_nothing_project_wide(prod):
+def test_setup_grants_project_wide_roles_only_to_the_deploy_account_and_only_the_listed_ones(prod):
     for line in all_argv(gcp.plan_setup(prod)) + all_argv(gcp.plan_deploy(prod, "abc", STATE)):
-        assert "add-iam-policy-binding" not in line or not line.startswith("gcloud projects")
-        assert "projects add-iam-policy-binding" not in line
-        assert "roles/owner" not in line and "roles/editor" not in line
+        if line.startswith("gcloud projects add-iam-policy-binding"):
+            assert f"--member=serviceAccount:{prod.deploy_sa}" in line, (
+                "the runtime and scheduler accounts get nothing project-wide"
+            )
+            assert any(f"--role={role}" in line for role in gcp.DEPLOY_ROLES)
+    assert not {"roles/owner", "roles/editor", "roles/iam.securityAdmin", "roles/secretmanager.secretAccessor"} & set(
+        gcp.DEPLOY_ROLES
+    )
 
 
 def test_setup_budget_alerts_at_50_80_100_and_counts_usage_before_credits(prod):
@@ -206,9 +213,9 @@ def test_setup_budget_alerts_at_50_80_100_and_counts_usage_before_credits(prod):
 
 def test_setup_steps_are_safe_to_rerun(prod):
     for step in gcp.plan_setup(prod):
-        creates = step.argv[:3] in (
-            ["gcloud", "secrets", "create"],
-            ["gcloud", "iam", "service-accounts"],
+        creates = step.argv[:4] in (
+            ["gcloud", "secrets", "create", step.argv[3]],
+            ["gcloud", "iam", "service-accounts", "create"],
         ) or step.argv[3:5] == ["repositories", "create"]
         if creates or step.argv[:4] == ["gcloud", "billing", "budgets", "create"]:
             assert step.skip_if, f"{step.argv[:4]} would fail on the second run"
@@ -437,7 +444,10 @@ def test_cli_wrong_confirmation_changes_nothing(cli):
     run = FakeRun()
     out: list[str] = []
     code = gcp.main(["setup", "--env", "production"], run=run, input_fn=lambda _: "yes", out=out.append)
-    assert code == 1 and run.calls == []
+    assert code == 1
+    assert [argv[:3] for argv, _ in run.calls] == [
+        ["gcloud", "projects", "describe"]
+    ]  # only the read of the project number happened
     assert any("Nothing was changed" in line for line in out)
 
 

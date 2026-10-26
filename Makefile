@@ -18,7 +18,7 @@ endef
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
-	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run
+	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report job-health
 
 help: ## List every command
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  \033[1m%-22s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -124,6 +124,35 @@ daily: ## The 08:00 set: matches, then the Daily Drop (investor picks arrive wit
 circuit-round: ## Run an exchange circuit round now
 	$(MANAGE) run_circuit_round
 
+backup-now: ## Take an encrypted database backup now. Locally into backend/.backups/ (needs pg_dump, age and BACKUP_AGE_RECIPIENT in .env); in the cloud: make backup-now ENV=production
+ifeq ($(ENV),local)
+	$(MANAGE) backup_db
+else
+	$(call need_env,backup-now)
+	$(GCP) jobs-run --env $(ENV) --job backup_db
+endif
+
+restore-drill: ## Restore the newest backup into a throwaway LOCAL database and check the row counts: AGE_KEY_FILE=~/backup.key make restore-drill [ENV=production]
+	python3 scripts/restore_drill.py $(if $(filter-out local,$(ENV)),--env $(ENV))
+
+usage-report: ## Free-tier usage (database, storage, emails, Redis, AI calls) with a warning at 70%: make usage-report [ENV=production]
+ifeq ($(ENV),local)
+	$(MANAGE) usage_report
+else
+	$(call need_env,usage-report)
+	$(GCP) jobs-run --env $(ENV) --job usage_report
+	$(GCP) logs --env $(ENV) --job usage_report --limit 20
+endif
+
+job-health: ## Scheduled jobs: last result, last success, overdue ones. Locally your database; in the cloud: make job-health ENV=production runs the watcher once and shows its log
+ifeq ($(ENV),local)
+	$(MANAGE) job_health
+else
+	$(call need_env,job-health)
+	$(GCP) jobs-run --env $(ENV) --job check_jobs
+	$(GCP) logs --env $(ENV) --job check_jobs --limit 30
+endif
+
 retention: ## Run the daily clean-up now: stale accounts, expired export files, old rejected waitlist entries
 	$(MANAGE) retention_cleanup
 
@@ -224,6 +253,10 @@ secret: ## Store a new value for one secret (typed at a hidden prompt): make sec
 	$(call need_env,secret)
 	@test -n "$(NAME)" || { echo "usage: make secret ENV=production NAME=SECRET_KEY"; exit 1; }
 	$(GCP) secret --env $(ENV) --name $(NAME)
+
+monitoring: ## Create or update the uptime checks, log metrics and alert policies in infra/monitoring/: make monitoring ENV=production (add DRY=1 to only print them)
+	$(call need_env,monitoring)
+	$(GCP) monitoring --env $(ENV) $(if $(DRY),--dry-run)
 
 jobs-run: ## Run one job in the cloud now and wait: make jobs-run ENV=production JOB=compute_matches
 	$(call need_env,jobs-run)

@@ -1,0 +1,6 @@
+{
+  "kind": "logMetric",
+  "name": "circuit_${ENV}_job_overdue",
+  "description": "Circuit ${ENV}: check_jobs found a scheduled job with no success for twice its interval",
+  "filter": "resource.type=\"cloud_run_job\" AND resource.labels.job_name=~\"^circuit-${ENV}-\" AND jsonPayload.event=\"job.overdue\""
+}

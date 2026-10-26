@@ -22,8 +22,10 @@ from django.utils import timezone
 
 from core import flags
 from core.models import JobRun
+from core.monitoring import capture_job_failure, scrub_text
 
 log = structlog.get_logger("jobs")
+LAST_ERROR_CHARS = 200
 
 
 def acquire(name: str, minutes: int) -> bool:
@@ -39,9 +41,23 @@ def acquire(name: str, minutes: int) -> bool:
     return taken == 1
 
 
-def release(name: str, status: str) -> None:
+def describe_error(exc: BaseException) -> str:
+    """Class name plus a short message with emails, phone numbers and tokens masked: for super admins only (job health), never logged."""
+    message = scrub_text(str(exc)).replace("\n", " ").strip()
+    text = f"{type(exc).__name__}: {message}" if message else type(exc).__name__
+    return text[:LAST_ERROR_CHARS]
+
+
+def release(name: str, status: str, error: str = "") -> None:
+    """End a run. A run that ended ok, or looked and found nothing to do ("skipped"), counts as a success for job health; a failure
+    keeps the previous success time and records why. The error clears itself on the next success."""
     now = timezone.now()
-    JobRun.objects.filter(name=name).update(running_until=now, last_finished_at=now, last_status=status)
+    fields: dict = {"running_until": now, "last_finished_at": now, "last_status": status}
+    if status in ("ok", "skipped"):
+        fields |= {"last_success_at": now, "last_error": ""}
+    elif status == "failed":
+        fields["last_error"] = error
+    JobRun.objects.filter(name=name).update(**fields)
 
 
 class JobCommand(BaseCommand):
@@ -77,8 +93,9 @@ class JobCommand(BaseCommand):
         try:
             result = self.run()
         except BaseException as exc:  # includes a timeout signal: free the lease so the retry is not turned away
-            release(name, "failed")
+            release(name, "failed", describe_error(exc))
             log.error("job.failed", job=name, error=type(exc).__name__, ms=round((time.monotonic() - started) * 1000))
+            capture_job_failure(name, exc)
             raise
         ms = round((time.monotonic() - started) * 1000)
         if result.get("skip_reason"):  # the job looked and found nothing to do (e.g. not enough data to train on)

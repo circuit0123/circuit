@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 
 class RateLimitHit(models.Model):
@@ -68,3 +69,26 @@ class JobRun(models.Model):
     last_started_at = models.DateTimeField(null=True, blank=True)
     last_finished_at = models.DateTimeField(null=True, blank=True)
     last_status = models.CharField(max_length=10, blank=True, default="")  # running | ok | skipped | failed
+    # Job health (core/jobhealth.py): a job is overdue when it has had no success for twice its interval.
+    first_seen_at = models.DateTimeField(
+        default=timezone.now
+    )  # when check_jobs first saw the job: the clock for a job that never succeeded
+    last_success_at = models.DateTimeField(null=True, blank=True)  # last run that ended ok, or looked and found nothing to do
+    last_error = models.CharField(
+        max_length=240, blank=True, default=""
+    )  # exception class + short scrubbed message of the last failure; cleared on success
+
+
+class UsageCounter(models.Model):
+    """One counter per name per India day (core/usage.py): LLM calls today, so the daily cap holds across every instance and job.
+    Counts only; no member, no text. Rows are tiny and a year of them is a few hundred."""
+
+    name = models.CharField(max_length=40)
+    day = models.DateField()
+    count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["name", "day"], name="usage_counter_name_day")]
+
+    def __str__(self) -> str:
+        return f"{self.name} {self.day}: {self.count}"

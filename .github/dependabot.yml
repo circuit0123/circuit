@@ -1,0 +1,19 @@
+# Dependabot (PRODUCTION.md §3): weekly pull requests for out-of-date dependencies, which CI then checks.
+# GitHub Actions are referenced by tag (actions/checkout@v4); Dependabot proposes newer tags.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: uv
+    directory: /backend
+    schedule: { interval: weekly }
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: docker
+    directory: /docker/backend
+    schedule: { interval: weekly }
+  - package-ecosystem: docker
+    directory: /docker/postgres
+    schedule: { interval: weekly }

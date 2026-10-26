@@ -8,6 +8,11 @@
 #   secret             circuit-<env>-<name lowercased, _ -> ->      e.g. circuit-production-secret-key
 #   service accounts   circuit-run-<env> (API + jobs) and circuit-sched-<env> (only starts jobs)
 
+# The GitHub repository whose workflows may deploy (keyless: Workload Identity Federation, no JSON key anywhere). `make gcp-setup` restricts the
+# trust to exactly this repository, and each environment's deploy account to the GitHub Environment of the same name.
+[github]
+repository = "circuit0123/circuit"
+
 [service]
 cpu = "1"
 memory = "1Gi"                # gunicorn: 2 workers x 4 threads (circuit/gunicorn.py) + numpy/Pillow/OR-Tools; the model adds ~200 MB
@@ -32,6 +37,8 @@ EMBEDDING_PROVIDER = "fastembed"
 DATABASE_POOLER = "transaction"   # Supabase pooler, port 6543. Why: PRODUCTION.md "Database connections"
 DEMO_AUTH = "false"
 DEBUG = "false"
+REDIS_LEAN = "true"               # Upstash free plan (500k commands a month): keep fewer copies in Redis (backend/core/cache). Set "false" on a paid plan
+MEDIA_WEBP_QUALITY = "75"         # smaller uploaded images (Supabase free storage is 1 GB). 82 on a paid plan
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Jobs. Every management command that runs on a schedule is a Cloud Run Job. `schedule` is a Cloud Scheduler cron in
@@ -81,12 +88,23 @@ timeout_seconds = 1800
 command = "retention_cleanup"
 schedule = "0 3 * * *"
 
+[jobs.backup-db]
+command = "backup_db"
+schedule = "30 2 * * *"       # 02:30 IST, the quietest hour: pg_dump | age -> the private backup bucket (production only; staging and demo data is disposable)
+envs = ["production"]
+memory = "2Gi"                # the encrypted dump is staged on Cloud Run's in-memory disk until it is uploaded
+timeout_seconds = 1800
+
 [jobs.train-ranker]
 command = "train_ranker"
 schedule = "0 2 * * 0"        # Sundays 02:00 IST; only saves a candidate, a super admin promotes it
 cpu = "2"
 memory = "4Gi"
 timeout_seconds = 3600
+
+[jobs.usage-report]
+command = "usage_report"
+schedule = "0 9 * * 1"        # Mondays 09:00 IST: free-tier usage; logs usage.warning at 70% of a limit (the alert in infra/monitoring/)
 
 [jobs.reset-demo]
 command = "reset_demo"
@@ -104,7 +122,7 @@ timeout_seconds = 300
 # its own start/end/skipped lines and has its own lease, and is also a job of its own below so `make jobs-run` can run it alone.
 [jobs.every-5-min]
 command = "run_jobs"
-args = ["expire_items", "send_emails", "build_exports", "delete_accounts"]
+args = ["expire_items", "send_emails", "build_exports", "delete_accounts", "check_jobs"]
 schedule = "*/5 * * * *"
 timeout_seconds = 600
 
@@ -123,3 +141,7 @@ bundled = true
 [jobs.delete-accounts]
 command = "delete_accounts"
 bundled = true
+
+[jobs.check-jobs]
+command = "check_jobs"
+bundled = true                # the job watcher: logs job.overdue for any job with no success for twice its interval. Its job.end line is the heartbeat the alert waits for

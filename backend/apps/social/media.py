@@ -47,6 +47,21 @@ def create_upload(member: Member, purpose: str, content_type: str, size: int) ->
     return upload, url
 
 
+def _encode(img: Image.Image, max_bytes: int) -> bytes:
+    """WebP at MEDIA_WEBP_QUALITY; if that is still bigger than the size budget for this width (storage is 1 GB on the free plan),
+    try lower qualities until it fits. A photo of a whiteboard stays sharp, a noisy 12-megapixel photo shrinks more."""
+    blob = b""
+    for quality in (settings.MEDIA_WEBP_QUALITY, 70, 60, 50):
+        if quality > settings.MEDIA_WEBP_QUALITY:
+            continue
+        buf = io.BytesIO()
+        img.save(buf, "WEBP", quality=quality, method=4)  # no exif= argument: metadata is dropped
+        blob = buf.getvalue()
+        if len(blob) <= max_bytes:
+            break
+    return blob
+
+
 def _process(data: bytes) -> tuple[dict[int, bytes], tuple[int, int]]:
     Image.MAX_IMAGE_PIXELS = settings.MEDIA_MAX_PIXELS
     try:
@@ -62,9 +77,7 @@ def _process(data: bytes) -> tuple[dict[int, bytes], tuple[int, int]]:
     out: dict[int, bytes] = {}
     for width in settings.MEDIA_VARIANT_WIDTHS:
         v = img if img.width <= width else img.resize((width, round(img.height * width / img.width)), Image.Resampling.LANCZOS)
-        buf = io.BytesIO()
-        v.save(buf, "WEBP", quality=82)  # no exif= argument: metadata is dropped
-        out[width] = buf.getvalue()
+        out[width] = _encode(v, settings.MEDIA_VARIANT_MAX_BYTES[width])
     return out, (img.width, img.height)
 
 
