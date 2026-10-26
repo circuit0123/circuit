@@ -1,14 +1,15 @@
 "use client";
 
-import { TabBar, TabPager, cx, memberTabs, type PagerTab } from "@circuit/ui";
+import { Bell, Plus } from "lucide-react";
+import { Logo, TabBar, TabPager, cx, memberTabs, useToast, type PagerTab } from "@circuit/ui";
 import { useMotionValue } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFeatures, useMe, useUnreadCount } from "@/data";
+import { composeHref, useFeatures, useMe, useNotificationNudges, useUnreadCount } from "@/data";
 import { useDesktop } from "@/hooks/useDesktop";
 import { Discover } from "./discover/Discover";
-import { Home, NotificationsBell } from "./home/Home";
+import { Home } from "./home/Home";
 import { HomeRail } from "./home/Rail";
 import { Inbox } from "./inbox/Inbox";
 import { Profile } from "./profile/Profile";
@@ -24,8 +25,10 @@ const NODES: Record<string, React.ReactNode> = {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const features = useFeatures();
+  const toast = useToast();
   const me = useMe().data;
   const unread = useUnreadCount().data ?? 0;
+  useNotificationNudges();
   const desktop = useDesktop();
   const path = usePathname();
   const router = useRouter();
@@ -48,13 +51,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const panes: PagerTab[] = tabs.map((t) => ({ id: t.id, node: NODES[t.id] }));
   const pushed = active === null;
-  const rail = !pushed && desktop && active === "home" ? <HomeRail /> : null;
 
   return (
     <div id="app-root" className="min-h-dvh">
-      {/* Desktop left rail: the same destinations as the bar. */}
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col gap-2 border-r border-separator px-4 py-6 lg:flex" style={{ top: "var(--dev-bar, 0px)" }}>
-        <Link href="/" className="t-title2 mb-6 px-3">Circuit</Link>
+      {/* Desktop left rail (Desktop.dc.html): the logo, the same destinations as the bar, then the one create button. */}
+      <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col gap-1 border-r border-separator px-6 py-8 lg:flex" style={{ top: "var(--dev-bar, 0px)" }}>
+        <Link href="/" aria-label="Circuit, Home" onClick={(e) => { e.preventDefault(); select("home"); }} className="mx-3 mb-8 flex items-center"><Logo kind="lockup" height={32} /></Link>
         <nav aria-label="Main" className="flex flex-col gap-1">
           {tabs.map((t) => (
             <Link
@@ -63,26 +65,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               scroll={false}
               onClick={(e) => { e.preventDefault(); select(t.id); }}
               aria-current={t.id === active ? "page" : undefined}
-              className={cx("flex min-h-12 items-center gap-4 rounded-control px-3 t-body", t.id === active ? "font-semibold text-text" : "text-text-muted")}
+              className={cx("flex h-12 items-center gap-4 rounded-control px-3 t-body", t.id === active ? "bg-surface font-semibold text-text" : "text-text-muted")}
             >
               {t.icon}
               {t.label}
             </Link>
           ))}
         </nav>
-        <div className="mt-auto flex items-center justify-between">
-          <NotificationsBell />
-          {unread > 0 && <span className="sr-only">{unread} unread</span>}
-        </div>
+        {features.on("pulse") && (
+          <button type="button" onClick={() => (composeHref ? router.push(composeHref) : toast({ text: "The build log composer is coming next." }))} className="mt-6 flex h-11 items-center justify-center gap-2 rounded-control bg-surface-2 t-body font-medium active:scale-[0.97]">
+            <Plus size={20} strokeWidth={1.8} aria-hidden />New build log
+          </button>
+        )}
+        <Link href="/notifications" aria-label={unread > 0 ? `Notifications, ${unread > 9 ? "9+" : unread} unread` : "Notifications"} className={cx("mt-auto flex h-12 items-center gap-4 rounded-control px-3 t-body", path === "/notifications" ? "bg-surface font-semibold text-text" : "text-text-muted")}>
+          <span className="relative flex"><Bell size={24} strokeWidth={1.75} aria-hidden />{unread > 0 && <span className="absolute -right-0.5 top-0 h-2 w-2 rounded-full bg-live ring-2 ring-bg" aria-hidden />}</span>
+          Notifications
+        </Link>
       </aside>
 
       <div className="lg:pl-60">
-        <div className="mx-auto flex w-full max-w-[1036px] justify-center gap-12 lg:px-6">
+        <div className="mx-auto flex w-full max-w-[1092px] justify-center lg:gap-14 lg:px-12">
           <main data-page-behind className="w-full min-w-0 overflow-x-clip pb-[calc(88px+env(safe-area-inset-bottom))] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] lg:max-w-[600px] lg:p-0 lg:pb-12">
-            <TabPager className="min-h-dvh overflow-x-clip" tabs={panes} value={active} progress={progress} swipe={!!me?.appearance.swipeTabs && !desktop && !pushed} onSwipe={(id) => select(id)} />
+            <TabPager className={pushed ? undefined : "min-h-dvh overflow-x-clip"} tabs={panes} value={active} progress={progress} swipe={!!me?.appearance.swipeTabs && !desktop && !pushed} onSwipe={(id) => select(id)} />
             {pushed && children}
           </main>
-          {rail && <aside aria-label="For you" className="sticky hidden w-[340px] shrink-0 self-start py-6 lg:block" style={{ top: "var(--dev-bar, 0px)" }}>{rail}</aside>}
+          {!pushed && desktop && active === "home" && <HomeRail />}
         </div>
       </div>
 

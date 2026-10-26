@@ -3,14 +3,16 @@
 import { LiveWire, LiveWireSkeleton, UpdateView, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { loadFailed, useLiveWire, useMarkUpdateSeen, useRequestIntro } from "@/data";
+import { composeHref, loadFailed, useHome, useLiveWire, useMarkUpdateSeen, wireActionHref } from "@/data";
+import { useAskIntro } from "./IntroSheet";
 
 export function LiveWireSection() {
   const wire = useLiveWire();
   const seen = useMarkUpdateSeen();
-  const intro = useRequestIntro();
+  const ask = useAskIntro();
   const router = useRouter();
   const toast = useToast();
+  const { minor } = useHome();
   const [open, setOpen] = useState<number | null>(null);
   const items = wire.data ?? [];
   const current = open === null ? undefined : items[open];
@@ -24,22 +26,22 @@ export function LiveWireSection() {
   };
   return (
     <>
-      <LiveWire updates={items} onOpen={show} onEmptyAction={() => router.push("/discover")} />
+      <LiveWire updates={items} onOpen={show} onEmptyAction={() => (composeHref ? router.push(composeHref) : toast({ text: "The build log composer is coming next." }))} />
       <UpdateView
         open={current !== undefined}
         updates={items}
         index={open ?? 0}
         onIndex={show}
         onClose={() => setOpen(null)}
+        hideAction={(u) => minor && items.find((x) => x.key === u.key)?.action.kind === "intro"}
         onAction={(u) => {
           const { action } = items.find((x) => x.key === u.key)!;
-          if (action.kind === "view_role") router.push(`/discover/jobs/${action.target_id}`);
-          else if (action.kind === "reply") router.push("/inbox");
-          else
-            intro.mutate(action.target_id, {
-              onSuccess: () => toast({ text: "Intro requested. We'll tell you when they reply." }),
-              onError: () => toast({ text: "Couldn't send that. Try again." }),
-            });
+          const href = wireActionHref(action);
+          if (href) router.push(href);
+          else {
+            setOpen(null); // one sheet at a time: the Update view steps aside for the confirm sheet
+            ask({ id: action.target_id, name: u.person.name });
+          }
         }}
       />
     </>

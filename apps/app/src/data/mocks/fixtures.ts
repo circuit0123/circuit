@@ -182,3 +182,17 @@ export const INTRO = {
   target: { id: 2, display_name: "Asha Raman", role: "founder", verification_level: 2 },
   via: { id: 7, display_name: "Dr. Lakshmi Narayanan", role: "mentor", verification_level: 3 },
 } satisfies Schemas["IntroOut"];
+
+const note = (id: number, kind: string, text: string, actor: Schemas["AuthorOut"] | null, target: Schemas["TargetOut"] | null, mins: number, read: boolean): Schemas["NotificationOut"] =>
+  ({ id, kind, text, actor: actor && { id: actor.id, display_name: actor.display_name, role: actor.role, verification_level: actor.verification_level }, target, payload: {}, read, created_at: minutes(mins) });
+
+/** Newest first, as the API sends them: a few minutes ago, yesterday, and a few days back. Two are unread. */
+export const NOTIFICATIONS = [
+  note(1, "intro.accepted", `${PEOPLE.lakshmi.display_name} accepted your introduction.`, PEOPLE.lakshmi, { type: "intro", id: 501 }, 8, false),
+  note(2, "application.status", "Your application has a new status.", null, { type: "application", id: 9 }, 30, false),
+  note(3, "circuit.proposed", "A new circuit is waiting for your answer.", null, { type: "circuit", id: 12 }, 50, true),
+  note(4, "post.reply", `${PEOPLE.divya.display_name} replied to your build log.`, PEOPLE.divya, { type: "post", id: 101 }, 60 * 26, true),
+  note(5, "message.new", `${PEOPLE.arjun.display_name} sent you a message.`, PEOPLE.arjun, { type: "conversation", id: 3 }, 60 * 28, true),
+  note(6, "startup.interest", "Someone showed interest in your startup.", null, { type: "startup", id: 4 }, 60 * 24 * 3, true),
+  note(7, "intro.received", `${PEOPLE.kavya.display_name} would like to meet you.`, PEOPLE.kavya, { type: "intro", id: 502 }, 60 * 24 * 3 + 40, true),
+] satisfies Schemas["NotificationOut"][];

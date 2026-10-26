@@ -27,7 +27,7 @@ export function AddChip({ label, onClick, className }: { label: string; onClick:
 
 /** Static, selectable (onToggle) or removable (onRemove). Tap target stays 44px via the hit area. */
 export function Chip({ label, selected, onToggle, onRemove, className, size = "md" }: Props) {
-  const base = "inline-flex min-h-8 items-center gap-1 rounded-full px-3 t-footnote";
+  const base = "inline-flex min-h-8 items-center gap-1 rounded-full px-3 t-subhead";
   if (onToggle && size === "lg") {
     return (
       <button

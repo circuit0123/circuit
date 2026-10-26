@@ -9,11 +9,13 @@ export function strengthLabel(score: number): Strength | null {
   return null;
 }
 
-export function MatchStrength({ strength, className }: { strength: Strength | null | undefined; className?: string }) {
+export function MatchStrength({ strength, plain, className }: { strength: Strength | null | undefined; /** Plain muted words, as on the Daily Drop card, instead of a pill. */ plain?: boolean; className?: string }) {
   if (!strength) return null;
+  const words = strength === "strong" ? "Strong match" : "Good match";
+  if (plain) return <span className={cx("t-subhead text-text-muted", className)}>{words}</span>;
   return (
     <span className={cx("inline-flex items-center rounded-full bg-surface-2 px-2 py-0.5 t-footnote font-semibold text-text", className)}>
-      {strength === "strong" ? "Strong match" : "Good match"}
+      {words}
     </span>
   );
 }

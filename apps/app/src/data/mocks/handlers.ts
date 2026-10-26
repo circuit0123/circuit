@@ -2,7 +2,7 @@ import { delay, http, HttpResponse, type HttpHandler, type HttpResponseResolver 
 import type { Schemas } from "@circuit/api-client";
 import { currentScenario, type Scenario } from "./config";
 import { isSignup, signupConfig, signupHandlers, signupMe } from "./signup";
-import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, ONBOARDING, PERSONAS, PULSE, dropOf } from "./fixtures";
+import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, NOTIFICATIONS, ONBOARDING, PEOPLE, PERSONAS, PULSE, dropOf } from "./fixtures";
 
 /**
  * Mock Service Worker handlers for every endpoint the data hooks call today. A call to anything else answers 404 in the standard
@@ -31,9 +31,27 @@ function me(s: Scenario): Schemas["MeOut"] {
 function config(s: Scenario): Schemas["ConfigOut"] {
   if (isSignup()) return signupConfig();
   if (s === "beta") return { ...CONFIG, beta_mode: true, beta_access: false };
+  // With Pulse off, what depends on it (promotions, then payments) is off too: the server refuses a flag on without its dependency.
+  const off = (...names: string[]) => ({ ...CONFIG, features: { ...CONFIG.features, ...Object.fromEntries(names.map((n) => [n, false])) } });
+  if (s === "pulse_off") return off("pulse", "promotions", "payments");
+  if (s === "drop_off") return off("daily_drop");
+  if (s === "home_off") return off("pulse", "promotions", "payments", "daily_drop");
   if (s === "features_off") return { ...CONFIG, features: Object.fromEntries(Object.keys(CONFIG.features).map((k) => [k, false])) };
   return CONFIG;
 }
+
+const person = (id: number): Schemas["PersonOut"] => {
+  const p = Object.values(PEOPLE).find((x) => x.id === id) ?? PEOPLE.asha;
+  return { id: p.id, display_name: p.display_name, role: p.role, verification_level: p.verification_level };
+};
+/** Mock people for the intro flow: Kavya (5) shares no connection with Ravi, Arjun (4) is already connected and has no slots left this week, everyone else is reached via Dr. Lakshmi. */
+const NO_PATH = 5;
+const CONNECTED = 4;
+const FULL = 4;
+
+/** Notifications read in this page load. */
+const readIds = new Set<number>();
+const notifications = (s: Scenario) => (s === "empty" ? [] : NOTIFICATIONS.map((n) => ({ ...n, read: n.read || readIds.has(n.id) })));
 
 const noDrop = (s: Scenario) => s === "empty" || s === "under18";
 
@@ -76,7 +94,18 @@ export const handlers: HttpHandler[] = [
     const items = all.slice(offset, offset + limit);
     return HttpResponse.json({ items, count: all.length, next_offset: offset + limit < all.length ? offset + limit : null });
   })),
-  http.post(`${API}/intros`, scenario(() => HttpResponse.json(INTRO))),
+  http.get(`${API}/intros/path/:id`, scenario((_s, { params }) => {
+    const id = Number(params.id);
+    if (id === NO_PATH) return envelope(404, "no_warm_path", "You have no mutual connection with this person");
+    return HttpResponse.json({ target: person(id), via: id === CONNECTED ? null : person(PEOPLE.lakshmi.id) });
+  })),
+  http.post(`${API}/intros`, scenario(async (s, { request }) => {
+    const { target_id } = (await request.json()) as { target_id: number };
+    if (s === "intros_used") return envelope(409, "intro_weekly_limit", "You have used this week's introductions");
+    if (target_id === NO_PATH) return envelope(404, "no_warm_path", "You have no mutual connection with this person");
+    if (target_id === FULL) return envelope(409, "target_full", "This person is not taking more introductions this week");
+    return HttpResponse.json({ ...INTRO, target: person(target_id) }, { status: 201 });
+  })),
 
   http.get(`${API}/livewire`, scenario((s) => HttpResponse.json(s === "empty" ? [] : LIVEWIRE))),
   http.post(`${API}/livewire/seen`, scenario(() => new HttpResponse(null, { status: 204 }))),
@@ -88,7 +117,18 @@ export const handlers: HttpHandler[] = [
     const b = (await request.json()) as { target_type: string; target_id: number };
     return HttpResponse.json({ id: 1, status: "open", target_type: b.target_type, target_id: b.target_id, created_at: new Date().toISOString() }, { status: 201 });
   })),
-  http.get(`${API}/notifications/unread-count`, scenario((s) => HttpResponse.json({ count: s === "empty" ? 0 : 3 }))),
+  http.get(`${API}/notifications/unread-count`, scenario((s) => HttpResponse.json({ count: notifications(s).filter((n) => !n.read).length }))),
+  http.get(`${API}/notifications`, scenario((s, { request }) => {
+    const q = new URL(request.url).searchParams;
+    const limit = Number(q.get("limit") ?? 20);
+    const offset = Number(q.get("offset") ?? 0);
+    const all = notifications(s).filter((n) => q.get("unread") !== "true" || !n.read);
+    return HttpResponse.json({ items: all.slice(offset, offset + limit), count: all.length, next_offset: offset + limit < all.length ? offset + limit : null });
+  })),
+  http.post(`${API}/notifications/:id/read`, scenario((_s, { params }) => {
+    readIds.add(Number(params.id));
+    return HttpResponse.json(NOTIFICATIONS.find((n) => n.id === Number(params.id)) ?? NOTIFICATIONS[0]);
+  })),
 
   // Anything else: not mocked yet.
   http.all(`${API}/*`, ({ request }) => {

@@ -9,7 +9,8 @@ export type MatchView = { id: number; person: Person; strength: Strength | null;
 
 type Props = {
   match: MatchView;
-  onOpen: () => void;
+  /** Opens their profile; leave out while there is no profile screen to open. */
+  onOpen?: () => void;
   onIntro?: () => void;
   /** Disables the Intro button after it was sent. */
   asked?: boolean;

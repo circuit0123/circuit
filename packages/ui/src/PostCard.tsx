@@ -16,30 +16,33 @@ type Props = {
   onMore: () => void;
   onOpenAuthor?: () => void;
   priority?: boolean;
+  /** Reactions to leave out ("intro_me" for under-18 members). */
+  hideReactions?: ReactionKind[];
   className?: string;
 };
 
 /** A build log. Media runs edge to edge; text shows two full lines until "more". Not a card: the feed (FeedItem) draws the hairline. */
-export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, className }: Props) {
+export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, hideReactions, className }: Props) {
   const a = post.author;
   let host = "";
   try { host = post.link ? new URL(post.link).hostname.replace(/^www\./, "") : ""; } catch { host = post.link; }
   return (
     <article className={cx("flex flex-col gap-3", className)}>
       <header className="flex items-center gap-4 px-4 lg:px-0">
-        <button onClick={onOpenAuthor} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+        <button onClick={onOpenAuthor} disabled={!onOpenAuthor} className="flex min-w-0 flex-1 items-center gap-3 text-left">
           <Avatar id={a.id} name={a.name} src={a.photo} size={40} />
           <span className="min-w-0">
             <span className="t-body block font-semibold">{a.name} <VerifiedBadge level={a.level} /></span>
-            <span className="t-footnote block text-text-muted">{[a.headline || a.role, a.place].filter(Boolean).join(", ")} · {post.when}</span>
+            <span className="t-subhead block text-text-muted">{[a.headline || a.role, a.place].filter(Boolean).join(", ")} · {post.when}</span>
           </span>
         </button>
         <button onClick={onMore} aria-label="More options" className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-text-muted lg:mr-0">
           <MoreHorizontal size={20} strokeWidth={1.75} />
         </button>
       </header>
-      <div className="lg:overflow-hidden lg:rounded-card"><MediaPager media={post.media} priority={priority} /></div>
-      <div className="flex flex-col gap-3 px-4 lg:px-0">
+      {/* On a phone the picture comes first and runs edge to edge; on desktop the words come first (Desktop.dc.html). */}
+      <div className="order-2 lg:order-3 lg:overflow-hidden lg:rounded-card"><MediaPager media={post.media} priority={priority} /></div>
+      <div className="order-3 flex flex-col gap-3 px-4 lg:order-2 lg:px-0 empty:hidden">
         <ClampedText text={post.body} />
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">{post.tags.map((t) => <Chip key={t} label={t} />)}</div>
@@ -50,8 +53,8 @@ export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, classN
             <span className="t-body min-w-0 break-all">{host}</span>
           </a>
         )}
-        {!post.mine && <ReactionBar active={post.reactions} onToggle={onReact} />}
       </div>
+      {!post.mine && <div className="order-4 px-4 lg:px-0"><ReactionBar active={post.reactions} onToggle={onReact} hide={hideReactions} /></div>}
     </article>
   );
 }
