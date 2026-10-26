@@ -5,7 +5,7 @@ import { useMotionValue } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFeatures, useMe, useUnreadCount } from "@/data";
+import { useFeatures, useMe, useNotificationNudges, useUnreadCount } from "@/data";
 import { useDesktop } from "@/hooks/useDesktop";
 import { Discover } from "./discover/Discover";
 import { Home, NotificationsBell } from "./home/Home";
@@ -26,6 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const features = useFeatures();
   const me = useMe().data;
   const unread = useUnreadCount().data ?? 0;
+  useNotificationNudges();
   const desktop = useDesktop();
   const path = usePathname();
   const router = useRouter();
@@ -78,7 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="lg:pl-60">
         <div className="mx-auto flex w-full max-w-[1036px] justify-center gap-12 lg:px-6">
           <main data-page-behind className="w-full min-w-0 overflow-x-clip pb-[calc(88px+env(safe-area-inset-bottom))] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] lg:max-w-[600px] lg:p-0 lg:pb-12">
-            <TabPager className="min-h-dvh overflow-x-clip" tabs={panes} value={active} progress={progress} swipe={!!me?.appearance.swipeTabs && !desktop && !pushed} onSwipe={(id) => select(id)} />
+            <TabPager className={pushed ? undefined : "min-h-dvh overflow-x-clip"} tabs={panes} value={active} progress={progress} swipe={!!me?.appearance.swipeTabs && !desktop && !pushed} onSwipe={(id) => select(id)} />
             {pushed && children}
           </main>
           {!pushed && desktop && active === "home" && <HomeRail />}

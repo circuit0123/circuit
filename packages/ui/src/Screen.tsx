@@ -27,6 +27,10 @@ export function Screen({ title, left, right, children, className }: { title: str
 
 type PushProps = {
   title?: string;
+  /** Draw `title` as a Large title under the bar (Notifications.dc.html) instead of centred in it. */
+  largeTitle?: boolean;
+  /** Text next to the back chevron, e.g. "Today": where Back goes. */
+  backLabel?: string;
   onBack: () => void;
   right?: React.ReactNode;
   /** Pinned to the bottom (a sticky Apply button, a message composer). */
@@ -39,7 +43,7 @@ type PushProps = {
  * A pushed screen: slides in from the right (0.4s, no bounce), has a back chevron, and a swipe from
  * the left edge goes back following the finger. Tab swiping is off here (DESIGN.md §3).
  */
-export function PushScreen({ title, onBack, right, footer, children, className }: PushProps) {
+export function PushScreen({ title, largeTitle, backLabel, onBack, right, footer, children, className }: PushProps) {
   const reduce = useReducedMotion();
   const x = useMotionValue(0);
   const start = useRef<{ x0: number; y0: number; t: number; vx: number; lastX: number; lastT: number; on: boolean } | null>(null);
@@ -80,14 +84,23 @@ export function PushScreen({ title, onBack, right, footer, children, className }
       }}
       onPointerCancel={() => { if (start.current?.on) animate(x, 0, pushSpring); start.current = null; }}
     >
-      <header className="material sticky top-0 z-20 grid min-h-11 grid-cols-[1fr_auto_1fr] items-center border-b border-separator px-2 pt-[env(safe-area-inset-top)]">
+      <header className={cx("material sticky top-0 z-20 grid min-h-11 grid-cols-[1fr_auto_1fr] items-center border-b px-2 pt-[env(safe-area-inset-top)]", largeTitle ? "border-transparent" : "border-separator")}>
         <div className="flex justify-start">
-          <BarButton label="Back" onClick={leave}><ChevronLeft size={24} strokeWidth={1.75} /></BarButton>
+          {backLabel ? (
+            <button type="button" onClick={leave} aria-label={`Back to ${backLabel}`} className="flex min-h-11 items-center gap-0.5 rounded-full pl-1 pr-3 t-body active:opacity-80">
+              <ChevronLeft size={24} strokeWidth={1.75} aria-hidden />{backLabel}
+            </button>
+          ) : (
+            <BarButton label="Back" onClick={leave}><ChevronLeft size={24} strokeWidth={1.75} /></BarButton>
+          )}
         </div>
-        <span className="t-headline min-w-0 truncate text-center">{title}</span>
+        <span className="t-headline min-w-0 truncate text-center">{largeTitle ? null : title}</span>
         <div className="flex justify-end">{right}</div>
       </header>
-      <div className={cx("mx-auto w-full max-w-[600px] px-4 pb-24 pt-4", className)}>{children}</div>
+      <div className={cx("mx-auto w-full max-w-[600px] px-4 pb-24 pt-4", className)}>
+        {largeTitle && title && <h1 className="t-large -mt-4 pb-2 pt-1">{title}</h1>}
+        {children}
+      </div>
       {footer && (
         <div className="material fixed inset-x-0 bottom-0 z-20 border-t border-separator px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3">
           <div className="mx-auto w-full max-w-[600px]">{footer}</div>

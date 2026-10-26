@@ -2,7 +2,7 @@ import { delay, http, HttpResponse, type HttpHandler, type HttpResponseResolver 
 import type { Schemas } from "@circuit/api-client";
 import { currentScenario, type Scenario } from "./config";
 import { isSignup, signupConfig, signupHandlers, signupMe } from "./signup";
-import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, ONBOARDING, PERSONAS, PULSE, dropOf } from "./fixtures";
+import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, NOTIFICATIONS, ONBOARDING, PERSONAS, PULSE, dropOf } from "./fixtures";
 
 /**
  * Mock Service Worker handlers for every endpoint the data hooks call today. A call to anything else answers 404 in the standard
@@ -39,6 +39,10 @@ function config(s: Scenario): Schemas["ConfigOut"] {
   if (s === "features_off") return { ...CONFIG, features: Object.fromEntries(Object.keys(CONFIG.features).map((k) => [k, false])) };
   return CONFIG;
 }
+
+/** Notifications read in this page load. */
+const readIds = new Set<number>();
+const notifications = (s: Scenario) => (s === "empty" ? [] : NOTIFICATIONS.map((n) => ({ ...n, read: n.read || readIds.has(n.id) })));
 
 const noDrop = (s: Scenario) => s === "empty" || s === "under18";
 
@@ -93,7 +97,18 @@ export const handlers: HttpHandler[] = [
     const b = (await request.json()) as { target_type: string; target_id: number };
     return HttpResponse.json({ id: 1, status: "open", target_type: b.target_type, target_id: b.target_id, created_at: new Date().toISOString() }, { status: 201 });
   })),
-  http.get(`${API}/notifications/unread-count`, scenario((s) => HttpResponse.json({ count: s === "empty" ? 0 : 3 }))),
+  http.get(`${API}/notifications/unread-count`, scenario((s) => HttpResponse.json({ count: notifications(s).filter((n) => !n.read).length }))),
+  http.get(`${API}/notifications`, scenario((s, { request }) => {
+    const q = new URL(request.url).searchParams;
+    const limit = Number(q.get("limit") ?? 20);
+    const offset = Number(q.get("offset") ?? 0);
+    const all = notifications(s).filter((n) => q.get("unread") !== "true" || !n.read);
+    return HttpResponse.json({ items: all.slice(offset, offset + limit), count: all.length, next_offset: offset + limit < all.length ? offset + limit : null });
+  })),
+  http.post(`${API}/notifications/:id/read`, scenario((_s, { params }) => {
+    readIds.add(Number(params.id));
+    return HttpResponse.json(NOTIFICATIONS.find((n) => n.id === Number(params.id)) ?? NOTIFICATIONS[0]);
+  })),
 
   // Anything else: not mocked yet.
   http.all(`${API}/*`, ({ request }) => {

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { checkPage as axeCheck, inBothThemes, isPhone } from "../e2e/helpers";
+import { drag } from "./touch";
 
 /** The translucent tab bar (DESIGN.md §5 Materials) takes on whatever scrolls under it, so a green button behind it dips its labels below 4.5:1 in
  * the light theme. The bar is checked on its own over plain content in foundation.spec.ts; here it is left out. */
@@ -15,20 +16,6 @@ const open = async (page: Page, scenario = "default") => {
 };
 const drop = (page: Page) => page.getByRole("region", { name: "Daily Drop" });
 const counter = (page: Page) => drop(page).getByText(/^\d of 3$/);
-
-type Pt = { x: number; y: number };
-/** One real touch drag, so the card sees pointer events the way it does on a phone. */
-async function drag(page: Page, from: Pt, to: Pt) {
-  const cdp = await page.context().newCDPSession(page);
-  const at = (p: Pt) => [{ x: p.x, y: p.y, id: 1 }];
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: at(from) });
-  for (let i = 1; i <= 10; i++) {
-    await page.waitForTimeout(20);
-    await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: at({ x: from.x + ((to.x - from.x) * i) / 10, y: from.y + ((to.y - from.y) * i) / 10 }) });
-  }
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-  await cdp.detach();
-}
 
 test.describe("Home: the Daily Drop", () => {
   test("shows the reason first, the two buttons inside the card, and 1 of 3", async ({ page }) => {
