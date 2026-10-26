@@ -122,8 +122,9 @@ timeout_seconds = 300
 # its own start/end/skipped lines and has its own lease, and is also a job of its own below so `make jobs-run` can run it alone.
 [jobs.every-5-min]
 command = "run_jobs"
-args = ["expire_items", "send_emails", "build_exports", "delete_accounts", "check_jobs"]
+args = ["expire_items", "send_emails", "build_exports", "delete_accounts", "check_jobs", "first_drops"]
 schedule = "*/5 * * * *"
+memory = "2Gi"                # first_drops ranks new members (loads the whole member graph, like compute_matches); idle runs are over in seconds
 timeout_seconds = 600
 
 [jobs.expire-items]
@@ -141,6 +142,10 @@ bundled = true
 [jobs.delete-accounts]
 command = "delete_accounts"
 bundled = true
+
+[jobs.first-drops]
+command = "first_drops"
+bundled = true                # new members get their first Daily Drop within minutes (flag: daily_drop). Ranking loads the member graph: see the bundle memory
 
 [jobs.check-jobs]
 command = "check_jobs"

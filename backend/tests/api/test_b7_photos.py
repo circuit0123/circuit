@@ -117,3 +117,28 @@ def test_deleting_the_account_removes_the_photo(make_member, client_for, make_im
 
 def test_the_photo_endpoints_reject_extra_fields(make_member, client_for):
     assert client_for(make_member()).put("/api/me/photo", {"upload_id": 1, "x": 1}).status_code == 422
+
+
+# -- one storage call per list ---------------------------------------------------------------------------------
+def test_a_list_of_people_signs_their_photos_in_one_storage_call(make_member, connect, client_for, make_image, monkeypatch):
+    from apps.accounts.models import Member
+    from core.cache import get_cache
+
+    me = make_member("student")
+    friends = []
+    for _ in range(6):
+        friend = make_member("student")
+        connect(me, friend)
+        c = client_for(friend)
+        up = upload_avatar(c, make_image("PNG", (300, 300)))
+        c.put("/api/me/photo", {"upload_id": up.pk})
+        friends.append(friend)
+    for f in Member.objects.filter(pk__in=[f.pk for f in friends]):
+        get_cache().delete(f"media:{f.photo_path}/w480.webp")  # start cold: every photo has to be signed
+    store = get_storage()
+    calls = []
+    original = store.signed_urls
+    monkeypatch.setattr(store, "signed_urls", lambda bucket, paths: calls.append(len(paths)) or original(bucket, paths))
+    people = client_for(me).get("/api/connections").json()
+    assert len(people) == 6 and all(p["photo"] for p in people)
+    assert calls == [6]  # six photos, one storage call

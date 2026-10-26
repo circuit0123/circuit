@@ -89,6 +89,7 @@ def delete_post(member: Member, post_id: int) -> None:
 def post_rows(viewer: Member, posts) -> list[dict]:
     """Posts as the viewer sees them. Totals only for the author's own posts; `my_reactions` is just the viewer's own."""
     posts = list(posts)
+    media.prime_photos(p.author for p in posts)
     ids = [p.pk for p in posts]
     mine: dict[int, list[str]] = {}
     for post_id, kind in Reaction.objects.filter(post_id__in=ids, member=viewer).values_list("post_id", "kind"):

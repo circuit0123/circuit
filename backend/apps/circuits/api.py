@@ -5,6 +5,7 @@ from ninja import Field, Query, Router, Schema
 
 from apps.circuits import services
 from apps.circuits.models import Circuit, CircuitLeg
+from apps.social import media
 from core.auth import current_member
 from core.errors import Conflict, Forbidden
 from core.flags import require_flag
@@ -82,6 +83,7 @@ def _next_step(status: str, mine: CircuitLeg, got: CircuitLeg) -> str:
 def _out(c: Circuit, me) -> dict:
     """Everything the circuit screen and the completion moment show, in one response (DESIGN.md §4 Circuits)."""
     legs = sorted(c.legs.all(), key=lambda leg: leg.pk)
+    media.prime_photos({m.pk: m for leg in legs for m in (leg.giver, leg.receiver)}.values())
     mine = next(leg for leg in legs if leg.giver_id == me.pk)  # the leg I give carries my consent and my "done"
     got = next(leg for leg in legs if leg.receiver_id == me.pk)
     status = services.effective_status(c)

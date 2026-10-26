@@ -5,6 +5,7 @@ from ninja import Query, Router, Schema
 from apps.accounts.models import Member
 from apps.notifications import copy, services
 from apps.notifications.models import Notification
+from apps.social import media
 from core.auth import current_member
 from core.pagination import Page, PageParams, paginate
 from core.schemas import PersonOut, person
@@ -88,6 +89,7 @@ def _outs(rows: list[Notification]) -> list[dict]:
     ids = {n.payload.get("actor_id") for n in rows}
     actors = {m.pk: m for m in Member.objects.filter(pk__in={i for i in ids if isinstance(i, int)})}
     look = _lookups(rows)
+    media.prime_photos(actors.values())  # one storage call for the whole page
     result = []
     for n in rows:
         actor = actors.get(n.payload.get("actor_id"))

@@ -17,7 +17,7 @@ from apps.accounts.models import Member
 from apps.events.models import Event
 from apps.events.services import record
 from apps.matching.models import Need, Offer
-from apps.social import pulse, services
+from apps.social import media, pulse, services
 from apps.social.models import UpdateView
 from apps.social.relations import blocked_ids, connected_ids, org_mate_ids, visible_posts
 from apps.social.schemas import author
@@ -230,6 +230,7 @@ def live_wire(member: Member) -> list[dict]:
         if per_kind.get(c["kind"], 0) < PER_KIND.get(c["kind"], DEFAULT_PER_KIND):
             per_kind[c["kind"]] = per_kind.get(c["kind"], 0) + 1
             picked.append(c)
+    media.prime_photos(c["member"] for c in picked[:MAX_ITEMS] if c["member"])
     return [
         {
             "key": c["key"], "kind": c["kind"], "actor": author(c["member"]) if c["member"] else None,

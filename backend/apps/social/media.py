@@ -73,7 +73,7 @@ def _encode(img: Image.Image, max_bytes: int) -> bytes:
     return blob
 
 
-def _process(data: bytes, sizes: tuple[int, ...]) -> tuple[dict[int, bytes], tuple[int, int]]:
+def _process(data: bytes, sizes: tuple[int, ...] | None = None) -> tuple[dict[int, bytes], tuple[int, int]]:
     Image.MAX_IMAGE_PIXELS = settings.MEDIA_MAX_PIXELS
     try:
         probe = Image.open(io.BytesIO(data))
@@ -86,7 +86,7 @@ def _process(data: bytes, sizes: tuple[int, ...]) -> tuple[dict[int, bytes], tup
         raise ApiError(422, "invalid_image", "This file is not a usable image") from e
     img = img.convert("RGBA" if "A" in img.getbands() else "RGB")
     out: dict[int, bytes] = {}
-    for width in sizes:
+    for width in sizes or settings.MEDIA_VARIANT_WIDTHS:
         v = img if img.width <= width else img.resize((width, round(img.height * width / img.width)), Image.Resampling.LANCZOS)
         out[width] = _encode(v, settings.MEDIA_VARIANT_MAX_BYTES[width])
     return out, (img.width, img.height)

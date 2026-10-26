@@ -20,7 +20,7 @@ from apps.circuits.models import Circuit
 from apps.events.models import Event
 from apps.events.services import record
 from apps.intros.models import IntroRequest
-from apps.jobs.services import list_jobs
+from apps.jobs.services import list_jobs, skills_in_demand
 from apps.social import services
 from apps.social.models import Follow
 from apps.social.relations import blocked_ids, connected_ids, org_mate_ids, visible_posts
@@ -149,23 +149,10 @@ def skills_item(member: Member, since: datetime, upto: datetime, now: datetime) 
     at = ist_day_start(now)
     if not (since <= at <= upto):
         return []
-    lat, lng = default_centre(member)
-    centre = Point(lng, lat, srid=4326)
-    from apps.jobs.models import JobCapability
-
-    counts: dict[str, tuple[str, int]] = {}
-    qs = JobCapability.objects.filter(
-        job__is_open=True,
-        job__startup__hidden_at__isnull=True,
-        job__created_at__gte=now - timedelta(days=settings.PULSE_WINDOW_DAYS),
-        job__startup__location__distance_lte=(centre, D(km=settings.STUDENT_MAX_DISTANCE_KM)),
-    ).values_list("capability__slug", "capability__name")
-    for slug, name in qs:
-        counts[slug] = (name, counts.get(slug, (name, 0))[1] + 1)
-    top = sorted(counts.items(), key=lambda kv: (-kv[1][1], kv[0]))[:3]
+    top = skills_in_demand(member, settings.STUDENT_MAX_DISTANCE_KM, since=now - timedelta(days=settings.PULSE_WINDOW_DAYS))
     if not top:
         return []
-    return [Item(at, "skills_in_demand", 0, {"skills": [{"slug": s, "name": n, "open_roles": c} for s, (n, c) in top]})]
+    return [Item(at, "skills_in_demand", 0, {"skills": top})]
 
 
 def pulse(member: Member, cursor: str | None, limit: int, include_seen: bool) -> dict:

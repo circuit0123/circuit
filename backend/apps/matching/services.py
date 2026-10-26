@@ -24,9 +24,11 @@ from apps.matching.ranker.base import Ranker
 from apps.matching.ranker.serving import RULE, Serving, load_serving
 from apps.matching.scoring import PairScore, Side
 from apps.moderation.models import Block
+from apps.social import media
 from apps.startups.models import StartupMember
 from core.cache import get_cache
 from core.embeddings import get_embedder
+from core.errors import ApiError
 from core.graph import neighbours
 
 log = structlog.get_logger("matching")
@@ -297,6 +299,37 @@ def rank_member(ctx: Context, mid: int) -> list[Ranked]:
     return out
 
 
+def _store_member(ctx: Context, cache, mid: int, now) -> tuple[int, int, bool]:
+    """Rank one member, replace their stored matches and refresh their cached list. Returns (matches, bridge matches, model-ordered)."""
+    ranked = rank_member(ctx, mid)
+    rows = [
+        MatchResult(
+            member_id=mid, candidate_id=r.candidate_id, score=r.ps.score, components=r.ps.components, is_bridge=r.ps.is_bridge,
+            reason=scoring.reason(r.ps, ctx.cap_names, ctx.trait_names), features=r.features, position=r.position, arm=r.arm,
+            model_version=r.model_version, model_score=r.model_score,
+        )
+        for r in ranked
+    ]  # fmt: skip
+    with transaction.atomic():
+        MatchResult.objects.filter(member_id=mid).delete()
+        MatchResult.objects.bulk_create(rows)
+    cache.set_json(cache_key(mid), [_cached(r) for r in rows], ttl=settings.MATCH_CACHE_TTL)
+    return len(rows), sum(r.is_bridge for r in rows), bool(ranked) and ranked[0].arm == "model"
+
+
+def compute_for(member_ids) -> dict:
+    """Matches for just these members (new sign-ups waiting for their first Daily Drop). Same ranking as the full run; the
+    other members' lists are left alone until the next full `compute_matches`. Safe to run again."""
+    now = timezone.now()
+    backfill_embeddings()  # a new member's needs and offers have no embedding yet
+    ctx = make_context(now)
+    cache, done = get_cache(), 0
+    for mid in sorted(set(member_ids) & set(ctx.world.members)):
+        _store_member(ctx, cache, mid, now)
+        done += 1
+    return {"members": done}
+
+
 # -- the batch job -----------------------------------------------------------------------------------
 def compute_all() -> dict:
     """Recompute every member's matches. Safe to run again: each member's rows are replaced, never added to."""
@@ -306,22 +339,10 @@ def compute_all() -> dict:
     world = ctx.world
     cache, total, bridges, model_lists = get_cache(), 0, 0, 0
     for mid in sorted(world.members):  # fixed order, so the appearance cap is applied the same way every run
-        ranked = rank_member(ctx, mid)
-        rows = [
-            MatchResult(
-                member_id=mid, candidate_id=r.candidate_id, score=r.ps.score, components=r.ps.components, is_bridge=r.ps.is_bridge,
-                reason=scoring.reason(r.ps, ctx.cap_names, ctx.trait_names), features=r.features, position=r.position, arm=r.arm,
-                model_version=r.model_version, model_score=r.model_score,
-            )
-            for r in ranked
-        ]  # fmt: skip
-        with transaction.atomic():
-            MatchResult.objects.filter(member_id=mid).delete()
-            MatchResult.objects.bulk_create(rows)
-        cache.set_json(cache_key(mid), [_cached(r) for r in rows], ttl=settings.MATCH_CACHE_TTL)
-        total += len(rows)
-        bridges += sum(r.is_bridge for r in rows)
-        model_lists += bool(ranked) and ranked[0].arm == "model"
+        n, b, model = _store_member(ctx, cache, mid, now)
+        total += n
+        bridges += b
+        model_lists += model
     stale = MatchResult.objects.exclude(member_id__in=world.members)  # suspended or removed since the last run
     for mid in set(stale.values_list("member_id", flat=True)):
         cache.delete(cache_key(mid))
@@ -349,11 +370,25 @@ def strength_for(score: float) -> str | None:
 
 
 # -- the read path -------------------------------------------------------------------------------------
-def matches_for(member: Member, bridge: bool | None = None) -> list[dict]:
+WITHIN_KM_CHOICES = (5, 10, 25, 50)  # coarse on purpose: an exact distance to a person could be narrowed down by moving around
+
+
+def matches_for(
+    member: Member,
+    bridge: bool | None = None,
+    role: str | None = None,
+    verified: bool | None = None,
+    capability: str | None = None,
+    within_km: int | None = None,
+) -> list[dict]:
     """Precomputed matches, best first. Redis first, Postgres if Redis is down or cold.
 
     Eligibility is checked again here: someone suspended, hidden or blocked since the last run disappears at once.
+    Filters (all optional): role, verified (level 2 or 3), capability (one of their offers) and within_km (5, 10, 25 or 50 from my
+    location or the city centre). Only a yes/no distance filter is offered: the distance itself is never returned.
     """
+    if within_km is not None and within_km not in WITHIN_KM_CHOICES:
+        raise ApiError(422, "validation_error", f"within_km must be one of {', '.join(map(str, WITHIN_KM_CHOICES))}")
     cache = get_cache()
     rows = cache.get_json(cache_key(member.pk))
     if rows is None:
@@ -368,7 +403,32 @@ def matches_for(member: Member, bridge: bool | None = None) -> list[dict]:
         .exclude(profile_visibility=Member.Visibility.HIDDEN)
         .exclude(pk__in=gone)
     }
+    if role:
+        people = {k: m for k, m in people.items() if m.role == role}
+    if verified:
+        people = {k: m for k, m in people.items() if m.verification_level >= 2}
+    if within_km is not None:
+        from django.contrib.gis.geos import Point
+        from django.contrib.gis.measure import D
+
+        from apps.startups.services import default_centre
+
+        lat, lng = default_centre(member)
+        near = Member.objects.filter(
+            pk__in=list(people), location__distance_lte=(Point(lng, lat, srid=4326), D(km=within_km))
+        ).values_list("pk", flat=True)
+        people = {k: m for k, m in people.items() if k in set(near)}
+    offers: dict[int, list[tuple[str, str]]] = {}
+    for mid, slug, name in (
+        Offer.objects.filter(member_id__in=list(people))
+        .order_by("id")
+        .values_list("member_id", "capability__slug", "capability__name")
+    ):
+        offers.setdefault(mid, []).append((slug, name))
+    if capability:
+        people = {k: m for k, m in people.items() if any(slug == capability for slug, _ in offers.get(k, []))}
     sectors = member_sectors(people)
+    media.prime_photos(people.values())
     out = []
     for r in rows:
         p = people.get(r["candidate_id"])
@@ -378,7 +438,8 @@ def matches_for(member: Member, bridge: bool | None = None) -> list[dict]:
             {
                 "candidate_id": p.pk, "display_name": p.display_name, "role": p.role, "verification_level": p.verification_level,
                 "city": p.city, "sector": sectors.get(p.pk), "score": r["score"], "strength": strength_for(r["score"]),
-                "reason": r["reason"], "is_bridge": r["is_bridge"],
+                "reason": r["reason"], "is_bridge": r["is_bridge"], "photo": media.photo_of(p),
+                "headline": (p.bio or "").strip()[:140], "capabilities": [name for _, name in offers.get(p.pk, [])[:3]],
             }
         )  # fmt: skip
     return out

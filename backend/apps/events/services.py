@@ -31,7 +31,7 @@ EVENT_TYPES = frozenset(
         "notification.read", "notification.read_all",
         # social: build logs, Pulse, Today, Daily Drop, follows, connections (F15-F17)
         "media.uploaded", "post.created", "post.deleted", "reaction.added", "reaction.removed", "reply.created", "reply.deleted",
-        "follow.added", "follow.removed", "pulse.seen", "livewire.viewed", "drop.built", "drop.swiped",
+        "follow.added", "follow.removed", "pulse.seen", "livewire.viewed", "drop.built", "drop.first_attempted", "drop.swiped",
         "connection.requested", "connection.responded", "connection.removed",
         # messaging and reports
         "conversation.started", "conversation.accepted", "conversation.declined", "conversation.blocked", "message.sent", "report.created",

@@ -6,6 +6,7 @@ from ninja import Field, Query, Router, Schema, Status
 from apps.accounts.models import Member
 from apps.intros import services
 from apps.intros.models import IntroRequest
+from apps.social import media
 from core.auth import current_member
 from core.errors import Forbidden
 from core.pagination import Page, PageParams, paginate
@@ -61,6 +62,7 @@ class IntroParams(PageParams):
 
 
 def _out(i: IntroRequest, me: Member) -> dict:
+    media.prime_photos([i.requester, i.target, *([i.via] if i.via else [])])
     return {
         "id": i.pk, "my_role": "requester" if i.requester_id == me.pk else "broker" if i.via_id == me.pk else "target",
         "status": services.effective_status(i), "stage": i.stage, "can_respond": services.can_respond(i, me),

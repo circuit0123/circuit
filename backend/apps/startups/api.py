@@ -1,12 +1,14 @@
 from ninja import Query, Router, Schema, Status
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from apps.accounts.api import WorkEmailOut
 from apps.accounts.models import Role
+from apps.social.api import PostMediaOut
 from apps.startups import services
 from core.auth import current_member
 from core.permissions import require_role
 from core.ratelimit import check_rate
+from core.schemas import PersonOut
 
 router = Router()
 
@@ -22,6 +24,7 @@ class PinOut(Schema):
     open_roles: int
     match_pct: int | None = None  # students only; None when the startup has no open role
     distance_km: float | None = None
+    logo: str | None = None  # signed link, or null (draw the circuit-pattern square)
 
 
 class NearbyParams(Schema):
@@ -72,6 +75,19 @@ class OpenJobOut(Schema):
     stipend_max: int | None
 
 
+class FounderOut(Schema):
+    person: PersonOut
+    role: str
+    via: PersonOut | None  # the mutual connection who would introduce me; null when connected, none, or I am under 18
+    connected: bool
+    is_me: bool
+
+
+class BuildLogTileOut(Schema):
+    post_id: int
+    image: PostMediaOut  # the first picture of that build log
+
+
 class StartupOut(Schema):
     id: int
     name: str
@@ -80,18 +96,23 @@ class StartupOut(Schema):
     sector: str
     stage: str
     address: str
+    team_size: int | None
+    logo: str | None
     lat: float | None
     lng: float | None
     hiring: bool
     tech_stack: list
     claimed: bool
+    verified: bool  # claimed through a company email on the startup's own domain
     source: str
-    view_count: int
-    interest_count: int
+    view_count: int | None  # private: the startup's team, or a founder looking at an unclaimed page (not under 5). Else null
+    interest_count: int | None  # same rule
     interested: bool
     is_team: bool
     match_pct: int | None
     open_jobs: list[OpenJobOut]
+    founders: list[FounderOut]
+    build_logs: list[BuildLogTileOut]  # empty when Pulse is off for me
 
 
 class StartupPatch(Schema):
@@ -100,6 +121,7 @@ class StartupPatch(Schema):
     hiring: bool | None = None
     address: str | None = Field(None, max_length=300)
     tech_stack: list[str] | None = Field(None, max_length=20)
+    team_size: int | None = Field(None, ge=1, le=10000)
     lat: float | None = Field(None, ge=-90, le=90)
     lng: float | None = Field(None, ge=-180, le=180)
 
@@ -108,7 +130,9 @@ class StartupPatch(Schema):
     "/{startup_id}",
     response=StartupOut,
     summary="Startup profile",
-    description="Profile, open roles, and how many people viewed it or showed interest (a reason to claim it). Counts one view per member per day.",
+    description="Profile, open roles, founders (each with the warm path to them), the latest build log pictures and the logo. Counts one view per member per day. "
+    "`view_count` and `interest_count` are private: only the startup's team, or a founder looking at an unclaimed page (a reason to claim it, never under 5), get them. "
+    "Members under 18 see an unverified startup as not hiring, with no roles.",
 )
 def startup_detail(request, startup_id: int):
     member = current_member(request)
@@ -124,6 +148,38 @@ def startup_detail(request, startup_id: int):
 def update_startup(request, startup_id: int, body: StartupPatch):
     member = current_member(request)
     startup = services.update_startup(member, services.get_startup(startup_id), body.dict(exclude_unset=True))
+    return services.detail(member, startup, count_view=False)
+
+
+class LogoIn(Schema):
+    model_config = ConfigDict(extra="forbid")
+    upload_id: int
+
+
+@router.put(
+    "/{startup_id}/logo",
+    response=StartupOut,
+    summary="Set the startup's logo",
+    description="The startup's team only. Upload the image first (`POST /api/media/uploads` with purpose `startup_logo`, founders only), "
+    "then send its id. The previous logo is deleted.",
+)
+def set_logo(request, startup_id: int, body: LogoIn):
+    member = current_member(request)
+    check_rate(member.pk, "settings_write")
+    startup = services.set_logo(member, services.get_startup(startup_id), body.upload_id)
+    return services.detail(member, startup, count_view=False)
+
+
+@router.delete(
+    "/{startup_id}/logo",
+    response=StartupOut,
+    summary="Remove the startup's logo",
+    description="The startup's team only. Safe to repeat.",
+)
+def remove_logo(request, startup_id: int):
+    member = current_member(request)
+    check_rate(member.pk, "settings_write")
+    startup = services.set_logo(member, services.get_startup(startup_id), None)
     return services.detail(member, startup, count_view=False)
 
 

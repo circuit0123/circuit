@@ -12,11 +12,12 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.accounts.models import Member
+from apps.events.models import Event
 from apps.events.services import record
 from apps.matching.models import MatchResult, Need, Offer
 from apps.matching.ranker import snapshots
 from apps.matching.services import matches_for, strength_for
-from apps.social import services
+from apps.social import media, services
 from apps.social.models import DailyDrop
 from apps.social.relations import SOCIAL_ROLES, blocked_ids, connected_ids, visible_posts
 from apps.social.schemas import author
@@ -71,6 +72,50 @@ def build_for(member: Member, day: date) -> bool:
     return created
 
 
+FIRST_DROP_WINDOW = timedelta(hours=24)
+FIRST_DROP_RETRY = timedelta(minutes=5)  # the job runs every 5 minutes
+
+
+def first_drop_waiting(member: Member, now: datetime) -> bool:
+    """A member who finished sign-up in the last 24 hours and whose first drop the job has not tried to build yet."""
+    done = (member.onboarding or {}).get("completed_at")
+    if not done or member.is_minor or member.role not in SOCIAL_ROLES:
+        return False
+    try:
+        finished = datetime.fromisoformat(done)
+    except ValueError:
+        return False
+    return now - finished <= FIRST_DROP_WINDOW and not Event.objects.filter(type="drop.first_attempted", actor=member).exists()
+
+
+def build_first_drops(now: datetime | None = None) -> dict:
+    """The `first_drops` job (every 5 minutes): members who just finished sign-up get matches and a Daily Drop now, not at
+    08:00 tomorrow. Each member is tried once (an event marks it), so a member with nobody to meet yet is not retried every run."""
+    from apps.matching.services import compute_for
+
+    now = now or timezone.now()
+    day = drop_day(now)
+    since = now - FIRST_DROP_WINDOW - timedelta(hours=1)
+    waiting = [
+        m
+        for m in Member.objects.filter(
+            role__in=SOCIAL_ROLES, is_minor=False, suspended_at__isnull=True, deleted_at__isnull=True, is_simulated=False,
+            updated_at__gte=since,
+        ).order_by("pk")[:500]
+        if first_drop_waiting(m, now)
+    ]  # fmt: skip
+    if not waiting:
+        return {"day": day, "waiting": 0, "built": 0}
+    compute_for([m.pk for m in waiting])
+    built = 0
+    for m in waiting:
+        with transaction.atomic():
+            ok = build_for(m, day)
+            record("drop.first_attempted", actor=m, built=ok)
+        built += ok
+    return {"day": day, "waiting": len(waiting), "built": built}
+
+
 def _snap(r: MatchResult | None) -> dict | None:
     """What the ranker saw for this card, kept with the card so the snapshot logged when it is shown is exact."""
     if r is None or not r.features:
@@ -117,6 +162,7 @@ def _card_extras(member: Member, people: dict[int, Member]) -> dict[int, dict]:
         pk: reach[pk]["path"][1] for pk in people if pk in reach and reach[pk]["hops"] == 2 and reach[pk]["path"][1] not in hidden
     }
     via = {m.pk: m for m in Member.objects.filter(pk__in=set(brokers.values()), suspended_at__isnull=True)}
+    media.prime_photos(via.values())
     posts: dict[int, object] = {}
     for p in (
         visible_posts(member).filter(author_id__in=people, media__isnull=False).distinct().order_by("-created_at", "-id")[:60]
@@ -153,6 +199,7 @@ def today_drop(member: Member) -> dict:
             ).exclude(profile_visibility=Member.Visibility.HIDDEN)
         }
         shown = {pk: p for pk, p in people.items() if pk not in hidden}
+        media.prime_photos(shown.values())
         extras = _card_extras(member, shown)
         seen = []
         for c in drop.candidates:
@@ -167,7 +214,8 @@ def today_drop(member: Member) -> dict:
         snapshots.log_drop(member, seen, drop.date, now)
     return {
         "date": drop.date if drop else drop_day(now), "cards": cards,
-        "done": bool(cards) and all(c["outcome"] for c in cards), "next_drop_at": next_drop_at(now),
+        "done": bool(cards) and all(c["outcome"] for c in cards),
+        "next_drop_at": now + FIRST_DROP_RETRY if drop is None and first_drop_waiting(member, now) else next_drop_at(now),
     }  # fmt: skip
 
 

@@ -84,6 +84,7 @@ def conversation_rows(member: Member, convs: list[Conversation]) -> list[dict]:
         .distinct("conversation_id")
     ):
         last[m.conversation_id] = m
+    media.prime_photos(_other(c, member) for c in convs)  # one storage call for the whole list
     rows = []
     for c in convs:
         lm = last.get(c.pk)
