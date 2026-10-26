@@ -213,6 +213,17 @@ Frontend only, mock mode only (no backend, keys or login). Screenshots per scree
   - What they cover: everything above, plus every scenario (empty, loading, error, slow 3G, under-18, features off, Pulse off, uploads failing) and axe in dark and light on every new screen.
   - A touch test closes the last TabPager item (LAUNCH.md): a sideways swipe on a post's pictures stays with the pictures.
   - `premium.spec.ts` already measured `/profile`; it now measures the real screen.
+  - Updated because links now go somewhere real: `discover.spec.ts` (People tiles open the profile; the intro is one tap away there), `home.spec.ts` (the intro from Discover goes through the profile), `notifications.spec.ts` (a reply to your build log opens `/posts/201`).
+- **Test results.**
+  - Type check, ESLint, the boundary rule (20 passed) and the UI package's type check and lint are all clean.
+  - New specs: `profile.spec.ts` 50, `compose.spec.ts` 46 (1 skipped on desktop: the touch test), `settings.spec.ts` 62. All pass.
+  - Whole mock suite, one full run: **562 passed, 10 failed, 36 skipped**.
+    - Eight failures were the four tests above, which still expected the old links (both widths). One was a 39px gap on the profile (premium rule needs 40). All are fixed.
+    - The tenth was a `/design` sheet-detent test that passed on the re-run.
+  - Re-run of every touched spec file (discover, home, notifications, premium, tabpager, profile, compose, settings): **365 passed, 2 failed, 35 skipped**. The two failures were Home's Update view arrow keys and the pager's scroll position (F4 already noted that one as flaky). Neither is F6 code, and both passed 3 out of 3 when run alone.
+  - `foundation.spec.ts` after adding the F6 components to `/design`: 44 passed.
+  - `make check` (backend) was not run: this session touched no backend code.
+  - As in F4 and F5, Playwright ran with the pre-installed Chromium through a local, uncommitted config.
 
 ### Frontend → API needed (F6)
 Served from clearly marked mocks (`data/missing.ts`, `PROFILE_EXTRAS` / `ME_EXTRAS`); never an invented endpoint in a real build.
