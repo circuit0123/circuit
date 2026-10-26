@@ -3,7 +3,7 @@ from pydantic import ConfigDict, Field
 
 from apps.accounts.api import WorkEmailOut
 from apps.accounts.models import Role
-from apps.social.api import PostMediaOut
+from apps.social.api import BuildLogTileOut
 from apps.startups import services
 from core.auth import current_member
 from core.permissions import require_role
@@ -83,11 +83,6 @@ class FounderOut(Schema):
     is_me: bool
 
 
-class BuildLogTileOut(Schema):
-    post_id: int
-    image: PostMediaOut  # the first picture of that build log
-
-
 class StartupOut(Schema):
     id: int
     name: str
@@ -101,7 +96,7 @@ class StartupOut(Schema):
     lat: float | None
     lng: float | None
     hiring: bool
-    tech_stack: list
+    tech_stack: list[str]
     claimed: bool
     verified: bool  # claimed through a company email on the startup's own domain
     source: str

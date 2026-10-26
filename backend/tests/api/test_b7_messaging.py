@@ -201,3 +201,16 @@ def test_a_message_image_has_the_documented_shape(make_member, connect, client_f
     c.post(f"/api/media/uploads/{up.pk}/complete")
     image = start(c, b, "", upload_id=up.pk).json()["message"]["image"]
     assert set(image) == {"width", "height", "w1440", "w480"} and (image["width"], image["height"]) == (800, 600)
+
+
+def test_every_message_nudges_only_the_other_persons_member_channel(
+    make_member, connect, client_for, broadcasts, django_capture_on_commit_callbacks
+):
+    a, b = make_member("student"), make_member("founder")
+    connect(a, b)
+    cid = start(client_for(a), b).json()["conversation"]["id"]
+    broadcasts.clear()
+    with django_capture_on_commit_callbacks(execute=True):
+        client_for(b).post(f"/api/conversations/{cid}/messages", {"body": "second"})
+    nudges = [e for e in broadcasts if e[1] == "conversation"]
+    assert nudges == [(f"member:{a.pk}", "conversation", {"conversation_id": cid})]

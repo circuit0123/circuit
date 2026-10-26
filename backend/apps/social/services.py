@@ -231,3 +231,27 @@ def unfollow(member: Member, startup_id: int) -> None:
 def my_follows(member: Member) -> list[Startup]:
     require_social(member)
     return [f.startup for f in Follow.objects.filter(member=member).select_related("startup").order_by("-created_at")]
+
+
+def picture_tiles(viewer: Member, author_ids, limit: int) -> list[dict]:
+    """The first picture of each of the latest build logs by these people that the viewer may see (Startup page, Profile grid).
+    Empty when Pulse is off for the viewer. Posts with no picture are skipped."""
+    from core import flags
+
+    if not flags.enabled("pulse", viewer):
+        return []
+    posts = list(
+        visible_posts(viewer)
+        .filter(author_id__in=list(author_ids), status=Post.Status.VISIBLE, media__isnull=False)
+        .order_by("-created_at", "-id")
+        .distinct()[:limit]
+    )
+    first: dict[int, PostMedia] = {}
+    for pm in PostMedia.objects.filter(post__in=posts).select_related("upload").order_by("-order"):
+        first[pm.post_id] = pm  # ends on order 0, the first picture
+    urls = media.urls_for(pm.upload for pm in first.values())
+    return [
+        {"post_id": p.pk, "image": {"alt_text": first[p.pk].alt_text, **urls[first[p.pk].upload_id]}}
+        for p in posts
+        if p.pk in first
+    ]

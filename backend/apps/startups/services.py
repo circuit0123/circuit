@@ -22,8 +22,9 @@ from apps.matching.models import MemberSkill
 from apps.matching.scoring import skill_match
 from apps.notifications.services import notify, notify_many
 from apps.social import media
+from apps.social import services as social_services
 from apps.startups.models import ClaimRequest, Startup, StartupInterest, StartupMember
-from core import codes, flags
+from core import codes
 from core.cache import get_cache
 from core.errors import ApiError, Conflict, Forbidden, NotFound
 from core.schemas import person
@@ -216,26 +217,7 @@ def _founders(member: Member, startup: Startup) -> list[dict]:
 
 def _build_logs(member: Member, startup: Startup) -> list[dict]:
     """The first picture of the team's latest build logs that this member may see (empty when Pulse is off for them)."""
-    from apps.social.models import Post, PostMedia
-    from apps.social.relations import visible_posts
-
-    if not flags.enabled("pulse", member):
-        return []
-    posts = list(
-        visible_posts(member)
-        .filter(author_id__in=team_member_ids(startup), status=Post.Status.VISIBLE, media__isnull=False)
-        .order_by("-created_at", "-id")
-        .distinct()[:MAX_BUILD_LOGS]
-    )
-    first = {}
-    for pm in PostMedia.objects.filter(post__in=posts).select_related("upload").order_by("-order"):
-        first[pm.post_id] = pm  # ends on order 0, the first picture
-    urls = media.urls_for(pm.upload for pm in first.values())
-    return [
-        {"post_id": p.pk, "image": {"alt_text": first[p.pk].alt_text, **urls[first[p.pk].upload_id]}}
-        for p in posts
-        if p.pk in first
-    ]
+    return social_services.picture_tiles(member, team_member_ids(startup), MAX_BUILD_LOGS)
 
 
 def detail(member: Member, startup: Startup, count_view: bool = True) -> dict:

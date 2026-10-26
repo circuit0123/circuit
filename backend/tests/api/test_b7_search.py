@@ -47,15 +47,15 @@ def test_startups_by_sector_and_jobs_by_skill_or_startup(town, make_member, clie
 
 def test_hidden_minor_blocked_deleted_and_admin_people_never_appear(town, make_member, block, client_for):
     me = make_member("student")
-    hidden = make_member("mentor", display_name="Zed Hidden", profile_visibility="hidden")
-    kid = make_member("student", display_name="Zed Kid", is_minor=True)
+    make_member("mentor", display_name="Zed Hidden", profile_visibility="hidden")
+    make_member("student", display_name="Zed Kid", is_minor=True)
     blocked = make_member("mentor", display_name="Zed Blocked")
     gone = make_member("mentor", display_name="Zed Gone")
     gone.deleted_at = gone.created_at
     gone.save()
-    admin = make_member("super_admin", display_name="Zed Admin")
-    sim = make_member("mentor", display_name="Zed Sim", is_simulated=True)
-    ok = make_member("mentor", display_name="Zed Fine")
+    make_member("super_admin", display_name="Zed Admin")
+    make_member("mentor", display_name="Zed Sim", is_simulated=True)
+    make_member("mentor", display_name="Zed Fine")
     block(me, blocked)
     assert [p["display_name"] for p in search(client_for(me), "zed")["people"]] == ["Zed Fine"]
 

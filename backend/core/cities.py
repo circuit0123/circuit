@@ -9,7 +9,7 @@ from ninja import Router, Schema
 
 router = Router()
 
-CITIES = (
+CITIES: tuple[tuple[str, float, float], ...] = (
     ("Chennai", 13.0827, 80.2707), ("Bengaluru", 12.9716, 77.5946), ("Mumbai", 19.0760, 72.8777),
     ("Delhi", 28.6139, 77.2090), ("Hyderabad", 17.3850, 78.4867), ("Pune", 18.5204, 73.8567),
     ("Kolkata", 22.5726, 88.3639), ("Ahmedabad", 23.0225, 72.5714), ("Jaipur", 26.9124, 75.7873),
@@ -32,7 +32,9 @@ class CityOut(Schema):
 
 def city_list() -> list[dict]:
     pilot = settings.SEED_CITY
-    rest = [{"name": n, "lat": lat, "lng": lng, "pilot": False} for n, lat, lng in CITIES if n.lower() != pilot["name"].lower()]
+    rest = [
+        {"name": n, "lat": lat, "lng": lng, "pilot": False} for n, lat, lng in CITIES if n.lower() != str(pilot["name"]).lower()
+    ]
     return [{"name": pilot["name"], "lat": pilot["lat"], "lng": pilot["lng"], "pilot": True}, *rest]
 
 

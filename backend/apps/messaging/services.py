@@ -156,7 +156,6 @@ def start(member: Member, member_id: int, body: str, upload_id: int | None) -> t
                     status=C.ACTIVE if is_connected(member.pk, other.pk) else C.REQUEST,
                 )  # fmt: skip
                 record("conversation.started", actor=member, target_type="conversation", target_id=conv.pk, status=conv.status)
-                transaction.on_commit(lambda cid=conv.pk: realtime.conversation_changed(other.pk, cid))
         except IntegrityError:  # both people wrote first at the same moment
             conv = Conversation.objects.get(member_a_id=x, member_b_id=y)
         conv = Conversation.objects.select_related("member_a", "member_b").get(pk=conv.pk)
@@ -184,7 +183,6 @@ def send(member: Member, conversation_id: int, body: str, upload_id: int | None)
                 conv.status = C.ACTIVE
                 conv.declined_by = None
                 record("conversation.accepted", actor=member, target_type="conversation", target_id=conv.pk)
-                transaction.on_commit(lambda: realtime.conversation_changed(conv.started_by_id, conv.pk))
         check_rate(member.pk, "message")
         image = media.claim_uploads(member, [upload_id], MediaUpload.Purpose.MESSAGE)[0] if upload_id is not None else None
         msg = Message.objects.create(conversation=conv, sender=member, body=body, image=image)
@@ -193,6 +191,9 @@ def send(member: Member, conversation_id: int, body: str, upload_id: int | None)
         record("message.sent", actor=member, target_type="conversation", target_id=conv.pk, has_image=image is not None)
         _notify_once(other, conv, member)
         transaction.on_commit(lambda: realtime.broadcast(conv.pk, msg.pk))
+        # the other person's Inbox hears about a new conversation, a new message or an accepted request on their own channel,
+        # so it needs one subscription instead of one per conversation
+        transaction.on_commit(lambda: realtime.conversation_changed(other.pk, conv.pk))
     return msg
 
 

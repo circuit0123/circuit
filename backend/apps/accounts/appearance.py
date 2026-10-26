@@ -18,7 +18,8 @@ def resolved(member: Member) -> dict:
     """The member's settings with defaults filled in. Unknown or invalid stored values fall back to the default."""
     stored = member.appearance if isinstance(member.appearance, dict) else {}
     theme = stored.get("theme")
-    accent = LEGACY_ACCENTS.get(stored.get("accent"), stored.get("accent"))
+    raw = stored.get("accent")
+    accent = LEGACY_ACCENTS.get(raw, raw) if isinstance(raw, str) else None
     swipe = stored.get("swipe_tabs")
     return {
         "theme": theme if theme in THEMES else DEFAULTS["theme"],

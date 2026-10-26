@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from django.utils import timezone
 from ninja import Field, Query, Router, Schema
@@ -52,7 +53,9 @@ class CircuitOut(Schema):
     time_left_seconds: int | None  # while proposed: seconds to answer; otherwise null
     created_at: datetime
     my_consent: str
-    next_step: str  # answer, waiting, mark_done, rate or none: what the screen should offer me now
+    next_step: Literal[
+        "answer", "waiting", "mark_done", "rate", "none"
+    ]  # answer, waiting, mark_done, rate or none: what the screen should offer me now
     you_help: LineOut  # "You help Priya with fundraising"
     helps_you: LineOut  # "Arjun helps you with marketing"
     members: list[MemberStatusOut]  # the three people, in ring order, with consent and done
@@ -67,7 +70,7 @@ class RatingIn(Schema):
     rating: int = Field(ge=1, le=5)
 
 
-def _next_step(status: str, mine: CircuitLeg, got: CircuitLeg) -> str:
+def _next_step(status: str, mine: CircuitLeg, got: CircuitLeg) -> str:  # one of CircuitOut.next_step
     unrated = got.fulfilled and got.rating is None
     if status == Circuit.Status.PROPOSED:
         return "answer" if mine.consent == CircuitLeg.Consent.PENDING else "waiting"

@@ -4,13 +4,15 @@ from django.conf import settings
 from ninja import Router, Schema
 from pydantic import ConfigDict, Field
 
-from apps.accounts import appearance, photo, services
+from apps.accounts import appearance, photo, profile, services
 from apps.accounts.models import Member
 from apps.matching.models import Capability, MemberSkill, MemberTrait, Need, Offer, Trait
 from apps.social import media
+from apps.social.api import BuildLogTileOut
 from core import gate
 from core.auth import current_context, current_member
 from core.ratelimit import check_rate
+from core.schemas import PersonOut
 
 router = Router()
 RoleChoice = Literal["student", "founder", "mentor", "investor"]
@@ -24,7 +26,7 @@ class AppearanceOut(Schema):
 
 class MeOut(Schema):
     id: int
-    role: str
+    role: Literal["student", "founder", "mentor", "investor", "partner_admin", "super_admin"]
     display_name: str
     bio: str
     city: str
@@ -252,8 +254,35 @@ def put_traits(request, body: list[str]):
 
 
 # -- public profile -------------------------------------------------------------------------
+class ProfileActionsOut(Schema):
+    connect: bool
+    message: bool
+    intro: bool  # a mutual connection can introduce me (not for members under 18)
+
+
+class StrengthStepOut(Schema):
+    key: str
+    text: str
+
+
+class StrengthOut(Schema):
+    percent: int
+    next_step: StrengthStepOut | None  # the one thing to do next
+
+
 class ProfileOut(Schema):
     id: int
+    is_me: bool
+    photo: str | None
+    headline: str
+    organisation: str | None  # their organisation's name, only for people in the same one (and for me)
+    connection: Literal["self", "connected", "requested", "requested_you", "none"]
+    actions: ProfileActionsOut
+    mutual_count: int | None  # "12 mutual connections"; null on my own profile. There are no public follower or connection counts
+    via: PersonOut | None  # who would introduce me, when there is a path and they are not yet a connection
+    build_logs: list[BuildLogTileOut]  # first picture of their latest build logs I may see; empty when Pulse is off
+    circuits_closed: int | None  # mine, or a connection's; null for everyone else and when circuits are off
+    strength: StrengthOut | None  # my own profile only: how complete it is
     role: str
     display_name: str
     bio: str
@@ -270,11 +299,16 @@ class ProfileOut(Schema):
     "/members/{member_id}",
     response=ProfileOut,
     summary="A member's profile",
-    description="Another member's profile. Hidden, under-18, suspended, blocked and admin accounts are a 404.",
+    description="The whole Profile screen in one call: header (photo, headline, organisation for people in mine), what I can do with them "
+    "(connect, message, intro via a mutual), mutual connections, needs and offers, skills, a grid of their build logs, closed circuits "
+    "(mine or a connection's) and, on my own profile, the strength meter with its next step. Hidden, under-18, suspended, blocked and "
+    "admin accounts are a 404. My own id works too.",
 )
 def member_profile(request, member_id: int):
-    target = services.visible_member(current_member(request), member_id)
+    viewer = current_member(request)
+    target = services.visible_member(viewer, member_id)
     return {
+        **profile.header(viewer, target),
         "id": target.pk, "role": target.role, "display_name": target.display_name, "bio": target.bio, "city": target.city,
         "college": target.college, "verification_level": target.verification_level,
         "needs": _no(Need.objects.filter(member=target, is_active=True).select_related("capability").order_by("id")),

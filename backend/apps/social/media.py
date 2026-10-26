@@ -7,7 +7,7 @@ is deleted. This is the one heavy step done inside a request: one image of at mo
 
 import io
 import uuid
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 
 import structlog
 from django.conf import settings
@@ -40,11 +40,11 @@ def widths(purpose: str) -> tuple[int, ...]:
 
 
 def create_upload(member: Member, purpose: str, content_type: str, size: int) -> tuple[MediaUpload, str]:
-    allowed = {
-        MediaUpload.Purpose.POST: SOCIAL_ROLES,
-        MediaUpload.Purpose.AVATAR: MESSAGING_ROLES,  # every member who can use the app
-        MediaUpload.Purpose.STARTUP_LOGO: {Role.FOUNDER},
-    }.get(purpose, MESSAGING_ROLES)
+    allowed: Collection[str] = MESSAGING_ROLES  # messages and avatars: every member who can use the app
+    if purpose == MediaUpload.Purpose.POST:
+        allowed = SOCIAL_ROLES
+    elif purpose == MediaUpload.Purpose.STARTUP_LOGO:
+        allowed = {Role.FOUNDER}
     if member.role not in allowed:
         raise Forbidden()
     if content_type not in CONTENT_TYPES:
@@ -209,13 +209,13 @@ def prime_photos(members: Iterable[Member]) -> None:
     members = [m for m in members if m is not None]
     urls = small_urls(m.photo_path for m in members if m.photo_path and not m.is_minor)
     for m in members:
-        m._photo_url = urls.get(m.photo_path) if m.photo_path and not m.is_minor else None
+        m._photo_url = urls.get(m.photo_path) if m.photo_path and not m.is_minor else None  # type: ignore[attr-defined]
 
 
 def photo_of(member: Member) -> str | None:
     if not hasattr(member, "_photo_url"):
         prime_photos([member])
-    return member._photo_url
+    return member._photo_url  # type: ignore[attr-defined]
 
 
 def own_photo(member: Member) -> str | None:
