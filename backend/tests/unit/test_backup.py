@@ -263,7 +263,8 @@ def test_upload_recovers_after_one_failure(tmp_path):
 # ---- the job ---------------------------------------------------------------------------------------------------------------
 
 
-def test_backup_db_is_a_job_that_records_its_result(monkeypatch, capsys):
+def test_backup_db_is_a_job_that_records_its_result(monkeypatch, capsys, settings):
+    settings.BACKUP_DATABASE_URL = URL
     monkeypatch.setattr(backup, "backup", lambda: backup.BackupResult("d", "c", 12_300_000, 87, "gs://b"))
     call_command("backup_db")
     assert "12.3 MB, 87 tables" in capsys.readouterr().out
@@ -271,7 +272,8 @@ def test_backup_db_is_a_job_that_records_its_result(monkeypatch, capsys):
     assert row.last_status == "ok" and row.last_success_at
 
 
-def test_a_failed_backup_is_a_failed_job(monkeypatch):
+def test_a_failed_backup_is_a_failed_job(monkeypatch, settings):
+    settings.BACKUP_DATABASE_URL = URL
     def boom():
         raise CommandError("pg_dump failed (exit 1): no message")
 
@@ -280,6 +282,15 @@ def test_a_failed_backup_is_a_failed_job(monkeypatch):
         call_command("backup_db")
     row = JobRun.objects.get(name="backup_db")
     assert row.last_status == "failed" and "pg_dump failed" in row.last_error
+
+
+def test_backup_db_without_a_database_address_skips_and_exits_zero(monkeypatch, capsys, settings):
+    settings.BACKUP_DATABASE_URL = ""
+    monkeypatch.setattr(backup, "backup", lambda: pytest.fail("must not try to back up"))
+    call_command("backup_db")  # no exception = exit code 0
+    assert "skipped: not configured" in capsys.readouterr().out
+    row = JobRun.objects.get(name="backup_db")
+    assert row.last_status == "skipped" and not row.last_error
 
 
 # ---- the restore drill -----------------------------------------------------------------------------------------------------
@@ -453,4 +464,5 @@ def test_only_production_backs_up_and_the_job_is_nightly():
     assert env["BACKUP_BUCKET"] == prod.backup_bucket and "BACKUP_BUCKET" not in {
         e["name"] for e in gcp.container_env(staging, "1")
     }
-    assert "BACKUP_DATABASE_URL" in prod.secrets
+    # beta: not mounted, because Cloud Run refuses an empty secret. The job skips until it is added to production.toml `secrets`
+    assert "BACKUP_DATABASE_URL" not in prod.secrets

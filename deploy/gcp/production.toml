@@ -26,7 +26,6 @@ CORS_ALLOWED_ORIGINS = "https://circuit-app.vercel.app"
 GRIEVANCE_OFFICER_NAME = "G Lokesh Kumar"
 GRIEVANCE_EMAIL = "support@circuitapp.net"
 GRIEVANCE_ADDRESS = "pondicherry,India"
-BACKUP_AGE_RECIPIENT = "age1...your public key..."
 STORAGE_PROVIDER = "supabase"
 EMAIL_BACKEND = "resend"
 EMAIL_FROM = "Circuit <support@circuitapp.net>"   # production refuses Resend's @resend.dev test sender: verify your domain in Resend first
@@ -37,7 +36,9 @@ SEED_CITY_LNG = "80.2707"
 BETA_MODE = "true"                       # invite-only until public launch
 TRUSTED_PROXY_HOPS = "1"                 # Cloud Run's front end is one hop
 FEATURES = "pulse:everyone,daily_drop:everyone,circuits:testers"   # PRODUCTION.md §2b, beta start
-POLICY_VERSION = "2026-01"        # the PUBLIC key of your backup key pair (`age-keygen -o backup.key` prints it). Keep backup.key itself offline. The bucket is created by `make gcp-setup`
+POLICY_VERSION = "2026-01"
+# Backups are off until you add BACKUP_DATABASE_URL (a secret) and BACKUP_AGE_RECIPIENT (the PUBLIC key from `age-keygen -o backup.key`; keep
+# backup.key offline). Until then the nightly backup-db job logs "skipped: not configured". Turn this on before real data matters (RUNBOOK).
 
 # Alerts go to these Cloud Monitoring notification channels, by display name. Empty is fine for the first weeks: only
 # `make monitoring ENV=production` needs them, and it stops with a clear message while the list is empty. To switch alerts on, create an email
