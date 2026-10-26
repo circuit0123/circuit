@@ -16,6 +16,7 @@ secrets = ["GROQ_API_KEY", "RESEND_API_KEY"]
 [env]
 ENV = "staging"
 LLM_PROVIDER = "groq"                    # free tier is allowed outside production
+LLM_DAILY_CALL_LIMIT = "1000"            # the free Groq tier allows more, but a runaway loop should stop here
 APP_URL = "<https://circuit-app-staging.vercel.app>"
 LANDING_URL = "<https://circuit-landing.vercel.app>"
 API_URL = "auto"

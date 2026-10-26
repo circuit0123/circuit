@@ -16,7 +16,8 @@ secrets = ["ANTHROPIC_API_KEY", "RESEND_API_KEY", "SENTRY_DSN", "BACKUP_DATABASE
 
 [env]
 ENV = "production"
-LLM_PROVIDER = "anthropic"               # paid tier whose terms exclude training on our data (CLAUDE.md)
+LLM_PROVIDER = "anthropic"               # paid tier whose terms exclude training on our data (CLAUDE.md). "none" = no LLM, manual pickers only (then drop ANTHROPIC_API_KEY from secrets)
+LLM_DAILY_CALL_LIMIT = "500"             # AI calls per day; past it onboarding uses the manual pickers until tomorrow. 0 = no cap
 APP_URL = "<https://app.yourdomain>"     # the Vercel production app (https://circuit-app-production.vercel.app until the domain exists)
 LANDING_URL = "<https://yourdomain>"
 API_URL = "auto"                         # auto = https://circuit-production-api-<project number>.<region>.run.app. After mapping a custom domain, write it here

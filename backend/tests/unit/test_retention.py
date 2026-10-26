@@ -5,16 +5,23 @@ from datetime import timedelta
 
 import pytest
 from django.core.management import call_command
+from django.db import DatabaseError, connection, transaction
 from django.utils import timezone
 
 from apps.accounts import retention
 from apps.accounts.models import Consent, DataExport, Member
 from apps.beta.models import WaitlistEntry
 from apps.events.models import Event
+from apps.notifications.models import Notification
 from core import supabase_admin
 from core.storage import get_storage
 
 pytestmark = pytest.mark.django_db
+
+NONE = dict.fromkeys(
+    ("unverified_accounts", "export_files", "waitlist_entries", "ranker_snapshots", "events", "notifications", "webhook_events"),
+    0,
+)  # what run() reports when there was nothing to remove
 
 
 def aged(member, days=0, seconds=0):
@@ -136,12 +143,12 @@ def test_running_it_twice_changes_nothing_the_second_time(make_member):
     aged(make_member("student"), days=60)
     entry("a@example.org", "rejected", reviewed_days=200)
     first = retention.run()
-    assert first == {"unverified_accounts": 1, "export_files": 0, "waitlist_entries": 1, "ranker_snapshots": 0}
-    assert retention.run() == {"unverified_accounts": 0, "export_files": 0, "waitlist_entries": 0, "ranker_snapshots": 0}
+    assert first == {**NONE, "unverified_accounts": 1, "waitlist_entries": 1}
+    assert retention.run() == NONE
 
 
 def test_nothing_to_do_is_fine(db):
-    assert retention.run() == {"unverified_accounts": 0, "export_files": 0, "waitlist_entries": 0, "ranker_snapshots": 0}
+    assert retention.run() == NONE
 
 
 def test_it_logs_counts_only_and_records_one_event(make_member, capfd):
@@ -154,7 +161,84 @@ def test_it_logs_counts_only_and_records_one_event(make_member, capfd):
     for private in ("private.person", "Private Person", "PRIVATE-BIO", "waiter@example.org"):
         assert private not in out
     event = Event.objects.get(type="retention.cleaned")
-    assert (
-        event.payload == {"counts": {"unverified_accounts": 1, "export_files": 0, "waitlist_entries": 1, "ranker_snapshots": 0}}
-        and event.actor_id is None
+    assert event.payload == {"counts": {**NONE, "unverified_accounts": 1, "waitlist_entries": 1}} and event.actor_id is None
+
+
+# -- free-tier housekeeping: events, notifications, webhook records ------------------------------------
+def old_event(days, type_="post.created"):
+    """The events table refuses UPDATE, so an old row is inserted with its date."""
+    with connection.cursor() as cur:
+        cur.execute(
+            "INSERT INTO events_event (type, target_type, payload, created_at) VALUES (%s, '', '{}', now() - make_interval(days => %s))",
+            [type_, days],
+        )
+
+
+def test_events_older_than_a_year_go_and_newer_ones_stay():
+    old_event(400)
+    old_event(366)
+    old_event(364)
+    old_event(1)
+    assert retention.purge_events() == 2
+    assert Event.objects.filter(type="post.created").count() == 2
+
+
+def test_events_stay_append_only_for_everyone_else():
+    old_event(400)
+    with pytest.raises(DatabaseError, match="append-only"), transaction.atomic():
+        Event.objects.filter(type="post.created").delete()
+    with pytest.raises(DatabaseError, match="append-only"), transaction.atomic():
+        Event.objects.filter(type="post.created").update(payload={"x": 1})
+    with pytest.raises(DatabaseError, match="append-only"), transaction.atomic(), connection.cursor() as cur:
+        cur.execute("DELETE FROM events_event")  # the permission to purge lasts for one transaction only
+    assert retention.purge_events() == 1
+
+
+def test_events_are_purged_in_batches(monkeypatch):
+    monkeypatch.setattr(retention, "BATCH", 2)
+    for _ in range(5):
+        old_event(500)
+    assert retention.purge_events() == 5
+
+
+def test_notifications_read_ones_after_90_days_and_any_after_180(make_member):
+    m = make_member("student")
+    now = timezone.now()
+
+    def note(days, read):
+        n = Notification.objects.create(member=m, kind="intro.received")
+        Notification.objects.filter(pk=n.pk).update(created_at=now - timedelta(days=days), read_at=now if read else None)
+        return n.pk
+
+    keep = {note(30, True), note(89, True), note(100, False), note(179, False)}
+    note(91, True)
+    note(181, False)
+    note(400, True)
+    assert retention.purge_notifications() == 3
+    assert set(Notification.objects.values_list("pk", flat=True)) == keep
+
+
+def test_webhook_records_are_skipped_until_the_payments_app_exists():
+    assert retention.purge_webhook_events() == 0
+
+
+def test_webhook_records_older_than_90_days_go_when_the_model_exists(monkeypatch):
+    class FakeModel:
+        class objects:  # noqa: N801
+            @staticmethod
+            def filter(**kw):
+                FakeModel.seen = kw
+                return Notification.objects.none()
+
+    monkeypatch.setattr(retention.apps, "get_model", lambda app, name: FakeModel)
+    assert retention.purge_webhook_events() == 0
+    assert "received_at__lt" in FakeModel.seen
+
+
+def test_retention_periods_are_the_documented_ones(settings):
+    assert (settings.EVENT_RETENTION_DAYS, settings.NOTIFICATION_READ_RETENTION_DAYS, settings.NOTIFICATION_RETENTION_DAYS) == (
+        365,
+        90,
+        180,
     )
+    assert (settings.WEBHOOK_EVENT_RETENTION_DAYS, settings.RANKER_SNAPSHOT_RETENTION_DAYS) == (90, 365)

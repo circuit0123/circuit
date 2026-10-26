@@ -77,3 +77,18 @@ class JobRun(models.Model):
     last_error = models.CharField(
         max_length=240, blank=True, default=""
     )  # exception class + short scrubbed message of the last failure; cleared on success
+
+
+class UsageCounter(models.Model):
+    """One counter per name per India day (core/usage.py): LLM calls today, so the daily cap holds across every instance and job.
+    Counts only; no member, no text. Rows are tiny and a year of them is a few hundred."""
+
+    name = models.CharField(max_length=40)
+    day = models.DateField()
+    count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["name", "day"], name="usage_counter_name_day")]
+
+    def __str__(self) -> str:
+        return f"{self.name} {self.day}: {self.count}"

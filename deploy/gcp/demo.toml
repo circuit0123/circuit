@@ -18,6 +18,7 @@ ENV = "demo"
 DEMO_AUTH = "true"                       # personas; the app refuses this in staging and production
 DEMO_PUBLIC = "true"
 LLM_PROVIDER = "groq"
+LLM_DAILY_CALL_LIMIT = "1000"            # the free Groq tier allows more, but a runaway loop should stop here
 APP_URL = "<https://circuit-app-demo.vercel.app>"
 LANDING_URL = "<https://circuit-landing.vercel.app>"
 API_URL = "auto"

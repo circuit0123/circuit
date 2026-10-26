@@ -1,8 +1,13 @@
-"""LLM behind one interface (LLM_PROVIDER = gemini | groq | anthropic | fake).
+"""LLM behind one interface (LLM_PROVIDER = gemini | groq | anthropic | none | fake).
 
 Contract: `extract_json` returns a validated pydantic object or None. It never raises.
 Callers treat None as "fall back to manual pickers". Every call has a timeout and
 retries with backoff.
+
+Two ways to run without paying for (or while out of) LLM calls, both ending in the manual pickers:
+  - LLM_PROVIDER=none: no provider at all. `extract_json` returns None at once and never touches the network or the database.
+  - LLM_DAILY_CALL_LIMIT=N: at most N provider calls per India day, counted in Postgres (core/usage.py), across every instance.
+    Past it `extract_json` returns None and logs `llm.cap_reached`; tomorrow it works again. 0 = no cap.
 """
 
 import json
@@ -35,6 +40,13 @@ class FakeLLM:
         if self.error:
             raise self.error
         return self.response
+
+
+class NoLLM:
+    """LLM_PROVIDER=none. `extract_json` never calls it; if something does, that is a bug worth seeing."""
+
+    def complete(self, system: str, user: str) -> str:
+        raise RuntimeError("LLM_PROVIDER=none: no language model is configured")
 
 
 class GroqLLM:
@@ -86,6 +98,7 @@ def get_llm() -> LLMProvider:
             "groq": GroqLLM,
             "gemini": GeminiLLM,
             "anthropic": AnthropicLLM,
+            "none": NoLLM,
             "fake": FakeLLM,
         }
         _provider = factories[settings.LLM_PROVIDER]()
@@ -105,12 +118,34 @@ def _has_key() -> bool:
     )
 
 
+def _within_daily_cap() -> bool:
+    """Count one provider call against today's cap. True = go ahead. A database problem never blocks onboarding."""
+    limit = settings.LLM_DAILY_CALL_LIMIT
+    if not limit:
+        return True
+    from core import usage
+
+    try:
+        used = usage.bump("llm_calls")
+    except Exception as exc:
+        log.warning("llm_cap_unavailable", error=type(exc).__name__)
+        return True
+    if used > limit:
+        log.warning("llm.cap_reached", limit=limit)
+        return False
+    return True
+
+
 def extract_json(system: str, user: str, schema: type[T]) -> T | None:
+    if settings.LLM_PROVIDER == "none":
+        return None  # manual pickers; no key, no network, no database
     provider = get_llm()
     if isinstance(provider, (GroqLLM, GeminiLLM, AnthropicLLM)) and not _has_key():
         log.warning("llm_no_api_key", provider=settings.LLM_PROVIDER)
         return None
     for attempt in range(MAX_ATTEMPTS):
+        if not _within_daily_cap():
+            return None
         try:
             raw = provider.complete(system, user)
             return schema.model_validate(json.loads(raw))

@@ -18,7 +18,7 @@ endef
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
-	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill
+	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report
 
 help: ## List every command
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  \033[1m%-22s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -134,6 +134,15 @@ endif
 
 restore-drill: ## Restore the newest backup into a throwaway LOCAL database and check the row counts: AGE_KEY_FILE=~/backup.key make restore-drill [ENV=production]
 	python3 scripts/restore_drill.py $(if $(filter-out local,$(ENV)),--env $(ENV))
+
+usage-report: ## Free-tier usage (database, storage, emails, Redis, AI calls) with a warning at 70%: make usage-report [ENV=production]
+ifeq ($(ENV),local)
+	$(MANAGE) usage_report
+else
+	$(call need_env,usage-report)
+	$(GCP) jobs-run --env $(ENV) --job usage_report
+	$(GCP) logs --env $(ENV) --job usage_report --limit 20
+endif
 
 retention: ## Run the daily clean-up now: stale accounts, expired export files, old rejected waitlist entries
 	$(MANAGE) retention_cleanup

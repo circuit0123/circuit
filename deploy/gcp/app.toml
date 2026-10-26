@@ -32,6 +32,8 @@ EMBEDDING_PROVIDER = "fastembed"
 DATABASE_POOLER = "transaction"   # Supabase pooler, port 6543. Why: PRODUCTION.md "Database connections"
 DEMO_AUTH = "false"
 DEBUG = "false"
+REDIS_LEAN = "true"               # Upstash free plan (500k commands a month): keep fewer copies in Redis (backend/core/cache). Set "false" on a paid plan
+MEDIA_WEBP_QUALITY = "75"         # smaller uploaded images (Supabase free storage is 1 GB). 82 on a paid plan
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Jobs. Every management command that runs on a schedule is a Cloud Run Job. `schedule` is a Cloud Scheduler cron in
@@ -94,6 +96,10 @@ schedule = "0 2 * * 0"        # Sundays 02:00 IST; only saves a candidate, a sup
 cpu = "2"
 memory = "4Gi"
 timeout_seconds = 3600
+
+[jobs.usage-report]
+command = "usage_report"
+schedule = "0 9 * * 1"        # Mondays 09:00 IST: free-tier usage; logs usage.warning at 70% of a limit (the alert in infra/monitoring/)
 
 [jobs.reset-demo]
 command = "reset_demo"

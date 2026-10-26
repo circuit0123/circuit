@@ -65,11 +65,11 @@ def overrides() -> dict[str, str]:
     from core.models import FeatureFlag
 
     cache = get_cache()
-    cached = cache.get_json(CACHE_KEY)
+    cached = cache.get_json(CACHE_KEY, essential=True)
     if cached is not None:
         return cached
     rows = dict(FeatureFlag.objects.values_list("name", "audience"))
-    cache.set_json(CACHE_KEY, rows, ttl=CACHE_TTL)
+    cache.set_json(CACHE_KEY, rows, ttl=CACHE_TTL, essential=True)
     return rows
 
 
