@@ -6,19 +6,20 @@ import { useMotionValue } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { composeHref, useFeatures, useMe, useNotificationNudges, useUnreadCount } from "@/data";
+import { composeHref, useFeatures, useInboxDot, useMe, useNotificationNudges, useUnreadCount } from "@/data";
 import { useDesktop } from "@/hooks/useDesktop";
+import { Circuits } from "./circuits/Circuits";
 import { Discover } from "./discover/Discover";
 import { Home } from "./home/Home";
 import { HomeRail } from "./home/Rail";
 import { Inbox } from "./inbox/Inbox";
 import { Profile } from "./profile/Profile";
 
-/** The screen behind each tab id. A tab with no screens yet (Circuits, until its session) has no node, so the features hook keeps it hidden. */
+/** The screen behind each tab id. Circuits is only in the bar while its flag is on (the features hook decides). */
 const NODES: Record<string, React.ReactNode> = {
   home: <Home />,
   discover: <Discover />,
-  circuits: null,
+  circuits: <Circuits />,
   inbox: <Inbox />,
   profile: <Profile />,
 };
@@ -28,13 +29,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const toast = useToast();
   const me = useMe().data;
   const unread = useUnreadCount().data ?? 0;
+  const inboxDot = useInboxDot();
   useNotificationNudges();
   const desktop = useDesktop();
   const path = usePathname();
   const router = useRouter();
 
   // Bar order and labels come from the shared preset. `features.on` is false for anything the server has off or the app has no screens for.
-  const tabs = memberTabs({ circuits: features.on("circuits"), inboxDot: false });
+  const tabs = memberTabs({ circuits: features.on("circuits"), inboxDot });
   const fromPath = tabs.find((t) => t.href === path)?.id ?? null;
   const [picked, setPicked] = useState<string | null>(fromPath);
   useEffect(() => { setPicked(fromPath); }, [fromPath]); // eslint-disable-line react-hooks/set-state-in-effect
@@ -67,8 +69,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-current={t.id === active ? "page" : undefined}
               className={cx("flex h-12 items-center gap-4 rounded-control px-3 t-body", t.id === active ? "bg-surface font-semibold text-text" : "text-text-muted")}
             >
-              {t.icon}
+              <span className="relative flex">{t.icon}{t.dot && <span className="absolute -right-0.5 top-0 h-2 w-2 rounded-full bg-live ring-2 ring-bg" aria-hidden />}</span>
               {t.label}
+              {t.dot && <span className="sr-only">, unread messages</span>}
             </Link>
           ))}
         </nav>

@@ -2,7 +2,9 @@ import { delay, http, HttpResponse, type HttpHandler, type HttpResponseResolver 
 import type { Schemas } from "@circuit/api-client";
 import { currentScenario, type Scenario } from "./config";
 import { isSignup, signupConfig, signupHandlers, signupMe } from "./signup";
+import { circuitHandlers } from "./circuits";
 import { discoverHandlers } from "./discover";
+import { inboxHandlers } from "./inbox";
 import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, NOTIFICATIONS, ONBOARDING, PEOPLE, PERSONAS, PULSE, dropOf } from "./fixtures";
 
 /**
@@ -135,6 +137,8 @@ export const handlers: HttpHandler[] = [
   })),
 
   ...discoverHandlers,
+  ...circuitHandlers,
+  ...inboxHandlers,
 
   // Anything else: not mocked yet.
   http.all(`${API}/*`, ({ request }) => {

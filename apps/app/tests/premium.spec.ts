@@ -19,6 +19,7 @@ const SCREENS = [
   { id: "discover", path: "/discover" }, // a student starts on Jobs
   { id: "discover-people", path: "/discover?s=people" },
   { id: "discover-startups", path: "/discover?s=startups" },
+  { id: "circuits", path: "/circuits" },
   { id: "inbox", path: "/inbox" },
   { id: "profile", path: "/profile" },
   // The back of the fence (DESIGN.md §1a) follows the same rules: the 404 page and the 500 page (a route that throws on purpose).

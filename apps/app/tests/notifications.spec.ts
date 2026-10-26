@@ -42,9 +42,9 @@ test.describe("Notifications", () => {
     const href = (name: RegExp) => page.getByRole("link", { name }).getAttribute("href");
     expect(await href(/accepted your introduction/)).toBe("/inbox");
     expect(await href(/application has a new status/)).toBe("/discover/applications");
-    expect(await href(/new circuit is waiting/)).toBe("/inbox");
+    expect(await href(/new circuit is waiting/)).toBe("/circuits");
     expect(await href(/replied to your build log/)).toBe("/");
-    expect(await href(/sent you a message/)).toBe("/inbox");
+    expect(await href(/sent you a message/)).toBe("/inbox/502");
     expect(await href(/showed interest in your startup/)).toBe("/startups/41");
   });
 

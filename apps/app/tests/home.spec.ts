@@ -116,11 +116,12 @@ test.describe("Update view", () => {
     await expect(wireNode(page, 0)).not.toContainText(", new");
   });
 
-  test("the action does what it says: Reply opens Inbox, View role opens the job page", async ({ page }) => {
+  test("the action does what it says: Reply opens a message to them, View role opens the job page", async ({ page }) => {
     await open(page);
     await wireNode(page, 0).click();
     await update(page).getByRole("button", { name: "Reply" }).click();
-    await expect(page).toHaveURL(/\/inbox$/);
+    await expect(page).toHaveURL(/\/inbox\/new\?to=4$/);
+    await expect(page.getByText("Arjun Mehta").first()).toBeVisible();
     await open(page);
     await wireNode(page, 1).click();
     await update(page).getByRole("button", { name: "View role" }).click();
