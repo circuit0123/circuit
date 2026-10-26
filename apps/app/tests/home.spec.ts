@@ -121,7 +121,7 @@ test.describe("Update view", () => {
     await wireNode(page, 0).click();
     await update(page).getByRole("button", { name: "Reply" }).click();
     await expect(page).toHaveURL(/\/inbox\/new\?to=4$/);
-    await expect(page.getByText("Arjun Mehta").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Arjun Mehta", level: 1 })).toBeVisible();
     await open(page);
     await wireNode(page, 1).click();
     await update(page).getByRole("button", { name: "View role" }).click();
