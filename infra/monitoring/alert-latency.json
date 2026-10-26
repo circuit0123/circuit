@@ -1,0 +1,22 @@
+{
+  "kind": "alertPolicy",
+  "displayName": "Circuit ${ENV}: API slow (p95 above 1 s)",
+  "documentation": {"mimeType": "text/markdown", "content": "The 95th-percentile response time has been above 1 second for 10 minutes. With min instances 0, a few cold starts (5-10 s) in a quiet hour can trigger this: check whether there was real traffic. RUNBOOK.md, section \"Sentry alert triage\"."},
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "p95 latency above 1000 ms",
+      "conditionThreshold": {
+        "filter": "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"${SERVICE}\" AND metric.type=\"run.googleapis.com/request_latencies\"",
+        "aggregations": [{"alignmentPeriod": "600s", "perSeriesAligner": "ALIGN_PERCENTILE_95", "crossSeriesReducer": "REDUCE_MAX"}],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 1000,
+        "duration": "600s",
+        "trigger": {"count": 1}
+      }
+    }
+  ],
+  "alertStrategy": {"autoClose": "1800s"},
+  "notificationChannels": ${CHANNELS},
+  "enabled": true
+}

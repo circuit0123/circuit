@@ -116,15 +116,16 @@ test.describe("Update view", () => {
     await expect(wireNode(page, 0)).not.toContainText(", new");
   });
 
-  test("the action does what it says: Reply opens Inbox, View role opens Discover", async ({ page }) => {
+  test("the action does what it says: Reply opens a message to them, View role opens the job page", async ({ page }) => {
     await open(page);
     await wireNode(page, 0).click();
     await update(page).getByRole("button", { name: "Reply" }).click();
-    await expect(page).toHaveURL(/\/inbox$/);
+    await expect(page).toHaveURL(/\/inbox\/new\?to=4$/);
+    await expect(page.getByRole("heading", { name: "Arjun Mehta", level: 1 })).toBeVisible();
     await open(page);
     await wireNode(page, 1).click();
     await update(page).getByRole("button", { name: "View role" }).click();
-    await expect(page).toHaveURL(/\/discover$/);
+    await expect(page).toHaveURL(/\/discover\/jobs\/301$/);
   });
 
   test("under 18: an intro update has no action", async ({ page }) => {
@@ -261,7 +262,7 @@ test.describe("Desktop Home (Desktop.dc.html)", () => {
     const r = rail(page);
     await expect(r.getByRole("link", { name: "Circuit, Home" })).toBeVisible();
     const rows = r.getByRole("navigation", { name: "Main" }).getByRole("link");
-    await expect(rows).toHaveText(["Home", "Discover", "Inbox", "Profile"]);
+    await expect(rows).toHaveText(["Home", "Discover", "Circuits", /^Inbox/, "Profile"]); // Inbox may carry ", unread messages"
     for (const row of await rows.all()) expect((await row.boundingBox())!.height).toBe(48);
     await expect(rows.first()).toHaveAttribute("aria-current", "page");
     expect(await rows.first().evaluate((e) => getComputedStyle(e).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
@@ -439,13 +440,11 @@ test.describe("Intro request flow", () => {
     await expect(helpful).toHaveAttribute("aria-pressed", "true");
   });
 
-  test("in Discover's People list too", async ({ page }) => {
-    await open(page);
-    await page.getByRole("link", { name: "Discover" }).filter({ visible: true }).first().click();
-    const row = page.getByRole("region", { name: "People you may know" }).getByRole("listitem").filter({ hasText: "Sneha" });
-    await row.getByRole("button", { name: "Intro me" }).click();
+  test("in Discover's People grid too", async ({ page }) => {
+    await page.goto("/discover?s=people");
+    await page.getByRole("list", { name: "People" }).getByRole("button", { name: /^Sneha Pillai/ }).click();
     await sheet(page, "Intro to Sneha").getByRole("button", { name: "Send request" }).click();
-    await expect(row.getByRole("button", { name: "Intro asked" })).toBeDisabled();
+    await expect(page.getByText("Intro requested. We'll tell you when they reply.")).toBeVisible();
   });
 
   test("axe is clean with the sheet open, in both themes", async ({ page }) => {

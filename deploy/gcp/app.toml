@@ -1,0 +1,147 @@
+# Deploy config shared by every environment (production, staging, demo). scripts/gcp.py reads this file and
+# <env>.toml, and turns them into the gcloud commands it prints before it runs anything.
+#
+# Names in Google Cloud are built from the environment, so several environments can live in one project:
+#   service            circuit-<env>-api
+#   Cloud Run Job      circuit-<env>-<job key below>
+#   Scheduler trigger  circuit-<env>-<job key below>
+#   secret             circuit-<env>-<name lowercased, _ -> ->      e.g. circuit-production-secret-key
+#   service accounts   circuit-run-<env> (API + jobs) and circuit-sched-<env> (only starts jobs)
+
+# The GitHub repository whose workflows may deploy (keyless: Workload Identity Federation, no JSON key anywhere). `make gcp-setup` restricts the
+# trust to exactly this repository, and each environment's deploy account to the GitHub Environment of the same name.
+[github]
+repository = "circuit0123/circuit"
+
+[service]
+cpu = "1"
+memory = "1Gi"                # gunicorn: 2 workers x 4 threads (circuit/gunicorn.py) + numpy/Pillow/OR-Tools; the model adds ~200 MB
+concurrency = 8               # = workers x threads, so one container never holds more requests than it can work on
+timeout_seconds = 60          # = gunicorn timeout
+min_instances = 0             # 0 = no cost while idle, but the first request after a quiet spell waits ~5-10 s (cold start). Override in <env>.toml
+max_instances = 3             # each instance can open up to ~8 database connections, so this caps connections too (PRODUCTION.md "Database connections")
+cpu_boost = true              # extra CPU while an instance starts, which shortens cold starts
+cpu_throttling = true         # CPU only while a request is being handled (cheapest). Background threads do not run between requests, and we have none
+startup_probe_path = "/health"    # the process is up. NOT /ready: if Supabase blinks, every new instance would be refused and a deploy could not finish
+liveness_probe_path = "/health"   # same reason: a database outage must not make Cloud Run restart healthy instances in a loop
+
+# Secret Manager secrets mounted as environment variables, for every environment. <env>.toml adds the LLM key (and the email key where email is on).
+# Each one is created empty by `make gcp-setup`; you fill it with `make secret NAME=...` (the value is never typed into a command line).
+# `make deploy` refuses to start while any of them has no value, because Cloud Run cannot start a revision that mounts an empty secret.
+secrets = ["SECRET_KEY", "DATABASE_URL", "REDIS_URL", "SUPABASE_SERVICE_ROLE_KEY"]
+
+# Non-secret defaults for every environment; <env>.toml wins. PORT is set by Cloud Run itself.
+[env]
+LOG_LEVEL = "INFO"
+EMBEDDING_PROVIDER = "fastembed"
+DATABASE_POOLER = "transaction"   # Supabase pooler, port 6543. Why: PRODUCTION.md "Database connections"
+DEMO_AUTH = "false"
+DEBUG = "false"
+REDIS_LEAN = "true"               # Upstash free plan (500k commands a month): keep fewer copies in Redis (backend/core/cache). Set "false" on a paid plan
+MEDIA_WEBP_QUALITY = "75"         # smaller uploaded images (Supabase free storage is 1 GB). 82 on a paid plan
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Jobs. Every management command that runs on a schedule is a Cloud Run Job. `schedule` is a Cloud Scheduler cron in
+# Asia/Kolkata (IST). A job without `schedule` is started on demand (`make jobs-run JOB=...`) or by a bundle.
+#
+#   command      the manage.py command
+#   args         arguments for it
+#   schedule     5-field cron, IST
+#   enabled      false = documented but not created yet (its code does not exist). tests/unit/test_deploy_config.py fails
+#                as soon as the command appears, so whoever builds it must switch it on here
+#   envs         only these environments get the job (default: all)
+#   manual       true = on demand by design (migrate)
+#   cpu, memory, timeout_seconds, max_retries   per job
+#
+# Every job here is idempotent and takes a lease (core/jobs.py), so a retried or overlapping run does no harm.
+# ---------------------------------------------------------------------------------------------------------------------
+
+[jobs.migrate]
+command = "migrate"
+args = ["--noinput"]
+manual = true                 # `make deploy` runs it and waits for it BEFORE the new revision gets any traffic
+timeout_seconds = 900
+max_retries = 0               # a half-failed migration is read by a human, not retried
+
+[jobs.compute-matches]
+command = "compute_matches"
+schedule = "30 7 * * *"       # before the Daily Drop
+memory = "2Gi"
+timeout_seconds = 1800
+
+[jobs.build-daily-drops]
+command = "build_daily_drops"
+schedule = "0 8 * * *"        # 08:00 IST: the Daily Drop (flag: daily_drop)
+
+[jobs.build-investor-picks]
+command = "build_investor_picks"
+schedule = "0 8 * * *"        # 08:00 IST, with the Daily Drop (flag: investor_mode)
+enabled = false               # the command arrives with B3d (Stage 4f)
+
+[jobs.run-circuit-round]
+command = "run_circuit_round"
+schedule = "0 9 * * 1"        # Mondays 09:00 IST (flag: circuits)
+memory = "2Gi"                # OR-Tools
+timeout_seconds = 1800
+
+[jobs.retention-cleanup]
+command = "retention_cleanup"
+schedule = "0 3 * * *"
+
+[jobs.backup-db]
+command = "backup_db"
+schedule = "30 2 * * *"       # 02:30 IST, the quietest hour: pg_dump | age -> the private backup bucket (production only; staging and demo data is disposable)
+envs = ["production"]
+memory = "2Gi"                # the encrypted dump is staged on Cloud Run's in-memory disk until it is uploaded
+timeout_seconds = 1800
+
+[jobs.train-ranker]
+command = "train_ranker"
+schedule = "0 2 * * 0"        # Sundays 02:00 IST; only saves a candidate, a super admin promotes it
+cpu = "2"
+memory = "4Gi"
+timeout_seconds = 3600
+
+[jobs.usage-report]
+command = "usage_report"
+schedule = "0 9 * * 1"        # Mondays 09:00 IST: free-tier usage; logs usage.warning at 70% of a limit (the alert in infra/monitoring/)
+
+[jobs.reset-demo]
+command = "reset_demo"
+schedule = "30 3 * * *"       # nightly demo reset
+envs = ["demo"]
+
+[jobs.reconcile-payments]
+command = "reconcile_payments"
+schedule = "*/10 * * * *"
+enabled = false               # the command arrives with B3c (Stage 4e)
+timeout_seconds = 300
+
+# The frequent jobs share ONE Cloud Run Job and ONE Scheduler trigger: five separate triggers would start five containers
+# every 5 minutes (~33,000 starts a month, roughly $8-13); one trigger starts one container (~$0-1). Each command still logs
+# its own start/end/skipped lines and has its own lease, and is also a job of its own below so `make jobs-run` can run it alone.
+[jobs.every-5-min]
+command = "run_jobs"
+args = ["expire_items", "send_emails", "build_exports", "delete_accounts", "check_jobs"]
+schedule = "*/5 * * * *"
+timeout_seconds = 600
+
+[jobs.expire-items]
+command = "expire_items"
+bundled = true                # started by every-5-min
+
+[jobs.send-emails]
+command = "send_emails"
+bundled = true
+
+[jobs.build-exports]
+command = "build_exports"
+bundled = true
+
+[jobs.delete-accounts]
+command = "delete_accounts"
+bundled = true
+
+[jobs.check-jobs]
+command = "check_jobs"
+bundled = true                # the job watcher: logs job.overdue for any job with no success for twice its interval. Its job.end line is the heartbeat the alert waits for

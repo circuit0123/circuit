@@ -1,6 +1,8 @@
+import os
+from typing import Any
 from urllib.parse import unquote, urlparse
 
-from circuit.config import ROOT, load_config
+from circuit.config import ROOT, load_config, parse_job_intervals
 
 cfg = load_config()
 
@@ -20,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.staticfiles",  # collectstatic gathers the Django admin's CSS/JS for WhiteNoise
     "django.contrib.gis",
     "django.contrib.postgres",
     "corsheaders",
@@ -44,8 +47,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "core.health.ProbeMiddleware",  # /health and /ready answer before host checks, redirects and request logging
     "core.logging.RequestLogMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # serves the Django admin's CSS/JS from the container (collectstatic runs at image build)
     # Security headers sit outside everything that can answer early (CORS preflight, redirects, errors).
     "core.security.SecurityHeadersMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -75,7 +80,7 @@ TEMPLATES = [
 ]
 
 _db = urlparse(cfg.database_url)
-DATABASES = {
+DATABASES: dict[str, dict[str, Any]] = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": _db.path.lstrip("/"),
@@ -83,9 +88,19 @@ DATABASES = {
         "PASSWORD": unquote(_db.password or ""),
         "HOST": _db.hostname,
         "PORT": _db.port or 5432,
-        "CONN_MAX_AGE": 60,
+        "CONN_MAX_AGE": 60,  # one connection per gunicorn thread, reused for a minute: Cloud Run keeps few, busy instances
+        "CONN_HEALTH_CHECKS": True,  # a connection the pooler dropped while the instance was idle is replaced, not used
+        "OPTIONS": {"connect_timeout": 5},  # a database that does not answer must fail /ready quickly, not hang the probe
     }
 }
+if ENV != "dev" and _db.hostname not in ("localhost", "127.0.0.1"):
+    DATABASES["default"]["OPTIONS"]["sslmode"] = "require"  # the default (prefer) would silently fall back to plain text
+if cfg.database_pooler == "transaction":
+    # Supabase's transaction pooler hands out a different server connection for every transaction. Two things break on that:
+    #  - server-side cursors (QuerySet.iterator() on Postgres) live on one connection: switched off here;
+    #  - prepared statements are per connection: Django's psycopg 3 backend leaves them off unless prepare_threshold is set,
+    #    which tests/unit/test_database_pooler.py asserts so nobody turns it on by accident.
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 12}},
@@ -95,6 +110,17 @@ USE_TZ = True
 TIME_ZONE = "UTC"
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+if ENV == "dev":
+    import warnings
+
+    # WhiteNoise looks for the collected admin files; on a laptop nobody has run collectstatic and runserver serves them itself.
+    warnings.filterwarnings("ignore", message="No directory at")
+else:
+    # Hashed file names + gzip/brotli copies, so the admin's static files can be cached for a year.
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
 
 # Circuit-specific settings -------------------------------------------------
 APP_URL = cfg.app_url
@@ -118,8 +144,14 @@ STORAGE_BUCKETS = {
 }  # private buckets; reads use short-lived signed URLs
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MEDIA_VARIANT_WIDTHS = (1440, 480)
+MEDIA_WEBP_QUALITY = cfg.media_webp_quality
+MEDIA_VARIANT_MAX_BYTES = {
+    1440: 300_000,
+    480: 60_000,
+}  # per width: quality steps down until a re-encoded image fits (media._encode)
 MEDIA_MAX_PIXELS = 40_000_000  # decompression-bomb guard
 LLM_PROVIDER = cfg.llm_provider
+LLM_DAILY_CALL_LIMIT = cfg.llm_daily_call_limit
 GEMINI_API_KEY = cfg.gemini_api_key
 GROQ_API_KEY = cfg.groq_api_key
 ANTHROPIC_API_KEY = cfg.anthropic_api_key
@@ -131,8 +163,11 @@ BETA_MODE = cfg.beta_mode
 INVITES_PER_MEMBER = cfg.invites_per_member
 TRUSTED_PROXY_HOPS = cfg.trusted_proxy_hops
 RESEND_API_KEY = cfg.resend_api_key
+REDIS_LEAN = cfg.redis_lean
+REDIS_LEAN_MAX_TTL = cfg.redis_lean_max_ttl
 POLICY_VERSION = cfg.policy_version
 GRIEVANCE = {"name": cfg.grievance_officer_name, "email": cfg.grievance_email, "address": cfg.grievance_address}
+GOOGLE_CLOUD_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "")  # set by deploy/gcp; only used to link log lines to traces
 SEED_CITY = {"name": cfg.seed_city_name, "lat": cfg.seed_city_lat, "lng": cfg.seed_city_lng}
 CSRF_TRUSTED_ORIGINS = cfg.csv(cfg.csrf_trusted_origins)
 
@@ -156,7 +191,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_AGE = 8 * 3600
 if ENV != "dev":  # demo is on the public internet too
     SECURE_SSL_REDIRECT = True
-    SECURE_REDIRECT_EXEMPT = [r"^api/health"]  # Cloud Run health checks arrive over plain HTTP
+    SECURE_REDIRECT_EXEMPT = [r"^api/health"]  # /health and /ready are answered before this (core.health.ProbeMiddleware)
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # Cloud Run terminates TLS
     SECURE_HSTS_SECONDS = 31_536_000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -198,6 +233,11 @@ EXPORT_LINK_HOURS = 24
 EXPORT_DOWNLOAD_SECONDS = 300  # the storage link handed out after the signed token is checked
 UNVERIFIED_ACCOUNT_DAYS = 30  # signed in but never accepted the terms
 REJECTED_WAITLIST_DAYS = 90
+# Free-tier housekeeping (the Supabase free database is 500 MB): the retention job removes these when they are this old.
+EVENT_RETENTION_DAYS = 365  # product events; long enough for a year of funnel analytics
+NOTIFICATION_READ_RETENTION_DAYS = 90  # a notification that was read
+NOTIFICATION_RETENTION_DAYS = 180  # any notification, read or not
+WEBHOOK_EVENT_RETENTION_DAYS = 90  # payment webhook records (orders, payments and invoices are financial records and are kept)
 FINANCIAL_RECORD_RETENTION_YEARS = (
     8  # orders, payments and invoices survive account deletion for this long. ACCOUNTANT TO CONFIRM the period
 )
@@ -209,6 +249,24 @@ INVITE_EXPIRY_DAYS_WAITLIST = 30  # the single-use code emailed when a waitlist 
 EMAIL_RETRY_BACKOFF_MINUTES = (1, 5, 30, 120, 720)  # wait before attempt 2, 3, ... ; the outbox gives up after the last one fails
 EMAIL_TIMEOUT_SECONDS = 5
 EMAIL_KEEP_DAYS = 30
+EMAIL_DAILY_BUDGET = cfg.email_daily_budget  # free-tier budget, see core/email.py
+EMAIL_MONTHLY_BUDGET = cfg.email_monthly_budget
+EMAIL_DAILY_LIMIT = cfg.email_daily_limit
+EMAIL_MONTHLY_LIMIT = cfg.email_monthly_limit
+
+# Free-tier limits the weekly usage report compares against (core/usage_report.py). A paid plan raises them: set FREE_TIER_LIMITS in
+# the environment to a JSON object with the keys you want to change, e.g. {"database_bytes": 8589934592} for Supabase Pro.
+USAGE_WARN_PCT = 70
+FREE_TIER_LIMITS = {
+    "database_bytes": 500 * 1024**2,  # Supabase free
+    "storage_bytes": 1024**3,  # Supabase free
+    "auth_users": 50_000,  # Supabase free monthly active users
+    "emails_month": 3000,  # Resend free
+    "emails_day": 100,
+    "redis_memory_bytes": 256 * 1024**2,  # Upstash free
+    "redis_commands_month": 500_000,
+    **cfg.free_tier_limit_overrides(),
+}
 
 # Social (F15-F17)
 PULSE_WINDOW_DAYS = 7
@@ -256,5 +314,13 @@ CIRCUIT_MIN_LEG_SCORE = 0.2  # a loop is only proposed if even its weakest hando
 STUDENT_MAX_DISTANCE_KM = 25
 
 from core.logging import configure_logging  # noqa: E402
+from core.monitoring import init_sentry  # noqa: E402
 
 configure_logging(cfg.log_level)
+RELEASE = cfg.release
+BACKUP_BUCKET = cfg.backup_bucket
+BACKUP_DATABASE_URL = cfg.backup_database_url
+BACKUP_AGE_RECIPIENT = cfg.backup_age_recipient
+BACKUP_DIR = BASE_DIR / ".backups"  # BACKUP_BUCKET empty (a laptop): `make backup-now` writes here; gitignored
+JOB_INTERVALS = parse_job_intervals(cfg.job_intervals)  # job health: minutes between successes, per scheduled job
+init_sentry(cfg.sentry_dsn, environment=cfg.env, release=cfg.release, traces_sample_rate=cfg.sentry_traces_sample_rate)

@@ -99,8 +99,8 @@ test.describe("404, 500 and the banner", () => {
     await expect(page.getByRole("heading", { name: "Today", level: 1 })).toBeVisible();
   });
 
-  test("a deep link to a tab that is off or not built shows the same 404", async ({ page }) => {
-    await page.goto("/circuits");
+  test("a deep link to a tab that is off shows the same 404", async ({ page }) => {
+    await page.goto("/circuits?scenario=features_off");
     await expect(page.getByRole("heading", { name: "We couldn't find that page" })).toBeVisible();
   });
 

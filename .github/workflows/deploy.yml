@@ -1,0 +1,122 @@
+# The deploy pipeline, shared by staging, production and demo (the three small files next to this one call it).
+#
+#   verify  the commit passed `ci` (and, for production and demo, is on main). Nothing is built or deployed on red.
+#   deploy  [GitHub Environment = the environment's name, so production waits for a human to approve]
+#             1. log in to Google Cloud with Workload Identity Federation: NO JSON key exists anywhere
+#             2. build the image for linux/amd64 and linux/arm64 and push it to Artifact Registry (tag = the commit)
+#             3. `scripts/gcp.py deploy --yes --no-build`: check the secrets have values -> run the migrations as a Cloud Run Job and
+#                wait -> new revision at 0% traffic -> smoke test its private address -> move traffic -> smoke test the live address
+#                -> update the jobs and schedules. A failed migration or a failed private smoke test leaves the old version serving; a
+#                failed LIVE smoke test sends traffic back to the previous revision by itself (`make smoke` is that test).
+#
+# Per GitHub Environment (Settings > Environments > <name> > Variables), printed by `make gcp-setup ENV=<name>`:
+#   WIF_PROVIDER   the Workload Identity provider        DEPLOY_SA   the deploy service account
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "production | staging | demo (also the GitHub Environment)"
+        type: string
+        required: true
+      ref:
+        description: "commit to deploy; empty means the commit that triggered the workflow"
+        type: string
+        default: ""
+      require_main:
+        description: "refuse a commit that is not on main"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      checks: read
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          fetch-depth: 0
+      - name: Resolve the commit
+        id: commit
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: The commit must be on main
+        if: inputs.require_main
+        run: |
+          git fetch --quiet origin main
+          git merge-base --is-ancestor "${{ steps.commit.outputs.sha }}" origin/main \
+            || { echo "::error::${{ steps.commit.outputs.sha }} is not on main. Merge it first."; exit 1; }
+      - name: CI must have passed on this exact commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          result=$(gh api "repos/${{ github.repository }}/commits/${{ steps.commit.outputs.sha }}/check-runs?per_page=100" \
+            --jq '[.check_runs[] | select(.name == "ci")] | if length == 0 then "missing" elif all(.conclusion == "success") then "success" else "failed" end' \
+            | sort -u | tr '\n' ' ')
+          echo "ci on ${{ steps.commit.outputs.sha }}: $result"
+          [ "$(echo "$result" | xargs)" = "success" ] \
+            || { echo "::error::The ci check has not passed on this commit. Never deploy on red."; exit 1; }
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 90 # the arm64 build runs under emulation: the first one is slow, the cache makes the next ones quick
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write # lets the job ask GitHub for the signed token that Google trusts (Workload Identity Federation)
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false # two deploys of one environment never overlap, and a running one is never cut off
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.sha }}
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Image name for this commit
+        id: image
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          image=$(python3 scripts/gcp.py image --env "$ENVIRONMENT")
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          echo "registry=${image%%/*}" >> "$GITHUB_OUTPUT"
+      - name: Let docker push to Artifact Registry
+        run: gcloud auth configure-docker "${{ steps.image.outputs.registry }}" --quiet
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build (x86_64 and ARM64) and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/backend/Dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          tags: ${{ steps.image.outputs.image }}
+          provenance: false # Cloud Run reads a plain image index, not attestation manifests
+          cache-from: type=gha,scope=circuit-api
+          cache-to: type=gha,scope=circuit-api,mode=max
+
+      - name: Migrate, deploy, smoke test, switch traffic (rolls back by itself if the live smoke test fails)
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: python3 scripts/gcp.py deploy --env "$ENVIRONMENT" --yes --no-build

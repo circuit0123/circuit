@@ -27,7 +27,7 @@ Backend sessions, each on its own branch, merged via PR before the next:
 - B3e: Stage 4g backend (partner mode: org verification, cohorts, calls, events,
   announcements, partner home)
 - B4: Stage 4c (ML pipeline) — can run in parallel on a second account
-- B5: Stage 5 backend (API, jobs, scheduler on staging + demo)
+- B5: Stage 5 backend: deployment code for Google Cloud (image, deploy scripts, jobs, scheduler, probes, smoke test, runbook). Code only; production is deployed first in a separate session, staging and demo later
 - B6: Stage 8 + 9 backend (monitoring, production env, backups + restore drill,
   backend CI, keyless deploys)
 - B7: Stage 10 + 11 backend (API load test, cleanup, RUNBOOK.md) + FRONTEND_HANDOFF.md
@@ -120,13 +120,13 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [x] Sign-up and onboarding per DESIGN.md §4 "Sign-up and onboarding": one thing per screen (steps 1–14), resumable, inference before asking, under-18 defaults, measured time-to-first-drop < 2 min (Playwright test with timing) (F2; the investor and partner branches arrive with their flags, and the photo step is mock-only until an avatar upload endpoint exists)
 - [x] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end (F3: mobile and desktop Home, Update view, Notifications, the intro confirm sheet; Pulse off / Daily Drop off / both off / under-18 states)
 - [ ] Build log composer and post view (media pager, reactions, replies, report)
-- [ ] Discover: People, Startups, Jobs (+ job page, apply), Map
-- [ ] Circuits: ring cards, live status, signature closing animation
-- [ ] Inbox: Chats + Requests, realtime messages, report/block
+- [x] Discover: People, Startups, Jobs (+ job page, apply), Map (F4: search over all four, filters in a sheet, Skills in demand, the promoted slot, MapLibre map with the pin sheet and Back to the same pin and zoom, Startup page with Follow, founders and the claim flow; empty, loading, error, under-18 and features-off states)
+- [x] Circuits: ring cards, live status, signature closing animation (F5: Accept/Decline with a confirm sheet, live segments through Realtime `circuit:<id>`, the §7 closing moment once per circuit and its reduced-motion version, mark done, rating, completed history, empty/under-18/loading/error/features-off; Realtime tested on the mock bus only, not yet against real Supabase)
+- [x] Inbox: Chats + Requests, realtime messages, report/block (F5: no Requests for under-18s, unread states and the tab dot, New message, conversation with optimistic send and Retry, image share, Accept for requests, report/block confirm sheets; Realtime `conversation:<id>` tested on the mock bus only, not yet against real Supabase)
 - [ ] Profile: header, needs/offers, highlights, build log grid, circuits, about; connect/follow/message/intro via mutual
-- [ ] Founder applicants view, my applications, partner dashboard
+- [ ] Founder applicants view, my applications, partner dashboard — F4: founder applicant view (ranked by skill match, Shortlist / Not now / Hired) and "Your applications" are built. Still open: the partner dashboard
 - [ ] Every screen: loading, empty, error states; works at 375px and 1280px
-- [ ] TabPager: swipe between tabs per DESIGN.md §3 gesture rules (Playwright touch tests: swipe commits, vertical scroll wins, no conflict with Live wire, Daily Drop, media pager, map) — F1: touch tests for the swipe commit and snap-back, vertical scroll, Live wire, Daily Drop, chips rows, segmented control, a swipe lock for the Map, sheets, text fields, scroll position, reduced motion and the toggle. Still open: the media pager and the real Map (F4, F6)
+- [ ] TabPager: swipe between tabs per DESIGN.md §3 gesture rules (Playwright touch tests: swipe commits, vertical scroll wins, no conflict with Live wire, Daily Drop, media pager, map) — F1: touch tests for the swipe commit and snap-back, vertical scroll, Live wire, Daily Drop, chips rows, segmented control, a swipe lock for the Map, sheets, text fields, scroll position, reduced motion and the toggle. F4: the real Map holds the lock (touch test in discover.spec.ts). Still open: the media pager (F6)
 - [ ] ThemeProvider + AccentPicker: accent applied before first paint, all six accents pass contrast checks in both themes — F1 built ThemeProvider (first paint, 250ms crossfade) and tested contrast for all six accents in both themes; the AccentPicker is built and used on the sign-up Colour step (F2); Settings → Appearance arrives in F6
 - [ ] Playwright tests for the five demo stories at both widths; axe checks
 
@@ -193,13 +193,27 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Frontend: partner onboarding 8p–11p, Partner home, `New` sheet, Organisation page, call and event cards/pages, application form, review pipeline, RSVP
 - [ ] Seed: one college and one incubator with a cohort, an open call, an upcoming demo day
 
-## Stage 5 — Deploy staging + demo (Sessions A + B together)
-- [ ] Backend image builds on ARM64 + x86_64; deployed to Cloud Run (staging, demo); jobs + scheduler created
-- [ ] Vercel: landing, app-staging, app-demo deployed with §2a variables
-- [ ] Supabase redirect URLs + Google OAuth origins set for staging and demo
-- [ ] `make smoke URL=...`: landing loads, app sign-in page loads, CORS preflight passes, one authed read, one write, test email
-- [ ] `make reset-demo ENV=demo` + nightly reset job
-- [ ] Smoke passes on staging and demo
+## Stage 5 — Deploy (Google Cloud, asia-south1; Sessions A + B together)
+Production is deployed first, behind BETA_MODE. Staging and demo are postponed until before payments or public launch; the
+same code and scripts serve all three (`ENV=staging|demo|production`, `deploy/gcp/<env>.toml`).
+
+Backend code (B5, written and tested; nothing was deployed or created in the cloud):
+- [x] Backend image: multi-stage, non-root, gunicorn on `$PORT`, healthcheck, embedding model baked in; builds on ARM64 + x86_64
+- [x] Deploy config as code: `deploy/gcp/*.toml` + `scripts/gcp.py` create/update the Cloud Run service, one Cloud Run Job per job, the Cloud Scheduler triggers (India time), least-privilege service accounts and Secret Manager bindings; idempotent; prints every gcloud command and asks first
+- [x] Startup checks: refuse DEMO_AUTH in staging/production, live Razorpay keys outside production, a flag on without its dependency, a missing or empty required variable, and the deployed-only requirements (real email, embeddings, LLM key, CSRF origins, TLS Redis); one test per rule
+- [x] `/health` and `/ready` (Redis down = warning); Cloud Run probes use `/health`; logs carry `severity`
+- [x] Migrations run as their own job before a new revision gets traffic, never at container start
+- [x] Jobs: flag off = `skipped: flag off` and exit 0; database lease so overlapping runs do the work once; JSON start/end/skipped lines; every job has a schedule (tested); the frequent jobs share one trigger
+- [x] Supabase pooler settings (transaction mode, no server-side cursors, TLS) documented in PRODUCTION.md
+- [x] `make gcp-setup | deploy | rollback | secret | jobs-run | logs | jobs | smoke`, documented in COMMANDS.md; `make smoke` tested against the local stack
+- [x] RUNBOOK.md "First production deploy on Google Cloud" + monthly cost table
+
+Deployment (next session):
+- [ ] Backend image deployed to Cloud Run (production first); jobs + scheduler created
+- [ ] Vercel: landing, app (production) deployed with §2a variables
+- [ ] Supabase redirect URLs + Google OAuth origins set
+- [ ] `make smoke` passes on production (landing loads, app sign-in page loads, CORS preflight passes, one authed read, one write, test email)
+- [ ] Staging and demo deployed, `make reset-demo ENV=demo` + nightly reset job (code ready: the `reset-demo` job exists for demo only) (postponed until before payments or public launch)
 
 ## Stage 6 — Product basics
 - [x] Account settings: edit profile, notification preferences, privacy, export, delete (backend, B3; screens: PROGRESS.md "Frontend remaining")
@@ -215,17 +229,24 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [x] Consent stored with version + timestamp; data request process; retention cleanup job (backend, B3)
 
 ## Stage 8 — Reliability and monitoring
-- [ ] Sentry (backend + app), uptime monitors, alerts to a phone
-- [ ] Timeouts/retries/fallbacks audit; job failure alerts; `expire_items` every 15 min
+- [x] Sentry for the backend with PII scrubbing and environment/release tags; uptime checks and alert policies (5xx, p95 latency, job failures, overdue jobs, usage) as code in `infra/monitoring/`, applied by `make monitoring` (B6)
+- [ ] Sentry in the app (frontend session); [YOU] create the email + phone notification channels, then `make monitoring ENV=production` so alerts reach a phone
+- [x] Job failure alerts; every job records last success and last error; `check_jobs` flags any job overdue (2x its interval); `GET /api/health/jobs` for super admins; `expire_items` every 5 min (B6)
+- [ ] Timeouts/retries/fallbacks audit
 - [ ] [YOU] Production Supabase (Pro), Upstash, Cloud Run, Vercel production project
-- [ ] Production backups + PITR; restore drill to staging
-- [ ] Budget alerts on all paid services
+- [x] Nightly encrypted `pg_dump` to a private bucket (30-day lifecycle), `make backup-now`, `make restore-drill` (B6, code)
+- [ ] [YOU] First production backup and restore drill (RUNBOOK.md "One-time setup", step 8); decide on PITR
+- [ ] Budget alerts on all paid services (Google Cloud: `make gcp-setup`, B5; the others are in their dashboards)
+- [x] Free-tier guards: image compression, retention for events/notifications/webhook records/snapshots, Resend daily budget with in-app fallback, Redis lean mode, `LLM_PROVIDER=none` and a daily LLM cap, weekly `usage_report` warning at 70% (B6)
 
 ## Stage 9 — CI/CD hardening
-- [ ] GitHub Actions on PR: ruff, mypy, pytest, tsc, ESLint, Playwright, axe; merge blocked on red
-- [ ] Merge → staging deploy + smoke; tag → demo; manual approval → production
-- [ ] Replace temporary keys with Workload Identity Federation; delete the old key and Vercel token
-- [ ] Rollback documented and tried once
+- [x] GitHub Actions on every pull request: ruff, mypy and `make check` (pytest, tsc, ESLint, Playwright, axe), uv and pnpm cached (B6)
+- [ ] [YOU] Branch protection on `main` requiring the `ci` check, so a red pull request cannot merge (RUNBOOK.md "One-time setup", step 7)
+- [x] Merge → staging deploy + smoke; tag → demo; manual approval → production (B6: `.github/workflows/deploy*.yml`; staging and demo switch on with a repository variable once they exist)
+- [x] Workload Identity Federation in code (`make gcp-setup`), no JSON key in any workflow (B6)
+- [ ] [YOU] Run `make gcp-setup`, set the GitHub variables, then delete the temporary deploy key and the Vercel token
+- [x] Rollback documented (RUNBOOK.md "Rollback"); the deploy rolls back by itself when the live smoke test fails (tested with fakes)
+- [ ] [YOU] Rollback tried once for real (RUNBOOK.md "One-time setup", step 9)
 
 ## Stage 10 — Quality and performance
 - [ ] Every row in PRODUCTION.md §14 has a passing automated test or a dated manual check in RUNBOOK.md

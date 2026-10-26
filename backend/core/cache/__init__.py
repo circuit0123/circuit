@@ -2,6 +2,14 @@
 
 Every method swallows Redis errors, logs a warning and behaves like a cache miss,
 so callers fall back to Postgres (the source of truth).
+
+LEAN MODE (REDIS_LEAN=true, for Upstash's free plan: 500,000 commands a month). Redis only ever holds copies of what Postgres
+knows, so lean mode simply keeps fewer copies:
+  - `get_json` / `set_json` do nothing (no Redis command at all) unless the caller says `essential=True`;
+  - an essential entry lives at most REDIS_LEAN_MAX_TTL seconds (default 600), so Redis never holds much;
+  - counters (`incr_window`: rate limits, the once-a-day view count) always run: they are behaviour, not a copy.
+Essential = read on every request and expensive to rebuild (the feature-flag overrides). Everything else (match lists, partner
+dashboards, signed image links) is rebuilt from Postgres or storage when it is not cached.
 """
 
 import json
@@ -28,11 +36,21 @@ class Cache:
     def ping(self) -> bool:
         return bool(self._safe("ping", self.client.ping, False))
 
-    def get_json(self, key: str) -> Any | None:
+    @staticmethod
+    def lean() -> bool:
+        return bool(getattr(settings, "REDIS_LEAN", False))
+
+    def get_json(self, key: str, *, essential: bool = False) -> Any | None:
+        if self.lean() and not essential:
+            return None  # lean mode: a miss without asking Redis
         raw = self._safe("get", lambda: self.client.get(key))
         return json.loads(raw) if raw else None
 
-    def set_json(self, key: str, value: Any, ttl: int = 3600) -> bool:
+    def set_json(self, key: str, value: Any, ttl: int = 3600, *, essential: bool = False) -> bool:
+        if self.lean():
+            if not essential:
+                return False  # lean mode: keep no copy
+            ttl = min(ttl, settings.REDIS_LEAN_MAX_TTL)
         return bool(self._safe("set", lambda: self.client.set(key, json.dumps(value), ex=ttl), False))
 
     def delete(self, key: str) -> None:

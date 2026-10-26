@@ -1,17 +1,13 @@
-from django.core.management.base import BaseCommand
-
 from apps.circuits.services import run_round
-from core import flags
+from core.jobs import JobCommand
 
 
-class Command(BaseCommand):
+class Command(JobCommand):
     help = "Run this week's circuit round: find loops of three, propose the best ones. Safe to run again."
+    flag = "circuits"
 
-    def handle(self, *args, **options):
-        if not flags.enabled("circuits"):
-            self.stdout.write("skipped: flag off")
-            return
-        r = run_round(triggered_by="schedule")
-        self.stdout.write(
-            f"{r['week']}: {r['edges']} possible handovers, {r['loops_found']} loops, {r['circuits_created']} proposed"
-        )
+    def run(self) -> dict:
+        return run_round(triggered_by="schedule")
+
+    def summary(self, result: dict) -> str:
+        return f"{result['week']}: {result['edges']} possible handovers, {result['loops_found']} loops, {result['circuits_created']} proposed"

@@ -9,11 +9,11 @@ type Target = Schemas["TargetOut"];
 /** A notification's `target` (what the API says to open) as an app path. */
 export function notificationHref(target: Target | null | undefined): string {
   switch (target?.type) {
-    case "intro": return "/inbox"; // F5: Inbox → Requests
-    case "conversation": return "/inbox"; // F5: /inbox/{id}
-    case "circuit": return "/inbox"; // F5: Circuits tab; until then nothing of its own
-    case "application": return "/discover"; // F4: /discover/jobs/applications
-    case "startup": return "/discover"; // F4: /startups/{id}
+    case "intro": return "/inbox";
+    case "conversation": return conversationHref(target.id);
+    case "circuit": return circuitsHref;
+    case "application": return "/discover/applications";
+    case "startup": return startupHref(target.id);
     case "post": return "/"; // F6: /posts/{id}
     default: return "/";
   }
@@ -21,16 +21,34 @@ export function notificationHref(target: Target | null | undefined): string {
 
 /** The one action on a Live wire update. `intro` is handled by the intro sheet, not a path. */
 export function wireActionHref(action: { kind: "intro" | "view_role" | "reply"; target_id: number }): string | null {
-  if (action.kind === "view_role") return "/discover"; // F4: /discover/jobs/{id}
-  if (action.kind === "reply") return "/inbox"; // F5: /inbox/{member}
+  if (action.kind === "view_role") return roleHref(action.target_id);
+  if (action.kind === "reply") return newMessageHref(action.target_id);
   return null;
 }
 
 /** The `+` in the top bar. Null until F6 builds the composer; the caller says so in a toast. */
 export const composeHref: string | null = null; // F6: "/compose"
 
-/** A role's page. F4 builds `/discover/jobs/{id}`; until then the Discover tab. */
-export const roleHref = (_id: number): string => "/discover"; // F4: `/discover/jobs/${id}`
+/** A role's page. */
+export const roleHref = (id: number): string => `/discover/jobs/${id}`;
+
+/** A startup's page; `hiring` lands on its Hiring section (the map sheet's "See open roles"). */
+export const startupHref = (id: number, hiring = false): string => `/startups/${id}${hiring ? "#hiring" : ""}`;
+
+/** A role's applicants (founders of that startup only). */
+export const applicantsHref = (jobId: number): string => `/discover/jobs/${jobId}/applicants`;
+
+/** "My applications". */
+export const applicationsHref = "/discover/applications";
 
 /** Someone's profile. Null until F6 builds it, so the name simply isn't a link yet. */
 export const memberHref = (_id: number): string | null => null; // F6: `/members/${id}`
+
+/** The Circuits tab (only there while the `circuits` flag is on; the server sends no circuit notifications otherwise). */
+export const circuitsHref = "/circuits";
+
+/** One conversation. */
+export const conversationHref = (id: number): string => `/inbox/${id}`;
+
+/** A new message to someone (opens their existing conversation if there is one). */
+export const newMessageHref = (memberId: number): string => `/inbox/new?to=${memberId}`;

@@ -1,0 +1,33 @@
+{
+  "kind": "alertPolicy",
+  "displayName": "Circuit ${ENV}: a scheduled job failed",
+  "documentation": {"mimeType": "text/markdown", "content": "A job logged job.failed, or a Cloud Run Job execution ended failed (this also catches a job killed for memory or time, which cannot log). `make logs ENV=${ENV} JOB=<name>` shows why. RUNBOOK.md, section \"A job is overdue\"."},
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "job.failed logged",
+      "conditionThreshold": {
+        "filter": "metric.type=\"logging.googleapis.com/user/circuit_${ENV}_job_failed\" AND resource.type=\"cloud_run_job\"",
+        "aggregations": [{"alignmentPeriod": "300s", "perSeriesAligner": "ALIGN_DELTA", "crossSeriesReducer": "REDUCE_SUM"}],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0,
+        "duration": "0s",
+        "trigger": {"count": 1}
+      }
+    },
+    {
+      "displayName": "Cloud Run Job execution failed",
+      "conditionThreshold": {
+        "filter": "metric.type=\"run.googleapis.com/job/completed_execution_count\" AND resource.type=\"cloud_run_job\" AND resource.labels.job_name=monitoring.regex.full_match(\"circuit-${ENV}-.*\") AND metric.labels.result=\"failed\"",
+        "aggregations": [{"alignmentPeriod": "300s", "perSeriesAligner": "ALIGN_DELTA", "crossSeriesReducer": "REDUCE_SUM"}],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0,
+        "duration": "0s",
+        "trigger": {"count": 1}
+      }
+    }
+  ],
+  "alertStrategy": {"autoClose": "3600s"},
+  "notificationChannels": ${CHANNELS},
+  "enabled": true
+}

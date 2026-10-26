@@ -7,7 +7,7 @@ from apps.moderation.models import AuditLog
 from circuit.config import Config
 from core import cache, flags
 from core.models import FeatureFlag
-from tests.unit.test_config import BASE
+from tests.unit.test_config import BASE, DEPLOYED
 
 pytestmark = pytest.mark.django_db
 ALL = ",".join(f"{n}:everyone" for n in flags.FLAGS)
@@ -45,8 +45,7 @@ def test_live_razorpay_key_is_refused_outside_production():
 
 
 def test_payments_in_production_needs_a_live_key():
-    prod = dict(env="production", supabase_url="https://x.supabase.co", storage_provider="supabase")
-    prod.update(supabase_service_role_key="k", allowed_hosts="api.example.com", cors_allowed_origins="https://app.example.com")
+    prod = dict(env="production", **DEPLOYED, allowed_hosts="api.example.com", cors_allowed_origins="https://app.example.com")
     with pytest.raises(ValidationError, match="live key"):
         make(**prod, features=ALL, razorpay_key_id="rzp_test_abc")
     assert make(**prod, features=ALL, razorpay_key_id="rzp_live_abc")

@@ -2,7 +2,8 @@ from django import forms
 from django.contrib import admin, messages
 
 from core import flags
-from core.models import FeatureFlag
+from core.adminbase import ReadOnlyAdmin
+from core.models import FeatureFlag, JobRun
 
 
 class FeatureFlagForm(forms.ModelForm):
@@ -49,3 +50,17 @@ class FeatureFlagAdmin(admin.ModelAdmin):
             flags.set_audience(obj.name, obj.audience, actor=request.user, note=obj.note)
         except ValueError as exc:
             self.message_user(request, str(exc), level=messages.ERROR)
+
+
+@admin.register(JobRun)
+class JobRunAdmin(ReadOnlyAdmin):
+    """When each scheduled job last ran and how it ended (ok, skipped, failed). Jobs write this themselves (core/jobs.py)."""
+
+    list_display = ("name", "last_status", "last_success_at", "last_started_at", "last_finished_at", "overdue", "last_error")
+    ordering = ("name",)
+
+    @admin.display(boolean=True, description="Overdue")
+    def overdue(self, obj):
+        from core import jobhealth
+
+        return any(s.overdue for s in jobhealth.status() if s.name == obj.name)

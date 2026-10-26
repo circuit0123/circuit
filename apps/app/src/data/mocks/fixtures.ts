@@ -158,7 +158,7 @@ export const MATCHES = [
 ] satisfies Schemas["MatchOut"][];
 
 const wire = (key: string, kind: Schemas["WireItemOut"]["kind"], actor: Schemas["AuthorOut"] | null, headline: string, reason: string, mins: number, seen: boolean, action: Schemas["WireActionOut"]["kind"]): Schemas["WireItemOut"] =>
-  ({ key, kind, actor, startup: null, headline, reason, created_at: minutes(mins), seen, image: null, action: { kind: action, target_id: actor?.id ?? 1 } });
+  ({ key, kind, actor, startup: null, headline, reason, created_at: minutes(mins), seen, image: null, action: { kind: action, target_id: action === "view_role" ? 301 : actor?.id ?? 1 } }); // a role points at a mock job (mocks/discover.ts)
 
 export const LIVEWIRE = [
   wire("w1", "shipped", PEOPLE.arjun, "Arjun shipped the stock-alert screen", "He builds with the same tools you do.", 95, false, "reply"),
@@ -192,7 +192,7 @@ export const NOTIFICATIONS = [
   note(2, "application.status", "Your application has a new status.", null, { type: "application", id: 9 }, 30, false),
   note(3, "circuit.proposed", "A new circuit is waiting for your answer.", null, { type: "circuit", id: 12 }, 50, true),
   note(4, "post.reply", `${PEOPLE.divya.display_name} replied to your build log.`, PEOPLE.divya, { type: "post", id: 101 }, 60 * 26, true),
-  note(5, "message.new", `${PEOPLE.arjun.display_name} sent you a message.`, PEOPLE.arjun, { type: "conversation", id: 3 }, 60 * 28, true),
-  note(6, "startup.interest", "Someone showed interest in your startup.", null, { type: "startup", id: 4 }, 60 * 24 * 3, true),
+  note(5, "message.new", "Farhan Ali sent you a message.", author(22, "Farhan Ali", "student", "Maps and mobile, final year"), { type: "conversation", id: 502 }, 60 * 28, true), // a chat in mocks/inbox.ts
+  note(6, "startup.interest", "Someone showed interest in your startup.", null, { type: "startup", id: 41 }, 60 * 24 * 3, true),
   note(7, "intro.received", `${PEOPLE.kavya.display_name} would like to meet you.`, PEOPLE.kavya, { type: "intro", id: 502 }, 60 * 24 * 3 + 40, true),
 ] satisfies Schemas["NotificationOut"][];

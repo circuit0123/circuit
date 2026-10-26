@@ -1,0 +1,23 @@
+# The backend image is built from the repo root (docker/backend/Dockerfile); keep everything else out of the build context.
+**/.git
+**/node_modules
+**/__pycache__
+**/.venv
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.next
+.env
+.env.*
+!.env.example
+apps
+packages
+screenshots
+docs
+# tests are not shipped, except the hand-labelled pairs that train_ranker and eval_matching read at run time
+backend/tests/*
+!backend/tests/eval
+backend/tests/eval/__pycache__
+backend/.media
+backend/staticfiles
+*.md
