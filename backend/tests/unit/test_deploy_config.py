@@ -564,3 +564,14 @@ def test_make_monitoring_with_no_channels_stops_with_a_clear_message(prod):
     prod.monitoring["notification_channels"] = []
     with pytest.raises(Exception, match="No notification channels"):
         gcp.plan_monitoring(prod, "123456789")
+
+
+def test_production_cors_allows_exactly_the_origin_the_app_and_landing_are_served_from(prod):
+    from urllib.parse import urlparse
+
+    def origin(url):
+        u = urlparse(url)
+        return f"{u.scheme}://{u.netloc}"
+
+    cors = [o for o in prod.env_vars["CORS_ALLOWED_ORIGINS"].split(",") if o]
+    assert cors == [origin(prod.env_vars["APP_URL"])] == [origin(prod.env_vars["LANDING_URL"])]
