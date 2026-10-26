@@ -216,7 +216,8 @@ class User:
         )
         await self.pause()
 
-    async def run(self, stop_at: float) -> None:
+    async def run(self, stop_at: float, delay: float = 0) -> None:
+        await asyncio.sleep(delay)  # users do not all arrive in the same instant
         await self.session()
         steps = [self.home, self.discover, self.map, self.job, self.inbox, self.message]
         while time.monotonic() < stop_at:
@@ -227,14 +228,14 @@ class User:
 
 
 async def run_level(
-    url: str, tokens: list[str], users: int, seconds: float, seed: int, centre: tuple[float, float]
+    url: str, tokens: list[str], users: int, seconds: float, seed: int, centre: tuple[float, float], ramp: float = 0
 ) -> list[dict]:
     stats: dict[str, Stats] = {}
     limits = httpx.Limits(max_connections=users + 10, max_keepalive_connections=users + 10)
     async with httpx.AsyncClient(timeout=30, limits=limits) as client:
         stop_at = time.monotonic() + seconds
         crowd = [User(client, url, tokens[i % len(tokens)], stats, random.Random(seed + i), centre) for i in range(users)]
-        await asyncio.gather(*(u.run(stop_at) for u in crowd))
+        await asyncio.gather(*(u.run(stop_at, random.Random(seed + i).uniform(0, ramp)) for i, u in enumerate(crowd)))
     return summarise(stats)
 
 
@@ -252,7 +253,7 @@ async def main_async(args: argparse.Namespace) -> int:
     results: dict[str, list[dict]] = {}
     failed = False
     for users in [int(u) for u in args.users.split(",")]:
-        rows = await run_level(url, tokens, users, args.seconds, args.seed, (args.lat, args.lng))
+        rows = await run_level(url, tokens, users, args.seconds, args.seed, (args.lat, args.lng), args.ramp)
         print(render(users, args.seconds, rows))
         results[str(users)] = rows
         failed = failed or not rows or any(not r["pass"] for r in rows)
@@ -268,6 +269,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--tokens", required=True, help="file with one bearer token per line")
     p.add_argument("--users", default="50,200", help="comma-separated concurrent user levels")
     p.add_argument("--seconds", type=float, default=60)
+    p.add_argument("--ramp", type=float, default=10, help="seconds over which the users arrive")
     p.add_argument("--seed", type=int, default=1)
     p.add_argument("--lat", type=float, required=True, help="seed city centre (SEED_CITY_LAT)")
     p.add_argument("--lng", type=float, required=True, help="seed city centre (SEED_CITY_LNG)")
