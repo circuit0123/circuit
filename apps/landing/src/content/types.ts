@@ -1,7 +1,8 @@
 import type { Role } from "@/lib/env";
+import type { ScreenId } from "./screens";
 
-/** `shot` is the file in public/shots (without extension); null = the screen doesn't exist in the app yet, so a labelled placeholder is shown. */
-export type Step = { n: string; title: string; body: string; shot: string | null; alt: string; missing: string };
+/** `screen` (a picture from public/screens) wins over `shot`. `shot` is the file in public/shots (without extension); null = the screen doesn't exist in the app yet, so a labelled placeholder is shown. */
+export type Step = { n: string; title: string; body: string; shot: string | null; alt: string; missing: string; screen?: ScreenId };
 export type FaqItem = { q: string; a: string };
 
 export const SLUGS = ["students", "founders", "mentors", "investors", "partners"] as const;

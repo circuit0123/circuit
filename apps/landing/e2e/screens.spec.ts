@@ -11,12 +11,15 @@ const SHOWN: Record<string, ScreenId[]> = {
   "/partners/": ["partner-home"],
 };
 
+/** Steps with a screen of their own ("How it works", step 03), besides the strip. */
+const STEP_SCREENS: Record<string, ScreenId[]> = { "/": ["circuits"], "/students/": ["job"], "/mentors/": ["circuits"] };
+
 test.use({ reducedMotion: "reduce" });
 
 for (const [path, ids] of Object.entries(SHOWN)) {
   test(`${path}: shows its app screens, as AVIF, WebP and PNG, with size, alt text and lazy loading`, async ({ page }) => {
     await page.goto(path);
-    const pictures = page.locator("picture:has(img[src^='/screens/'])");
+    const pictures = page.getByRole("region", { name: "App screens" }).locator("picture");
     await expect(pictures).toHaveCount(ids.length);
     for (const [i, id] of ids.entries()) {
       const pic = pictures.nth(i);
@@ -32,6 +35,8 @@ for (const [path, ids] of Object.entries(SHOWN)) {
       await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth)).toBe(780);
       await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(new RegExp(`/screens/${id}\\.avif$`));
     }
+    await expect(page.locator("main img[src^='/screens/']")).toHaveCount(ids.length + (STEP_SCREENS[path]?.length ?? 0));
+    for (const id of STEP_SCREENS[path] ?? []) await expect(page.locator(`li img[src="/screens/${id}.png"]`).first()).toHaveAttribute("alt", SCREENS[id].alt);
     await expect(page.getByText("The screens show sample data, not real people or startups.")).toHaveCount(1);
   });
 }

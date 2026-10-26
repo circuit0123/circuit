@@ -754,7 +754,7 @@ Real app screens now sit on the home page and all five audience pages. Only `app
 **Decisions / skipped**
 1. **Dark only.** All references are dark (only Appearance previews light, and it is not on the list), so there is no light version of any picture. The dark phone in its frame looks fine on the light theme. A light set would need a light colour pass over the references (the README gives the light tokens): tell me if you want it.
 2. **Pasted images:** none arrived in this chat, so `public/screens/source/` does not exist yet.
-3. **Still placeholders:** home steps 01 and 03, students step 03 ("Apply"), mentors step 03 ("Circuit ring"), founders steps 01 and 02 still show "screenshot coming" boxes. Circuits and Job screens exist now, so steps 03 could use them; I left the steps alone as asked.
+3. **Step 03 now uses real screens:** home (Circuits), `/students` "Apply in one tap" (Job) and `/mentors` "Join a circuit" (Circuits), as the top of the screen cropped into the step's frame (`Step.screen`). On home and `/mentors` the Circuits picture therefore appears twice (step and tour). **Still placeholders:** home step 01, students steps 01–02 are fine (02 is the Daily Drop), founders steps 01 and 02, mentors step 01 (no onboarding or claim reference screens were on the list).
 4. `next build` on its own needs the `NEXT_PUBLIC_*` variables (same as before); the static builds in `make test-landing` are the build check.
 5. The sandbox's Playwright browser was one version behind the repo's: I linked it locally outside the repo; nothing to do on your machine.
 

@@ -54,10 +54,10 @@ test("makes no request outside the landing origin, and shows no placeholder text
   await expect(page.getByRole("region", { name: /Live in/ })).toHaveCount(0);
 });
 
-test("the two screens that don't exist yet are labelled placeholders", async ({ page }) => {
+test("the screen that doesn't exist yet is a labelled placeholder", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("img", { name: "App screenshot coming: You offer screen" })).toBeVisible();
-  await expect(page.getByRole("img", { name: "App screenshot coming: Circuit ring screen" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "App screenshot coming: Circuit ring screen" })).toHaveCount(0);
 });
 
 test("SEO: title, description, canonical, Open Graph, Twitter, icons, robots and sitemap", async ({ page, request }) => {
