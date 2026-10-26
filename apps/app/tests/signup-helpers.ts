@@ -53,8 +53,8 @@ export async function checkStep(page: Page, info: TestInfo, screen: string, opts
     await shot(page, screen, `${widthOf(info)}-${theme}`);
   }
   await page.emulateMedia({ colorScheme: "dark" });
-  // One thing per screen: at most one primary button (DESIGN.md §1a).
-  const primaries = await page.evaluate(() => [...document.querySelectorAll("button")].filter((b) => b.className.includes("bg-primary") && b.offsetParent !== null).length);
+  // One thing per screen: at most one primary button (DESIGN.md §1a). A chosen chip wears the brand fill too, but it is a choice, not an action.
+  const primaries = await page.evaluate(() => [...document.querySelectorAll("button")].filter((b) => b.className.includes("bg-primary") && !b.hasAttribute("aria-pressed") && b.offsetParent !== null).length);
   expect(primaries, `${screen}: primary buttons`).toBeLessThanOrEqual(opts.primary ?? 1);
   const sizes = await page.evaluate(() => new Set([...document.querySelectorAll("body *")].filter((e) => e.childNodes.length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent?.trim())).map((e) => getComputedStyle(e).fontSize)).size);
   expect(sizes, `${screen}: font sizes`).toBeLessThanOrEqual(5);

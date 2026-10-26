@@ -11,6 +11,20 @@ type Props = {
   size?: "md" | "lg";
 };
 
+/** The dashed "+ Add" pill at the end of a row of large chips (Offer.dc.html). `label` is what a screen reader hears, e.g. "Add a skill". */
+export function AddChip({ label, onClick, className }: { label: string; onClick: () => void; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={cx("inline-flex min-h-10 items-center rounded-full border border-dashed border-surface-3 bg-transparent px-4 t-body text-text-muted active:opacity-80", className)}
+    >
+      <span aria-hidden>+ Add</span>
+    </button>
+  );
+}
+
 /** Static, selectable (onToggle) or removable (onRemove). Tap target stays 44px via the hit area. */
 export function Chip({ label, selected, onToggle, onRemove, className, size = "md" }: Props) {
   const base = "inline-flex min-h-8 items-center gap-1 rounded-full px-3 t-footnote";

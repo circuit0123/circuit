@@ -1,5 +1,5 @@
-:HL["/_next/static/chunks/3h6h4x-3oal3o.css","style"]
+:HL["/_next/static/chunks/1do-1cdp7_fe0.css","style"]
 :HL["/_next/static/media/Geist_Variable-s.p.2py-ke1f706a6.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 2:[["children",{"s":"__PAGE__","h":160}]]
 1:[["children",{"s":"partners","h":96,"c":"$Q2"}]]
-0:{"b":"Vumfz3GBt8wlwgjkMaiBQ","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"5GVqTIDzp3uEfY0EZZNzy","t":{"t":{"s":"","h":80,"c":"$Q1"}}}

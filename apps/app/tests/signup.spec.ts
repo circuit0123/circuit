@@ -241,7 +241,7 @@ test.describe("onboarding: name, role, age, safety, where", () => {
     await expect(sheet.getByRole("button")).toHaveCount(1);
     await sheet.getByRole("button", { name: "Madurai" }).click();
     await expect.poll(async () => (await serverState(page)).me.city).toBe("Madurai");
-    await expect(heading(page, "Almost there")).toBeVisible(); // the next screens arrive in F2 parts 3–4
+    await expect(heading(page, "What are you working on?")).toBeVisible();
   });
 
   test("reloading resumes on the screen you were on, with the progress kept", async ({ page }) => {
@@ -290,5 +290,220 @@ test.describe("onboarding: name, role, age, safety, where", () => {
     await page.evaluate(() => localStorage.removeItem("circuit.mock.fail"));
     await page.getByRole("button", { name: "Continue" }).click(); // trying again works
     await expect(heading(page, "What brings you here?")).toBeVisible();
+  });
+});
+
+const BIO = "Third-year B.Tech student in Madurai. I build React apps with maps and dashboards, mostly for small farms. Looking for an internship and someone to help me with backend.";
+
+/** The screen with this title, once the one before it has finished leaving (both are in the page while a step slides). */
+async function onScreen(page: import("@playwright/test").Page, title: string) {
+  await expect(heading(page, title)).toBeVisible();
+  await expect(page.getByRole("main")).toHaveCount(1);
+}
+
+/** Name → Role → Age → Where (Madurai): ends on the Work screen. */
+async function toWork(page: import("@playwright/test").Page, opts: { role?: string; scenario?: string } = {}) {
+  await intoOnboarding(page, "/", { scenario: opts.scenario });
+  await page.getByLabel("First name").fill("Ravi");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: opts.role ?? "Find work and internships" }).click();
+  await page.getByRole("button", { name: "Yes", exact: true }).click();
+  await page.getByRole("button", { name: "Choose a city" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Madurai" }).click();
+  await onScreen(page, "What are you working on?");
+}
+
+/** Skips Work, then picks one chip from each searchable list: ends on the screen after Needs. */
+async function throughPickers(page: import("@playwright/test").Page) {
+  await page.getByRole("button", { name: "Skip" }).click();
+  await onScreen(page, "Here's what you can offer.");
+  await page.getByRole("button", { name: "Sales", exact: true }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await onScreen(page, "And what you need right now.");
+  await page.getByRole("button", { name: "Marketing", exact: true }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+}
+
+test.describe("onboarding: work, offers, needs, organisation", () => {
+  test("Work → Offers: the bio becomes chips, already chosen; remove, add back, save", async ({ page }, info) => {
+    await toWork(page);
+    await checkStep(page, info, "work");
+    await page.getByLabel("About your work").fill(BIO);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "Here's what you can offer.");
+    const pressed = (name: string) => page.getByRole("button", { name, exact: true });
+    for (const n of ["Frontend development", "Maps", "Dashboards"]) await expect(pressed(n)).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText("3 of 5")).toBeVisible();
+    await checkStep(page, info, "offers");
+    await pressed("Maps").click();
+    await expect(pressed("Maps")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByText("2 of 5")).toBeVisible();
+    await pressed("Maps").click(); // a removed chip stays so it can be added back
+    await expect(page.getByText("3 of 5")).toBeVisible();
+    await pressed("Dashboards").click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "And what you need right now.");
+    const s = await serverState(page);
+    expect(s.offers.map((o) => o.capability).sort()).toEqual(["frontend-dev", "maps"]);
+    expect(s.me.bio).toBe(BIO);
+  });
+
+  test("Work: Enter makes a new line, Ctrl+Enter continues", async ({ page }) => {
+    await toWork(page);
+    const field = page.getByLabel("About your work");
+    await field.fill("I build maps.");
+    await field.press("Enter");
+    await expect(field).toHaveValue("I build maps.\n");
+    await onScreen(page, "What are you working on?");
+    await field.press("Control+Enter");
+    await onScreen(page, "Here's what you can offer.");
+  });
+
+  test("Offers: + Add searches the rest, and the sixth chip is refused", async ({ page }, info) => {
+    await toWork(page);
+    await page.getByLabel("About your work").fill(BIO);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Add a skill" }).click();
+    const sheet = page.getByRole("dialog");
+    await expect(sheet).toBeVisible();
+    await checkStep(page, info, "offers-add");
+    await sheet.getByLabel("Search skills").fill("sal");
+    await expect(sheet.getByRole("button")).toHaveCount(1);
+    await sheet.getByRole("button", { name: "Sales" }).click();
+    await expect(sheet).toBeHidden();
+    await expect(page.getByRole("button", { name: "Sales", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText("4 of 5")).toBeVisible();
+    await page.getByRole("button", { name: "Add a skill" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Pitching" }).click();
+    await expect(page.getByText("5 of 5")).toBeVisible();
+    await page.getByRole("button", { name: "Add a skill" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByText("Up to 5. Remove one to add another.")).toBeVisible();
+  });
+
+  test("Needs: starts from the bio, holds three, and wants at least one", async ({ page }) => {
+    await toWork(page);
+    await page.getByLabel("About your work").fill(BIO);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "And what you need right now.");
+    const backend = page.getByRole("button", { name: "Backend development", exact: true });
+    await expect(backend).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText("1 of 3")).toBeVisible();
+    await backend.click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByText("Pick at least one.")).toBeVisible();
+    await onScreen(page, "And what you need right now.");
+    await backend.click();
+    for (const n of ["Sales", "Marketing"]) {
+      await page.getByRole("button", { name: "Add a need" }).click();
+      await page.getByRole("dialog").getByRole("button", { name: n }).click();
+    }
+    await expect(page.getByText("3 of 3")).toBeVisible();
+    await page.getByRole("button", { name: "Add a need" }).click();
+    await expect(page.getByText("Up to 3. Remove one to add another.")).toBeVisible();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "Where do you study?");
+    expect((await serverState(page)).needs.map((n) => n.capability).sort()).toEqual(["backend-dev", "marketing", "sales"]);
+  });
+
+  test("Skip on Work gives the searchable list, with no error shown", async ({ page }, info) => {
+    await toWork(page);
+    await page.getByRole("button", { name: "Skip" }).click();
+    await onScreen(page, "Here's what you can offer.");
+    await expect(alertOf(page)).toHaveCount(0);
+    await expect(page.getByLabel("Search skills")).toBeVisible();
+    await checkStep(page, info, "offers-list");
+    await page.getByLabel("Search skills").fill("sal");
+    await expect(page.getByRole("button", { name: "Sales", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Marketing", exact: true })).toHaveCount(0);
+    await page.getByRole("button", { name: "Sales", exact: true }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "And what you need right now.");
+    expect((await serverState(page)).offers.map((o) => o.capability)).toEqual(["sales"]);
+  });
+
+  test("AI down: the same searchable list, no error, saving works", async ({ page }) => {
+    await toWork(page, { scenario: "signup_ai_down" });
+    await page.getByLabel("About your work").fill(BIO);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "Here's what you can offer.");
+    await expect(alertOf(page)).toHaveCount(0);
+    await expect(page.getByLabel("Search skills")).toBeVisible();
+    await page.getByRole("button", { name: "Frontend development", exact: true }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "And what you need right now.");
+    expect((await serverState(page)).offers.map((o) => o.capability)).toEqual(["frontend-dev"]);
+  });
+
+  test("Organisation: a result saves the college and moves on", async ({ page }, info) => {
+    await toWork(page);
+    await throughPickers(page);
+    await onScreen(page, "Where do you study?");
+    await checkStep(page, info, "organisation", { primary: 0 });
+    await page.getByLabel("Search colleges").fill("thia");
+    await page.getByRole("button", { name: "Thiagarajar College of Engineering" }).click();
+    await onScreen(page, "Almost there");
+    expect((await serverState(page)).me.college).toBe("Thiagarajar College of Engineering");
+  });
+
+  test("Organisation: a college that isn't listed can be used as typed", async ({ page }) => {
+    await toWork(page);
+    await throughPickers(page);
+    await page.getByLabel("Search colleges").fill("Kamaraj Engineering College");
+    await page.getByRole("button", { name: "Use “Kamaraj Engineering College”" }).click();
+    await onScreen(page, "Almost there");
+    expect((await serverState(page)).me.college).toBe("Kamaraj Engineering College");
+  });
+
+  test("Organisation: Skip saves nothing", async ({ page }) => {
+    await toWork(page);
+    await throughPickers(page);
+    await page.getByRole("button", { name: "Skip" }).click();
+    await onScreen(page, "Almost there");
+    const s = await serverState(page);
+    expect(s.me.college).toBe("");
+    expect(s.onboarding.answers.organisation).toEqual({ skipped: true });
+  });
+
+  test("a college email skips Organisation: the college is already set", async ({ page }) => {
+    await openAsNewMember(page, "/");
+    await signInByEmail(page, "ravi@svit.edu.in");
+    await page.getByRole("button", { name: "I agree" }).click();
+    const invite = page.getByLabel("Invite code");
+    await invite.fill("CIRCUIT-0001");
+    await invite.press("Enter");
+    await page.getByLabel("First name").fill("Ravi");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Find work and internships" }).click();
+    await page.getByRole("button", { name: "Yes", exact: true }).click();
+    await page.getByRole("button", { name: "Choose a city" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Madurai" }).click();
+    await throughPickers(page);
+    await onScreen(page, "Almost there");
+    expect((await serverState(page)).me.college).toBe("Sri Venkateswara Institute of Technology");
+  });
+
+  test("a founder is never asked where they study", async ({ page }) => {
+    await toWork(page, { role: "Build a startup" });
+    await throughPickers(page);
+    await onScreen(page, "Almost there");
+  });
+
+  test("Back keeps what was chosen, and a reload resumes on Needs", async ({ page }) => {
+    await toWork(page);
+    await page.getByLabel("About your work").fill(BIO);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Maps", exact: true }).click(); // removes Maps
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "And what you need right now.");
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await onScreen(page, "Here's what you can offer.");
+    await expect(page.getByRole("button", { name: "Maps", exact: true })).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByRole("button", { name: "Dashboards", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await onScreen(page, "And what you need right now.");
+    await page.reload();
+    await onScreen(page, "And what you need right now.");
   });
 });

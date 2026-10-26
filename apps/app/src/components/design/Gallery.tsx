@@ -2,8 +2,8 @@
 
 import { Bell, Plus, Search } from "lucide-react";
 import {
-  ACCENTS, Avatar, BarButton, BridgeBadge, Button, Card, Chip, DistanceBadge, EmptyState, ErrorState, GroupedList, HiringBadge, LargeTitleHeader,
-  ListRow, Logo, MatchStrength, PrivateBadge, SegmentedControl, Sheet, Skeleton, TabBar, TopBar, VerifiedBadge, memberTabs, partnerTabs, useToast,
+  ACCENTS, AddChip, Avatar, BarButton, BridgeBadge, Button, Card, Chip, DistanceBadge, EmptyState, ErrorState, GroupedList, HiringBadge, LargeTitleHeader,
+  ListRow, Logo, MatchStrength, PrivateBadge, SegmentedControl, Sheet, Skeleton, TabBar, TextArea, TopBar, VerifiedBadge, memberTabs, partnerTabs, useToast,
   type Accent, type ButtonVariant, type Detent,
 } from "@circuit/ui";
 import { useMotionValue } from "motion/react";
@@ -53,6 +53,7 @@ function Panel({ theme, accent }: { theme: "dark" | "light"; accent: Accent }) {
   const [box, setBox] = useState<HTMLElement | null>(null);
   const [seg, setSeg] = useState("people");
   const [chip, setChip] = useState(true);
+  const [big, setBig] = useState(true);
   const [chips, setChips] = useState(["React", "Figma"]);
   const [sheet, setSheet] = useState<Detent | null>(null);
   const progress = useMotionValue(0);
@@ -86,6 +87,15 @@ function Panel({ theme, accent }: { theme: "dark" | "light"; accent: Accent }) {
           <Chip label="Hiring" selected={chip} onToggle={() => setChip(true)} />
           {chips.map((c) => <Chip key={c} label={c} onRemove={() => setChips((x) => x.filter((y) => y !== c))} />)}
         </Row>
+        <Row label="large (sign-up picks) · selected · add">
+          <Chip size="lg" label="React" selected={big} onToggle={() => setBig((b) => !b)} />
+          <Chip size="lg" label="Maps" selected={!big} onToggle={() => setBig((b) => !b)} />
+          <AddChip label="Add a skill" onClick={() => {}} />
+        </Row>
+      </Block>
+
+      <Block title="Text area">
+        <TextArea label="About your work" placeholder="I'm a third-year student who builds…" className="max-w-[440px]" />
       </Block>
 
       <Block title="Card">

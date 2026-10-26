@@ -29,6 +29,33 @@ export function TextField({ label, error, hint, className, id, ...rest }: Props)
   );
 }
 
+type AreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  label: string;
+  /** Keeps the label for screen readers only, when the screen's title already asks the question. */
+  hideLabel?: boolean;
+  error?: string | null;
+  hint?: string;
+};
+
+/** A labelled multi-line input: 12px radius, surface-2 fill, 220px tall, no resize handle. */
+export function TextArea({ label, hideLabel, error, hint, className, id, ...rest }: AreaProps) {
+  const uid = useId();
+  const fid = id ?? uid;
+  return (
+    <div className={cx("flex flex-col gap-2", className)}>
+      <label htmlFor={fid} className={hideLabel ? "sr-only" : "t-footnote text-text-muted"}>{label}</label>
+      <textarea
+        id={fid}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${fid}-err` : hint ? `${fid}-hint` : undefined}
+        className={cx("h-[220px] w-full resize-none rounded-control bg-surface-2 p-4 t-body text-text outline-none placeholder:text-text-subtle", error && "ring-1 ring-danger")}
+        {...rest}
+      />
+      {error ? <p id={`${fid}-err`} role="alert" className="t-footnote text-danger">{error}</p> : hint ? <p id={`${fid}-hint`} className="t-footnote text-text-subtle">{hint}</p> : null}
+    </div>
+  );
+}
+
 type CodeProps = {
   value: string;
   onChange: (v: string) => void;
