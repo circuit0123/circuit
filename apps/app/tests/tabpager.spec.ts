@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 /**
  * TabPager touch tests (DESIGN.md §3 "Swipe between tabs", LAUNCH.md Stage 4). Real touch input through Chrome's pipeline, so the page
  * sees real pointer events and the browser can claim vertical pans, like on a phone. Two places:
- *   - the app shell on mock mode (four tabs, because Circuits has no screens yet), and
+ *   - the app shell on mock mode (five tabs; four with features off), and
  *   - /design/pager, the five-tab pager on its own, with a sideways chips row, a Map-like lock, a text field and a sheet.
  */
 type Pt = { x: number; y: number };
