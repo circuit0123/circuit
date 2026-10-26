@@ -82,7 +82,7 @@ jobs:
             pnpm --filter @circuit/app exec playwright install --with-deps chromium
           fi
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Build the database image (PostGIS + pgvector), cached
         uses: docker/build-push-action@v6
         with:
