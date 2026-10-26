@@ -576,7 +576,7 @@ test.describe("onboarding: photo, colour, ready", () => {
     await page.getByRole("button", { name: "Skip" }).click();
     await onScreen(page, "You're on the circuit.");
     await expect(page.locator("html")).not.toHaveAttribute("data-accent", /.+/);
-    await expect.poll(() => accentSaved(page)).toBe("mint");
+    await expect.poll(() => accentSaved(page)).toBe("emerald");
   });
 
   test("a reload on Colour resumes on Colour with the colour you tried", async ({ page }) => {

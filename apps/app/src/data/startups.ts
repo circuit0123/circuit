@@ -35,9 +35,9 @@ export type StartupPage = {
   /** The signed-in member is on this startup's team: they see its private counts and its applicants. */
   isTeam: boolean;
   /** Only for the team (DESIGN.md §4: never public). */
-  privateCounts: { views: number; interested: number } | null;
+  privateCounts: { views: number | null; interested: number | null } | null;
   /** Shown to founders on an unclaimed page, to say why claiming is worth it (CLAUDE.md F3). */
-  claimNudge: { views: number; interested: number } | null;
+  claimNudge: { views: number | null; interested: number | null } | null;
   canClaim: boolean;
   teamSize: number | null;
   founders: StartupFounder[];

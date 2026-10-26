@@ -24,7 +24,7 @@ const envelope = (status: number, code: string, message: string) => HttpResponse
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
 
 type Author = Schemas["AuthorOut"];
-type Msg = Omit<Schemas["MessageOut"], "conversation_id"> & { read: boolean };
+type Msg = Omit<Schemas["MessageOut"], "conversation_id" | "read_at"> & { read: boolean };
 type Conv = { id: number; other: Author; status: "request" | "active"; started_by_me: boolean; messages: Msg[] };
 
 export const INBOX_PEOPLE = {
@@ -36,6 +36,8 @@ export const INBOX_PEOPLE = {
 };
 
 let nextId = 9000;
+/** Minutes since noon yesterday (local), so "Yesterday" is true whatever the time of day. */
+const sinceYesterdayNoon = () => { const d = new Date(); d.setDate(d.getDate() - 1); d.setHours(12, 0, 0, 0); return Math.round((Date.now() - d.getTime()) / 60_000); };
 const m = (mine: boolean, body: string, minutes: number, read = true): Msg => ({ id: ++nextId, mine, body, image: null, removed: false, created_at: minutesAgo(minutes), read: mine || read });
 
 const fresh = (): Conv[] => [
@@ -50,8 +52,8 @@ const fresh = (): Conv[] => [
     m(false, "Can you share the map prototype?", 95, false),
   ] },
   { id: 503, other: INBOX_PEOPLE.divyaS, status: "active", started_by_me: true, messages: [
-    m(true, "Try sending the reminder at 7 pm, when parents are home.", 30 * 60),
-    m(false, "Thanks, that helped a lot.", 29 * 60),
+    m(true, "Try sending the reminder at 7 pm, when parents are home.", sinceYesterdayNoon() + 60),
+    m(false, "Thanks, that helped a lot.", sinceYesterdayNoon()),
   ] },
   { id: 504, other: INBOX_PEOPLE.arun, status: "active", started_by_me: false, messages: [
     m(false, "Your team is on at 3:40 pm, after the agritech teams.", 3 * 24 * 60 + 20),
@@ -90,7 +92,7 @@ const REPLIES: Record<number, string> = {
 /** Under-18 members never get requests from strangers (backend rule). */
 const visible = (s: Scenario) => (s === "empty" ? [] : s === "under18" ? store.filter((c) => c.status !== "request") : store);
 
-const msgOut = (c: Conv, x: Msg): Schemas["MessageOut"] => ({ id: x.id, conversation_id: c.id, mine: x.mine, body: x.body, image: x.image, removed: x.removed, created_at: x.created_at });
+const msgOut = (c: Conv, x: Msg): Schemas["MessageOut"] => ({ id: x.id, conversation_id: c.id, mine: x.mine, body: x.body, image: x.image, removed: x.removed, created_at: x.created_at, read_at: x.read ? x.created_at : null });
 const convOut = (c: Conv): Schemas["ConversationOut"] => {
   const last = c.messages[c.messages.length - 1] ?? null;
   return {
@@ -245,7 +247,7 @@ export const inboxHandlers: HttpHandler[] = [
   })),
 ];
 
-function imageOf(uploadId: number): Record<string, unknown> | null {
+function imageOf(uploadId: number): Schemas["MessageImageOut"] | null {
   const u = uploads.get(uploadId);
   return u ? { width: u.width, height: u.height, w480: u.src, w1440: u.src } : null;
 }

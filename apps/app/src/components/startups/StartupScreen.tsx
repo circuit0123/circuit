@@ -81,8 +81,8 @@ function Page({ s }: { s: StartupPage }) {
         <section aria-label="Claim this startup" className="mx-4 lg:mx-0 mt-section rounded-card bg-surface p-surface">
           <h2 className="t-title3">Is this your startup?</h2>
           <p className="t-body mt-2 text-text-muted">
-            {s.claimNudge && s.claimNudge.views > 0
-              ? `${s.claimNudge.views} students looked at this page and ${s.claimNudge.interested} are interested. Claim it to post roles and keep it right.`
+            {s.claimNudge && s.claimNudge.views != null && s.claimNudge.views > 0
+              ? `${s.claimNudge.views} students looked at this page${s.claimNudge.interested != null ? ` and ${s.claimNudge.interested} are interested` : ""}. Claim it to post roles and keep it right.`
               : "Claim it to post roles and keep it right."}
           </p>
           <Button variant="secondary" className="mt-4 w-full" onClick={() => setClaim(true)}>Claim this startup</Button>

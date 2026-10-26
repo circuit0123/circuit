@@ -6,6 +6,7 @@ import { circuitHandlers } from "./circuits";
 import { discoverHandlers } from "./discover";
 import { inboxHandlers } from "./inbox";
 import { postHandlers } from "./posts";
+import { requestHandlers } from "./requests";
 import { SHORT_BIO, mePatch, profileFirstHandlers, profileHandlers } from "./profile";
 import { privacyFor, settingsHandlers } from "./settings";
 import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, NOTIFICATIONS, ONBOARDING, PEOPLE, PERSONAS, PULSE, dropOf } from "./fixtures";
@@ -77,6 +78,7 @@ function scenario(fn: (s: Scenario, info: Info) => Response | Promise<Response>)
 }
 
 export const handlers: HttpHandler[] = [
+  ...requestHandlers, // intros and connection requests to answer (the `requests` scenario has some)
   ...profileFirstHandlers, // your needs, offers and skills; they step aside in the New member scenarios
   ...signupHandlers, // each answers only in the New member scenarios and otherwise lets the handlers below take over
   http.get(`${API}/config`, scenario((s) => HttpResponse.json(config(s)))),

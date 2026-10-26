@@ -41,6 +41,8 @@ export async function shot(page: Page, screen: string, name: string) {
 export async function inBothThemes(page: Page, fn: (theme: "dark" | "light") => Promise<void>) {
   for (const theme of ["dark", "light"] as const) {
     await page.emulateMedia({ colorScheme: theme });
+    // The accent crossfades for 250ms (tokens.css); axe must measure the settled colours, not a blend.
+    await page.waitForTimeout(350);
     await fn(theme);
   }
 }

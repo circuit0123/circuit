@@ -91,6 +91,8 @@ export const profileHandlers: HttpHandler[] = [
     const profile: Schemas["ProfileOut"] = {
       id: a.id, role: a.role, display_name: a.display_name, bio: l.bio ?? a.headline, city: a.city, college: l.college ?? "", verification_level: a.verification_level,
       needs: l.needs ?? [], offers: l.offers ?? [], skills: l.skills ?? [], traits: [],
+      actions: { connect: true, intro: true, message: true }, build_logs: [], circuits_closed: null, circuits_together: null, connection: "none", headline: a.headline, highlights: [],
+      is_me: false, mutual_count: null, organisation: null, photo: null, strength: null, via: null,
     };
     return HttpResponse.json(profile);
   })),

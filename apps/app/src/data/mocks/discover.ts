@@ -25,7 +25,7 @@ function km(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
 }
 const HOME = { lat: ME.lat, lng: ME.lng };
 
-type Startup = Omit<Schemas["StartupOut"], "interested" | "is_team" | "match_pct" | "open_jobs" | "hiring"> & { lat: number; lng: number; match_pct: number | null };
+type Startup = Omit<Schemas["StartupOut"], "interested" | "is_team" | "match_pct" | "open_jobs" | "hiring" | "build_logs" | "founders" | "logo" | "team_size" | "verified"> & { lat: number; lng: number; match_pct: number | null };
 
 export const STARTUPS: Startup[] = [
   { id: 41, name: "Aravind Pathology", website_domain: "aravindpath.in", description: "Stock and reorder software for neighbourhood pharmacies and pathology labs in Adyar and Velachery. Pharmacists check it before they open.", sector: "healthtech", stage: "seed", address: "Gandhi Nagar, Adyar, Chennai", lat: 13.0067, lng: 80.2573, claimed: true, source: "user", tech_stack: ["React", "Django", "PostgreSQL"], view_count: 214, interest_count: 18, match_pct: 82 },
@@ -37,11 +37,11 @@ export const STARTUPS: Startup[] = [
   { id: 47, name: "Neerflow", website_domain: "neerflow.in", description: "Rainwater harvesting audits for apartment associations.", sector: "climate", stage: "idea", address: "Velachery, Chennai", lat: 12.9791, lng: 80.2209, claimed: true, source: "user", tech_stack: ["Flutter"], view_count: 31, interest_count: 2, match_pct: null },
 ];
 
-type Job = Schemas["JobOut"] & MissingJobFields;
+type Job = Schemas["JobOut"];
 const cap = (slug: string, name: string, required: boolean, your_level: number | null) => ({ slug, name, required, your_level });
 const job = (id: number, s: Startup, title: string, kind: string, min: number | null, max: number | null, match: number | null, description: string, caps: Schemas["JobCapabilityOut"][], hours: number): Job => ({
   id, title, description, kind, is_open: true, sector: s.sector, startup_id: s.id, startup_name: s.name, location: s.address.split(",").slice(-2).join(",").trim(),
-  lat: s.lat, lng: s.lng, distance_km: km(HOME, s), stipend_min: min, stipend_max: max, skill_match: match, applied: false, created_at: hoursAgo(hours), capabilities: caps,
+  lat: s.lat, lng: s.lng, distance_km: km(HOME, s), stipend_min: min, stipend_max: max, skill_match: match, applied: false, contact: null, duration_weeks: null, is_team: false, starts_on: null, startup_logo: null, created_at: hoursAgo(hours), capabilities: caps,
   startup_verified: s.claimed,
 });
 
@@ -74,6 +74,11 @@ function startupOut(s: Startup, sc: Scenario): Schemas["StartupOut"] {
     claimed: s.claimed || claimedNow.has(s.id),
     hiring: hiring(s),
     interested: false,
+    build_logs: [],
+    founders: [],
+    logo: null,
+    team_size: null,
+    verified: s.claimed,
     is_team: isTeam(sc, s.id),
     open_jobs: openJobs(s.id).map((j) => ({ id: j.id, title: j.title, kind: j.kind, stipend_min: j.stipend_min, stipend_max: j.stipend_max })),
   };
@@ -91,7 +96,7 @@ function applicationOut(jobId: number): Schemas["ApplicationOut"] {
   return { id: a.id, job_id: j.id, job_title: j.title, startup_id: j.startup_id, startup_name: j.startup_name, status: a.status, skill_match: j.skill_match ?? 0, created_at: a.created_at };
 }
 
-const skill = (capability: string, level: number, proof_url = "") => ({ capability, level, proof_url });
+const skill = (capability: string, level: number, proof_url = "") => ({ capability, name: capability, level, proof_url });
 const APPLICANTS: Schemas["ApplicantOut"][] = [
   { application_id: 7001, student_id: 21, display_name: "Karthik Selvam", skill_match: 0.91, status: "submitted", applied_at: hoursAgo(5), skills: [skill("frontend-dev", 3, "https://github.com/karthik-selvam/ration-tracker"), skill("ui-design", 2), skill("data-viz", 3, "https://karthik.dev/dashboards")] },
   { application_id: 7002, student_id: 22, display_name: "Fathima Rizwana", skill_match: 0.78, status: "shortlisted", applied_at: hoursAgo(20), skills: [skill("frontend-dev", 2, "https://github.com/fathimarizwana"), skill("ui-design", 3)] },

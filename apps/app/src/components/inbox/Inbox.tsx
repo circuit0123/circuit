@@ -5,6 +5,7 @@ import { SquarePen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { WaitingForYou, YourIntros } from "./Waiting";
 import { conversationHref, loadFailed, newMessageHref, useConnections, useFindConversation, useInbox, type Folder, type InboxRow } from "@/data";
 
 const FOLDERS: { id: Folder; label: string }[] = [{ id: "chats", label: "Chats" }, { id: "requests", label: "Requests" }];
@@ -25,6 +26,7 @@ export function Inbox() {
 
   return (
     <Screen title="Inbox" right={<BarButton label="New message" onClick={() => setComposing(true)}><SquarePen size={22} strokeWidth={1.75} /></BarButton>}>
+      <WaitingForYou />
       <Section label="Conversations">
         {/* On desktop the top bar isn't drawn, so the one action sits above the list. */}
         <div className="mb-4 hidden justify-end lg:flex">
@@ -49,6 +51,7 @@ export function Inbox() {
           </ul>
         )}
       </Section>
+      {current === "chats" && <YourIntros />}
       <NewMessageSheet open={composing} onClose={() => setComposing(false)} />
     </Screen>
   );

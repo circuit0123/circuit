@@ -99,7 +99,7 @@ export const STARTUP_EXTRAS: Record<number, { teamSize: number; founders: Startu
 /* -- F6: profiles, posting, settings -------------------------------------------------------------------------------- */
 
 export type Highlight = { id: number; title: string; src: string; alt: string };
-export type Connection = "none" | "pending" | "connected";
+export type Connection = "none" | "pending" | "incoming" | "connected";
 
 /**
  * API needed (F6): what a profile page shows that `ProfileOut` and `MeOut` don't carry. A headline, organisation, whether the person is

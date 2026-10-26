@@ -4,13 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Schemas } from "@circuit/api-client";
 import { roleLabel } from "@/lib/format";
 import { ACCENTS } from "@circuit/ui";
-import { accentFromApi } from "./appearance";
 import { api, ApiError, unwrap } from "./client";
 import { useKey } from "./keys";
 import { useSession } from "./session";
 
 type Settings = Schemas["SettingsOut"];
-export type NotificationType = keyof Schemas["NotificationPrefsOut"];
+export type NotificationType = Exclude<keyof Schemas["NotificationPrefsOut"], "push_daily_cap" | "quiet_hours" | "quiet_hours_locked">;
 export type Channel = "in_app" | "email";
 export type ProfileVisibility = "public" | "members" | "hidden";
 
@@ -49,7 +48,7 @@ export function useSettings() {
     level: s.profile.verification_level,
     privacy: VISIBILITY_OPTIONS.find((v) => v.id === s.privacy.profile_visibility)?.label ?? "",
     notifications: on.length === 0 ? "Off" : on.length === NOTIFICATION_TYPES.length ? "All on" : on.slice(0, 2).map((t, i) => (i === 0 ? t.label : t.label.toLowerCase())).join(", ") + (on.length > 2 ? ", more" : ""),
-    appearance: `${themeWord[s.appearance.theme]} · ${ACCENTS.find((a) => a.id === accentFromApi(s.appearance.accent))?.label ?? ""}`,
+    appearance: `${themeWord[s.appearance.theme]} · ${ACCENTS.find((a) => a.id === s.appearance.accent)?.label ?? ""}`,
     blocked: s.blocked_count,
     policyVersion: s.consent.accepted_version ?? s.consent.policy_version,
     support: s.support,

@@ -68,7 +68,7 @@ export function signupMe(): Schemas["MeOut"] {
     ...ME,
     id: 99,
     display_name: s.me.name,
-    role: s.me.role,
+    role: s.me.role as Schemas["MeOut"]["role"],
     bio: s.me.bio,
     city: s.me.city,
     college: s.me.college,

@@ -62,7 +62,7 @@ const settle = (c: Circuit) => {
   else if (c.status === "active" && c.legs.every((l) => l.fulfilled)) c.status = "completed";
 };
 
-function nextStep(c: Circuit, mine: Leg, got: Leg): string {
+function nextStep(c: Circuit, mine: Leg, got: Leg): Schemas["CircuitOut"]["next_step"] {
   const unrated = got.fulfilled && got.rating === null;
   if (c.status === "proposed") return mine.consent === "pending" ? "answer" : "waiting";
   if (c.status === "active") return !mine.fulfilled ? "mark_done" : unrated ? "rate" : "waiting";

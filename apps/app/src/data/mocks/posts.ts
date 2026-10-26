@@ -112,8 +112,9 @@ export const postHandlers: HttpHandler[] = [
     return new HttpResponse(null, { status: 204 });
   })),
   http.get(`${API}/members/:id/posts`, scenario((s, { params }) => {
-    if (noPosts(s) && !posts.some((p) => p.id >= 900)) return HttpResponse.json([]);
-    return HttpResponse.json(posts.filter((p) => p.author.id === Number(params.id) && (!noPosts(s) || p.id >= 900)).sort((a, b) => b.created_at.localeCompare(a.created_at)).map((p) => out(p)));
+    if (noPosts(s) && !posts.some((p) => p.id >= 900)) return HttpResponse.json({ items: [], next_cursor: null });
+    const items = posts.filter((p) => p.author.id === Number(params.id) && (!noPosts(s) || p.id >= 900)).sort((a, b) => b.created_at.localeCompare(a.created_at)).map((p) => out(p));
+    return HttpResponse.json({ items, next_cursor: null });
   })),
   http.post(`${API}/posts`, scenario(async (s, { request }) => {
     const b = (await request.json()) as Schemas["PostIn"];

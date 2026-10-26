@@ -20,7 +20,7 @@ export function Person({ id }: { id: number }) {
   const me = useMe().data;
   const q = useProfile(id);
   const p = q.data;
-  const [sheet, setSheet] = useState<null | "menu" | "report" | "block">(null);
+  const [sheet, setSheet] = useState<null | "menu" | "report" | "block" | "remove">(null);
   // Your own id goes to your own profile.
   useEffect(() => { if (me && me.id === id) router.replace("/profile"); }, [me, id, router]);
   if (q.notFound) notFound();
@@ -39,7 +39,7 @@ export function Person({ id }: { id: number }) {
       )}
       {q.isError && !q.notFound && <ErrorState className="px-4 pt-6 lg:px-0" text={loadFailed("this profile")} onRetry={() => void q.refetch()} />}
       {p && (p.hidden ? <Private p={p} /> : <Page p={p} connect={(note) => q.connect.mutate(note)} />)}
-      {p && <Sheets p={p} sheet={sheet} setSheet={setSheet} report={q.report} block={() => q.block.mutateAsync()} onBlocked={() => router.replace("/")} />}
+      {p && <Sheets p={p} sheet={sheet} setSheet={setSheet} report={q.report} block={() => q.block.mutateAsync()} remove={() => q.remove.mutateAsync()} onBlocked={() => router.replace("/")} />}
     </PushScreen>
   );
 }
@@ -79,6 +79,7 @@ function Page({ p, connect }: { p: PersonView; connect: (note: string) => void }
 
   const connectButton =
     p.connection === "connected" ? <Button disabled aria-disabled>Connected</Button>
+      : p.connection === "incoming" ? <Button variant="primary" onClick={() => router.push("/inbox")}>Answer request</Button>
       : p.connection === "pending" ? <Button disabled aria-disabled className="text-text-muted">Request sent</Button>
       : <Button variant="primary" onClick={() => { connect(""); toast({ text: `Request sent to ${first}.` }); }}>Connect</Button>;
 
@@ -124,9 +125,9 @@ function Page({ p, connect }: { p: PersonView; connect: (note: string) => void }
   );
 }
 
-function Sheets({ p, sheet, setSheet, report, block, onBlocked }: {
-  p: PersonView; sheet: null | "menu" | "report" | "block"; setSheet: (s: null | "menu" | "report" | "block") => void;
-  report: (reason: string) => Promise<unknown>; block: () => Promise<unknown>; onBlocked: () => void;
+function Sheets({ p, sheet, setSheet, report, block, remove, onBlocked }: {
+  p: PersonView; sheet: null | "menu" | "report" | "block" | "remove"; setSheet: (s: null | "menu" | "report" | "block" | "remove") => void;
+  report: (reason: string) => Promise<unknown>; block: () => Promise<unknown>; remove: () => Promise<unknown>; onBlocked: () => void;
 }) {
   const toast = useToast();
   const first = firstName(p.name);
@@ -144,10 +145,25 @@ function Sheets({ p, sheet, setSheet, report, block, onBlocked }: {
     <>
       <Sheet open={sheet === "menu"} onClose={() => setSheet(null)} title={p.name} detents={["medium"]}>
         {!p.hidden && <Button className="w-full" onClick={() => void share()}>Share profile</Button>}
+        {p.connection === "connected" && <Button className="mt-3 w-full" onClick={() => setSheet("remove")}>Remove connection</Button>}
         <Button className="mt-3 w-full" onClick={() => setSheet("report")}>Report {first}</Button>
         <Button variant="destructive" className="mt-3 w-full" onClick={() => setSheet("block")}>Block {first}</Button>
       </Sheet>
       <ReportSheet open={sheet === "report"} onClose={() => setSheet(null)} title={`Report ${first}?`} intro="We'll look at this profile within a day. They won't know who reported them." onSend={report} />
+      <ConfirmSheet
+        open={sheet === "remove"}
+        onClose={() => setSheet(null)}
+        title={`Remove ${first} from your connections?`}
+        text={`You'll stop being connected. ${first} isn't told, and either of you can send a new request later.`}
+        confirmLabel="Remove connection"
+        busy={busy}
+        onConfirm={async () => {
+          setBusy(true);
+          try { await remove(); setSheet(null); toast({ text: `Removed ${first}.` }); }
+          catch { toast({ text: "Couldn't remove. Try again.", tone: "error" }); }
+          finally { setBusy(false); }
+        }}
+      />
       <ConfirmSheet
         open={sheet === "block"}
         onClose={() => setSheet(null)}

@@ -15,6 +15,7 @@ export const SCENARIOS = [
   { id: "drop_off", label: "Daily Drop off" },
   { id: "home_off", label: "Pulse and Daily Drop off" },
   { id: "intros_used", label: "Intros used up" },
+  { id: "requests", label: "Intros and requests waiting" },
   { id: "under18", label: "Under 18" },
   { id: "founder", label: "Founder" },
   { id: "discover_loading", label: "Discover loading" },

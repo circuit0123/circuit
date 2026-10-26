@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Schemas } from "@circuit/api-client";
 import { roleLabel } from "@/lib/format";
-import { api, unwrap } from "./client";
+import { api, ApiError, unwrap } from "./client";
 import { useKey } from "./keys";
 import { useMe } from "./me";
 import { useChannels } from "./realtime";
@@ -114,5 +114,41 @@ export function useStartConversation() {
   return useMutation({
     mutationFn: (b: { member_id: number; body: string; upload_id?: number | null }) => unwrap(api.POST("/api/conversations", { body: b })),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["inbox"] }),
+  });
+}
+
+export type ConnectionRequestRow = { id: number; from: { id: number; name: string; line: string }; note: string };
+
+/** People who asked to connect with the viewer and are waiting for an answer (newest first). */
+export function useConnectionRequests() {
+  const { enabled } = useKey();
+  const q = useQuery({
+    queryKey: ["connection-requests"],
+    enabled,
+    refetchInterval: 60_000,
+    queryFn: async (): Promise<ConnectionRequestRow[]> =>
+      (await unwrap(api.GET("/api/connections/requests", { params: { query: { box: "incoming" } } }))).map((r) => ({
+        id: r.id,
+        from: { id: r.sender.id, name: r.sender.display_name, line: [r.sender.headline || roleLabel(r.sender.role), r.sender.city].filter(Boolean).join(" · ") },
+        note: r.note,
+      })),
+  });
+  return { rows: q.data ?? [], isPending: q.isPending, isError: q.isError, refetch: q.refetch };
+}
+
+/** Accept or decline a connection request. Already answered (409) counts as done, so the row just goes away. */
+export function useRespondConnection() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, accept }: { id: number; accept: boolean }) => {
+      try { await unwrap(api.POST("/api/connections/requests/{request_id}/respond", { params: { path: { request_id: id } }, body: { accept } })); }
+      catch (e) { if (!(e instanceof ApiError && e.code === "already_answered")) throw e; }
+    },
+    onMutate: ({ id }) => { qc.setQueryData<ConnectionRequestRow[]>(["connection-requests"], (old) => old?.filter((r) => r.id !== id)); },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["connection-requests"] });
+      qc.invalidateQueries({ queryKey: ["connections"] });
+      qc.invalidateQueries({ queryKey: ["unread"] });
+    },
   });
 }

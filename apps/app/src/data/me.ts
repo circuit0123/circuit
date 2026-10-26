@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { accentFromApi, type Appearance } from "./appearance";
+import type { Appearance } from "./appearance";
 import { api, unwrap } from "./client";
 import { useKey } from "./keys";
 
@@ -44,7 +44,7 @@ export function useMe() {
         betaAccess: m.beta_access,
         needsConsent: m.needs_consent,
         policyVersion: m.policy_version,
-        appearance: { theme: m.appearance.theme, accent: accentFromApi(m.appearance.accent), swipeTabs: m.appearance.swipe_tabs },
+        appearance: { theme: m.appearance.theme, accent: m.appearance.accent, swipeTabs: m.appearance.swipe_tabs },
         allowRequests: m.allow_requests,
         location: m.lat != null && m.lng != null ? { lat: m.lat, lng: m.lng } : null,
       };

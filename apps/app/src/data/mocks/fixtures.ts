@@ -28,6 +28,7 @@ export const CONFIG = {
   env: "dev",
   beta_mode: false,
   beta_access: true,
+  llm_available: true,
   features: { pulse: true, daily_drop: true, circuits: true, investor_mode: true, partner_mode: true, promotions: true, payments: true },
 } satisfies Schemas["ConfigOut"];
 
@@ -51,7 +52,13 @@ export const ME = {
   beta_access: true,
   needs_consent: false,
   policy_version: "2026-10",
-  appearance: { theme: "system", accent: "mint", swipe_tabs: true },
+  appearance: { theme: "system", accent: "emerald", swipe_tabs: true },
+  has_needs_and_offers: true,
+  headline: "Frontend developer, third year",
+  organisation_name: null,
+  photo: null,
+  read_receipts: false,
+  startup_id: null,
 } satisfies Schemas["MeOut"];
 
 export const PERSONAS = [
@@ -122,6 +129,12 @@ export const JOB = {
   stipend_max: 15000,
   skill_match: 0.82,
   applied: false,
+  contact: null,
+  duration_weeks: 8,
+  is_team: false,
+  starts_on: null,
+  startup_logo: null,
+  startup_verified: true,
   created_at: minutes(60 * 30),
   capabilities: [{ slug: "frontend-dev", name: "Frontend", required: true, your_level: 3 }, { slug: "ui-design", name: "UI design", required: false, your_level: 2 }],
 } satisfies Schemas["JobOut"];
@@ -150,11 +163,11 @@ export const dropOf = (cards: Schemas["DropCardOut"][]) =>
   ({ cards, date: new Date().toISOString().slice(0, 10), done: cards.every((c) => c.outcome), next_drop_at: new Date(Date.now() + 14 * 3600_000).toISOString() }) satisfies Schemas["DropOut"];
 
 export const MATCHES = [
-  { candidate_id: 5, display_name: "Dr. Kavya Subramanian", role: "founder", city: "Chennai", sector: "healthtech", verification_level: 3, strength: "strong", is_bridge: true, reason: "Kavya needs marketing for lab buyers, which you offer. You both prefer long, careful sales." },
-  { candidate_id: 6, display_name: "Rohan Gupta", role: "founder", city: "Chennai", sector: "logistics", verification_level: 2, strength: "good", is_bridge: false, reason: "Rohan needs a frontend developer for his kirana dashboard. You are 3 km apart." },
-  { candidate_id: 8, display_name: "Divya Menon", role: "founder", city: "Chennai", sector: "climate", verification_level: 2, strength: "good", is_bridge: false, reason: "Divya needs data visualisation help and offers mentoring on pitching." },
-  { candidate_id: 9, display_name: "Sneha Pillai", role: "founder", city: "Chennai", sector: "fintech", verification_level: 1, strength: "good", is_bridge: false, reason: "Sneha wants a design review of her sign-up flow. You offer UI design." },
-  { candidate_id: 7, display_name: "Dr. Lakshmi Narayanan", role: "mentor", city: "Chennai", sector: null, verification_level: 3, strength: "good", is_bridge: false, reason: "Lakshmi offers mentoring on first sales calls, which you asked for." },
+  { candidate_id: 5, display_name: "Dr. Kavya Subramanian", role: "founder", city: "Chennai", sector: "healthtech", verification_level: 3, strength: "strong", is_bridge: true, capabilities: ["marketing"], headline: "Biotech founder, assay kits", reason: "Kavya needs marketing for lab buyers, which you offer. You both prefer long, careful sales." },
+  { candidate_id: 6, display_name: "Rohan Gupta", role: "founder", city: "Chennai", sector: "logistics", verification_level: 2, strength: "good", is_bridge: false, capabilities: ["backend-dev"], headline: "Logistics for small kirana shops", reason: "Rohan needs a frontend developer for his kirana dashboard. You are 3 km apart." },
+  { candidate_id: 8, display_name: "Divya Menon", role: "founder", city: "Chennai", sector: "climate", verification_level: 2, strength: "good", is_bridge: false, capabilities: ["data-viz"], headline: "Climate data for farms", reason: "Divya needs data visualisation help and offers mentoring on pitching." },
+  { candidate_id: 9, display_name: "Sneha Pillai", role: "founder", city: "Chennai", sector: "fintech", verification_level: 1, strength: "good", is_bridge: false, capabilities: ["ui-design"], headline: "Design-first fintech", reason: "Sneha wants a design review of her sign-up flow. You offer UI design." },
+  { candidate_id: 7, display_name: "Dr. Lakshmi Narayanan", role: "mentor", city: "Chennai", sector: null, verification_level: 3, strength: "good", is_bridge: false, capabilities: ["mentoring"], headline: "Ex-VP sales, deep tech", reason: "Lakshmi offers mentoring on first sales calls, which you asked for." },
 ] satisfies Schemas["MatchOut"][];
 
 const wire = (key: string, kind: Schemas["WireItemOut"]["kind"], actor: Schemas["AuthorOut"] | null, headline: string, reason: string, mins: number, seen: boolean, action: Schemas["WireActionOut"]["kind"]): Schemas["WireItemOut"] =>

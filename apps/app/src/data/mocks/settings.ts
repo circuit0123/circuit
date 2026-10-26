@@ -34,13 +34,13 @@ function scenario(fn: (s: Scenario, info: Info) => Response | Promise<Response>)
 }
 
 type Prefs = Schemas["NotificationPrefsOut"];
-const both = (email: boolean) => ({ in_app: true, email });
-const prefs: Prefs = { intros: both(true), messages: both(true), applications: both(false), circuits: both(false), pulse_replies: both(false), announcements: both(false) };
+const both = (email: boolean) => ({ in_app: true, email, push: false });
+const prefs: Prefs = { intros: both(true), messages: both(true), applications: both(false), circuits: both(false), pulse_replies: both(false), announcements: both(false), push_daily_cap: 3, quiet_hours: { start: 22, end: 8 }, quiet_hours_locked: false };
 
 /** Privacy for the adult member and, separately, for the Under 18 scenario (hidden and no requests by default). */
 const privacy: Record<"adult" | "minor", Schemas["PrivacyOut"]> = {
-  adult: { profile_visibility: "members", visible_to_org: false, circuits_opt_in: true, allow_requests: true },
-  minor: { profile_visibility: "hidden", visible_to_org: true, circuits_opt_in: false, allow_requests: false },
+  adult: { profile_visibility: "members", visible_to_org: false, circuits_opt_in: true, allow_requests: true, read_receipts: false },
+  minor: { profile_visibility: "hidden", visible_to_org: true, circuits_opt_in: false, allow_requests: false, read_receipts: false },
 };
 const who = (s: Scenario) => (s === "under18" ? "minor" : "adult");
 let blocked: Schemas["PersonOut"][] = [{ id: 31, display_name: "Karthik Selvam", role: "student", verification_level: 1 }];
