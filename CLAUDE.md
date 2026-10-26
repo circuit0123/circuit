@@ -155,7 +155,8 @@ Approved supporting libraries (no need to ask):
   google-genai (Gemini), groq, anthropic (one active via LLM_PROVIDER),
   PyJWT[crypto] (JWKS), django-otp (admin 2FA), redis, fakeredis (tests),
   httpx, sentry-sdk, resend, razorpay (official SDK), django-environ or
-  pydantic-settings (pick one), ruff, mypy
+  pydantic-settings (pick one), gunicorn (production server), whitenoise (serves the
+  Django admin's static files), ruff, mypy
 - Frontend: @supabase/supabase-js, @tanstack/react-query, @tanstack/react-virtual,
   openapi-typescript, motion (animations), lucide-react (icons), geist (font),
   maplibre-gl, recharts, serwist (PWA, Stage 10), msw (mock mode), @playwright/test,
@@ -178,7 +179,9 @@ behind core/graph. Neo4j is NOT in scope (trigger in BACKLOG.md).
 - Heavy work (matching, circuit rounds, bulk LLM, crawling) never runs in a request;
   it runs as management commands/jobs and users read precomputed results.
 - Every external call has a timeout, retries with backoff and a graceful fallback.
-- Jobs and important endpoints are idempotent.
+- Jobs and important endpoints are idempotent. Every scheduled job extends `core.jobs.JobCommand`
+  (flag check, database lease, JSON start/end/skipped logs, non-zero exit on failure) and is listed in
+  `deploy/gcp/app.toml` with its schedule; a test fails if one is missing.
 - One way to do each thing: one error format, one pagination style, one logging setup.
 
 ## Feature flags (ship code dark, switch features on when the pilot is ready)
@@ -322,6 +325,8 @@ Code for every feature can be merged and deployed; flags decide what members see
   fairness_passed; one model per serving status)
 - feature_flags (name unique, audience: off | testers | everyone, note, updated_by,
   updated_at); every change audit-logged
+- job_runs (name, running_until, last_started_at, last_finished_at, last_status): each scheduled
+  job's lease and last result (core/jobs.py)
 - events (append-only: actor, type, target_type, target_id, payload, created_at)
 GIST indexes on locations, HNSW on embeddings, indexes on every foreign key.
 

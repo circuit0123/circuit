@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from apps.matching.ranker import simulation
+from core.devguard import require_local_database
 
 
 class Command(BaseCommand):
@@ -19,6 +20,7 @@ class Command(BaseCommand):
     def handle(self, *args, **opts):
         if settings.ENV == "production":
             raise CommandError("simulate_network never runs in production")
+        require_local_database("simulate_network")
         if opts["reset"]:
             self.stdout.write(f"removed {simulation.remove()} rows (simulated members and what hangs off them)")
         elif simulation.exists():

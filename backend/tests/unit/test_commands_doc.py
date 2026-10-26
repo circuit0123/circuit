@@ -35,3 +35,10 @@ def test_no_target_still_says_it_is_not_built_for_stage_5():
 def test_there_is_no_cloud_command_in_make_check():
     check_line = re.search(r"^check:.*$", MAKEFILE, flags=re.MULTILINE).group(0)
     assert not any(word in check_line for word in ("deploy", "gcp", "secret", "rollback", "jobs-run"))
+
+
+def test_the_runbook_only_uses_make_targets_that_exist():
+    runbook = (REPO / "RUNBOOK.md").read_text()
+    used = set(re.findall(r"`?make ([a-z][a-z0-9-]*)", runbook))
+    assert used <= TARGETS, f"RUNBOOK.md uses make targets that do not exist: {sorted(used - TARGETS)}"
+    assert "First production deploy on Google Cloud" in runbook and "What it costs per month" in runbook

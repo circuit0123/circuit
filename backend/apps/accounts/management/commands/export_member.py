@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from apps.accounts import export
 from apps.accounts.models import DataExport, Member
+from core.devguard import require_local_database
 from core.storage import LocalStorage, get_storage
 
 
@@ -15,6 +16,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if settings.ENV != "dev":
             raise CommandError("export_member is for local development only. Members request exports in the app.")
+        require_local_database("export_member")
         member = Member.objects.filter(pk=options["member"]).first()
         if member is None:
             raise CommandError(f"No member with id {options['member']}")

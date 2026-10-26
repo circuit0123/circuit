@@ -27,7 +27,7 @@ Backend sessions, each on its own branch, merged via PR before the next:
 - B3e: Stage 4g backend (partner mode: org verification, cohorts, calls, events,
   announcements, partner home)
 - B4: Stage 4c (ML pipeline) — can run in parallel on a second account
-- B5: Stage 5 backend (API, jobs, scheduler on staging + demo)
+- B5: Stage 5 backend: deployment code for Google Cloud (image, deploy scripts, jobs, scheduler, probes, smoke test, runbook). Code only; production is deployed first in a separate session, staging and demo later
 - B6: Stage 8 + 9 backend (monitoring, production env, backups + restore drill,
   backend CI, keyless deploys)
 - B7: Stage 10 + 11 backend (API load test, cleanup, RUNBOOK.md) + FRONTEND_HANDOFF.md
@@ -193,13 +193,27 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Frontend: partner onboarding 8p–11p, Partner home, `New` sheet, Organisation page, call and event cards/pages, application form, review pipeline, RSVP
 - [ ] Seed: one college and one incubator with a cohort, an open call, an upcoming demo day
 
-## Stage 5 — Deploy staging + demo (Sessions A + B together)
-- [ ] Backend image builds on ARM64 + x86_64; deployed to Cloud Run (staging, demo); jobs + scheduler created
-- [ ] Vercel: landing, app-staging, app-demo deployed with §2a variables
-- [ ] Supabase redirect URLs + Google OAuth origins set for staging and demo
-- [ ] `make smoke URL=...`: landing loads, app sign-in page loads, CORS preflight passes, one authed read, one write, test email
-- [ ] `make reset-demo ENV=demo` + nightly reset job
-- [ ] Smoke passes on staging and demo
+## Stage 5 — Deploy (Google Cloud, asia-south1; Sessions A + B together)
+Production is deployed first, behind BETA_MODE. Staging and demo are postponed until before payments or public launch; the
+same code and scripts serve all three (`ENV=staging|demo|production`, `deploy/gcp/<env>.toml`).
+
+Backend code (B5, written and tested; nothing was deployed or created in the cloud):
+- [x] Backend image: multi-stage, non-root, gunicorn on `$PORT`, healthcheck, embedding model baked in; builds on ARM64 + x86_64
+- [x] Deploy config as code: `deploy/gcp/*.toml` + `scripts/gcp.py` create/update the Cloud Run service, one Cloud Run Job per job, the Cloud Scheduler triggers (India time), least-privilege service accounts and Secret Manager bindings; idempotent; prints every gcloud command and asks first
+- [x] Startup checks: refuse DEMO_AUTH in staging/production, live Razorpay keys outside production, a flag on without its dependency, a missing or empty required variable, and the deployed-only requirements (real email, embeddings, LLM key, CSRF origins, TLS Redis); one test per rule
+- [x] `/health` and `/ready` (Redis down = warning); Cloud Run probes use `/health`; logs carry `severity`
+- [x] Migrations run as their own job before a new revision gets traffic, never at container start
+- [x] Jobs: flag off = `skipped: flag off` and exit 0; database lease so overlapping runs do the work once; JSON start/end/skipped lines; every job has a schedule (tested); the frequent jobs share one trigger
+- [x] Supabase pooler settings (transaction mode, no server-side cursors, TLS) documented in PRODUCTION.md
+- [x] `make gcp-setup | deploy | rollback | secret | jobs-run | logs | jobs | smoke`, documented in COMMANDS.md; `make smoke` tested against the local stack
+- [x] RUNBOOK.md "First production deploy on Google Cloud" + monthly cost table
+
+Deployment (next session):
+- [ ] Backend image deployed to Cloud Run (production first); jobs + scheduler created
+- [ ] Vercel: landing, app (production) deployed with §2a variables
+- [ ] Supabase redirect URLs + Google OAuth origins set
+- [ ] `make smoke` passes on production (landing loads, app sign-in page loads, CORS preflight passes, one authed read, one write, test email)
+- [ ] Staging and demo deployed, `make reset-demo ENV=demo` + nightly reset job (code ready: the `reset-demo` job exists for demo only) (postponed until before payments or public launch)
 
 ## Stage 6 — Product basics
 - [x] Account settings: edit profile, notification preferences, privacy, export, delete (backend, B3; screens: PROGRESS.md "Frontend remaining")

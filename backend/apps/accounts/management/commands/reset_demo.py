@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
+from core.devguard import require_local_database
 from core.jobs import JobCommand
 from seed.build import run
 
@@ -11,6 +12,7 @@ class Command(JobCommand):
     def run(self) -> dict:
         if settings.ENV not in ("dev", "demo"):
             raise CommandError(f"reset_demo refuses to run when ENV={settings.ENV}")
+        require_local_database("reset_demo")
         return {"counts": run(settings.SEED_CITY)}
 
     def summary(self, result: dict) -> str:
