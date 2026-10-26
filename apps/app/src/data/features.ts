@@ -8,10 +8,10 @@ export type FeatureName = "pulse" | "daily_drop" | "circuits" | "investor_mode" 
 
 /**
  * Features this build has screens for. A flag can be on at the server for a feature the app
- * doesn't draw yet (circuits, investor and partner mode, promotions, payments); those stay hidden
+ * doesn't draw yet (investor and partner mode, promotions, payments); those stay hidden
  * here so nobody lands on a missing screen. Add a name when its screens ship.
  */
-const BUILT: ReadonlySet<FeatureName> = new Set(["pulse", "daily_drop"]);
+const BUILT: ReadonlySet<FeatureName> = new Set(["pulse", "daily_drop", "circuits"]);
 
 /** GET /api/config (public, cached 60s). The one place the app asks "is this feature on for me?" (DESIGN.md §3). */
 export function useFeatures() {
