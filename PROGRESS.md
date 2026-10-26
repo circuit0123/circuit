@@ -3,6 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
+- Audit fixes, backend (branch `fix-backend`, from `main`): **done, waiting for your OK**. Every BLOCKER and HIGH finding that AUDIT.md gives to the backend is fixed, one commit each (`fix(audit #<id>)`), each with a test. Details in "Audit fixes, backend" below.
 - F6 — profiles, build log composer and post view, Settings (Appearance, privacy, notifications, export, delete, help, legal): **done, waiting for your OK** (branch `frontend-f6`, from `main` after F3–F5; frontend only, mock mode; details in "F6" below)
 - B6 — monitoring, job health, backups, free-tier guards, CI/CD, backend (Stages 8 + 9, backend boxes): **done, waiting for your OK** (branch `backend-b6`; code only, nothing deployed; "Cloud setup I must run later" and the decisions are in "B6" below)
 - B5 — deployment code for Google Cloud, backend (Stage 5, backend boxes): **done, waiting for your OK** (branch `backend-b5`; code only, nothing deployed; staging and demo postponed until before payments or public launch; details in "B5" below)
@@ -25,6 +26,30 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 contin
   - Part 2: jobs and applications (F11), in-app notifications, strict list of event types (`EVENT_TYPES`; an unknown type raises).
   - Part 3: matching (F4). `manage.py compute_matches` (1.3 s for the 300-member seed), `GET /api/matches`, `manage.py eval_matching` with 14 hand-labelled pairs, demo story 1 test.
   - Part 4: warm intros (F5), exchange circuits (F6), partner dashboard (F8), verification badge tests (F7), demo stories 2–5, and `make check` printing `Story n: PASS/FAIL` (marker `@pytest.mark.story(n)` plus a summary hook in `tests/conftest.py`).
+
+## Audit fixes, backend (branch `fix-backend`): done, waiting for your OK
+Scope: AUDIT.md findings for the backend, BLOCKER then HIGH. No `apps/` changes; `packages/api-client` was regenerated.
+
+**Fixed (see AUDIT.md, each marked "fixed in fix-backend")**
+- BL1 `production.toml` was invalid TOML (repeated keys). A new test parses every `deploy/gcp/*.toml`.
+- BL2 `<placeholder>` check: alert channels only block `make monitoring`, never `make deploy`; `[monitoring] notification_channels = []` in production. The "fill these in" error now lists each value with a one-line hint. `make monitoring` with no channels prints its message instead of a traceback.
+- BL3 `BACKUP_AGE_RECIPIENT` sample removed; the `backup-db` job logs `skipped: not configured` and exits 0 while `BACKUP_DATABASE_URL` is empty (it is not mounted as a secret yet).
+- BL4 `LLM_PROVIDER = "none"` in production. BL5 `CSRF_TRUSTED_ORIGINS = "https://*.run.app"`. BL7 CORS = `https://circuit-phi.vercel.app`.
+- BL6 Redis optional: empty `REDIS_URL` = cache off, rate limits count in Postgres, `/ready` says `redis: not_configured`, one `redis_not_configured` warning at start. A set value must still be `rediss://`. `REDIS_URL` moved from the shared secrets to staging/demo; add it to production `secrets` when you create Upstash. (This changes AUDIT's advice "keep Redis required", as you asked.)
+- BL8 backend part: `ruff format`, one mypy error, and the stale B7 tests. CI lint and all backend tests are green. A real bug found on the way: the deploy script took `Circuit <support@...>` for a placeholder, so `make deploy` would have refused to run. Fixed and tested against the file as committed.
+- H1 `APP_URL = https://circuit-phi.vercel.app/app`, `LANDING_URL = https://circuit-phi.vercel.app`; PRODUCTION.md §2a describes the one-project layout.
+- H2 `PUT /api/me/highlights` 500: the event `member.highlights_set` was not in `EVENT_TYPES`.
+- H3 openapi.json, api-client and contract fixtures regenerated; API version 1.2.0; FRONTEND_HANDOFF.md section 3 updated. The frontend session must re-pull `packages/api-client`.
+- H8 the under-18 posts test was updated and passes. Also: profile strength now rounds half up (5 of 8 = 63).
+
+**Not done here (frontend or later)**: BL9 and H4–H7 (frontend). `make check` still stops at the frontend type check until BL9 is done.
+
+**After beta (MEDIUM/LOW, not touched)**
+- M3 committed build output (`apps/landing/out`, `next-env.d.ts`); M4 app build should insist on its public variables; M6 `/unsubscribe` page and help link in the app; M7 hide "paste your bio" when `llm_available` is false (all frontend).
+- M8 remaining doc drift: RUNBOOK step 9 and 19 wording, and the CLAUDE.md data-model list (B7 columns), which needs your OK because it is a CLAUDE.md edit.
+- M9 `/api/health/deps` is public.
+- L1 billing account, admin path and grievance officer details are committed (the file says it is public); L2 `min_instances = 0`; L3 build the landing site after the API is up; L4 nothing has been tried against real Google/Vercel/Supabase accounts yet.
+- Turn backups on (`BACKUP_DATABASE_URL`, `BACKUP_AGE_RECIPIENT`, add to `secrets`) before real data matters.
 
 ## B7 part 2 — load test, cleanup, funnel, RUNBOOK and API freeze, backend (branch `backend-b7-2`): done, waiting for your OK
 Built in the `../circuit-b7` worktree from `origin/main`. Your local `main` has an unpushed commit "hello" (landing build files, screenshots); I left it alone and moved `/home/klk/circuit` from `backend-b7-2` to `main` (same commit, clean tree) so the branch could live in the worktree. Nothing under `apps/` changed; `packages/api-client` was regenerated. No cloud command, no secret, no push to `main`.
