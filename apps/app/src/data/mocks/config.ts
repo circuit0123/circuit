@@ -42,6 +42,18 @@ export function currentScenario(): Scenario {
   return pick;
 }
 
+/**
+ * "Replay onboarding": forgets the fake new member (the store in signup.ts, its saved colour, the cached first-paint colour) and reloads on
+ * the New member scenario, so the next load starts at Welcome. The caller signs out first. Key names are the ones signup.ts and handlers.ts
+ * use; the replay test in signup.spec.ts fails if they drift.
+ */
+export function restartSignup() {
+  try {
+    for (const k of ["circuit.mock.member", "circuit.mock.appearance", "circuit.appearance"]) localStorage.removeItem(k);
+  } catch { /* nothing to forget */ }
+  switchScenario("signup");
+}
+
 /** Switches scenario. A reload gives every hook a clean start, which is what a scenario means. */
 export function switchScenario(id: Scenario) {
   resolved = id;

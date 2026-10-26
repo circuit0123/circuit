@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { SCENARIOS, currentScenario, switchScenario, useAppearance, useFeatures, useMe, usePersonaSignIn, usePersonas, useSession, MOCK, type Scenario, type Theme } from "@/data";
+import { SCENARIOS, currentScenario, restartSignup, switchScenario, useAppearance, useFeatures, useMe, usePersonaSignIn, usePersonas, useSession, MOCK, type Scenario, type Theme } from "@/data";
 import { APP_ENV, SHOW_DEV_TOOLS } from "@/lib/env";
 
 /** What the banner says, per PRODUCTION.md §2: Dev, Demo, Staging, and Beta in production while BETA_MODE is on. Null means no banner. */
@@ -71,7 +71,8 @@ function Tools() {
         </select>
       </label>
       <Link href="/design" className="min-h-6 underline">Design</Link>
-      <Link href="/onboarding" className="min-h-6 underline">Replay onboarding</Link>
+      {/* Only where it can work: the mock keeps its member in the browser. A real server keeps a finished sign-up. */}
+      {MOCK && <button onClick={() => void signOut().then(restartSignup)} className="min-h-6 underline">Replay onboarding</button>}
       <button onClick={() => void signOut()} className="min-h-6 underline">Sign out</button>
     </>
   );

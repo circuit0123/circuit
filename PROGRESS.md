@@ -43,6 +43,7 @@ Built and tested: `/join`, Welcome (matches the reference), email code, consent,
   - **Tests:** 12 more in `signup.spec.ts` (photo, colour with axe on all six accents, ready, ready with no drop, role link, under-18 start to finish, reload on Colour) plus the **timed sign-up: Welcome (Google) to the first drop card in about 3 seconds in mock mode, asserted under 120 s** (the time is attached to the test report). Test helper: font sizes now ignore the dev banner and SVG text, as `premium.spec.ts` does, and the failure message names the element behind each size.
   - **/design** now shows AccentPicker, TextArea, AddChip, the large Chip and both DropCardFace forms.
   - The temporary "Almost there" screen is gone.
+  - **Replay onboarding** (banner, mock mode only): signs out, forgets the fake new member and restarts at Welcome. It used to link to an `/onboarding` page that never existed (404). Outside mock mode the link is hidden: a real server keeps a finished sign-up, and replaying would overwrite a persona's data.
 - **Landing: set NEXT_PUBLIC_JOIN_LIVE=true after the app deploys.**
 - Changed in F1's tests: "beta access missing" now expects the invite screen instead of the old placeholder.
 - Google in mock mode returns straight to `/auth/callback` (the real call now uses `skipBrowserRedirect` and navigates itself; same URL in production).

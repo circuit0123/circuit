@@ -663,6 +663,26 @@ test.describe("onboarding: photo, colour, ready", () => {
     expect(s.onboarding.completed_at).not.toBeNull();
   });
 
+  test("Replay onboarding (the banner) starts again at Welcome with nothing remembered", async ({ page }) => {
+    await toColour(page);
+    await page.getByRole("radio", { name: "Sky" }).click();
+    await expect.poll(() => accentSaved(page)).toBe("sky");
+    await page.getByRole("button", { name: "Skip" }).click();
+    await page.getByRole("button", { name: "See today's drop" }).click();
+    await expect(page.getByRole("region", { name: "Daily Drop" })).toBeVisible();
+    await page.getByRole("button", { name: "Replay onboarding" }).click();
+    await expect(heading(page, "Build with people near you.")).toBeVisible();
+    await expect(page.locator("html")).not.toHaveAttribute("data-accent", /.+/);
+    expect((await serverState(page)).onboarding.completed_at).toBeNull();
+    await signInByEmail(page);
+    await page.getByRole("button", { name: "I agree" }).click(); // consent is asked again too
+    const invite = page.getByLabel("Invite code");
+    await invite.fill("CIRCUIT-0001");
+    await invite.press("Enter");
+    await expect(heading(page, "What should we call you?")).toBeVisible();
+    await expect(page.getByLabel("First name")).toHaveValue("");
+  });
+
   test("under 18: the whole way through keeps the private defaults", async ({ page }) => {
     await toColour(page, { minor: true });
     await page.getByRole("button", { name: "Skip" }).click();
