@@ -16,9 +16,10 @@ timeout = 60  # same as the Cloud Run request timeout; a hung worker is replaced
 graceful_timeout = 8  # Cloud Run sends SIGTERM and kills the container 10 s later
 keepalive = 75  # longer than Google's front end keeps idle connections open
 
-# A worker that restarts every ~1000 requests gives memory back (Pillow, numpy) without anyone noticing.
-max_requests = 1000
-max_requests_jitter = 100
+# A worker that restarts now and then gives memory back (Pillow, numpy). Every restart closes the keep-alive connections it holds, and a
+# client that sends on one at that moment gets a connection error: the load test measured about 1 in 800 requests at 1000. So: rarely.
+max_requests = 10000
+max_requests_jitter = 1000
 
 worker_tmp_dir = "/dev/shm"  # heartbeat files in memory: the container's disk may be read-only or slow
 accesslog = None  # RequestLogMiddleware writes exactly one JSON line per request

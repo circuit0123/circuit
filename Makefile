@@ -18,7 +18,7 @@ endef
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
-	smoke api-client openapi contract-fixtures build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report job-health
+	smoke load-test funnel api-freeze api-client openapi contract-fixtures build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report job-health
 
 help: ## List every command
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  \033[1m%-22s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -207,6 +207,23 @@ check: lint test test-web test-landing ## Everything: lint, tests with demo stor
 smoke: ## Check a running API: make smoke URL=https://api.example.com [ORIGIN=https://app.example.com] [EXPECT_ENV=production]
 	@test -n "$(URL)" || { echo "usage: make smoke URL=https://... [ORIGIN=https://app.example.com] [EXPECT_ENV=production]"; exit 1; }
 	python3 scripts/smoke.py "$(URL)" $(if $(ORIGIN),--origin "$(ORIGIN)") $(if $(EXPECT_ENV),--expect-env $(EXPECT_ENV))
+
+USERS ?= 50,200
+load-test: ## Beta-mix load test at 50 and 200 users, p50/p95/errors vs PRODUCTION.md section 9: make load-test URL=http://localhost:8080 [USERS=50,200] [SECONDS=60] [TOKENS=file]. Refuses to run against production
+	@test -n "$(URL)" || { echo "usage: make load-test URL=http://localhost:8080 [USERS=50,200] [SECONDS=60] [TOKENS=file with one token per line]"; exit 1; }
+	@tokens="$(TOKENS)"; \
+	if [ -z "$$tokens" ]; then \
+	  tokens=$$(mktemp); $(MANAGE) load_test_tokens --count 200 --out $$tokens || exit 1; \
+	fi; \
+	lat=$$(sed -n 's/^SEED_CITY_LAT=\([^ #]*\).*/\1/p' .env); lng=$$(sed -n 's/^SEED_CITY_LNG=\([^ #]*\).*/\1/p' .env); \
+	$(BACKEND) python -m core.loadtest --url "$(URL)" --tokens "$$tokens" --users $(USERS) --seconds $(or $(SECONDS),60) $(if $(RAMP),--ramp $(RAMP)) \
+	  --lat "$${lat:-13.0827}" --lng "$${lng:-80.2707}" $(if $(JSON),--json "$(JSON)")
+
+funnel: ## Sign-up funnel per source (landing click, signed up, beta access, onboarding done, first match action); counts under 5 are hidden: make funnel [DAYS=30]
+	$(MANAGE) funnel $(if $(DAYS),--days $(DAYS))
+
+api-freeze: ## Fail if openapi.json changed without a version bump and a FRONTEND_HANDOFF.md update: make api-freeze [BASE=origin/main]
+	python3 scripts/check_api_freeze.py --base $(or $(BASE),origin/main)
 
 # -- API client ----------------------------------------------------------------------------
 api-client: ## Export openapi.json from Django and regenerate packages/api-client

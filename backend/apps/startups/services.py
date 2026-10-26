@@ -27,6 +27,7 @@ from core import codes
 from core.cache import get_cache
 from core.errors import ApiError, Conflict, Forbidden, NotFound
 from core.schemas import person
+from core.smallcount import count
 
 log = structlog.get_logger("startups")
 
@@ -186,8 +187,7 @@ def _private_counts(member: Member, startup: Startup, team: bool) -> tuple[int |
     views, interested = startup.view_count, StartupInterest.objects.filter(startup=startup).count()
     if team:
         return views, interested
-    low = settings.DASHBOARD_MIN_COUNT
-    return (views if views >= low else None), (interested if interested >= low else None)
+    return count(views)["value"], count(interested)["value"]  # None under the threshold
 
 
 def _founders(member: Member, startup: Startup) -> list[dict]:

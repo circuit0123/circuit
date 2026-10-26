@@ -19,13 +19,9 @@ from apps.jobs.models import Application
 from apps.matching.models import Capability, MatchResult, Need, Offer
 from core.cache import get_cache
 from core.permissions import NETWORK_ROLES
+from core.smallcount import big_enough, count
 
 CACHE_PREFIX = "dash:"
-
-
-def count(n: int) -> dict:
-    """A count that is safe to show: below the threshold only the fact that it is small is returned."""
-    return {"value": n, "hidden": False} if n >= settings.DASHBOARD_MIN_COUNT else {"value": None, "hidden": True}
 
 
 def org_members(org_id: int) -> QuerySet[Member]:
@@ -81,7 +77,7 @@ def _gaps(org_id: int) -> list[dict]:
                 "needed_by": count(n),
                 "offered_by": count(o),
                 "offered_outside": count(x),
-                "is_gap": n >= settings.DASHBOARD_MIN_COUNT and o * 2 < n,
+                "is_gap": big_enough(n) and o * 2 < n,
                 "_sort": n - o,
             }  # fmt: skip
         )
@@ -113,7 +109,7 @@ def _heatmap(org_id: int, capability: str | None) -> dict:
     shown = [
         {"lat": round(r * size, 4), "lng": round(c * size, 4), "count": n}
         for (r, c), n in sorted(cells.items())
-        if n >= settings.DASHBOARD_MIN_COUNT  # small cells are left out entirely, not shown as zero
+        if big_enough(n)  # small cells are left out entirely, not shown as zero
     ]
     return {"cell_degrees": size, "capability": capability, "cells": shown}
 
@@ -160,7 +156,7 @@ def _acceptance(org_id: int) -> dict:
         accepted[kind] += status in (IntroRequest.Status.ACCEPTED, IntroRequest.Status.COMPLETED)
     out = {}
     for kind in ("local", "bridge"):
-        show_rate = asked[kind] >= settings.DASHBOARD_MIN_COUNT and accepted[kind] >= settings.DASHBOARD_MIN_COUNT
+        show_rate = big_enough(asked[kind]) and big_enough(accepted[kind])
         out[kind] = {
             "requested": count(asked[kind]), "accepted": count(accepted[kind]),
             "rate_percent": round(100 * accepted[kind] / asked[kind]) if show_rate else None,

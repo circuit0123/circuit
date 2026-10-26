@@ -258,18 +258,27 @@ Deployment (next session):
 - [ ] Frontend: update `apps/app` mocks to the new types (48 type errors), then switch the hooks in that list
 - [ ] Promoted and partner items in Pulse and Discover (Stage 4d and 4g backends first)
 
+## B7 part 2 — load test, cleanup, funnel, RUNBOOK, freeze (backend session)
+- [x] `make load-test URL=… [USERS=50,200]`: beta mix, p50/p95/error rate against PRODUCTION.md §9, refuses production (and anything it cannot identify); run locally at 50 and 200 users, results in PROGRESS.md
+- [x] Fixes from it: Live wire N+1 (52 → 37 queries), jobs rows built for the page only, Pulse role cards filtered before building, gunicorn worker recycling 10x rarer (it dropped about 1 request in 800); query-count tests on the 12 busiest endpoints
+- [x] Cleanup: one India-time helper (`core/ist.py`), one small-count rule (`core/smallcount.py`), one distance function, unused settings and definitions removed; ruff and mypy clean, no new `noqa` / `type: ignore`
+- [x] Funnel per `signup_source`: `POST /api/join/visit` (aggregate click counter), `make funnel`, Django admin → Metrics
+- [x] RUNBOOK.md completed for launch
+- [x] API frozen at 1.1.0: version line in FRONTEND_HANDOFF.md, `make api-freeze`, CI step that fails when openapi.json changes without a version bump and a handoff change
+- [ ] [YOU] Run the load test on staging; fill in the RUNBOOK contacts and manual-check dates
+
 ## Stage 10 — Quality and performance
 - [ ] Every row in PRODUCTION.md §14 has a passing automated test or a dated manual check in RUNBOOK.md
 - [ ] PWA for apps/app: manifest, icons, offline shell, update prompt, install prompt (incl. iOS)
 - [ ] Lighthouse ≥ 90 mobile (landing, app Home); bundle budget; lazy-load map and charts
-- [ ] Load test staging (~1,000 concurrent users); fix top bottlenecks
-- [ ] Privacy-friendly analytics for the pilot funnel
+- [ ] Load test staging (~1,000 concurrent users); fix top bottlenecks — B7 part 2 built `make load-test` (refuses production), ran it at 50 and 200 users against `make run-prod-local` and fixed what it found (PROGRESS.md "B7 part 2"). Still open: the staging run ([YOU])
+- [x] Privacy-friendly analytics for the pilot funnel — per-source funnel (clicks, signed up, beta access, onboarding done, first match action), counts under 5 hidden, in Django admin → Metrics and `make funnel` (B7 part 2). Frontend must call `POST /api/join/visit` from `/join`
 
 ## Stage 11 — Cleanup (alone, last)
-- [ ] Remove dead code, unused deps, debug code, stray TODOs; consistent patterns
+- [x] Remove dead code, unused deps, debug code, stray TODOs; consistent patterns — backend done in B7 part 2 (no TODOs were left; one India-time helper, one small-count rule, unused settings and definitions removed, `.env.example` tied to the settings by a test). Frontend and unused npm packages are still open
 - [ ] README: setup in under 10 minutes on Mac, Linux (Arch/Omarchy) and WSL, using only COMMANDS.md targets
 - [ ] Every COMMANDS.md target works from a fresh clone; no command missing from it
-- [ ] RUNBOOK.md: deploy, rollback, restore, rotate secrets, outage, data request, takedown
+- [x] RUNBOOK.md: deploy, rollback, restore, rotate secrets, outage, data request, takedown — completed in B7 part 2 ("Running the beta": deploy approval, invite codes, waitlist, flags, takedowns, staging load test, incident checklist, contacts, dated manual checks). The `<…>` placeholders are yours to fill
 - [ ] All tests and smoke green
 
 ## Stage 12 — Go live

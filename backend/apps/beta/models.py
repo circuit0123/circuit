@@ -106,3 +106,17 @@ class AllowlistEntry(models.Model):
 
     def __str__(self) -> str:
         return f"Allowlist #{self.pk}"
+
+
+class JoinVisit(models.Model):
+    """How many times a landing link with this `src` was opened on this day. A count only: no member, address or browser is stored."""
+
+    src = models.CharField(max_length=40, blank=True)
+    day = models.DateField()
+    count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["src", "day"], name="join_visit_src_day_unique")]
+
+    def __str__(self) -> str:
+        return f"{self.src or '(none)'} {self.day}: {self.count}"

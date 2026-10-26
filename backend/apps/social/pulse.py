@@ -8,7 +8,6 @@ Every post goes through the same visibility rule as everywhere else (relations.v
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import cast
-from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.contrib.gis.geos import Point
@@ -20,13 +19,14 @@ from apps.circuits.models import Circuit
 from apps.events.models import Event
 from apps.events.services import record
 from apps.intros.models import IntroRequest
-from apps.jobs.services import list_jobs, skills_in_demand
+from apps.jobs.models import Job
+from apps.jobs.services import job_match, list_jobs, skills_in_demand
 from apps.social import services
 from apps.social.models import Follow
 from apps.social.relations import blocked_ids, connected_ids, org_mate_ids, visible_posts
 from apps.startups.models import Startup
 from apps.startups.services import default_centre, team_member_ids
-from core import flags
+from core import flags, ist
 from core.errors import ApiError
 from core.pagination import decode_cursor, encode_cursor
 
@@ -70,18 +70,15 @@ def role_items(member: Member, since: datetime, upto: datetime, startups: list[S
     At most MAX_ROLES in the whole window, newest first, however far I have scrolled: roles are a nudge, not the feed.
     """
     followed = {s.pk for s in startups}
-    items = []
-    for row in list_jobs(member, {}):
-        if row["created_at"] < window_start:
-            continue
+
+    def wanted(job: Job, skills: dict[int, int] | None) -> bool:
+        dist = getattr(job, "dist", None)
         near_match = (
-            member.role == "student"
-            and (row["skill_match"] or 0) > 0
-            and row["distance_km"] is not None
-            and row["distance_km"] <= settings.STUDENT_MAX_DISTANCE_KM
+            skills is not None and job_match(skills, job) > 0 and dist is not None and dist.km <= settings.STUDENT_MAX_DISTANCE_KM
         )
-        if row["startup_id"] in followed or near_match:
-            items.append(Item(row["created_at"], "role", row["id"], row))
+        return job.startup_id in followed or near_match
+
+    items = [Item(row["created_at"], "role", row["id"], row) for row in list_jobs(member, {"since": window_start}, keep=wanted)]
     items.sort(key=lambda i: i.key, reverse=True)
     return [i for i in items[:MAX_ROLES] if since <= i.at <= upto]
 
@@ -139,14 +136,9 @@ def activity_items(member: Member, since: datetime, upto: datetime) -> list[Item
     return items
 
 
-def ist_day_start(now: datetime) -> datetime:
-    tz = ZoneInfo(settings.DROP_TZ)
-    return now.astimezone(tz).replace(hour=0, minute=0, second=0, microsecond=0)
-
-
 def skills_item(member: Member, since: datetime, upto: datetime, now: datetime) -> list[Item]:
     """At most one 'Skills in demand near you' card, dated the start of today (IST). Role counts, never people counts."""
-    at = ist_day_start(now)
+    at = ist.day_start(now)
     if not (since <= at <= upto):
         return []
     top = skills_in_demand(member, settings.STUDENT_MAX_DISTANCE_KM, since=now - timedelta(days=settings.PULSE_WINDOW_DAYS))

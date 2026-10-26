@@ -82,3 +82,22 @@ def join_waitlist(request, body: WaitlistIn):
     check_rate(ip_key(request), "waitlist")
     services.join_waitlist(**body.dict())
     return Status(202, {"status": "ok"})
+
+
+class VisitIn(Schema):
+    src: str = Field("", max_length=SRC_MAX, pattern=SRC_PATTERN)
+
+
+@router.post(
+    "/join/visit",
+    auth=None,
+    response={204: None},
+    summary="Count a landing link opened",
+    description="Public. The app's /join page calls it once per browser session with the link's `src`, so the funnel can show "
+    "clicks next to sign-ups. Adds 1 to a per-day count for that `src`; nothing about the visitor is stored. "
+    "Answers 204. Rate limited per address.",
+)
+def join_visit(request, body: VisitIn):
+    check_rate(ip_key(request), "join_visit")
+    services.count_visit(body.src)
+    return Status(204, None)

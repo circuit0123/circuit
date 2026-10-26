@@ -32,12 +32,6 @@ def neighbours(member_id: int, max_hops: int = 2) -> dict[int, dict]:
         return {n: {"hops": h, "path": p, "strength": s} for n, h, p, s in cur.fetchall() if n != member_id}
 
 
-def best_path(source: int, target: int, max_hops: int = 2) -> list[int] | None:
-    """Strongest shortest path source -> target (member ids, inclusive), or None."""
-    found = neighbours(source, max_hops).get(target)
-    return found["path"] if found else None
-
-
 def find_cycles(edges: list[tuple[int, int]], length: int = 3) -> list[list[int]]:
     """Directed cycles of exactly `length` nodes, each returned once, starting at its smallest node."""
     g = nx.DiGraph(edges)

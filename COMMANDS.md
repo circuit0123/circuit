@@ -102,6 +102,9 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 | `make fmt` | Auto-format Python with ruff (TypeScript formatting arrives with prettier) |
 | `make check` | lint + backend tests with demo stories PASS/FAIL + frontend type check + landing tests. Must be green before any push |
 | `make smoke URL=https://... ORIGIN=https://app.example.com` | Check a running API from the outside. See section 9 |
+| `make load-test URL=http://localhost:8080 [USERS=50,200] [SECONDS=60] [TOKENS=file] [JSON=out.json]` | Simulates the beta mix (sign-in, Home, Discover, Map, job page and apply, Inbox, send a message) at each user level and prints p50 / p95 / error rate per endpoint against PRODUCTION.md §9 (300 ms cached reads, 800 ms the rest). Without `TOKENS` it makes demo tokens for 200 seeded members (local and demo only; needs `make reset-demo` and `make daily` first). Staging needs a token file (RUNBOOK.md "Run a load test on staging"). **Refuses to run against production** (and against anything it cannot identify). Success: `RESULT: PASS`; `FAIL` names the endpoints over target |
+| `make funnel [DAYS=30]` | Per sign-up source: landing clicks, signed up, beta access, onboarding done, first match action. Counts under 5 show `<5`. No personal data. The same table is in Django admin → Metrics |
+| `make api-freeze [BASE=origin/main]` | Fails if `openapi.json` changed against BASE without a higher `info.version` and a change to `FRONTEND_HANDOFF.md`. CI runs it on every pull request |
 
 ## 7. API client
 | Command | What it does |

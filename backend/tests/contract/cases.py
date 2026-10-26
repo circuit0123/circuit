@@ -261,6 +261,7 @@ CASES: list[Case] = [
             Call("useMe", G, "/api/me"),
             Call("useHome", G, "/api/jobs", status=403),
             Call("useRedeem", P, "/api/beta/redeem", {"code": "NOT-A-CODE"}, status=400),
+            Call("useJoinVisit", P, "/api/join/visit", {"src": "landing-students"}, status=204),
             Call(
                 "useJoinWaitlist",
                 P,

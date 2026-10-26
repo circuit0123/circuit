@@ -3,6 +3,7 @@
 Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 continued on `backend-core` (you chose to keep it). Stage 3b is on its own branch, `stage-3b` (from `backend-core`). Backend only for now.
 
 ## Status
+- B7 part 2 — load test, cleanup, funnel, RUNBOOK and API freeze, backend (branch `backend-b7-2`, from `main` after B7 part 1): **done, waiting for your OK** (details in "B7 part 2" below; one decision for you about the 200-user result)
 - B7 part 1 — API handoff and frontend gaps, backend (branch `backend-b7`, from `main` after F5): **done, waiting for your OK** (every "Frontend → API needed" entry built or explained, FRONTEND_HANDOFF.md, contract tests with fixtures; one thing needs the frontend session first: the app's type check, see "B7 part 1" below)
 - B6 — monitoring, job health, backups, free-tier guards, CI/CD, backend (Stages 8 + 9, backend boxes): **done, waiting for your OK** (branch `backend-b6`; code only, nothing deployed; "Cloud setup I must run later" and the decisions are in "B6" below)
 - B5 — deployment code for Google Cloud, backend (Stage 5, backend boxes): **done, waiting for your OK** (branch `backend-b5`; code only, nothing deployed; staging and demo postponed until before payments or public launch; details in "B5" below)
@@ -25,6 +26,97 @@ Stages 1–2 are merged into `main` (PR #1, from `backend-core`). Stage 3 contin
   - Part 2: jobs and applications (F11), in-app notifications, strict list of event types (`EVENT_TYPES`; an unknown type raises).
   - Part 3: matching (F4). `manage.py compute_matches` (1.3 s for the 300-member seed), `GET /api/matches`, `manage.py eval_matching` with 14 hand-labelled pairs, demo story 1 test.
   - Part 4: warm intros (F5), exchange circuits (F6), partner dashboard (F8), verification badge tests (F7), demo stories 2–5, and `make check` printing `Story n: PASS/FAIL` (marker `@pytest.mark.story(n)` plus a summary hook in `tests/conftest.py`).
+
+## B7 part 2 — load test, cleanup, funnel, RUNBOOK and API freeze, backend (branch `backend-b7-2`): done, waiting for your OK
+Built in the `../circuit-b7` worktree from `origin/main`. Your local `main` has an unpushed commit "hello" (landing build files, screenshots); I left it alone and moved `/home/klk/circuit` from `backend-b7-2` to `main` (same commit, clean tree) so the branch could live in the worktree. Nothing under `apps/` changed; `packages/api-client` was regenerated. No cloud command, no secret, no push to `main`.
+
+**Checks.** ruff, ruff format and mypy clean; no new `noqa` or `type: ignore`. Backend tests: **3,119 passed, 0 failed** (3,086 before), Stories 1–5 PASS. ESLint clean. Landing tests: 361 passed. **`pnpm typecheck` in `apps/app` is still red with the same 48 errors as at the end of B7 part 1** (the app's typed mocks; you told me not to touch `apps/`), so `make check` as a whole stops at that step until the frontend session fixes them. Everything else it runs is green.
+
+### 1. Load test (`make load-test`)
+`make load-test URL=http://localhost:8080 [USERS=50,200] [SECONDS=60] [RAMP=10] [TOKENS=file] [JSON=out.json]` (script `backend/core/loadtest.py`, httpx + asyncio, nothing new installed). Each simulated user signs in, then loops through Home (Drop, Live wire, Pulse), Discover (matches, jobs, nearby, search), Map, a job page and Apply (students), Inbox, and a message (a member with no chats starts one first). It prints p50 / p95 / error rate per endpoint against PRODUCTION.md §9 and exits non-zero on a miss. **It reads `/api/config` first and refuses (exit 2) if the target says `production` or cannot be identified**; unit tests cover both. Locally it mints demo tokens for 200 seeded members (`load_test_tokens`, dev and demo only); for staging you pass real tokens (RUNBOOK.md "Run a load test on staging").
+
+**How I ran it.** `make run-prod-local` (the production image: gunicorn, 2 workers x 4 threads = 8 requests at once, like one Cloud Run instance) on this laptop; Postgres, Redis and the load generator on the same machine; the 300-member demo seed with matches and drops computed. 60 s per level (90 s for the 50-user "after" run), users arrive over 10 s, 0.5–2 s between steps. "Before" = the image at the start of the session (45 s, everyone arriving at once, no ramp); "after" = the final image.
+
+**50 concurrent users**
+
+| Endpoint | Target p95 | Before p50 / p95 | After p50 / p95 | After |
+|---|---|---|---|---|
+| `GET /api/config` | 300 ms | 83 / 114 ms | 6 / 42 ms | PASS |
+| `GET /api/conversations` | 800 ms | 195 / 589 ms | 19 / 80 ms | PASS |
+| `GET /api/conversations/unread-count` | 800 ms | 193 / 573 ms | 21 / 93 ms | PASS |
+| `GET /api/drop/today` | 800 ms | 380 / 929 ms | 34 / 110 ms | PASS |
+| `GET /api/jobs` | 800 ms | 432 / 1010 ms | 50 / 169 ms | PASS |
+| `GET /api/jobs/{id}` | 800 ms | 36 / 552 ms | 20 / 78 ms | PASS |
+| `GET /api/livewire` | 800 ms | 630 / 1569 ms | 98 / 216 ms | PASS |
+| `GET /api/matches` | 300 ms | 395 / 939 ms | 31 / 106 ms | PASS |
+| `GET /api/me` | 800 ms | 90 / 159 ms | 10 / 32 ms | PASS |
+| `GET /api/pulse` | 800 ms | 628 / 1653 ms | 114 / 260 ms | PASS |
+| `GET /api/search` | 800 ms | 388 / 721 ms | 42 / 113 ms | PASS |
+| `GET /api/startups/map` | 800 ms | 118 / 654 ms | 37 / 127 ms | PASS |
+| `GET /api/startups/nearby` | 800 ms | 389 / 806 ms | 33 / 93 ms | PASS |
+| `POST /api/conversations` | 800 ms | 342 / 813 ms | 23 / 118 ms | PASS |
+| `POST /api/conversations/{id}/messages` | 800 ms | 292 / 886 ms | 26 / 108 ms | PASS |
+| `POST /api/jobs/{id}/apply` | 800 ms | 43 / 559 ms | 18 / 73 ms | PASS |
+
+After: 7,241 requests (80 per second), **no errors, every endpoint inside its target.**
+
+**200 concurrent users.** One container is full here: it answers about 130 requests per second whatever the number of users, so latency is time waiting in line (the median is almost the same for every endpoint).
+
+| Endpoint | Target p95 | Before p50 / p95 | After p50 / p95 | After |
+|---|---|---|---|---|
+| `GET /api/config` | 300 ms | 449 / 983 ms | 189 / 883 ms | FAIL |
+| `GET /api/conversations` | 800 ms | 922 / 1898 ms | 882 / 1302 ms | FAIL |
+| `GET /api/conversations/unread-count` | 800 ms | 975 / 2988 ms | 885 / 1300 ms | FAIL |
+| `GET /api/drop/today` | 800 ms | 1979 / 4294 ms | 893 / 1346 ms | FAIL |
+| `GET /api/jobs` | 800 ms | 2550 / 4199 ms | 1002 / 1398 ms | FAIL |
+| `GET /api/jobs/{id}` | 800 ms | 756 / 2413 ms | 884 / 1330 ms | FAIL |
+| `GET /api/livewire` | 800 ms | 2585 / 4528 ms | 995 / 1481 ms | FAIL |
+| `GET /api/matches` | 300 ms | 2497 / 4318 ms | 958 / 1405 ms | FAIL |
+| `GET /api/me` | 800 ms | 3520 / 6735 ms | 306 / 1115 ms | FAIL |
+| `GET /api/pulse` | 800 ms | 2849 / 4518 ms | 1045 / 1504 ms | FAIL |
+| `GET /api/search` | 800 ms | 2294 / 4019 ms | 961 / 1414 ms | FAIL |
+| `GET /api/startups/map` | 800 ms | 1094 / 3101 ms | 921 / 1404 ms | FAIL |
+| `GET /api/startups/nearby` | 800 ms | 2459 / 4075 ms | 963 / 1377 ms | FAIL |
+| `POST /api/conversations` | 800 ms | 997 / 3594 ms | 857 / 1418 ms | FAIL |
+| `POST /api/conversations/{id}/messages` | 800 ms | 963 / 3758 ms | 932 / 1393 ms | FAIL |
+| `POST /api/jobs/{id}/apply` | 800 ms | 896 / 1168 ms | 895 / 1382 ms | FAIL |
+
+After: 7,856 requests (131 per second), **0 errors** (before: 4 connection errors in 4,000 requests). Every endpoint is over its p95 target **on one container**. The beta mix at 200 users asks for about 160 requests per second, more than one container answers. Production runs up to `max_instances = 3` with `cpu = "1"` each (`deploy/gcp/app.toml`), which is less CPU per container than this laptop gave the test, so I cannot promise from here that 200 users fit. **The staging run answers that** (see your to-do list). If it fails there, the levers are `max_instances`, `cpu` and `concurrency` in `app.toml` (I was told to stay out of `deploy/`), then `min_instances`.
+
+### 2. What the load test and the query counts found (all fixed, each with a test)
+- **Live wire asked the database about every person separately** (mutual connections): 52 queries, now 37, and the same however many cards. `social/relations.mutual_counts`.
+- **The jobs list built the full row for every open job (up to 500) and then threw away all but one page.** It still scores and orders all of them, but builds rows only for the page (`jobs/services.list_jobs_page`). **Pulse and Live wire did the same to find a handful of role cards**: they now drop the jobs that don't qualify, and only look inside the window, before building rows. Search uses the page version too. Together these were the biggest cost (Pulse: 628 to 114 ms median at 50 users).
+- **gunicorn recycled each worker every ~1,000 requests, and each recycle reset the keep-alive connections it held**: about 1 request in 800 failed with a connection error. Now every ~10,000 (`circuit/gunicorn.py`).
+- New `tests/api/test_query_counts.py`: 12 busy endpoints stay inside a query budget (measured: me 5, matches 10, jobs 7, Pulse 28, Live wire 37, Drop 15, conversations 4, search 10, map 5, nearby 5, notifications 4, unread count 7), and matches, jobs and Pulse cost the same number of queries for a page of 3 and a page of 20.
+- Not changed, on purpose: `matches` writes one ranker snapshot per request (8 ms; it is the training data). I found no missing index (every endpoint is 4–37 queries on the seed). The seed is small (66 jobs): once there is real volume, re-run the load test and `EXPLAIN` the Jobs and Pulse queries (PRODUCTION.md §14 row 5).
+
+### 3. Cleanup
+`core/ist.py` replaces six copies of the India-time arithmetic (`DROP_TZ` and `NOTIFICATION_TZ` became one setting, `APP_TZ`); `core/smallcount.py` is the one "hide counts under 5" rule (startup page, partner dashboard and funnel use it); Live wire uses the matching code's distance function; unused `PULSE_PAGE_SIZE`, `Unauthenticated`, `ErrorResponse` / `ErrorBody` and `graph.best_path` are gone (found by a name sweep; there was no TODO or FIXME left). `tests/unit/test_env_example.py` fails if `.env.example` and the settings drift apart in either direction (the five variables the container reads straight from the environment are listed in the test).
+
+### 4. Funnel
+Landing click, signed up, beta access, onboarding done, first match action, per `src`. Django admin → **Metrics** (`/<ADMIN_PATH>/metrics/`; superusers with 2FA; all time, 30 or 7 days) and `make funnel [DAYS=30]`. Counts under 5 show `<5`; real members only (not simulated, not deleted); no names, emails or ids. Steps after "clicks" count members who signed up in the window, so they read as a funnel. "First match action" = the first of `intro.requested`, `drop.swiped`, `connection.requested`. **Clicks needed a new public call, `POST /api/join/visit {src}`** (204; adds 1 to a per-day count in the new `JoinVisit` table, which holds only src, day and count; 120 an hour per address). It is in FRONTEND_HANDOFF.md ("access"), with a contract case and fixture.
+
+### 5. RUNBOOK.md
+New "Running the beta": approve a production deploy, revoke an invite code, approve the waitlist, switch a flag, take down a post / profile / startup, run a load test on staging, incident checklist, who to contact, and the PRODUCTION.md §14 manual checks with a date column. Existing sections unchanged. Placeholders in `<…>` are for you.
+
+### 6. API freeze
+The API is **1.1.0**, not 1.0.0: B7 part 1 had already published 1.0.0, and adding `POST /api/join/visit` is a new endpoint, so the freeze check would fail this very pull request otherwise. FRONTEND_HANDOFF.md starts with `**API version:** 1.1.0` and a test ties it to `openapi.json`. `make api-freeze [BASE=origin/main]` (`scripts/check_api_freeze.py`, standard library only) fails when `packages/api-client/openapi.json` differs from BASE beyond `info.version` unless the version is higher **and** FRONTEND_HANDOFF.md changed too. CI runs it in the `lint` job against the pull request's base commit. `packages/api-client` was regenerated.
+
+### Decisions and things to know (B7 part 2)
+1. **The 200-user numbers fail on one container**, as above. Your call after the staging run: more instances or CPU in `app.toml`, or accept slower pages at peak.
+2. **API version 1.1.0**, not 1.0.0 (section 6).
+3. **`make load-test` without `TOKENS` mints local demo tokens**, so staging needs a token file; browser tokens last an hour.
+4. Running the load test locally leaves a few hundred conversation requests and applications in your dev database (`make reset-demo` clears them).
+5. `max_requests` of 10,000 means a leaking dependency is recycled later; Cloud Run caps memory at 1 GiB anyway, and the Sentry triage in RUNBOOK.md covers out-of-memory.
+
+### Frontend remaining (from B7 part 2)
+- Call `POST /api/join/visit {src}` once per browser session when `/join` opens with a `src` (fire and forget): add `useJoinVisit` in `apps/app/src/data`.
+- Fix the 48 type errors in the app's mocks, then switch the hooks from mocks (the list under "B7 part 1").
+
+### My to-do list (you)
+- **Run the load test on staging**: RUNBOOK.md "Run a load test on staging" (10–20 real test accounts, then `make load-test URL=… TOKENS=…`); decide `max_instances` / `cpu` from the result.
+- Fill in the `<…>` contacts and the manual-check dates in RUNBOOK.md ("Who to contact", "Manual checks").
+- Review and merge the pull request; have the frontend fix the mock types and add `useJoinVisit`.
 
 ## B7 part 1 — API handoff and frontend gaps, backend (branch `backend-b7`, from `main` after F5): done, waiting for your OK
 Built in a separate git worktree (`../circuit-b7`) so the frontend session's folder was never touched. Nothing under `apps/` changed; `packages/api-client` was only regenerated (`make api-client`). No cloud command was run, nothing was pushed to `main`.

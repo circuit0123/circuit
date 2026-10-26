@@ -5,7 +5,6 @@ ask for intros, and under-18s cannot send them.
 """
 
 from datetime import date, datetime, time, timedelta
-from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.db import transaction
@@ -21,6 +20,7 @@ from apps.social import media, services
 from apps.social.models import DailyDrop
 from apps.social.relations import SOCIAL_ROLES, blocked_ids, connected_ids, visible_posts
 from apps.social.schemas import author
+from core import ist
 from core.errors import ApiError, NotFound
 from core.graph import neighbours
 
@@ -30,11 +30,11 @@ OUTCOMES = ("intro", "skip")
 
 def drop_day(now: datetime) -> date:
     """The drop 'day' starts at 08:00 IST, so before 08:00 you still see yesterday's finished drop."""
-    return (now.astimezone(ZoneInfo(settings.DROP_TZ)) - timedelta(hours=DROP_HOUR)).date()
+    return ist.day(now - timedelta(hours=DROP_HOUR))
 
 
 def next_drop_at(now: datetime) -> datetime:
-    return datetime.combine(drop_day(now) + timedelta(days=1), time(DROP_HOUR), tzinfo=ZoneInfo(settings.DROP_TZ))
+    return datetime.combine(drop_day(now) + timedelta(days=1), time(DROP_HOUR), tzinfo=ist.tz())
 
 
 def build_for(member: Member, day: date) -> bool:
