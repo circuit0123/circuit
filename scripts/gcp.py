@@ -220,19 +220,37 @@ def job_intervals(cfg: Cfg) -> dict[str, int]:
     return dict(sorted(out.items()))
 
 
-def find_placeholders(cfg: Cfg) -> list[str]:
-    """Every <angle bracket> value still waiting for you, so a half-filled file never reaches gcloud."""
-    found = []
+PLACEHOLDER_HINTS = {
+    "project.id": "your Google Cloud project ID (lowercase, with dashes), from the Cloud Console project picker",
+    "project.billing_account": "Cloud Console > Billing: the ID like 012345-ABCDEF-678901",
+    "env.APP_URL": "the address of the app on Vercel, e.g. https://<project>.vercel.app/app",
+    "env.LANDING_URL": "the address of the landing site on Vercel, no path",
+    "env.CORS_ALLOWED_ORIGINS": "the app's exact origin (https://host, no path, no slash)",
+    "env.SUPABASE_URL": "Supabase > Project Settings > API > Project URL",
+    "env.ADMIN_PATH": 'a secret-looking path: python3 -c "import secrets; print(secrets.token_urlsafe(12))"',
+    "env.EMAIL_FROM": "a sender on a domain you verified in Resend, e.g. Circuit <hello@yourdomain>",
+    "env.SUPPORT_EMAIL": "the address members can write to",
+    "env.GRIEVANCE_OFFICER_NAME": "the person named as grievance officer (DPDP Act)",
+    "env.GRIEVANCE_ADDRESS": "that person's postal address",
+    "monitoring.notification_channels": "the display name of a Cloud Monitoring notification channel (only needed for `make monitoring`)",
+}
+
+
+def find_placeholders(cfg: Cfg, command: str = "deploy") -> list[str]:
+    """Every <angle bracket> value still waiting for you, one line each with a hint, so a half-filled file never reaches gcloud.
+    Alert channels only matter to the `monitoring` command, so they never block a deploy."""
+    found: list[tuple[str, str]] = []
     for label, value in [("project.id", cfg.project), ("project.billing_account", cfg.billing_account)]:
         if PLACEHOLDER.search(value):
-            found.append(f"{label} = {value}")
+            found.append((label, value))
     for key, value in sorted(cfg.env_vars.items()):
         if PLACEHOLDER.search(value):
-            found.append(f"env.{key} = {value}")
-    for channel in cfg.monitoring.get("notification_channels", []):
-        if PLACEHOLDER.search(channel):
-            found.append(f"monitoring.notification_channels = {channel}")
-    return found
+            found.append((f"env.{key}", value))
+    if command == "monitoring":
+        for channel in cfg.monitoring.get("notification_channels", []):
+            if PLACEHOLDER.search(channel):
+                found.append(("monitoring.notification_channels", channel))
+    return [f"{label} = {value}   <- {PLACEHOLDER_HINTS.get(label, 'a value only you know')}" for label, value in found]
 
 
 # ---- plans ----------------------------------------------------------------------------------------------------------------
@@ -1232,7 +1250,7 @@ def main(
         if args.command == "image":  # prints one line, for the workflow: the image name for the commit that is checked out
             out(cfg.image(git_tag(run, allow_dirty=args.allow_dirty)))
             return 0
-        left = find_placeholders(cfg)
+        left = find_placeholders(cfg, args.command)
         if left and not args.dry_run:
             raise DeployError(
                 f"deploy/gcp/{args.env}.toml still has values for you to fill in:\n  "

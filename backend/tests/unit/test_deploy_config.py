@@ -537,3 +537,27 @@ def test_every_committed_deploy_file_is_valid_toml_with_no_repeated_keys():
 
     for path in sorted((REPO / "deploy" / "gcp").glob("*.toml")):
         tomllib.loads(path.read_text())  # a key written twice in one table raises here
+
+
+def test_alert_channels_never_block_a_deploy_but_do_block_make_monitoring(prod):
+    prod.monitoring["notification_channels"] = ["<Circuit production on-call email>"]
+    assert gcp.find_placeholders(prod, "deploy") == []
+    (line,) = gcp.find_placeholders(prod, "monitoring")
+    assert "notification_channels" in line and "Cloud Monitoring" in line
+
+
+def test_the_placeholder_error_lists_each_missing_value_with_a_hint(prod):
+    prod.env_vars["CORS_ALLOWED_ORIGINS"] = "<the app origin>"
+    prod.env_vars["SUPABASE_URL"] = "<https://xxxx.supabase.co>"
+    prod.env_vars["SOMETHING_NEW"] = "<?>"
+    lines = gcp.find_placeholders(prod)
+    assert len(lines) == 3
+    assert any("CORS_ALLOWED_ORIGINS" in x and "exact origin" in x for x in lines)
+    assert any("SUPABASE_URL" in x and "Project URL" in x for x in lines)
+    assert any("SOMETHING_NEW" in x and "only you know" in x for x in lines)
+
+
+def test_make_monitoring_with_no_channels_stops_with_a_clear_message(prod):
+    prod.monitoring["notification_channels"] = []
+    with pytest.raises(Exception, match="No notification channels"):
+        gcp.plan_monitoring(prod, "123456789")

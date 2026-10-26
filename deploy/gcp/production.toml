@@ -39,8 +39,9 @@ TRUSTED_PROXY_HOPS = "1"                 # Cloud Run's front end is one hop
 FEATURES = "pulse:everyone,daily_drop:everyone,circuits:testers"   # PRODUCTION.md §2b, beta start
 POLICY_VERSION = "2026-01"        # the PUBLIC key of your backup key pair (`age-keygen -o backup.key` prints it). Keep backup.key itself offline. The bucket is created by `make gcp-setup`
 
-# Alerts go to these Cloud Monitoring notification channels, by display name. You create them once in the Cloud Console
-# (Monitoring > Alerting > Edit notification channels): an email one, and an SMS or Cloud Console mobile-app one so it reaches your phone.
-# `make monitoring ENV=production` stops with a clear message if a name here does not exist. infra/monitoring/README.md.
+# Alerts go to these Cloud Monitoring notification channels, by display name. Empty is fine for the first weeks: only
+# `make monitoring ENV=production` needs them, and it stops with a clear message while the list is empty. To switch alerts on, create an email
+# channel and an SMS or Cloud Console mobile-app channel (Monitoring > Alerting > Edit notification channels) and list their names here.
+# infra/monitoring/README.md.
 [monitoring]
-notification_channels = ["<Circuit production on-call email>", "<Circuit production on-call phone>"]
+notification_channels = []
