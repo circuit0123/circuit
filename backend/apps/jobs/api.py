@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from ninja import Query, Router, Schema, Status
@@ -11,6 +11,7 @@ from apps.matching.models import MemberSkill
 from core.auth import current_member
 from core.pagination import Page, PageParams, paginate
 from core.permissions import require_role
+from core.schemas import PersonOut
 
 router = Router()
 Kind = Literal["internship", "full_time", "part_time"]
@@ -36,6 +37,12 @@ class JobOut(Schema):
     startup_id: int
     startup_name: str
     sector: str
+    startup_verified: bool  # claimed with a company email; members under 18 only ever see roles from verified startups
+    startup_logo: str | None
+    duration_weeks: int | None
+    starts_on: date | None
+    contact: PersonOut | None  # the founder who claimed the startup: who "We'll tell you when X replies" means
+    is_team: bool  # I am on this startup's team: show "See applicants" instead of "Apply"
     lat: float | None
     lng: float | None
     distance_km: float | None
@@ -57,6 +64,8 @@ class JobIn(Schema):
     stipend_min: int | None = Field(None, ge=0, le=10_000_000)
     stipend_max: int | None = Field(None, ge=0, le=10_000_000)
     location: str = Field("", max_length=200)
+    duration_weeks: int | None = Field(None, ge=1, le=520)
+    starts_on: date | None = None
     capabilities: list[JobCapabilityIn] = Field(min_length=1, max_length=services.MAX_JOB_CAPABILITIES)
 
 
@@ -67,6 +76,8 @@ class JobPatch(Schema):
     stipend_min: int | None = Field(None, ge=0, le=10_000_000)
     stipend_max: int | None = Field(None, ge=0, le=10_000_000)
     location: str | None = Field(None, max_length=200)
+    duration_weeks: int | None = Field(None, ge=1, le=520)
+    starts_on: date | None = None
     is_open: bool | None = None
     capabilities: list[JobCapabilityIn] | None = Field(None, min_length=1, max_length=services.MAX_JOB_CAPABILITIES)
 
@@ -87,8 +98,28 @@ class JobFilters(PageParams):
     "Students get skill_match (0 to 1) and the best match first; everyone else gets newest first.",
 )
 def list_jobs(request, params: JobFilters = Query(...)):
-    rows = services.list_jobs(current_member(request), params.dict(exclude={"limit", "offset"}))
-    return paginate(rows, params)
+    return services.list_jobs_page(current_member(request), params.dict(exclude={"limit", "offset"}), params.offset, params.limit)
+
+
+class SkillDemandOut(Schema):
+    slug: str
+    name: str
+    open_roles: int
+
+
+class SkillsParams(Schema):
+    within_km: float = Field(10, gt=0, le=100)
+
+
+@router.get(
+    "/jobs/skills-in-demand",
+    response=list[SkillDemandOut],
+    summary="Skills in demand near me",
+    description="The top 3 capabilities asked for by open roles within `within_km` (default 10) of my location or the city centre. "
+    "Role counts only, never people. Members under 18 count only verified startups' roles.",
+)
+def skills_in_demand(request, params: SkillsParams = Query(...)):
+    return services.skills_in_demand(current_member(request), params.within_km)
 
 
 @router.get(
@@ -144,7 +175,8 @@ class ApplicationOut(Schema):
 
 
 class ApplicantSkill(Schema):
-    capability: str
+    capability: str  # the capability's slug
+    name: str  # the same capability's display name
     level: int
     proof_url: str
 
@@ -220,16 +252,23 @@ def applicants(request, job_id: int, params: PageParams = Query(...)):
     member = current_member(request)
     require_role(member, Role.FOUNDER)
     _, qs = services.applicants(member, job_id)
-
-    def row(a: Application) -> dict:
-        skills = MemberSkill.objects.filter(member_id=a.student_id).select_related("capability").order_by("-level", "id")
-        return {
+    page = paginate(qs, params)
+    by_student: dict[int, list[MemberSkill]] = {}
+    ids = [a.student_id for a in page["items"]]
+    for s in MemberSkill.objects.filter(member_id__in=ids).select_related("capability").order_by("-level", "id"):
+        by_student.setdefault(s.member_id, []).append(s)  # one query for the whole page, not one per applicant
+    page["items"] = [
+        {
             "application_id": a.pk, "student_id": a.student_id, "display_name": a.student.display_name, "status": a.status,
             "skill_match": a.skill_match, "applied_at": a.created_at,
-            "skills": [{"capability": s.capability.slug, "level": s.level, "proof_url": s.proof_url} for s in skills],
-        }  # fmt: skip
-
-    return paginate(qs, params, row)
+            "skills": [
+                {"capability": s.capability.slug, "name": s.capability.name, "level": s.level, "proof_url": s.proof_url}
+                for s in by_student.get(a.student_id, [])
+            ],
+        }
+        for a in page["items"]
+    ]  # fmt: skip
+    return page
 
 
 @router.patch(

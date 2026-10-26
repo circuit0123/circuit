@@ -1,4 +1,6 @@
-from ninja import Router, Schema, Status
+from typing import Literal
+
+from ninja import Field, Router, Schema, Status
 
 from apps.accounts.models import Member
 from apps.organisations import services
@@ -35,6 +37,32 @@ class OrgMemberOut(Schema):
 def _org_out(org: Organisation, member: Member) -> dict:
     is_admin = member.role == "partner_admin" and member.organisation_id == org.pk
     return {"id": org.pk, "name": org.name, "kind": org.kind, "city": org.city, "join_code": org.join_code if is_admin else None}
+
+
+class OrgFoundOut(Schema):
+    id: int
+    name: str
+    kind: str
+    city: str
+
+
+class OrgSearchParams(Schema):
+    q: str = Field(min_length=2, max_length=100)
+    kind: Literal["college", "incubator", "program"] | None = None
+
+
+@router.get(
+    "/search",
+    response=list[OrgFoundOut],
+    summary="Find an organisation by name",
+    description="For 'Where do you study?': up to 10 organisations whose name contains the text (at least 2 characters), best first. "
+    "Never returns join codes or email domains. Picking one only fills in the college name; joining still needs the "
+    "organisation's invite code or a verified email on its domain.",
+)
+def search(request, params: OrgSearchParams = Query(...)):
+    member = current_member(request)
+    check_rate(member.pk, "org_search")
+    return services.search(params.q, params.kind)
 
 
 @router.get("/mine", response=OrgOut, summary="My organisation", description="The organisation I belong to. 404 if none.")

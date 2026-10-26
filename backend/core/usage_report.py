@@ -13,7 +13,6 @@ A reading that cannot be taken (no storage schema on a laptop, Redis down) is sh
 """
 
 from dataclasses import dataclass
-from zoneinfo import ZoneInfo
 
 import structlog
 from django.conf import settings
@@ -23,7 +22,7 @@ from django.db.models.functions import TruncDate
 from django.utils import timezone
 
 from core import email as email_module
-from core import usage
+from core import ist, usage
 from core.models import OutboundEmail
 
 log = structlog.get_logger("usage")
@@ -94,7 +93,7 @@ def emails() -> list[Reading]:
     used = email_module.usage()
     busiest = (
         OutboundEmail.objects.filter(status=OutboundEmail.Status.SENT, sent_at__gte=email_module.period_starts(timezone.now())[1])
-        .annotate(d=TruncDate("sent_at", tzinfo=ZoneInfo(settings.NOTIFICATION_TZ)))
+        .annotate(d=TruncDate("sent_at", tzinfo=ist.tz()))
         .values("d")
         .annotate(n=Count("pk"))
         .order_by("-n")

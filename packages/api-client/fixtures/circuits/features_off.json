@@ -1,0 +1,22 @@
+{
+  "calls": [
+    {
+      "hook": "useCircuits",
+      "request": {
+        "method": "GET",
+        "path": "/api/circuits"
+      },
+      "response": {
+        "error": {
+          "code": "feature_off",
+          "details": null,
+          "message": "This feature is not available"
+        }
+      },
+      "status": 404
+    }
+  ],
+  "persona": "asha",
+  "scenario": "features_off",
+  "screen": "circuits"
+}

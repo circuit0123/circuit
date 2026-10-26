@@ -18,6 +18,7 @@ PUBLIC = {
     ("GET", "/api/demo/personas"),
     ("POST", "/api/demo/token"),
     ("POST", "/api/waitlist"),
+    ("POST", "/api/join/visit"),
     ("GET", "/api/support/contact"),
     ("GET", "/api/unsubscribe"),
     ("POST", "/api/unsubscribe"),
@@ -156,6 +157,19 @@ MATRIX = {
     ("GET", "/api/me/blocks"): by_role(200),
     ("POST", "/api/members/{member_id}/block"): by_role(404),
     ("DELETE", "/api/members/{member_id}/block"): by_role(404),
+    # B7 part 1: gaps the screens reported
+    ("PUT", "/api/me/photo"): by_role(404),  # upload 999999 is nobody's
+    ("DELETE", "/api/me/photo"): by_role(200),
+    ("PUT", "/api/me/highlights"): by_role(200),  # an empty list clears them
+    ("PUT", "/api/startups/{startup_id}/logo"): by_role(404),
+    ("DELETE", "/api/startups/{startup_id}/logo"): by_role(404),
+    ("GET", "/api/cities"): by_role(200),
+    ("GET", "/api/organisations/search"): by_role(200),
+    ("GET", "/api/conversations/unread-count"): messaging(200),
+    ("POST", "/api/conversations/{conversation_id}/decline"): messaging(404),
+    ("GET", "/api/intros/capacity"): by_role(200),  # admins get allowed: false
+    ("GET", "/api/jobs/skills-in-demand"): by_role(200),
+    ("GET", "/api/search"): by_role(200),
 }
 
 # Request bodies and query strings for routes that need them (default POST body is {"code": "X"}).
@@ -196,10 +210,15 @@ BODIES = {
     ("POST", "/api/me/consent"): '{"policy_version": "2026-01"}',
     ("POST", "/api/me/deletion"): '{"confirm": "DELETE"}',
     ("POST", "/api/support"): '{"kind": "question", "message": "Hello, a question"}',
+    ("PUT", "/api/me/photo"): '{"upload_id": 999999}',
+    ("PUT", "/api/me/highlights"): '{"items": []}',
+    ("PUT", "/api/startups/{startup_id}/logo"): '{"upload_id": 999999}',
 }
 QUERIES = {
     ("GET", "/api/startups/map"): "?min_lng=80&min_lat=13&max_lng=80.5&max_lat=13.5",
     ("GET", "/api/me/export/download"): "?token=x",
+    ("GET", "/api/organisations/search"): "?q=ab",
+    ("GET", "/api/search"): "?q=ab",
 }
 
 

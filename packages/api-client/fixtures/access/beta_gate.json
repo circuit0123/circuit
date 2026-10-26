@@ -1,0 +1,132 @@
+{
+  "calls": [
+    {
+      "hook": "useFeatures",
+      "request": {
+        "method": "GET",
+        "path": "/api/config"
+      },
+      "response": {
+        "beta_access": false,
+        "beta_mode": true,
+        "env": "dev",
+        "features": {
+          "circuits": true,
+          "daily_drop": true,
+          "investor_mode": true,
+          "partner_mode": true,
+          "payments": true,
+          "promotions": true,
+          "pulse": true
+        },
+        "llm_available": true
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMe",
+      "request": {
+        "method": "GET",
+        "path": "/api/me"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": false,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "",
+        "college": "",
+        "display_name": "",
+        "has_needs_and_offers": false,
+        "id": 301,
+        "is_minor": false,
+        "lat": null,
+        "lng": null,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": null,
+        "photo": null,
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": false
+      },
+      "status": 200
+    },
+    {
+      "hook": "useHome",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs"
+      },
+      "response": {
+        "error": {
+          "code": "beta_required",
+          "details": null,
+          "message": "Circuit is invite-only for now. Enter an invite code or join the waitlist."
+        }
+      },
+      "status": 403
+    },
+    {
+      "hook": "useRedeem",
+      "request": {
+        "body": {
+          "code": "NOT-A-CODE"
+        },
+        "method": "POST",
+        "path": "/api/beta/redeem"
+      },
+      "response": {
+        "error": {
+          "code": "invalid_code",
+          "details": null,
+          "message": "That code doesn't work. Check it and try again."
+        }
+      },
+      "status": 400
+    },
+    {
+      "hook": "useJoinVisit",
+      "request": {
+        "body": {
+          "src": "landing-students"
+        },
+        "method": "POST",
+        "path": "/api/join/visit"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useJoinWaitlist",
+      "request": {
+        "body": {
+          "city": "Chennai",
+          "college": "SVIT",
+          "email": "meera@example.org",
+          "note": "",
+          "role": "student",
+          "src": "landing-students"
+        },
+        "method": "POST",
+        "path": "/api/waitlist"
+      },
+      "response": {
+        "status": "ok"
+      },
+      "status": 202
+    }
+  ],
+  "persona": "custom",
+  "scenario": "beta_gate",
+  "screen": "access"
+}

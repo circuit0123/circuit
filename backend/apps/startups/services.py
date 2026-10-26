@@ -21,10 +21,13 @@ from apps.jobs.models import Job, JobCapability
 from apps.matching.models import MemberSkill
 from apps.matching.scoring import skill_match
 from apps.notifications.services import notify, notify_many
+from apps.social import media
 from apps.startups.models import ClaimRequest, Startup, StartupInterest, StartupMember
 from core import codes
 from core.cache import get_cache
 from core.errors import ApiError, Conflict, Forbidden, NotFound
+from core.schemas import person
+from core.smallcount import count
 
 log = structlog.get_logger("startups")
 
@@ -32,16 +35,36 @@ CLAIM_TTL = timedelta(hours=24)
 MAX_PINS = 500
 MAX_BBOX_DEGREES = 2.0  # about 220 km: a city and its surroundings, not the country
 MAX_RADIUS_KM = 100
-EDITABLE = {"description", "stage", "hiring", "address", "tech_stack"}
+EDITABLE = {"description", "stage", "hiring", "address", "tech_stack", "team_size"}
+MAX_FOUNDERS = 4
+MAX_BUILD_LOGS = 9
+
+
+# -- verified startups (the under-18 rule) -----------------------------------------------------
+def is_verified(startup: Startup) -> bool:
+    """A startup is verified once its team claimed it with a company email on its own domain (CLAUDE.md F3)."""
+    return startup.claimed_by_id is not None
+
+
+def minor_blocked(member: Member, startup: Startup) -> bool:
+    """Members under 18 only see roles and hiring from verified startups (CLAUDE.md F19, PRODUCTION.md §14 row 16)."""
+    return member.is_minor and not is_verified(startup)
 
 
 # -- search ----------------------------------------------------------------------------------
-def _filtered(hiring: bool | None, capability: str | None) -> QuerySet[Startup]:
+def _filtered(hiring: bool | None, capability: str | None, minor: bool = False) -> QuerySet[Startup]:
     qs = Startup.objects.filter(location__isnull=False, hidden_at__isnull=True)  # a reported startup a moderator hid is gone
-    if hiring is not None:
-        qs = qs.filter(hiring=hiring)
+    if hiring:
+        qs = qs.filter(hiring=True)
+        if minor:
+            qs = qs.filter(claimed_by__isnull=False)  # an unverified startup is never "hiring" for an under-18
+    elif hiring is not None:
+        qs = qs.filter(hiring=False)
     if capability:
-        qs = qs.filter(jobs__is_open=True, jobs__capabilities__capability__slug=capability).distinct()
+        qs = qs.filter(jobs__is_open=True, jobs__capabilities__capability__slug=capability)
+        if minor:
+            qs = qs.filter(claimed_by__isnull=False)
+        qs = qs.distinct()
     return qs
 
 
@@ -68,18 +91,21 @@ def student_match_pcts(member: Member, startup_ids: list[int]) -> dict[int, int]
     return out
 
 
-def _pin(s: Startup, roles: dict[int, int], pcts: dict[int, int]) -> dict:
+def _pin(s: Startup, roles: dict[int, int], pcts: dict[int, int], minor: bool = False) -> dict:
     loc = cast(Point, s.location)  # every search filters on location__isnull=False
+    hide = minor and not is_verified(s)  # under-18: an unverified startup looks like one with no roles
     return {
-        "id": s.pk, "name": s.name, "lat": loc.y, "lng": loc.x, "hiring": s.hiring, "sector": s.sector,
-        "claimed": s.claimed_by_id is not None, "open_roles": roles.get(s.pk, 0), "match_pct": pcts.get(s.pk),
+        "id": s.pk, "name": s.name, "lat": loc.y, "lng": loc.x, "hiring": s.hiring and not hide, "sector": s.sector,
+        "claimed": s.claimed_by_id is not None, "open_roles": 0 if hide else roles.get(s.pk, 0),
+        "match_pct": None if hide else pcts.get(s.pk), "logo": media.logo_of(s),
     }  # fmt: skip
 
 
 def _pins(member: Member, startups: Sequence[Startup]) -> list[dict]:
     ids = [s.pk for s in startups]
     roles, pcts = _open_roles(ids), student_match_pcts(member, ids)
-    return [_pin(s, roles, pcts) for s in startups]
+    media.prime_logos(startups)
+    return [_pin(s, roles, pcts, member.is_minor) for s in startups]
 
 
 def default_centre(member: Member) -> tuple[float, float]:
@@ -98,7 +124,7 @@ def nearby(member: Member, lat: float | None, lng: float | None, radius_km: floa
     box.srid = 4326
     centre = Point(lng, lat, srid=4326)
     qs = (
-        _filtered(hiring, capability)
+        _filtered(hiring, capability, member.is_minor)
         .filter(location__intersects=box)  # uses the GIST index; the exact distance check comes next
         .annotate(dist=Distance("location", centre))
         .filter(dist__lte=D(km=radius_km))
@@ -118,7 +144,9 @@ def in_bbox(member: Member, min_lng: float, min_lat: float, max_lng: float, max_
         raise ApiError(422, "bbox_too_large", "Zoom in: that map area is too large")
     box = Polygon.from_bbox((min_lng, min_lat, max_lng, max_lat))
     box.srid = 4326
-    rows = list(_filtered(hiring, capability).filter(location__intersects=box).order_by("-hiring", "id")[:MAX_PINS])
+    rows = list(
+        _filtered(hiring, capability, member.is_minor).filter(location__intersects=box).order_by("-hiring", "id")[:MAX_PINS]
+    )
     return _pins(member, rows)
 
 
@@ -134,6 +162,16 @@ def team_member_ids(startup: Startup) -> list[int]:
     return sorted(ids)
 
 
+def startup_id_of(member: Member) -> int | None:
+    """The startup this member is on (a listed team member, else the one they claimed); the first if several."""
+    on_team = (
+        StartupMember.objects.filter(member=member).order_by("created_at", "id").values_list("startup_id", flat=True).first()
+    )
+    if on_team is not None:
+        return on_team
+    return Startup.objects.filter(claimed_by=member, hidden_at__isnull=True).order_by("id").values_list("pk", flat=True).first()
+
+
 def get_startup(startup_id: int) -> Startup:
     s = Startup.objects.filter(pk=startup_id, hidden_at__isnull=True).first()
     if s is None:
@@ -141,24 +179,70 @@ def get_startup(startup_id: int) -> Startup:
     return s
 
 
+def _private_counts(member: Member, startup: Startup, team: bool) -> tuple[int | None, int | None]:
+    """(views, interested) only for the people who may see them. The team sees its own exact numbers. A founder looking at an
+    unclaimed page sees them as a reason to claim it, but a count under DASHBOARD_MIN_COUNT stays hidden. Nobody else sees any."""
+    if not team and not (member.role == Role.FOUNDER and startup.claimed_by_id is None):
+        return None, None
+    views, interested = startup.view_count, StartupInterest.objects.filter(startup=startup).count()
+    if team:
+        return views, interested
+    return count(views)["value"], count(interested)["value"]  # None under the threshold
+
+
+def _founders(member: Member, startup: Startup) -> list[dict]:
+    """The people on the team, each with the warm path to them (so the page needs no call per founder)."""
+    from apps.intros.services import warm_path
+
+    rows = []
+    team = StartupMember.objects.filter(startup=startup).select_related("member").order_by("created_at", "id")
+    for sm in team[:MAX_FOUNDERS]:
+        person_ = sm.member
+        if person_.pk == member.pk:
+            rows.append({"person": person(person_), "role": sm.role, "via": None, "connected": False, "is_me": True})
+            continue
+        if person_.deleted_at is not None or person_.suspended_at is not None or person_.profile_visibility == "hidden":
+            continue
+        via, connected = None, False
+        if not member.is_minor:  # intros are not available to under-18s
+            try:
+                _, broker = warm_path(member, person_.pk)
+                via, connected = (person(broker) if broker else None), broker is None
+            except ApiError:  # no mutual connection, or they cannot be reached: still listed, just without a path
+                pass
+        rows.append({"person": person(person_), "role": sm.role, "via": via, "connected": connected, "is_me": False})
+    return rows
+
+
+def _build_logs(member: Member, startup: Startup) -> list[dict]:
+    """The first picture of the team's latest build logs that this member may see (empty when Pulse is off for them)."""
+    from apps.social.services import picture_tiles  # imported here: social.services imports this module
+
+    return picture_tiles(member, team_member_ids(startup), MAX_BUILD_LOGS)
+
+
 def detail(member: Member, startup: Startup, count_view: bool = True) -> dict:
-    if count_view and not is_team(member, startup):
+    team = is_team(member, startup)
+    if count_view and not team:
         _count_view(member, startup)
-    jobs = list(Job.objects.filter(startup=startup, is_open=True).order_by("-created_at"))
-    pct = student_match_pcts(member, [startup.pk]).get(startup.pk)
+    hide = minor_blocked(member, startup)  # under-18: an unverified startup looks like one with no roles
+    jobs = [] if hide else list(Job.objects.filter(startup=startup, is_open=True).order_by("-created_at"))
+    pct = None if hide else student_match_pcts(member, [startup.pk]).get(startup.pk)
+    views, interested = _private_counts(member, startup, team)
     return {
         "id": startup.pk, "name": startup.name, "website_domain": startup.website_domain, "description": startup.description,
-        "sector": startup.sector, "stage": startup.stage, "address": startup.address,
+        "sector": startup.sector, "stage": startup.stage, "address": startup.address, "team_size": startup.team_size,
+        "logo": media.logo_of(startup),
         "lat": startup.location.y if startup.location else None, "lng": startup.location.x if startup.location else None,
-        "hiring": startup.hiring, "tech_stack": startup.tech_stack, "claimed": startup.claimed_by_id is not None,
-        "source": startup.source, "view_count": startup.view_count,
-        "interest_count": StartupInterest.objects.filter(startup=startup).count(),
+        "hiring": startup.hiring and not hide, "tech_stack": startup.tech_stack, "claimed": is_verified(startup),
+        "verified": is_verified(startup), "source": startup.source, "view_count": views, "interest_count": interested,
         "interested": StartupInterest.objects.filter(startup=startup, member=member).exists(),
-        "is_team": is_team(member, startup), "match_pct": pct,
+        "is_team": team, "match_pct": pct,
         "open_jobs": [
             {"id": j.pk, "title": j.title, "kind": j.kind, "stipend_min": j.stipend_min, "stipend_max": j.stipend_max}
             for j in jobs
         ],
+        "founders": _founders(member, startup), "build_logs": _build_logs(member, startup),
     }  # fmt: skip
 
 
@@ -200,6 +284,21 @@ def update_startup(member: Member, startup: Startup, changes: dict) -> Startup:
             setattr(startup, field, value)
     startup.save()
     record("startup.updated", actor=member, target_type="startup", target_id=startup.pk, fields=sorted(changes))
+    return startup
+
+
+def set_logo(member: Member, startup: Startup, upload_id: int | None) -> Startup:
+    """The team sets (or, with None, removes) the startup's logo from one of their finished `startup_logo` uploads."""
+    if not is_team(member, startup):
+        raise Forbidden("Only the startup's team can change the logo")
+    if upload_id is None:
+        if startup.logo_path:
+            media.delete_picture(startup.logo_path)
+            startup.logo_path = ""
+    else:
+        startup.logo_path = media.set_picture(member, upload_id, "startup_logo", startup.logo_path)
+    startup.save(update_fields=["logo_path"])
+    record("startup.logo_set", actor=member, target_type="startup", target_id=startup.pk, removed=upload_id is None)
     return startup
 
 

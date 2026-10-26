@@ -72,6 +72,7 @@ def test_public_routes_still_work_for_everyone():
     needs_input = {
         ("POST", "/api/demo/token"),
         ("POST", "/api/waitlist"),
+        ("POST", "/api/join/visit"),
         ("GET", "/api/unsubscribe"),
         ("POST", "/api/unsubscribe"),
     }

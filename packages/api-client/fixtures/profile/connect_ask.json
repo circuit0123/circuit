@@ -1,0 +1,101 @@
+{
+  "calls": [
+    {
+      "hook": "useConnect",
+      "request": {
+        "body": {
+          "member_id": 3,
+          "note": "Loved your hiring board."
+        },
+        "method": "POST",
+        "path": "/api/connections/requests"
+      },
+      "response": {
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 3,
+        "note": "Loved your hiring board.",
+        "recipient": {
+          "city": "Chennai",
+          "display_name": "Arjun Mehta",
+          "headline": "",
+          "id": 3,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "sender": {
+          "city": "Chennai",
+          "display_name": "Ravi Kumar",
+          "headline": "",
+          "id": 10,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        "status": "pending"
+      },
+      "status": 201
+    },
+    {
+      "hook": "useConnectionRequests",
+      "request": {
+        "method": "GET",
+        "path": "/api/connections/requests?box=outgoing"
+      },
+      "response": [
+        {
+          "created_at": "2026-03-02T04:00:00Z",
+          "id": 3,
+          "note": "Loved your hiring board.",
+          "recipient": {
+            "city": "Chennai",
+            "display_name": "Arjun Mehta",
+            "headline": "",
+            "id": 3,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          },
+          "sender": {
+            "city": "Chennai",
+            "display_name": "Ravi Kumar",
+            "headline": "",
+            "id": 10,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "status": "pending"
+        },
+        {
+          "created_at": "2026-03-02T04:00:00Z",
+          "id": 1,
+          "note": "I built an attendance app and need a mentor for my first internship.",
+          "recipient": {
+            "city": "Chennai",
+            "display_name": "Dr. Lakshmi Narayanan",
+            "headline": "",
+            "id": 8,
+            "photo": null,
+            "role": "mentor",
+            "verification_level": 3
+          },
+          "sender": {
+            "city": "Chennai",
+            "display_name": "Ravi Kumar",
+            "headline": "",
+            "id": 10,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "status": "pending"
+        }
+      ],
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "connect_ask",
+  "screen": "profile"
+}

@@ -1,0 +1,1854 @@
+{
+  "calls": [
+    {
+      "hook": "useDiscoverJobs",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs?limit=50"
+      },
+      "response": {
+        "count": 16,
+        "items": [
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Keerthana Narayanan",
+              "id": 20,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 1
+            },
+            "created_at": "2026-03-01T06:00:00Z",
+            "description": "",
+            "distance_km": 10.17,
+            "duration_weeks": null,
+            "id": 7,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.108901517658738,
+            "lng": 80.217011916401,
+            "location": "Anna Nagar, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.08,
+            "starts_on": null,
+            "startup_id": 15,
+            "startup_logo": null,
+            "startup_name": "Pixelloop",
+            "startup_verified": true,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Yamini Pandian",
+              "id": 23,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 3
+            },
+            "created_at": "2026-03-01T19:00:00Z",
+            "description": "",
+            "distance_km": 15.45,
+            "duration_weeks": null,
+            "id": 9,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.008829917121815,
+            "lng": 80.28391838442917,
+            "location": "Adyar, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 18,
+            "startup_logo": null,
+            "startup_name": "Pranaloop",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Intern – Biotech lab work"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Operations",
+                "required": false,
+                "slug": "operations",
+                "your_level": null
+              },
+              {
+                "name": "Data engineering",
+                "required": false,
+                "slug": "data-engineering",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Bhavna Venkatesh",
+              "id": 32,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 3
+            },
+            "created_at": "2026-03-01T12:00:00Z",
+            "description": "",
+            "distance_km": 16.13,
+            "duration_weeks": null,
+            "id": 14,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.006302179812993,
+            "lng": 80.28969948991326,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "logistics",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 27,
+            "startup_logo": null,
+            "startup_name": "Vayulabs",
+            "startup_verified": true,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Associate – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Hardware design",
+                "required": true,
+                "slug": "hardware-design",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              },
+              {
+                "name": "Manufacturing",
+                "required": false,
+                "slug": "manufacturing",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Abdul Patel",
+              "id": 21,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-03-01T12:00:00Z",
+            "description": "",
+            "distance_km": 9.71,
+            "duration_weeks": null,
+            "id": 8,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.038686848230364,
+            "lng": 80.23616433212229,
+            "location": "Guindy, Chennai",
+            "sector": "cleantech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 16,
+            "startup_logo": null,
+            "startup_name": "Hexaloop",
+            "startup_verified": true,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Hardware design"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Mobile development",
+                "required": true,
+                "slug": "mobile-dev",
+                "your_level": null
+              },
+              {
+                "name": "Healthcare domain",
+                "required": false,
+                "slug": "healthcare-domain",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Suriya Subramanian",
+              "id": 28,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-03-01T11:00:00Z",
+            "description": "",
+            "distance_km": 25.23,
+            "duration_weeks": null,
+            "id": 12,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 12.908411537553965,
+            "lng": 80.3306273022431,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "healthtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 23,
+            "startup_logo": null,
+            "startup_name": "Zetacraft",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Trainee – Mobile development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Rahul Srinivasan",
+              "id": 16,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-03-01T03:00:00Z",
+            "description": "",
+            "distance_km": 12.16,
+            "duration_weeks": null,
+            "id": 3,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.044996191655521,
+            "lng": 80.25928477786206,
+            "location": "T. Nagar, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 11,
+            "startup_logo": null,
+            "startup_name": "Tatvabridge",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Imran Joseph",
+              "id": 19,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-28T20:00:00Z",
+            "description": "",
+            "distance_km": 16.92,
+            "duration_weeks": null,
+            "id": 6,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.00639365132818,
+            "lng": 80.29730767313528,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "saas",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 14,
+            "startup_logo": null,
+            "startup_name": "Cyberwave",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Hardware design",
+                "required": true,
+                "slug": "hardware-design",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              },
+              {
+                "name": "Manufacturing",
+                "required": false,
+                "slug": "manufacturing",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Rahul Narayanan",
+              "id": 31,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-28T19:00:00Z",
+            "description": "",
+            "distance_km": 0.75,
+            "duration_weeks": null,
+            "id": 13,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.04442430963304,
+            "lng": 80.15293896725241,
+            "location": "Porur, Chennai",
+            "sector": "cleantech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 26,
+            "startup_logo": null,
+            "startup_name": "Pranabridge",
+            "startup_verified": true,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Hardware design"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "UI design",
+                "required": false,
+                "slug": "ui-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Divya Menon",
+              "id": 6,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-27T13:00:00Z",
+            "description": "Build screens in React with our designer.",
+            "distance_km": 9.59,
+            "duration_weeks": null,
+            "id": 66,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.042590507024766,
+            "lng": 80.23541556147727,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "saas",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 3,
+            "startup_logo": null,
+            "startup_name": "Pixelwave Labs",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Frontend Intern"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Agritech domain",
+                "required": true,
+                "slug": "agritech-domain",
+                "your_level": null
+              },
+              {
+                "name": "Supply chain and logistics",
+                "required": false,
+                "slug": "supply-chain",
+                "your_level": null
+              },
+              {
+                "name": "Mobile development",
+                "required": false,
+                "slug": "mobile-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Karthik Natarajan",
+              "id": 27,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-26T19:00:00Z",
+            "description": "",
+            "distance_km": 16.62,
+            "duration_weeks": null,
+            "id": 11,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 12.973218266817284,
+            "lng": 80.2799104010453,
+            "location": "Velachery, Chennai",
+            "sector": "agritech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 22,
+            "startup_logo": null,
+            "startup_name": "Tatvaworks",
+            "startup_verified": true,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Agritech domain"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Charulatha Reddy",
+              "id": 26,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-26T03:00:00Z",
+            "description": "",
+            "distance_km": 13.98,
+            "duration_weeks": null,
+            "id": 10,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.076281241138268,
+            "lng": 80.2728018965771,
+            "location": "Nungambakkam, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 21,
+            "startup_logo": null,
+            "startup_name": "Aeroworks",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Bhavna Annamalai",
+              "id": 15,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-25T11:00:00Z",
+            "description": "",
+            "distance_km": 11.16,
+            "duration_weeks": null,
+            "id": 2,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.11515621136682,
+            "lng": 80.22347903464346,
+            "location": "Anna Nagar, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 10,
+            "startup_logo": null,
+            "startup_name": "Kaviloop",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Associate – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Machine learning",
+                "required": true,
+                "slug": "machine-learning",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Charulatha Nair",
+              "id": 34,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-25T10:00:00Z",
+            "description": "",
+            "distance_km": 0.42,
+            "duration_weeks": null,
+            "id": 15,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.048756492122179,
+            "lng": 80.14320340590254,
+            "location": "Porur, Chennai",
+            "sector": "deeptech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 29,
+            "startup_logo": null,
+            "startup_name": "Agriloop",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Trainee – Machine learning"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Agritech domain",
+                "required": true,
+                "slug": "agritech-domain",
+                "your_level": null
+              },
+              {
+                "name": "Supply chain and logistics",
+                "required": false,
+                "slug": "supply-chain",
+                "your_level": null
+              },
+              {
+                "name": "Mobile development",
+                "required": false,
+                "slug": "mobile-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Hemalatha Gupta",
+              "id": 17,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 1
+            },
+            "created_at": "2026-02-25T09:00:00Z",
+            "description": "",
+            "distance_km": 1.67,
+            "duration_weeks": null,
+            "id": 4,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.062466629711931,
+            "lng": 80.1508465539316,
+            "location": "Porur, Chennai",
+            "sector": "agritech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 12,
+            "startup_logo": null,
+            "startup_name": "Tatvaworks",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Associate – Agritech domain"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Mobile development",
+                "required": true,
+                "slug": "mobile-dev",
+                "your_level": null
+              },
+              {
+                "name": "Healthcare domain",
+                "required": false,
+                "slug": "healthcare-domain",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Lakshmi Srinivasan",
+              "id": 18,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 3
+            },
+            "created_at": "2026-02-23T23:00:00Z",
+            "description": "",
+            "distance_km": 10.96,
+            "duration_weeks": null,
+            "id": 5,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.029596049863269,
+            "lng": 80.24647040032559,
+            "location": "Guindy, Chennai",
+            "sector": "healthtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 13,
+            "startup_logo": null,
+            "startup_name": "Quantaworks",
+            "startup_verified": true,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Trainee – Mobile development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Rajesh Venkatesh",
+              "id": 13,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-23T13:00:00Z",
+            "description": "",
+            "distance_km": 15.83,
+            "duration_weeks": null,
+            "id": 1,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.005451991754517,
+            "lng": 80.28652761274965,
+            "location": "Adyar, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 8,
+            "startup_logo": null,
+            "startup_name": "Aeroforge",
+            "startup_verified": true,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Biotech lab work"
+          }
+        ],
+        "next_offset": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useSkillsInDemand",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs/skills-in-demand"
+      },
+      "response": [
+        {
+          "name": "Embedded systems",
+          "open_roles": 3,
+          "slug": "embedded-systems"
+        },
+        {
+          "name": "Hardware design",
+          "open_roles": 2,
+          "slug": "hardware-design"
+        },
+        {
+          "name": "Manufacturing",
+          "open_roles": 2,
+          "slug": "manufacturing"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useDiscoverStartups",
+      "request": {
+        "method": "GET",
+        "path": "/api/startups/nearby?limit=40"
+      },
+      "response": [
+        {
+          "claimed": false,
+          "distance_km": 0.12,
+          "hiring": false,
+          "id": 38,
+          "lat": 13.048472033940783,
+          "lng": 80.14795047551888,
+          "logo": null,
+          "match_pct": null,
+          "name": "Pixelstack",
+          "open_roles": 0,
+          "sector": "biotech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 0.39,
+          "hiring": false,
+          "id": 142,
+          "lat": 13.050745548212891,
+          "lng": 80.14917150470343,
+          "logo": null,
+          "match_pct": null,
+          "name": "Tatvaloop",
+          "open_roles": 0,
+          "sector": "agritech"
+        },
+        {
+          "claimed": true,
+          "distance_km": 0.42,
+          "hiring": true,
+          "id": 29,
+          "lat": 13.048756492122179,
+          "lng": 80.14320340590254,
+          "logo": null,
+          "match_pct": 0,
+          "name": "Agriloop",
+          "open_roles": 1,
+          "sector": "deeptech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 0.59,
+          "hiring": false,
+          "id": 99,
+          "lat": 13.046091658467848,
+          "lng": 80.152139208615,
+          "logo": null,
+          "match_pct": null,
+          "name": "Quantacraft",
+          "open_roles": 0,
+          "sector": "deeptech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 0.61,
+          "hiring": false,
+          "id": 74,
+          "lat": 13.049588296595454,
+          "lng": 80.14163768193905,
+          "logo": null,
+          "match_pct": null,
+          "name": "Terrapulse",
+          "open_roles": 0,
+          "sector": "saas"
+        },
+        {
+          "claimed": false,
+          "distance_km": 0.63,
+          "hiring": false,
+          "id": 77,
+          "lat": 13.050243359499229,
+          "lng": 80.14173073258227,
+          "logo": null,
+          "match_pct": null,
+          "name": "Indraware",
+          "open_roles": 0,
+          "sector": "logistics"
+        },
+        {
+          "claimed": false,
+          "distance_km": 0.73,
+          "hiring": false,
+          "id": 118,
+          "lat": 13.052492840523845,
+          "lng": 80.15179825151665,
+          "logo": null,
+          "match_pct": null,
+          "name": "Quantastack",
+          "open_roles": 0,
+          "sector": "biotech"
+        },
+        {
+          "claimed": true,
+          "distance_km": 0.75,
+          "hiring": true,
+          "id": 26,
+          "lat": 13.04442430963304,
+          "lng": 80.15293896725241,
+          "logo": null,
+          "match_pct": 0,
+          "name": "Pranabridge",
+          "open_roles": 1,
+          "sector": "cleantech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 0.8,
+          "hiring": false,
+          "id": 107,
+          "lat": 13.044399638681021,
+          "lng": 80.15346360734021,
+          "logo": null,
+          "match_pct": null,
+          "name": "Aerosense",
+          "open_roles": 0,
+          "sector": "logistics"
+        },
+        {
+          "claimed": false,
+          "distance_km": 0.94,
+          "hiring": false,
+          "id": 139,
+          "lat": 13.048610841024843,
+          "lng": 80.15565687281962,
+          "logo": null,
+          "match_pct": null,
+          "name": "Lumiforge",
+          "open_roles": 0,
+          "sector": "deeptech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 0.96,
+          "hiring": false,
+          "id": 95,
+          "lat": 13.056293897161765,
+          "lng": 80.14933695892479,
+          "logo": null,
+          "match_pct": null,
+          "name": "Indranest",
+          "open_roles": 0,
+          "sector": "d2c"
+        },
+        {
+          "claimed": false,
+          "distance_km": 1.08,
+          "hiring": false,
+          "id": 93,
+          "lat": 13.057494903418416,
+          "lng": 80.14837692428166,
+          "logo": null,
+          "match_pct": null,
+          "name": "Vayuware",
+          "open_roles": 0,
+          "sector": "healthtech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 1.1,
+          "hiring": false,
+          "id": 69,
+          "lat": 13.047650240770077,
+          "lng": 80.15716720874751,
+          "logo": null,
+          "match_pct": null,
+          "name": "Setusense",
+          "open_roles": 0,
+          "sector": "deeptech"
+        },
+        {
+          "claimed": true,
+          "distance_km": 1.12,
+          "hiring": false,
+          "id": 6,
+          "lat": 13.057962336605835,
+          "lng": 80.14640126028118,
+          "logo": null,
+          "match_pct": null,
+          "name": "Suvidha Logistics",
+          "open_roles": 0,
+          "sector": "logistics"
+        },
+        {
+          "claimed": false,
+          "distance_km": 1.21,
+          "hiring": false,
+          "id": 37,
+          "lat": 13.051318555386953,
+          "lng": 80.15764344730788,
+          "logo": null,
+          "match_pct": null,
+          "name": "Pravahpulse",
+          "open_roles": 0,
+          "sector": "logistics"
+        },
+        {
+          "claimed": false,
+          "distance_km": 1.4,
+          "hiring": false,
+          "id": 78,
+          "lat": 13.060089477030493,
+          "lng": 80.15028788412941,
+          "logo": null,
+          "match_pct": null,
+          "name": "Manthanbridge",
+          "open_roles": 0,
+          "sector": "biotech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 1.41,
+          "hiring": false,
+          "id": 36,
+          "lat": 13.047002888450526,
+          "lng": 80.16003373261105,
+          "logo": null,
+          "match_pct": null,
+          "name": "Novalabs",
+          "open_roles": 0,
+          "sector": "cleantech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 1.51,
+          "hiring": false,
+          "id": 52,
+          "lat": 13.061400641971925,
+          "lng": 80.14883814903094,
+          "logo": null,
+          "match_pct": null,
+          "name": "Setucraft",
+          "open_roles": 0,
+          "sector": "agritech"
+        },
+        {
+          "claimed": true,
+          "distance_km": 1.67,
+          "hiring": true,
+          "id": 12,
+          "lat": 13.062466629711931,
+          "lng": 80.1508465539316,
+          "logo": null,
+          "match_pct": 0,
+          "name": "Tatvaworks",
+          "open_roles": 1,
+          "sector": "agritech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 2.09,
+          "hiring": false,
+          "id": 140,
+          "lat": 13.061378488033485,
+          "lng": 80.16043765065686,
+          "logo": null,
+          "match_pct": null,
+          "name": "Sutrapulse",
+          "open_roles": 0,
+          "sector": "fintech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 9.18,
+          "hiring": false,
+          "id": 84,
+          "lat": 13.039633947663654,
+          "lng": 80.23137647514329,
+          "logo": null,
+          "match_pct": null,
+          "name": "Terracart",
+          "open_roles": 0,
+          "sector": "saas"
+        },
+        {
+          "claimed": false,
+          "distance_km": 9.23,
+          "hiring": false,
+          "id": 40,
+          "lat": 13.036971836926496,
+          "lng": 80.23147827932493,
+          "logo": null,
+          "match_pct": null,
+          "name": "Anumint",
+          "open_roles": 0,
+          "sector": "fintech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 9.41,
+          "hiring": false,
+          "id": 119,
+          "lat": 13.039004318813078,
+          "lng": 80.23343069429325,
+          "logo": null,
+          "match_pct": null,
+          "name": "Pixelware",
+          "open_roles": 0,
+          "sector": "deeptech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 9.54,
+          "hiring": false,
+          "id": 64,
+          "lat": 13.031008491476893,
+          "lng": 80.23333888679643,
+          "logo": null,
+          "match_pct": null,
+          "name": "Agricart",
+          "open_roles": 0,
+          "sector": "saas"
+        },
+        {
+          "claimed": true,
+          "distance_km": 9.59,
+          "hiring": true,
+          "id": 3,
+          "lat": 13.042590507024766,
+          "lng": 80.23541556147727,
+          "logo": null,
+          "match_pct": 0,
+          "name": "Pixelwave Labs",
+          "open_roles": 1,
+          "sector": "saas"
+        },
+        {
+          "claimed": true,
+          "distance_km": 9.71,
+          "hiring": true,
+          "id": 16,
+          "lat": 13.038686848230364,
+          "lng": 80.23616433212229,
+          "logo": null,
+          "match_pct": 0,
+          "name": "Hexaloop",
+          "open_roles": 1,
+          "sector": "cleantech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 9.78,
+          "hiring": false,
+          "id": 81,
+          "lat": 13.103614308959623,
+          "lng": 80.21695844037741,
+          "logo": null,
+          "match_pct": null,
+          "name": "Sutracraft",
+          "open_roles": 0,
+          "sector": "edtech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 9.79,
+          "hiring": false,
+          "id": 34,
+          "lat": 13.108504240099398,
+          "lng": 80.21263623305121,
+          "logo": null,
+          "match_pct": null,
+          "name": "Indralabs",
+          "open_roles": 0,
+          "sector": "saas"
+        },
+        {
+          "claimed": true,
+          "distance_km": 9.8,
+          "hiring": false,
+          "id": 5,
+          "lat": 13.10770006423178,
+          "lng": 80.21346797069208,
+          "logo": null,
+          "match_pct": null,
+          "name": "Medha Health",
+          "open_roles": 0,
+          "sector": "healthtech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 9.82,
+          "hiring": false,
+          "id": 51,
+          "lat": 13.02735673119612,
+          "lng": 80.23521343292563,
+          "logo": null,
+          "match_pct": null,
+          "name": "Ojasbridge",
+          "open_roles": 0,
+          "sector": "edtech"
+        },
+        {
+          "claimed": false,
+          "distance_km": 9.83,
+          "hiring": false,
+          "id": 101,
+          "lat": 13.108793159915026,
+          "lng": 80.21283944735163,
+          "logo": null,
+          "match_pct": null,
+          "name": "Pravahnest",
+          "open_roles": 0,
+          "sector": "edtech"
+        },
+        {
+          "claimed": true,
+          "distance_km": 9.85,
+          "hiring": false,
+          "id": 9,
+          "lat": 13.025690392379285,
+          "lng": 80.23501309488937,
+          "logo": null,
+          "match_pct": null,
+          "name": "Anuwave",
+          "open_roles": 0,
+          "sector": "deeptech"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useDiscoverSearch",
+      "request": {
+        "method": "GET",
+        "path": "/api/search?q=an"
+      },
+      "response": {
+        "jobs": [
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Keerthana Narayanan",
+              "id": 20,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 1
+            },
+            "created_at": "2026-03-01T06:00:00Z",
+            "description": "",
+            "distance_km": 10.17,
+            "duration_weeks": null,
+            "id": 7,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.108901517658738,
+            "lng": 80.217011916401,
+            "location": "Anna Nagar, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.08,
+            "starts_on": null,
+            "startup_id": 15,
+            "startup_logo": null,
+            "startup_name": "Pixelloop",
+            "startup_verified": true,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Yamini Pandian",
+              "id": 23,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 3
+            },
+            "created_at": "2026-03-01T19:00:00Z",
+            "description": "",
+            "distance_km": 15.45,
+            "duration_weeks": null,
+            "id": 9,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.008829917121815,
+            "lng": 80.28391838442917,
+            "location": "Adyar, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 18,
+            "startup_logo": null,
+            "startup_name": "Pranaloop",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Intern – Biotech lab work"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Hardware design",
+                "required": true,
+                "slug": "hardware-design",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              },
+              {
+                "name": "Manufacturing",
+                "required": false,
+                "slug": "manufacturing",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Abdul Patel",
+              "id": 21,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-03-01T12:00:00Z",
+            "description": "",
+            "distance_km": 9.71,
+            "duration_weeks": null,
+            "id": 8,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.038686848230364,
+            "lng": 80.23616433212229,
+            "location": "Guindy, Chennai",
+            "sector": "cleantech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 16,
+            "startup_logo": null,
+            "startup_name": "Hexaloop",
+            "startup_verified": true,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Hardware design"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Imran Joseph",
+              "id": 19,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-28T20:00:00Z",
+            "description": "",
+            "distance_km": 16.92,
+            "duration_weeks": null,
+            "id": 6,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.00639365132818,
+            "lng": 80.29730767313528,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "saas",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 14,
+            "startup_logo": null,
+            "startup_name": "Cyberwave",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Hardware design",
+                "required": true,
+                "slug": "hardware-design",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              },
+              {
+                "name": "Manufacturing",
+                "required": false,
+                "slug": "manufacturing",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Rahul Narayanan",
+              "id": 31,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-28T19:00:00Z",
+            "description": "",
+            "distance_km": 0.75,
+            "duration_weeks": null,
+            "id": 13,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.04442430963304,
+            "lng": 80.15293896725241,
+            "location": "Porur, Chennai",
+            "sector": "cleantech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 26,
+            "startup_logo": null,
+            "startup_name": "Pranabridge",
+            "startup_verified": true,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Hardware design"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Agritech domain",
+                "required": true,
+                "slug": "agritech-domain",
+                "your_level": null
+              },
+              {
+                "name": "Supply chain and logistics",
+                "required": false,
+                "slug": "supply-chain",
+                "your_level": null
+              },
+              {
+                "name": "Mobile development",
+                "required": false,
+                "slug": "mobile-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Karthik Natarajan",
+              "id": 27,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-26T19:00:00Z",
+            "description": "",
+            "distance_km": 16.62,
+            "duration_weeks": null,
+            "id": 11,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 12.973218266817284,
+            "lng": 80.2799104010453,
+            "location": "Velachery, Chennai",
+            "sector": "agritech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 22,
+            "startup_logo": null,
+            "startup_name": "Tatvaworks",
+            "startup_verified": true,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Agritech domain"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Agritech domain",
+                "required": true,
+                "slug": "agritech-domain",
+                "your_level": null
+              },
+              {
+                "name": "Supply chain and logistics",
+                "required": false,
+                "slug": "supply-chain",
+                "your_level": null
+              },
+              {
+                "name": "Mobile development",
+                "required": false,
+                "slug": "mobile-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Hemalatha Gupta",
+              "id": 17,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 1
+            },
+            "created_at": "2026-02-25T09:00:00Z",
+            "description": "",
+            "distance_km": 1.67,
+            "duration_weeks": null,
+            "id": 4,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.062466629711931,
+            "lng": 80.1508465539316,
+            "location": "Porur, Chennai",
+            "sector": "agritech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 12,
+            "startup_logo": null,
+            "startup_name": "Tatvaworks",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Associate – Agritech domain"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Mobile development",
+                "required": true,
+                "slug": "mobile-dev",
+                "your_level": null
+              },
+              {
+                "name": "Healthcare domain",
+                "required": false,
+                "slug": "healthcare-domain",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Lakshmi Srinivasan",
+              "id": 18,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 3
+            },
+            "created_at": "2026-02-23T23:00:00Z",
+            "description": "",
+            "distance_km": 10.96,
+            "duration_weeks": null,
+            "id": 5,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.029596049863269,
+            "lng": 80.24647040032559,
+            "location": "Guindy, Chennai",
+            "sector": "healthtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 13,
+            "startup_logo": null,
+            "startup_name": "Quantaworks",
+            "startup_verified": true,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Trainee – Mobile development"
+          }
+        ],
+        "people": [
+          {
+            "city": "Chennai",
+            "display_name": "Arjun Khan",
+            "headline": "",
+            "id": 195,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "city": "Chennai",
+            "display_name": "Dinesh Balasubramanian",
+            "headline": "",
+            "id": 158,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          }
+        ],
+        "startups": [
+          {
+            "claimed": false,
+            "distance_km": null,
+            "hiring": false,
+            "id": 86,
+            "lat": 12.913732871218226,
+            "lng": 80.31083224713984,
+            "logo": null,
+            "match_pct": null,
+            "name": "Anucart",
+            "open_roles": 0,
+            "sector": "cleantech"
+          },
+          {
+            "claimed": false,
+            "distance_km": null,
+            "hiring": false,
+            "id": 114,
+            "lat": 13.076794712319195,
+            "lng": 80.26847671560712,
+            "logo": null,
+            "match_pct": null,
+            "name": "Anucart",
+            "open_roles": 0,
+            "sector": "saas"
+          },
+          {
+            "claimed": false,
+            "distance_km": null,
+            "hiring": false,
+            "id": 55,
+            "lat": 13.0055262481903,
+            "lng": 80.28978698156314,
+            "logo": null,
+            "match_pct": null,
+            "name": "Anulabs",
+            "open_roles": 0,
+            "sector": "d2c"
+          },
+          {
+            "claimed": false,
+            "distance_km": null,
+            "hiring": false,
+            "id": 40,
+            "lat": 13.036971836926496,
+            "lng": 80.23147827932493,
+            "logo": null,
+            "match_pct": null,
+            "name": "Anumint",
+            "open_roles": 0,
+            "sector": "fintech"
+          },
+          {
+            "claimed": false,
+            "distance_km": null,
+            "hiring": false,
+            "id": 39,
+            "lat": 13.048597944567621,
+            "lng": 80.25857807425457,
+            "logo": null,
+            "match_pct": null,
+            "name": "Anupulse",
+            "open_roles": 0,
+            "sector": "deeptech"
+          },
+          {
+            "claimed": true,
+            "distance_km": null,
+            "hiring": false,
+            "id": 9,
+            "lat": 13.025690392379285,
+            "lng": 80.23501309488937,
+            "logo": null,
+            "match_pct": null,
+            "name": "Anuwave",
+            "open_roles": 0,
+            "sector": "deeptech"
+          },
+          {
+            "claimed": true,
+            "distance_km": null,
+            "hiring": false,
+            "id": 7,
+            "lat": 13.02039259547436,
+            "lng": 80.28703406511713,
+            "logo": null,
+            "match_pct": null,
+            "name": "Aqualytics",
+            "open_roles": 0,
+            "sector": "cleantech"
+          },
+          {
+            "claimed": false,
+            "distance_km": null,
+            "hiring": false,
+            "id": 136,
+            "lat": 13.031501988415597,
+            "lng": 80.24370040426317,
+            "logo": null,
+            "match_pct": null,
+            "name": "Cyberlabs",
+            "open_roles": 0,
+            "sector": "cleantech"
+          },
+          {
+            "claimed": true,
+            "distance_km": null,
+            "hiring": true,
+            "id": 16,
+            "lat": 13.038686848230364,
+            "lng": 80.23616433212229,
+            "logo": null,
+            "match_pct": 0,
+            "name": "Hexaloop",
+            "open_roles": 1,
+            "sector": "cleantech"
+          },
+          {
+            "claimed": false,
+            "distance_km": null,
+            "hiring": false,
+            "id": 46,
+            "lat": 12.921833709843932,
+            "lng": 80.31823649552372,
+            "logo": null,
+            "match_pct": null,
+            "name": "Hexamint",
+            "open_roles": 0,
+            "sector": "cleantech"
+          }
+        ]
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "under_18",
+  "screen": "discover"
+}

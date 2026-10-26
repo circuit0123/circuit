@@ -1,0 +1,44 @@
+{
+  "calls": [
+    {
+      "hook": "useBlock",
+      "request": {
+        "method": "POST",
+        "path": "/api/members/2/block"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useBlocks",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/blocks"
+      },
+      "response": {
+        "items": [
+          {
+            "display_name": "Priya Nair",
+            "id": 2,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          }
+        ]
+      },
+      "status": 200
+    },
+    {
+      "hook": "useBlock",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/members/2/block"
+      },
+      "response": null,
+      "status": 204
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "blocks",
+  "screen": "settings"
+}

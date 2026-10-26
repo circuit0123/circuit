@@ -276,5 +276,6 @@ def test_my_matches_are_mine_only_and_paginated(lists, make_member, client_for):
     assert client_for(other).get("/api/matches").json()["items"] == []
     assert set(page["items"][0]) == {
         "candidate_id", "display_name", "role", "verification_level", "city", "sector", "strength", "reason", "is_bridge",
+        "photo", "headline", "capabilities",
     }  # fmt: skip
     assert client_for(seeker).get("/api/matches?limit=0").status_code == 422

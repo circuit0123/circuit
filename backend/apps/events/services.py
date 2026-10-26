@@ -11,13 +11,13 @@ EVENT_TYPES = frozenset(
     {
         # accounts and verification
         "member.created", "member.profile_updated", "member.role_changed", "member.needs_set", "member.offers_set",
-        "member.skills_set", "member.traits_set", "onboarding.extracted", "verification.work_email_started",
+        "member.skills_set", "member.traits_set", "member.marked_minor", "member.photo_set", "member.photo_removed", "onboarding.extracted", "verification.work_email_started",
         "verification.level_raised",
         # organisations
         "org.joined", "org.left", "org.member_removed",
         # startups
         "startup.viewed", "startup.interest_added", "startup.interest_removed", "startup.updated", "startup.claim_started",
-        "startup.claimed",
+        "startup.claimed", "startup.logo_set",
         # jobs
         "job.created", "job.updated", "application.created", "application.withdrawn", "application.status_changed",
         # circuits
@@ -31,10 +31,10 @@ EVENT_TYPES = frozenset(
         "notification.read", "notification.read_all",
         # social: build logs, Pulse, Today, Daily Drop, follows, connections (F15-F17)
         "media.uploaded", "post.created", "post.deleted", "reaction.added", "reaction.removed", "reply.created", "reply.deleted",
-        "follow.added", "follow.removed", "pulse.seen", "livewire.viewed", "drop.built", "drop.swiped",
+        "follow.added", "follow.removed", "pulse.seen", "livewire.viewed", "drop.built", "drop.first_attempted", "drop.swiped",
         "connection.requested", "connection.responded", "connection.removed",
         # messaging and reports
-        "conversation.started", "conversation.accepted", "conversation.blocked", "message.sent", "report.created",
+        "conversation.started", "conversation.accepted", "conversation.declined", "conversation.blocked", "message.sent", "report.created",
         # invite-only beta (F18)
         "beta.access_granted", "invite.created", "waitlist.joined",
         # account basics and privacy (Stages 6-7)

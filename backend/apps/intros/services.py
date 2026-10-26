@@ -60,6 +60,23 @@ def warm_path(member: Member, target_id: int) -> tuple[Member, Member | None]:
     return target, broker
 
 
+def _my_recent(member: Member, now):
+    return IntroRequest.objects.filter(requester=member, created_at__gte=now - WEEK)
+
+
+def capacity(member: Member) -> dict:
+    """This week's introduction allowance: used, left, and when the next one frees up (the oldest request is a week old).
+    Only about me: how full another person is stays private (that is only ever the 409 `target_full`)."""
+    limit = settings.INTRO_WEEKLY_LIMIT
+    if member.is_minor or member.role not in NETWORK_ROLES:
+        return {"allowed": False, "weekly_limit": limit, "used": 0, "left": 0, "next_frees_at": None}
+    now = timezone.now()
+    created = list(_my_recent(member, now).order_by("created_at").values_list("created_at", flat=True))
+    left = max(limit - len(created), 0)
+    frees = created[len(created) - limit] + WEEK if left == 0 and created else None  # the one whose week ends first
+    return {"allowed": True, "weekly_limit": limit, "used": len(created), "left": left, "next_frees_at": frees}
+
+
 @transaction.atomic
 def request_intro(member: Member, target_id: int, message: str) -> tuple[IntroRequest, bool]:
     """Ask for an intro. Repeating while one is still open returns that request (second item False)."""
@@ -72,7 +89,7 @@ def request_intro(member: Member, target_id: int, message: str) -> tuple[IntroRe
         return open_one, False
     check_rate(member.pk, "intro")
     since = now - WEEK
-    if IntroRequest.objects.filter(requester=member, created_at__gte=since).count() >= settings.INTRO_WEEKLY_LIMIT:
+    if _my_recent(member, now).count() >= settings.INTRO_WEEKLY_LIMIT:
         raise Conflict("You have used this week's introductions", code="intro_weekly_limit")
     taken = IntroRequest.objects.filter(
         target=target, created_at__gte=since, status__in=[S.PENDING, S.ACCEPTED, S.COMPLETED]

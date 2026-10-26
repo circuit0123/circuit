@@ -1,0 +1,81 @@
+{
+  "calls": [
+    {
+      "hook": "useJob",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs/1"
+      },
+      "response": {
+        "applied": false,
+        "capabilities": [
+          {
+            "name": "Biotech lab work",
+            "required": true,
+            "slug": "biotech-lab",
+            "your_level": null
+          },
+          {
+            "name": "Clinical research",
+            "required": false,
+            "slug": "clinical-research",
+            "your_level": null
+          },
+          {
+            "name": "Regulatory affairs",
+            "required": false,
+            "slug": "regulatory-affairs",
+            "your_level": null
+          }
+        ],
+        "contact": {
+          "display_name": "Rajesh Venkatesh",
+          "id": 13,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "created_at": "2026-02-23T13:00:00Z",
+        "description": "",
+        "distance_km": null,
+        "duration_weeks": null,
+        "id": 1,
+        "is_open": true,
+        "is_team": false,
+        "kind": "internship",
+        "lat": 13.005451991754517,
+        "lng": 80.28652761274965,
+        "location": "Adyar, Chennai",
+        "sector": "biotech",
+        "skill_match": 0.0,
+        "starts_on": null,
+        "startup_id": 8,
+        "startup_logo": null,
+        "startup_name": "Aeroforge",
+        "startup_verified": true,
+        "stipend_max": 20000,
+        "stipend_min": 12000,
+        "title": "Associate – Biotech lab work"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useApply",
+      "request": {
+        "method": "POST",
+        "path": "/api/jobs/16/apply"
+      },
+      "response": {
+        "error": {
+          "code": "not_found",
+          "details": null,
+          "message": "Not found"
+        }
+      },
+      "status": 404
+    }
+  ],
+  "persona": "custom",
+  "scenario": "under_18",
+  "screen": "job"
+}

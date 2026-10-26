@@ -11,7 +11,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
-from apps.accounts.models import Member
+from apps.accounts.models import Member, Role
 from apps.events.services import record
 from core.errors import ApiError
 
@@ -75,6 +75,18 @@ def state(member: Member, beta_access: bool) -> dict:
     }
 
 
+def _mark_minor(member: Member) -> list[str]:
+    """The age answer is "under 18": apply every under-18 rule the server has. One way only: answering "adult" later never
+    clears it (a minor could otherwise just answer again); a super admin can change it in Django admin."""
+    member.is_minor = True
+    member.profile_visibility = Member.Visibility.HIDDEN
+    member.allow_requests = False
+    member.circuits_opt_in = False
+    member.role = Role.STUDENT  # under-18 members are students only
+    record("member.marked_minor", actor=member, target_type="member", target_id=member.pk)
+    return ["is_minor", "profile_visibility", "allow_requests", "circuits_opt_in", "role"]
+
+
 def save(member: Member, beta_access: bool, patch: dict) -> dict:
     """Merge a step into the saved state. `answers` merge per step; `signup_source` is set once (first touch wins)."""
     answers_in: dict[str, Any] = patch.get("answers") or {}
@@ -91,6 +103,8 @@ def save(member: Member, beta_access: bool, patch: dict) -> dict:
             saved["completed_at"] = timezone.now().isoformat()
         locked.onboarding = saved
         fields = ["onboarding", "updated_at"]
+        if (answers_in.get("age") or {}).get("adult") is False and not locked.is_minor:
+            fields += _mark_minor(locked)
         if patch.get("signup_source") and not locked.signup_source:
             locked.signup_source = patch["signup_source"]
             fields.append("signup_source")

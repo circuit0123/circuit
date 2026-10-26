@@ -21,6 +21,22 @@ def connected_ids(member_id: int) -> set[int]:
     return {b if a == member_id else a for a, b in pairs}
 
 
+def mutual_counts(friends: set[int], member_ids: set[int]) -> dict[int, int]:
+    """For each of `member_ids`: how many of `friends` they are connected to. One query for all of them (never one per person)."""
+    if not friends or not member_ids:
+        return {}
+    pairs = Connection.objects.filter(
+        Q(member_a_id__in=member_ids, member_b_id__in=friends) | Q(member_b_id__in=member_ids, member_a_id__in=friends)
+    ).values_list("member_a_id", "member_b_id")
+    counts: dict[int, int] = {}
+    for a, b in pairs:
+        if a in member_ids and b in friends and a != b:
+            counts[a] = counts.get(a, 0) + 1
+        if b in member_ids and a in friends and a != b:
+            counts[b] = counts.get(b, 0) + 1
+    return counts
+
+
 def blocked_ids(member_id: int) -> set[int]:
     """People I blocked and people who blocked me. Either way, we stop seeing each other."""
     pairs = Block.objects.filter(Q(blocker_id=member_id) | Q(blocked_id=member_id)).values_list("blocker_id", "blocked_id")

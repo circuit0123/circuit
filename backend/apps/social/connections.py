@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from apps.accounts.models import Connection, ConnectionRequest, Member
 from apps.events.services import record
-from apps.social import services
+from apps.social import media, services
 from apps.social.relations import blocked_ids, connected_ids, is_connected, may_request_connection
 from apps.social.schemas import author
 from core.errors import ApiError, Conflict, NotFound
@@ -24,7 +24,8 @@ REASK_AFTER = timedelta(days=30)  # after a decline, the sender cannot ask again
 def list_connections(member: Member) -> list[dict]:
     services.require_social(member)
     ids = connected_ids(member.pk) - blocked_ids(member.pk)
-    people = Member.objects.filter(pk__in=ids, suspended_at__isnull=True).order_by("display_name", "pk")
+    people = list(Member.objects.filter(pk__in=ids, suspended_at__isnull=True).order_by("display_name", "pk"))
+    media.prime_photos(people)  # one storage call for the whole list
     return [author(p) for p in people]
 
 

@@ -1,0 +1,89 @@
+{
+  "calls": [
+    {
+      "hook": "usePostComposer",
+      "request": {
+        "body": {
+          "body": "Draft to delete.",
+          "capabilities": [],
+          "link": "",
+          "visibility": "everyone"
+        },
+        "method": "POST",
+        "path": "/api/posts"
+      },
+      "response": {
+        "author": {
+          "city": "Chennai",
+          "display_name": "Asha Raman",
+          "headline": "",
+          "id": 1,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "body": "Draft to delete.",
+        "capabilities": [],
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 37,
+        "link": "",
+        "media": [],
+        "my_reactions": [],
+        "private_stats": {
+          "reactions": {},
+          "replies": 0
+        },
+        "status": "visible",
+        "visibility": "everyone"
+      },
+      "status": 201
+    },
+    {
+      "hook": "useDeletePost",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/posts/37"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useReply",
+      "request": {
+        "body": {
+          "body": "A reply to remove."
+        },
+        "method": "POST",
+        "path": "/api/posts/1/replies"
+      },
+      "response": {
+        "author": {
+          "city": "Chennai",
+          "display_name": "Asha Raman",
+          "headline": "",
+          "id": 1,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "body": "A reply to remove.",
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 8,
+        "replies": []
+      },
+      "status": 201
+    },
+    {
+      "hook": "useDeleteReply",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/replies/8"
+      },
+      "response": null,
+      "status": 204
+    }
+  ],
+  "persona": "asha",
+  "scenario": "delete",
+  "screen": "build_log"
+}

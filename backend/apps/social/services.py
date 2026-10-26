@@ -4,8 +4,10 @@
 Anything the viewer may not see is a 404, the same as a post that does not exist.
 """
 
+from datetime import UTC, datetime
+
 from django.db import IntegrityError, transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from apps.accounts.models import Member
 from apps.events.services import record
@@ -18,6 +20,7 @@ from apps.social.schemas import author
 from apps.startups.models import Startup
 from apps.startups.services import get_startup
 from core.errors import ApiError, Forbidden, NotFound
+from core.pagination import decode_cursor, encode_cursor
 from core.ratelimit import check_rate
 
 MAX_MEDIA = 4
@@ -89,6 +92,7 @@ def delete_post(member: Member, post_id: int) -> None:
 def post_rows(viewer: Member, posts) -> list[dict]:
     """Posts as the viewer sees them. Totals only for the author's own posts; `my_reactions` is just the viewer's own."""
     posts = list(posts)
+    media.prime_photos(p.author for p in posts)
     ids = [p.pk for p in posts]
     mine: dict[int, list[str]] = {}
     for post_id, kind in Reaction.objects.filter(post_id__in=ids, member=viewer).values_list("post_id", "kind"):
@@ -123,7 +127,8 @@ def post_rows(viewer: Member, posts) -> list[dict]:
     return rows
 
 
-def member_posts(viewer: Member, member_id: int) -> list[Post]:
+def member_posts(viewer: Member, member_id: int, cursor: str | None = None, limit: int = 20) -> tuple[list[Post], str | None]:
+    """One page of a member's build logs, newest first, plus the cursor for the next page (None on the last one)."""
     from apps.social.relations import is_connected, same_org
 
     require_social(viewer)
@@ -133,7 +138,18 @@ def member_posts(viewer: Member, member_id: int) -> list[Post]:
     if target.pk != viewer.pk and (target.is_minor or target.profile_visibility == Member.Visibility.HIDDEN):
         if not (is_connected(viewer.pk, target.pk) or same_org(viewer, target)):
             raise NotFound()  # a stranger cannot tell a hidden member from one who does not exist
-    return list(visible_posts(viewer).filter(author=target).select_related("author").order_by("-created_at", "-id")[:60])
+    qs = visible_posts(viewer).filter(author=target).select_related("author").order_by("-created_at", "-id")
+    if cursor:
+        micros, post_id = decode_cursor(cursor, 2)
+        if not isinstance(micros, int) or not isinstance(post_id, int):
+            raise ApiError(422, "bad_cursor", "That page marker is not valid. Reload from the top.")
+        before = datetime.fromtimestamp(micros / 1_000_000, tz=UTC)
+        qs = qs.filter(Q(created_at__lt=before) | Q(created_at=before, pk__lt=post_id))
+    page = list(qs[: limit + 1])
+    more = len(page) > limit
+    page = page[:limit]
+    nxt = encode_cursor(int(page[-1].created_at.timestamp() * 1_000_000), page[-1].pk) if more else None
+    return page, nxt
 
 
 # -- reactions ------------------------------------------------------------------------------------------
@@ -230,3 +246,27 @@ def unfollow(member: Member, startup_id: int) -> None:
 def my_follows(member: Member) -> list[Startup]:
     require_social(member)
     return [f.startup for f in Follow.objects.filter(member=member).select_related("startup").order_by("-created_at")]
+
+
+def picture_tiles(viewer: Member, author_ids, limit: int) -> list[dict]:
+    """The first picture of each of the latest build logs by these people that the viewer may see (Startup page, Profile grid).
+    Empty when Pulse is off for the viewer. Posts with no picture are skipped."""
+    from core import flags
+
+    if not flags.enabled("pulse", viewer):
+        return []
+    posts = list(
+        visible_posts(viewer)
+        .filter(author_id__in=list(author_ids), status=Post.Status.VISIBLE, media__isnull=False)
+        .order_by("-created_at", "-id")
+        .distinct()[:limit]
+    )
+    first: dict[int, PostMedia] = {}
+    for pm in PostMedia.objects.filter(post__in=posts).select_related("upload").order_by("-order"):
+        first[pm.post_id] = pm  # ends on order 0, the first picture
+    urls = media.urls_for(pm.upload for pm in first.values())
+    return [
+        {"post_id": p.pk, "image": {"alt_text": first[p.pk].alt_text, **urls[first[p.pk].upload_id]}}
+        for p in posts
+        if p.pk in first
+    ]

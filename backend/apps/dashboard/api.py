@@ -7,7 +7,7 @@ from core.permissions import require_org_admin
 router = Router()
 
 
-class CountOut(Schema):
+class MaskedCountOut(Schema):
     value: int | None  # None when the real number is below 5
     hidden: bool
 
@@ -16,9 +16,9 @@ class GapOut(Schema):
     capability: str
     name: str
     category: str
-    needed_by: CountOut  # my members who need it
-    offered_by: CountOut  # my members who offer it
-    offered_outside: CountOut  # visible people outside the organisation who offer it
+    needed_by: MaskedCountOut  # my members who need it
+    offered_by: MaskedCountOut  # my members who offer it
+    offered_outside: MaskedCountOut  # visible people outside the organisation who offer it
     is_gap: bool  # at least 5 members need it and fewer than half as many offer it
 
 
@@ -35,18 +35,18 @@ class HeatmapOut(Schema):
 
 
 class NetworkOut(Schema):
-    members: CountOut
-    new_members_30d: CountOut
-    members_with_matches: CountOut
-    intros_requested: CountOut
-    intros_accepted: CountOut
-    circuits_completed: CountOut
-    applications: CountOut
+    members: MaskedCountOut
+    new_members_30d: MaskedCountOut
+    members_with_matches: MaskedCountOut
+    intros_requested: MaskedCountOut
+    intros_accepted: MaskedCountOut
+    circuits_completed: MaskedCountOut
+    applications: MaskedCountOut
 
 
 class AcceptanceGroup(Schema):
-    requested: CountOut
-    accepted: CountOut
+    requested: MaskedCountOut
+    accepted: MaskedCountOut
     rate_percent: int | None  # only when both counts are at least 5
 
 

@@ -115,7 +115,7 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [x] App `/join` route reads role, org, invite code and src; onboarding skips the steps they answer; src saved on the member (F2: invite, role and college-email skips and `src` saving are tested)
 - [x] `useFeatures()` hook from `/api/config`; tabs, entry points and routes for an off flag are removed (DESIGN.md §3), and their URLs show the 404 screen (F1: tabs hide; `/circuits`, an unbuilt or off tab, shows the 404 page)
 - [x] Data layer: one hook per screen/action in apps/app/src/data; ESLint rule forbids API client, Supabase or fetch imports outside src/data; tested by `apps/app/tests/boundary.test.mjs` for the app and packages/ui (F1)
-- [ ] Mock mode: `pnpm dev:mock` with MSW handlers generated from contract fixtures and scenario switcher (empty, loading, error, slow 3G, under-18, partner, investor, features off) — F1 built `make mock` with temporary fixtures typed against openapi.json and the scenarios default, empty, loading, error, slow 3G, beta access missing, features off, under 18. Still open: partner and investor scenarios (their screens come later) and the B7 contract fixtures
+- [ ] Mock mode: `pnpm dev:mock` with MSW handlers generated from contract fixtures and scenario switcher (empty, loading, error, slow 3G, under-18, partner, investor, features off) — F1 built `make mock` with temporary fixtures typed against openapi.json and the scenarios default, empty, loading, error, slow 3G, beta access missing, features off, under 18. Still open: partner and investor scenarios (their screens come later). B7 part 1 made the contract fixtures (`packages/api-client/fixtures/`, one file per screen and scenario); pointing `make mock` at them is a frontend task
 - [ ] apps/app shell: Supabase sign-in (Google + OTP), auth callback, navigation per DESIGN.md §3 (Home · Discover · Circuits · Inbox · Profile; create in top bar), environment banner, persona switcher (dev/demo)
 - [x] Sign-up and onboarding per DESIGN.md §4 "Sign-up and onboarding": one thing per screen (steps 1–14), resumable, inference before asking, under-18 defaults, measured time-to-first-drop < 2 min (Playwright test with timing) (F2; the investor and partner branches arrive with their flags, and the photo step is mock-only until an avatar upload endpoint exists)
 - [x] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end (F3: mobile and desktop Home, Update view, Notifications, the intro confirm sheet; Pulse off / Daily Drop off / both off / under-18 states)
@@ -248,18 +248,37 @@ Deployment (next session):
 - [x] Rollback documented (RUNBOOK.md "Rollback"); the deploy rolls back by itself when the live smoke test fails (tested with fakes)
 - [ ] [YOU] Rollback tried once for real (RUNBOOK.md "One-time setup", step 9)
 
+## B7 part 1 — API handoff and frontend gaps (backend session)
+- [x] Every "Frontend → API needed" entry in PROGRESS.md (F1–F5) built with its endpoint, field or Realtime event, permission and flag checks, IDOR tests, one success and one failure test; the two that need tables from Stages 4d and 4g are explained, not built (B7)
+- [x] Each DESIGN.md §4 screen checked against its endpoint: one call returns everything the screen shows (no per-card follow-ups), privacy-sensitive fields absent for people who may not see them, tests prove it (found and fixed: startup `view_count` / `interest_count` went to every viewer) (B7)
+- [x] FRONTEND_HANDOFF.md: per screen the hook, endpoints, shapes, errors (incl. `feature_off`), Realtime channels and payloads, rate limits (B7)
+- [x] Contract tests in `backend/tests/contract/` that make the handoff's calls against the seeded demo world, check them against openapi.json and compare with fixtures exported to `packages/api-client/fixtures/` (B7)
+- [x] openapi.json and `packages/api-client` regenerated; `make api-client` and `make contract-fixtures` documented in COMMANDS.md (B7)
+- [x] PROGRESS.md: each handled entry marked "done in B7", plus the list "Frontend: switch these hooks from mocks to the real API" (B7)
+- [ ] Frontend: update `apps/app` mocks to the new types (48 type errors), then switch the hooks in that list
+- [ ] Promoted and partner items in Pulse and Discover (Stage 4d and 4g backends first)
+
+## B7 part 2 — load test, cleanup, funnel, RUNBOOK, freeze (backend session)
+- [x] `make load-test URL=… [USERS=50,200]`: beta mix, p50/p95/error rate against PRODUCTION.md §9, refuses production (and anything it cannot identify); run locally at 50 and 200 users, results in PROGRESS.md
+- [x] Fixes from it: Live wire N+1 (52 → 37 queries), jobs rows built for the page only, Pulse role cards filtered before building, gunicorn worker recycling 10x rarer (it dropped about 1 request in 800); query-count tests on the 12 busiest endpoints
+- [x] Cleanup: one India-time helper (`core/ist.py`), one small-count rule (`core/smallcount.py`), one distance function, unused settings and definitions removed; ruff and mypy clean, no new `noqa` / `type: ignore`
+- [x] Funnel per `signup_source`: `POST /api/join/visit` (aggregate click counter), `make funnel`, Django admin → Metrics
+- [x] RUNBOOK.md completed for launch
+- [x] API frozen at 1.1.0: version line in FRONTEND_HANDOFF.md, `make api-freeze`, CI step that fails when openapi.json changes without a version bump and a handoff change
+- [ ] [YOU] Run the load test on staging; fill in the RUNBOOK contacts and manual-check dates
+
 ## Stage 10 — Quality and performance
 - [ ] Every row in PRODUCTION.md §14 has a passing automated test or a dated manual check in RUNBOOK.md
 - [ ] PWA for apps/app: manifest, icons, offline shell, update prompt, install prompt (incl. iOS)
 - [ ] Lighthouse ≥ 90 mobile (landing, app Home); bundle budget; lazy-load map and charts
-- [ ] Load test staging (~1,000 concurrent users); fix top bottlenecks
-- [ ] Privacy-friendly analytics for the pilot funnel
+- [ ] Load test staging (~1,000 concurrent users); fix top bottlenecks — B7 part 2 built `make load-test` (refuses production), ran it at 50 and 200 users against `make run-prod-local` and fixed what it found (PROGRESS.md "B7 part 2"). Still open: the staging run ([YOU])
+- [x] Privacy-friendly analytics for the pilot funnel — per-source funnel (clicks, signed up, beta access, onboarding done, first match action), counts under 5 hidden, in Django admin → Metrics and `make funnel` (B7 part 2). Frontend must call `POST /api/join/visit` from `/join`
 
 ## Stage 11 — Cleanup (alone, last)
-- [ ] Remove dead code, unused deps, debug code, stray TODOs; consistent patterns
+- [x] Remove dead code, unused deps, debug code, stray TODOs; consistent patterns — backend done in B7 part 2 (no TODOs were left; one India-time helper, one small-count rule, unused settings and definitions removed, `.env.example` tied to the settings by a test). Frontend and unused npm packages are still open
 - [ ] README: setup in under 10 minutes on Mac, Linux (Arch/Omarchy) and WSL, using only COMMANDS.md targets
 - [ ] Every COMMANDS.md target works from a fresh clone; no command missing from it
-- [ ] RUNBOOK.md: deploy, rollback, restore, rotate secrets, outage, data request, takedown
+- [x] RUNBOOK.md: deploy, rollback, restore, rotate secrets, outage, data request, takedown — completed in B7 part 2 ("Running the beta": deploy approval, invite codes, waitlist, flags, takedowns, staging load test, incident checklist, contacts, dated manual checks). The `<…>` placeholders are yours to fill
 - [ ] All tests and smoke green
 
 ## Stage 12 — Go live

@@ -126,7 +126,9 @@ def test_detail_counts_one_view_per_member_per_day(make_member, make_startup, cl
     for _ in range(3):
         assert client_for(a).get(f"/api/startups/{s.pk}").status_code == 200
     r = client_for(b).get(f"/api/startups/{s.pk}")
-    assert r.json()["view_count"] == 2
+    assert r.json()["view_count"] is None  # students never see the count (see test_b7_startup_page.py)
+    s.refresh_from_db()
+    assert s.view_count == 2
     assert Event.objects.filter(type="startup.viewed", target_id=s.pk).count() == 2
 
 
@@ -135,7 +137,9 @@ def test_view_still_counts_when_redis_is_down(make_member, make_startup, client_
 
     monkeypatch.setattr(cache.Cache, "incr_window", lambda self, key, window: None)
     s = make_startup()
-    assert client_for(make_member()).get(f"/api/startups/{s.pk}").json()["view_count"] == 1
+    assert client_for(make_member()).get(f"/api/startups/{s.pk}").status_code == 200
+    s.refresh_from_db()
+    assert s.view_count == 1
 
 
 def test_team_views_do_not_count(make_member, make_startup, client_for):
@@ -154,7 +158,8 @@ def test_detail_shows_open_jobs_interest_and_claimed_flag(lists, make_member, ma
     client_for(student).post(f"/api/startups/{s.pk}/interest")
     body = client_for(student).get(f"/api/startups/{s.pk}").json()
     assert [j["id"] for j in body["open_jobs"]] == [job.pk]
-    assert body["interest_count"] == 1 and body["interested"] is True and body["claimed"] is False
+    assert StartupInterest.objects.filter(startup=s).count() == 1
+    assert body["interest_count"] is None and body["interested"] is True and body["claimed"] is False  # the count is private
 
 
 def test_unknown_startup_is_404(make_member, client_for):

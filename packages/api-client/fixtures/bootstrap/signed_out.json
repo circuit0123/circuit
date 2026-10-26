@@ -1,0 +1,30 @@
+{
+  "calls": [
+    {
+      "hook": "useFeatures",
+      "request": {
+        "method": "GET",
+        "path": "/api/config"
+      },
+      "response": {
+        "beta_access": true,
+        "beta_mode": false,
+        "env": "dev",
+        "features": {
+          "circuits": true,
+          "daily_drop": true,
+          "investor_mode": true,
+          "partner_mode": true,
+          "payments": true,
+          "promotions": true,
+          "pulse": true
+        },
+        "llm_available": true
+      },
+      "status": 200
+    }
+  ],
+  "persona": null,
+  "scenario": "signed_out",
+  "screen": "bootstrap"
+}

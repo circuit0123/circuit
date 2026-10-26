@@ -6,7 +6,6 @@ connections, distance. Every source uses the rules the rest of the social app us
 nothing here returns a count of views or reactions.
 """
 
-import math
 from datetime import timedelta
 from typing import Any
 
@@ -17,10 +16,12 @@ from apps.accounts.models import Member
 from apps.events.models import Event
 from apps.events.services import record
 from apps.matching.models import Need, Offer
-from apps.social import pulse, services
+from apps.matching.scoring import haversine_km
+from apps.social import media, pulse, services
 from apps.social.models import UpdateView
-from apps.social.relations import blocked_ids, connected_ids, org_mate_ids, visible_posts
+from apps.social.relations import blocked_ids, connected_ids, mutual_counts, org_mate_ids, visible_posts
 from apps.social.schemas import author
+from core import ist
 from core.errors import NotFound
 
 MAX_ITEMS = 12
@@ -33,10 +34,7 @@ def _km(a: Member, b: Member | None) -> float | None:
     """Straight-line distance in km between two members who have a location."""
     if b is None or a.location is None or b.location is None:
         return None
-    (lat1, lng1), (lat2, lng2) = (a.location.y, a.location.x), (b.location.y, b.location.x)
-    p1, p2 = math.radians(lat1), math.radians(lat2)
-    h = math.sin((p2 - p1) / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lng2 - lng1) / 2) ** 2
-    return 6371 * 2 * math.asin(math.sqrt(h))
+    return haversine_km(a.location.y, a.location.x, b.location.y, b.location.x)
 
 
 def _mine(member: Member) -> dict[str, dict[str, str]]:
@@ -53,7 +51,7 @@ def _mine(member: Member) -> dict[str, dict[str, str]]:
     }
 
 
-def _reason(cand: Candidate, mine: dict[str, dict[str, str]], friends: set[int], me: Member) -> tuple[float, str]:
+def _reason(cand: Candidate, mine: dict[str, dict[str, str]], mutual: dict[int, int], me: Member) -> tuple[float, str]:
     """(relevance, one line on why this matters to me). The line never names anyone I could not already see."""
     parts: list[str] = []
     score = 0.0
@@ -76,7 +74,7 @@ def _reason(cand: Candidate, mine: dict[str, dict[str, str]], friends: set[int],
     score += 3 * min(len(set(shared_do) | set(shared_need)), 2)
     actor = cand.get("member")
     if actor is not None:
-        mutuals = len((connected_ids(actor.pk) & friends) - {me.pk, actor.pk})
+        mutuals = mutual.get(actor.pk, 0)
         if mutuals:
             parts.append(f"{mutuals} mutual connection{'s' if mutuals > 1 else ''}")
         score += min(mutuals, 3)
@@ -220,8 +218,9 @@ def live_wire(member: Member) -> list[dict]:
         + _circuits(member, since, friends)
     )
     mine = _mine(member)
+    mutual = mutual_counts(friends, {c["member"].pk for c in candidates if c.get("member") is not None})
     for c in candidates:
-        c["score"], c["reason"] = _reason(c, mine, friends, member)
+        c["score"], c["reason"] = _reason(c, mine, mutual, member)
     viewed = set(UpdateView.objects.filter(viewer=member, key__in=[c["key"] for c in candidates]).values_list("key", flat=True))
     candidates.sort(key=lambda c: (c["key"] in viewed, -c["score"], -c["at"].timestamp()))
     picked: list[Candidate] = []
@@ -230,6 +229,7 @@ def live_wire(member: Member) -> list[dict]:
         if per_kind.get(c["kind"], 0) < PER_KIND.get(c["kind"], DEFAULT_PER_KIND):
             per_kind[c["kind"]] = per_kind.get(c["kind"], 0) + 1
             picked.append(c)
+    media.prime_photos(c["member"] for c in picked[:MAX_ITEMS] if c["member"])
     return [
         {
             "key": c["key"], "kind": c["kind"], "actor": author(c["member"]) if c["member"] else None,
@@ -244,5 +244,5 @@ def mark_viewed(member: Member, key: str) -> None:
     """Called when an update is opened. An update that is not on my wire is a 404, so keys cannot be probed."""
     if key not in {u["key"] for u in live_wire(member)}:
         raise NotFound()
-    UpdateView.objects.update_or_create(viewer=member, key=key, defaults={"date": pulse.ist_day_start(timezone.now()).date()})
+    UpdateView.objects.update_or_create(viewer=member, key=key, defaults={"date": ist.day_start().date()})
     record("livewire.viewed", actor=member, target_type="update", key=key)

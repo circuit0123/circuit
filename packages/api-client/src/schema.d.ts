@@ -184,6 +184,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cities
+         * @description The cities a member can choose in sign-up, each with its centre point. The pilot city is first.
+         */
+        get: operations["core_cities_cities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/config": {
         parameters: {
             query?: never;
@@ -312,6 +332,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/conversations/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Unread conversations
+         * @description How many chats and requests have something I have not read: for the Inbox tab dot and the desktop rail.
+         */
+        get: operations["apps_messaging_api_unread_count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/conversations/{conversation_id}": {
         parameters: {
             query?: never;
@@ -372,6 +412,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/conversations/{conversation_id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decline a request
+         * @description 'No thanks' to a request I received. It disappears for me; the sender is not told. Only the person the request was sent to; a conversation that is not a request is a 409 `not_a_request`.
+         */
+        post: operations["apps_messaging_api_decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/conversations/{conversation_id}/messages": {
         parameters: {
             query?: never;
@@ -381,7 +441,7 @@ export interface paths {
         };
         /**
          * Messages in a conversation
-         * @description Newest first. Pass next_cursor as cursor to load older ones. Read receipts are not shown to senders.
+         * @description Newest first. Pass next_cursor as cursor to load older ones. `read_at` on my own messages is set only when both of us have read receipts on.
          */
         get: operations["apps_messaging_api_list_messages"];
         put?: never;
@@ -660,6 +720,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/intros/capacity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Introductions left this week
+         * @description How many of this week's introductions I have used and left, and when the next one frees up, so the request sheet can say '2 left' before I press Send. Only about me; how full another person is stays private.
+         */
+        get: operations["apps_intros_api_capacity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/intros/path/{target_id}": {
         parameters: {
             query?: never;
@@ -764,6 +844,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/jobs/skills-in-demand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Skills in demand near me
+         * @description The top 3 capabilities asked for by open roles within `within_km` (default 10) of my location or the city centre. Role counts only, never people. Members under 18 count only verified startups' roles.
+         */
+        get: operations["apps_jobs_api_skills_in_demand"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/jobs/{job_id}": {
         parameters: {
             query?: never;
@@ -828,6 +928,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/join/visit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Count a landing link opened
+         * @description Public. The app's /join page calls it once per browser session with the link's `src`, so the funnel can show clicks next to sign-ups. Adds 1 to a per-day count for that `src`; nothing about the visitor is stored. Answers 204. Rate limited per address.
+         */
+        post: operations["apps_beta_api_join_visit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/livewire": {
         parameters: {
             query?: never;
@@ -877,7 +997,7 @@ export interface paths {
         };
         /**
          * My matches
-         * @description People who fit what I need and offer, best first, each with a one-line reason. Computed ahead of time, so this is a cheap read. bridge=true shows only Bridge matches (different sector), bridge=false only the rest. Partner admins and super admins have no matches.
+         * @description People who fit what I need and offer, best first, each with a one-line reason. Computed ahead of time, so this is a cheap read. bridge=true shows only Bridge matches (different sector), bridge=false only the rest. Filters: role, verified (level 2+), capability (a slug they offer) and within_km (5, 10, 25 or 50). The distance itself is never returned. Partner admins and super admins have no matches.
          */
         get: operations["apps_matching_api_list_matches"];
         put?: never;
@@ -927,7 +1047,7 @@ export interface paths {
         head?: never;
         /**
          * Update my appearance
-         * @description Theme (system, dark, light), personal accent (mint, sky, indigo, rose, lime, mono) and swipe between tabs. Send only the fields to change. Any other value or field is a 422. Stored on the member so it follows them across devices.
+         * @description Theme (system, dark, light), personal accent (emerald, sky, indigo, rose, lime, mono; the old name 'mint' is still accepted and stored as emerald) and swipe between tabs. Send only the fields to change. Any other value or field is a 422. Stored on the member so it follows them across devices.
          */
         patch: operations["apps_accounts_settings_api_patch_appearance"];
         trace?: never;
@@ -1144,6 +1264,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set my profile photo
+         * @description Upload the image first (`POST /api/media/uploads` with purpose `avatar`, PUT the file, then complete) and send its id here. The previous photo is deleted. Someone else's upload is a 404. Under-18 members' photos are shown to nobody but them.
+         */
+        put: operations["apps_accounts_api_set_my_photo"];
+        post?: never;
+        /**
+         * Remove my profile photo
+         * @description Back to the circuit-pattern avatar. Safe to repeat.
+         */
+        delete: operations["apps_accounts_api_remove_my_photo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/privacy": {
         parameters: {
             query?: never;
@@ -1321,7 +1465,7 @@ export interface paths {
         };
         /**
          * A member's profile
-         * @description Another member's profile. Hidden, under-18, suspended, blocked and admin accounts are a 404.
+         * @description The whole Profile screen in one call: header (photo, headline, organisation for people in mine), what I can do with them (connect, message, intro via a mutual), mutual connections, needs and offers, skills, a grid of their build logs, closed circuits (mine or a connection's) and, on my own profile, the strength meter with its next step. Hidden, under-18, suspended, blocked and admin accounts are a 404. My own id works too.
          */
         get: operations["apps_accounts_api_member_profile"];
         put?: never;
@@ -1620,6 +1764,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/organisations/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find an organisation by name
+         * @description For 'Where do you study?': up to 10 organisations whose name contains the text (at least 2 characters), best first. Never returns join codes or email domains. Picking one only fills in the college name; joining still needs the organisation's invite code or a verified email on its domain.
+         */
+        get: operations["apps_organisations_api_search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/posts": {
         parameters: {
             query?: never;
@@ -1792,6 +1956,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search people, startups and roles
+         * @description One call for the Discover search field: up to 10 people (by name), 10 startups (by name or sector) and 10 roles (by title, startup or skill). Hidden, under-18, blocked and deleted people never appear; members under 18 find only their connections and roles at verified startups. Rate limited.
+         */
+        get: operations["apps_startups_search_api_search_all"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/startups/map": {
         parameters: {
             query?: never;
@@ -1841,7 +2025,7 @@ export interface paths {
         };
         /**
          * Startup profile
-         * @description Profile, open roles, and how many people viewed it or showed interest (a reason to claim it). Counts one view per member per day.
+         * @description Profile, open roles, founders (each with the warm path to them), the latest build log pictures and the logo. Counts one view per member per day. `view_count` and `interest_count` are private: only the startup's team, or a founder looking at an unclaimed page (a reason to claim it, never under 5), get them. Members under 18 see an unverified startup as not hiring, with no roles.
          */
         get: operations["apps_startups_api_startup_detail"];
         put?: never;
@@ -1939,6 +2123,30 @@ export interface paths {
          * @description Students only. Safe to repeat.
          */
         delete: operations["apps_startups_api_remove_interest"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/startups/{startup_id}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set the startup's logo
+         * @description The startup's team only. Upload the image first (`POST /api/media/uploads` with purpose `startup_logo`, founders only), then send its id. The previous logo is deleted.
+         */
+        put: operations["apps_startups_api_set_logo"];
+        post?: never;
+        /**
+         * Remove the startup's logo
+         * @description The startup's team only. Safe to repeat.
+         */
+        delete: operations["apps_startups_api_remove_logo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2054,10 +2262,10 @@ export interface components {
     schemas: {
         /** AcceptanceGroup */
         AcceptanceGroup: {
-            accepted: components["schemas"]["CountOut"];
+            accepted: components["schemas"]["MaskedCountOut"];
             /** Rate Percent */
             rate_percent: number | null;
-            requested: components["schemas"]["CountOut"];
+            requested: components["schemas"]["MaskedCountOut"];
         };
         /** AcceptanceOut */
         AcceptanceOut: {
@@ -2092,7 +2300,7 @@ export interface components {
              * Accent
              * @enum {string}
              */
-            accent: "mint" | "sky" | "indigo" | "rose" | "lime" | "mono";
+            accent: "emerald" | "sky" | "indigo" | "rose" | "lime" | "mono";
             /** Swipe Tabs */
             swipe_tabs: boolean;
             /**
@@ -2104,7 +2312,7 @@ export interface components {
         /** AppearancePatch */
         AppearancePatch: {
             /** Accent */
-            accent?: ("mint" | "sky" | "indigo" | "rose" | "lime" | "mono") | null;
+            accent?: ("emerald" | "mint" | "sky" | "indigo" | "rose" | "lime" | "mono") | null;
             /** Swipe Tabs */
             swipe_tabs?: boolean | null;
             /** Theme */
@@ -2136,6 +2344,8 @@ export interface components {
             capability: string;
             /** Level */
             level: number;
+            /** Name */
+            name: string;
             /** Proof Url */
             proof_url: string;
         };
@@ -2171,6 +2381,8 @@ export interface components {
             headline: string;
             /** Id */
             id: number;
+            /** Photo */
+            photo?: string | null;
             /** Role */
             role: string;
             /** Verification Level */
@@ -2196,6 +2408,12 @@ export interface components {
             /** Items */
             items: components["schemas"]["PersonOut"][];
         };
+        /** BuildLogTileOut */
+        BuildLogTileOut: {
+            image: components["schemas"]["PostMediaOut"];
+            /** Post Id */
+            post_id: number;
+        };
         /** CapabilityOut */
         CapabilityOut: {
             /** Category */
@@ -2211,6 +2429,19 @@ export interface components {
             name: string;
             /** Slug */
             slug: string;
+        };
+        /** CapacityOut */
+        CapacityOut: {
+            /** Allowed */
+            allowed: boolean;
+            /** Left */
+            left: number;
+            /** Next Frees At */
+            next_frees_at: string | null;
+            /** Used */
+            used: number;
+            /** Weekly Limit */
+            weekly_limit: number;
         };
         /** CellOut */
         CellOut: {
@@ -2256,8 +2487,11 @@ export interface components {
             members: components["schemas"]["MemberStatusOut"][];
             /** My Consent */
             my_consent: string;
-            /** Next Step */
-            next_step: string;
+            /**
+             * Next Step
+             * @enum {string}
+             */
+            next_step: "answer" | "waiting" | "mark_done" | "rate" | "none";
             /** Score Percent */
             score_percent: number;
             /** Status */
@@ -2267,6 +2501,17 @@ export interface components {
             /** Week */
             week: string;
             you_help: components["schemas"]["LineOut"];
+        };
+        /** CityOut */
+        CityOut: {
+            /** Lat */
+            lat: number;
+            /** Lng */
+            lng: number;
+            /** Name */
+            name: string;
+            /** Pilot */
+            pilot: boolean;
         };
         /** ClaimConfirmIn */
         ClaimConfirmIn: {
@@ -2295,6 +2540,8 @@ export interface components {
             features: {
                 [key: string]: boolean;
             };
+            /** Llm Available */
+            llm_available: boolean;
         };
         /** ConnectionRequestIn */
         ConnectionRequestIn: {
@@ -2365,13 +2612,6 @@ export interface components {
             status: "request" | "active";
             /** Unread */
             unread: number;
-        };
-        /** CountOut */
-        CountOut: {
-            /** Hidden */
-            hidden: boolean;
-            /** Value */
-            value: number | null;
         };
         /**
          * CursorParams
@@ -2517,6 +2757,17 @@ export interface components {
             /** Sector */
             sector: string;
         };
+        /** FounderOut */
+        FounderOut: {
+            /** Connected */
+            connected: boolean;
+            /** Is Me */
+            is_me: boolean;
+            person: components["schemas"]["PersonOut"];
+            /** Role */
+            role: string;
+            via: components["schemas"]["PersonOut"] | null;
+        };
         /** GapOut */
         GapOut: {
             /** Capability */
@@ -2527,9 +2778,9 @@ export interface components {
             is_gap: boolean;
             /** Name */
             name: string;
-            needed_by: components["schemas"]["CountOut"];
-            offered_by: components["schemas"]["CountOut"];
-            offered_outside: components["schemas"]["CountOut"];
+            needed_by: components["schemas"]["MaskedCountOut"];
+            offered_by: components["schemas"]["MaskedCountOut"];
+            offered_outside: components["schemas"]["MaskedCountOut"];
         };
         /** GrievanceOut */
         GrievanceOut: {
@@ -2686,6 +2937,8 @@ export interface components {
              * @default
              */
             description: string;
+            /** Duration Weeks */
+            duration_weeks?: number | null;
             /**
              * Kind
              * @default internship
@@ -2697,6 +2950,8 @@ export interface components {
              * @default
              */
             location: string;
+            /** Starts On */
+            starts_on?: string | null;
             /** Startup Id */
             startup_id: number;
             /** Stipend Max */
@@ -2712,6 +2967,7 @@ export interface components {
             applied?: boolean | null;
             /** Capabilities */
             capabilities: components["schemas"]["JobCapabilityOut"][];
+            contact: components["schemas"]["PersonOut"] | null;
             /**
              * Created At
              * Format: date-time
@@ -2721,10 +2977,14 @@ export interface components {
             description: string;
             /** Distance Km */
             distance_km: number | null;
+            /** Duration Weeks */
+            duration_weeks: number | null;
             /** Id */
             id: number;
             /** Is Open */
             is_open: boolean;
+            /** Is Team */
+            is_team: boolean;
             /** Kind */
             kind: string;
             /** Lat */
@@ -2737,10 +2997,16 @@ export interface components {
             sector: string;
             /** Skill Match */
             skill_match?: number | null;
+            /** Starts On */
+            starts_on: string | null;
             /** Startup Id */
             startup_id: number;
+            /** Startup Logo */
+            startup_logo: string | null;
             /** Startup Name */
             startup_name: string;
+            /** Startup Verified */
+            startup_verified: boolean;
             /** Stipend Max */
             stipend_max: number | null;
             /** Stipend Min */
@@ -2754,12 +3020,16 @@ export interface components {
             capabilities?: components["schemas"]["JobCapabilityIn"][] | null;
             /** Description */
             description?: string | null;
+            /** Duration Weeks */
+            duration_weeks?: number | null;
             /** Is Open */
             is_open?: boolean | null;
             /** Kind */
             kind?: ("internship" | "full_time" | "part_time") | null;
             /** Location */
             location?: string | null;
+            /** Starts On */
+            starts_on?: string | null;
             /** Stipend Max */
             stipend_max?: number | null;
             /** Stipend Min */
@@ -2803,16 +3073,34 @@ export interface components {
             capability: string;
             person: components["schemas"]["PersonOut"];
         };
+        /** LogoIn */
+        LogoIn: {
+            /** Upload Id */
+            upload_id: number;
+        };
+        /** MaskedCountOut */
+        MaskedCountOut: {
+            /** Hidden */
+            hidden: boolean;
+            /** Value */
+            value: number | null;
+        };
         /** MatchOut */
         MatchOut: {
             /** Candidate Id */
             candidate_id: number;
+            /** Capabilities */
+            capabilities: string[];
             /** City */
             city: string;
             /** Display Name */
             display_name: string;
+            /** Headline */
+            headline: string;
             /** Is Bridge */
             is_bridge: boolean;
+            /** Photo */
+            photo?: string | null;
             /** Reason */
             reason: string;
             /** Role */
@@ -2829,6 +3117,11 @@ export interface components {
             /** Bridge */
             bridge?: boolean | null;
             /**
+             * Capability
+             * @description Slug of something they offer
+             */
+            capability?: string | null;
+            /**
              * Limit
              * @default 20
              */
@@ -2838,6 +3131,15 @@ export interface components {
              * @default 0
              */
             offset: number;
+            /** Role */
+            role?: ("student" | "founder" | "mentor" | "investor") | null;
+            /** Verified */
+            verified?: boolean | null;
+            /**
+             * Within Km
+             * @description 5, 10, 25 or 50: lives within this distance of my location or the city centre
+             */
+            within_km?: number | null;
         };
         /** MeOut */
         MeOut: {
@@ -2856,6 +3158,8 @@ export interface components {
             college: string;
             /** Display Name */
             display_name: string;
+            /** Has Needs And Offers */
+            has_needs_and_offers: boolean;
             /** Id */
             id: number;
             /** Is Minor */
@@ -2870,12 +3174,21 @@ export interface components {
             open_intro_slots: number;
             /** Organisation Id */
             organisation_id: number | null;
+            /** Photo */
+            photo: string | null;
             /** Policy Version */
             policy_version: string;
             /** Profile Visibility */
             profile_visibility: string;
-            /** Role */
-            role: string;
+            /** Read Receipts */
+            read_receipts: boolean;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "student" | "founder" | "mentor" | "investor" | "partner_admin" | "super_admin";
+            /** Startup Id */
+            startup_id: number | null;
             /** Verification Level */
             verification_level: number;
             /** Visible To Org */
@@ -2920,6 +3233,17 @@ export interface components {
             is_me: boolean;
             person: components["schemas"]["PersonOut"];
         };
+        /** MessageImageOut */
+        MessageImageOut: {
+            /** Height */
+            height: number | null;
+            /** W1440 */
+            w1440: string;
+            /** W480 */
+            w480: string;
+            /** Width */
+            width: number | null;
+        };
         /** MessageOut */
         MessageOut: {
             /** Body */
@@ -2933,12 +3257,11 @@ export interface components {
             created_at: string;
             /** Id */
             id: number;
-            /** Image */
-            image: {
-                [key: string]: unknown;
-            } | null;
+            image: components["schemas"]["MessageImageOut"] | null;
             /** Mine */
             mine: boolean;
+            /** Read At */
+            read_at: string | null;
             /** Removed */
             removed: boolean;
         };
@@ -2989,13 +3312,13 @@ export interface components {
         };
         /** NetworkOut */
         NetworkOut: {
-            applications: components["schemas"]["CountOut"];
-            circuits_completed: components["schemas"]["CountOut"];
-            intros_accepted: components["schemas"]["CountOut"];
-            intros_requested: components["schemas"]["CountOut"];
-            members: components["schemas"]["CountOut"];
-            members_with_matches: components["schemas"]["CountOut"];
-            new_members_30d: components["schemas"]["CountOut"];
+            applications: components["schemas"]["MaskedCountOut"];
+            circuits_completed: components["schemas"]["MaskedCountOut"];
+            intros_accepted: components["schemas"]["MaskedCountOut"];
+            intros_requested: components["schemas"]["MaskedCountOut"];
+            members: components["schemas"]["MaskedCountOut"];
+            members_with_matches: components["schemas"]["MaskedCountOut"];
+            new_members_30d: components["schemas"]["MaskedCountOut"];
         };
         /** NotificationOut */
         NotificationOut: {
@@ -3105,6 +3428,17 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** OrgFoundOut */
+        OrgFoundOut: {
+            /** City */
+            city: string;
+            /** Id */
+            id: number;
+            /** Kind */
+            kind: string;
+            /** Name */
+            name: string;
+        };
         /** OrgMemberOut */
         OrgMemberOut: {
             /** College */
@@ -3130,6 +3464,13 @@ export interface components {
             kind: string;
             /** Name */
             name: string;
+        };
+        /** OrgSearchParams */
+        OrgSearchParams: {
+            /** Kind */
+            kind?: ("college" | "incubator" | "program") | null;
+            /** Q */
+            q: string;
         };
         /** PageParams */
         PageParams: {
@@ -3227,6 +3568,8 @@ export interface components {
             display_name: string;
             /** Id */
             id: number;
+            /** Photo */
+            photo?: string | null;
             /** Role */
             role: string;
             /** Verification Level */
@@ -3246,6 +3589,11 @@ export interface components {
             /** Persona */
             persona: string;
         };
+        /** PhotoIn */
+        PhotoIn: {
+            /** Upload Id */
+            upload_id: number;
+        };
         /** PinOut */
         PinOut: {
             /** Claimed */
@@ -3260,6 +3608,8 @@ export interface components {
             lat: number;
             /** Lng */
             lng: number;
+            /** Logo */
+            logo?: string | null;
             /** Match Pct */
             match_pct?: number | null;
             /** Name */
@@ -3326,7 +3676,7 @@ export interface components {
             /** Media */
             media: components["schemas"]["PostMediaOut"][];
             /** My Reactions */
-            my_reactions: string[];
+            my_reactions: ("helpful" | "intro_me" | "lets_talk")[];
             private_stats?: components["schemas"]["PrivateStatsOut"] | null;
             /** Status */
             status: string;
@@ -3344,6 +3694,8 @@ export interface components {
              * @enum {string}
              */
             profile_visibility: "public" | "members" | "hidden";
+            /** Read Receipts */
+            read_receipts: boolean;
             /** Visible To Org */
             visible_to_org: boolean;
         };
@@ -3355,6 +3707,8 @@ export interface components {
             circuits_opt_in?: boolean | null;
             /** Profile Visibility */
             profile_visibility?: ("public" | "members" | "hidden") | null;
+            /** Read Receipts */
+            read_receipts?: boolean | null;
             /** Visible To Org */
             visible_to_org?: boolean | null;
         };
@@ -3367,30 +3721,61 @@ export interface components {
             /** Replies */
             replies: number;
         };
+        /** ProfileActionsOut */
+        ProfileActionsOut: {
+            /** Connect */
+            connect: boolean;
+            /** Intro */
+            intro: boolean;
+            /** Message */
+            message: boolean;
+        };
         /** ProfileOut */
         ProfileOut: {
+            actions: components["schemas"]["ProfileActionsOut"];
             /** Bio */
             bio: string;
+            /** Build Logs */
+            build_logs: components["schemas"]["BuildLogTileOut"][];
+            /** Circuits Closed */
+            circuits_closed: number | null;
             /** City */
             city: string;
             /** College */
             college: string;
+            /**
+             * Connection
+             * @enum {string}
+             */
+            connection: "self" | "connected" | "requested" | "requested_you" | "none";
             /** Display Name */
             display_name: string;
+            /** Headline */
+            headline: string;
             /** Id */
             id: number;
+            /** Is Me */
+            is_me: boolean;
+            /** Mutual Count */
+            mutual_count: number | null;
             /** Needs */
             needs: components["schemas"]["NeedOfferOut"][];
             /** Offers */
             offers: components["schemas"]["NeedOfferOut"][];
+            /** Organisation */
+            organisation: string | null;
+            /** Photo */
+            photo: string | null;
             /** Role */
             role: string;
             /** Skills */
             skills: components["schemas"]["SkillOut"][];
+            strength: components["schemas"]["StrengthOut"] | null;
             /** Traits */
             traits: string[];
             /** Verification Level */
             verification_level: number;
+            via: components["schemas"]["PersonOut"] | null;
         };
         /** ProfileSummary */
         ProfileSummary: {
@@ -3538,6 +3923,20 @@ export interface components {
             /** Accept */
             accept: boolean;
         };
+        /** SearchOut */
+        SearchOut: {
+            /** Jobs */
+            jobs: components["schemas"]["JobOut"][];
+            /** People */
+            people: components["schemas"]["AuthorOut"][];
+            /** Startups */
+            startups: components["schemas"]["PinOut"][];
+        };
+        /** SearchParams */
+        SearchParams: {
+            /** Q */
+            q: string;
+        };
         /** SendIn */
         SendIn: {
             /**
@@ -3601,6 +4000,14 @@ export interface components {
             /** Skills */
             skills: components["schemas"]["SkillDemandOut"][];
         };
+        /** SkillsParams */
+        SkillsParams: {
+            /**
+             * Within Km
+             * @default 10
+             */
+            within_km: number;
+        };
         /** StartIn */
         StartIn: {
             /**
@@ -3622,16 +4029,20 @@ export interface components {
         StartupOut: {
             /** Address */
             address: string;
+            /** Build Logs */
+            build_logs: components["schemas"]["BuildLogTileOut"][];
             /** Claimed */
             claimed: boolean;
             /** Description */
             description: string;
+            /** Founders */
+            founders: components["schemas"]["FounderOut"][];
             /** Hiring */
             hiring: boolean;
             /** Id */
             id: number;
             /** Interest Count */
-            interest_count: number;
+            interest_count: number | null;
             /** Interested */
             interested: boolean;
             /** Is Team */
@@ -3640,6 +4051,8 @@ export interface components {
             lat: number | null;
             /** Lng */
             lng: number | null;
+            /** Logo */
+            logo: string | null;
             /** Match Pct */
             match_pct: number | null;
             /** Name */
@@ -3652,10 +4065,14 @@ export interface components {
             source: string;
             /** Stage */
             stage: string;
+            /** Team Size */
+            team_size: number | null;
             /** Tech Stack */
-            tech_stack: unknown[];
+            tech_stack: string[];
+            /** Verified */
+            verified: boolean;
             /** View Count */
-            view_count: number;
+            view_count: number | null;
             /** Website Domain */
             website_domain: string;
         };
@@ -3673,6 +4090,8 @@ export interface components {
             lng?: number | null;
             /** Stage */
             stage?: string | null;
+            /** Team Size */
+            team_size?: number | null;
             /** Tech Stack */
             tech_stack?: string[] | null;
         };
@@ -3683,6 +4102,19 @@ export interface components {
              * @enum {string}
              */
             status: "shortlisted" | "rejected" | "hired";
+        };
+        /** StrengthOut */
+        StrengthOut: {
+            next_step: components["schemas"]["StrengthStepOut"] | null;
+            /** Percent */
+            percent: number;
+        };
+        /** StrengthStepOut */
+        StrengthStepOut: {
+            /** Key */
+            key: string;
+            /** Text */
+            text: string;
         };
         /** Suggestions */
         Suggestions: {
@@ -3738,6 +4170,18 @@ export interface components {
             /** Slug */
             slug: string;
         };
+        /** UnreadCountOut */
+        UnreadCountOut: {
+            /** Count */
+            count: number;
+        };
+        /** UnreadCountsOut */
+        UnreadCountsOut: {
+            /** Chats */
+            chats: number;
+            /** Requests */
+            requests: number;
+        };
         /** UnreadOut */
         UnreadOut: {
             /** Marked */
@@ -3774,7 +4218,7 @@ export interface components {
              * Purpose
              * @enum {string}
              */
-            purpose: "post" | "message";
+            purpose: "post" | "message" | "avatar" | "startup_logo";
             /** Size */
             size: number;
         };
@@ -3786,6 +4230,14 @@ export interface components {
             status: string;
             /** Upload Url */
             upload_url: string;
+        };
+        /** VisitIn */
+        VisitIn: {
+            /**
+             * Src
+             * @default
+             */
+            src: string;
         };
         /** WaitlistIn */
         WaitlistIn: {
@@ -4115,6 +4567,26 @@ export interface operations {
             };
         };
     };
+    core_cities_cities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CityOut"][];
+                };
+            };
+        };
+    };
     core_config_api_get_config: {
         parameters: {
             query?: never;
@@ -4293,6 +4765,26 @@ export interface operations {
             };
         };
     };
+    apps_messaging_api_unread_count: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadCountsOut"];
+                };
+            };
+        };
+    };
     apps_messaging_api_get_conversation: {
         parameters: {
             query?: never;
@@ -4338,6 +4830,26 @@ export interface operations {
         };
     };
     apps_messaging_api_block: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    apps_messaging_api_decline: {
         parameters: {
             query?: never;
             header?: never;
@@ -4731,6 +5243,26 @@ export interface operations {
             };
         };
     };
+    apps_intros_api_capacity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CapacityOut"];
+                };
+            };
+        };
+    };
     apps_intros_api_preview_path: {
         parameters: {
             query?: never;
@@ -4877,6 +5409,28 @@ export interface operations {
             };
         };
     };
+    apps_jobs_api_skills_in_demand: {
+        parameters: {
+            query?: {
+                within_km?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillDemandOut"][];
+                };
+            };
+        };
+    };
     apps_jobs_api_job_page: {
         parameters: {
             query?: never;
@@ -4981,6 +5535,28 @@ export interface operations {
             };
         };
     };
+    apps_beta_api_join_visit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VisitIn"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     apps_social_api_get_livewire: {
         parameters: {
             query?: never;
@@ -5029,6 +5605,12 @@ export interface operations {
                 limit?: number;
                 offset?: number;
                 bridge?: boolean | null;
+                role?: ("student" | "founder" | "mentor" | "investor") | null;
+                verified?: boolean | null;
+                /** @description Slug of something they offer */
+                capability?: string | null;
+                /** @description 5, 10, 25 or 50: lives within this distance of my location or the city centre */
+                within_km?: number | null;
             };
             header?: never;
             path?: never;
@@ -5400,6 +5982,50 @@ export interface operations {
             };
         };
     };
+    apps_accounts_api_set_my_photo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhotoIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeOut"];
+                };
+            };
+        };
+    };
+    apps_accounts_api_remove_my_photo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeOut"];
+                };
+            };
+        };
+    };
     apps_accounts_settings_api_patch_privacy: {
         parameters: {
             query?: never;
@@ -5749,7 +6375,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CountOut"];
+                    "application/json": components["schemas"]["UnreadCountOut"];
                 };
             };
         };
@@ -5769,7 +6395,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CountOut"];
+                    "application/json": components["schemas"]["UnreadCountOut"];
                 };
             };
         };
@@ -5986,6 +6612,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    apps_organisations_api_search: {
+        parameters: {
+            query: {
+                q: string;
+                kind?: ("college" | "incubator" | "program") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgFoundOut"][];
+                };
             };
         };
     };
@@ -6231,6 +6880,28 @@ export interface operations {
             };
         };
     };
+    apps_startups_search_api_search_all: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchOut"];
+                };
+            };
+        };
+    };
     apps_startups_api_map_pins: {
         parameters: {
             query: {
@@ -6462,6 +7133,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    apps_startups_api_set_logo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                startup_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LogoIn"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartupOut"];
+                };
+            };
+        };
+    };
+    apps_startups_api_remove_logo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                startup_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartupOut"];
+                };
             };
         };
     };

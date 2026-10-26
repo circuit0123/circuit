@@ -5,20 +5,15 @@ logged when either person is under 18: behavioural training data is never collec
 """
 
 from datetime import date, datetime
-from zoneinfo import ZoneInfo
 
 import structlog
-from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
 from apps.matching.models import FeatureSnapshot, MatchResult
+from core import ist
 
 log = structlog.get_logger("ranker")
-
-
-def ist_day(now: datetime) -> date:
-    return now.astimezone(ZoneInfo(settings.DROP_TZ)).date()
 
 
 def _write(rows: list[FeatureSnapshot]) -> None:
@@ -40,7 +35,7 @@ def log_matches(viewer, shown: list[tuple[int, int]], now: datetime | None = Non
                 FeatureSnapshot(
                     viewer=viewer, candidate_id=r.candidate_id, surface="matches", model_version=r.model_version, arm=r.arm,
                     features=r.features, position=place[r.candidate_id], rule_score=r.score, model_score=r.model_score,
-                    shown_at=now, shown_on=ist_day(now),
+                    shown_at=now, shown_on=ist.day(now),
                 )
                 for r in results
                 if r.features  # rows computed before Stage 4c have none

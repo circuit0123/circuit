@@ -1,0 +1,22 @@
+{
+  "calls": [
+    {
+      "hook": "useDashboard",
+      "request": {
+        "method": "GET",
+        "path": "/api/dashboard/gaps"
+      },
+      "response": {
+        "error": {
+          "code": "forbidden",
+          "details": null,
+          "message": "You do not have permission to do this"
+        }
+      },
+      "status": 403
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "not_a_partner",
+  "screen": "partner_dashboard"
+}

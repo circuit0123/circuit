@@ -109,7 +109,7 @@ def test_b_does_not_appear_in_as_settings_or_blocks_or_export(pair, client_for):
     settings = c.get("/api/me/settings").json()
     assert (
         settings["profile"]["display_name"] == "Anil A"
-        and settings["appearance"]["accent"] == "mint"
+        and settings["appearance"]["accent"] == "emerald"
         and settings["blocked_count"] == 0
     )
     assert settings["export"] is None  # b's finished export is not a's

@@ -1,0 +1,338 @@
+{
+  "access": {
+    "beta_gate": [
+      "useFeatures",
+      "useHome",
+      "useJoinVisit",
+      "useJoinWaitlist",
+      "useMe",
+      "useRedeem"
+    ],
+    "default": [
+      "useConsent",
+      "useInviteLink"
+    ]
+  },
+  "applicants": {
+    "default": [
+      "useApplicants",
+      "useSetApplicantStatus"
+    ]
+  },
+  "bootstrap": {
+    "default": [
+      "useFeatures",
+      "useMe",
+      "useSettings"
+    ],
+    "features_off": [
+      "useFeatures"
+    ],
+    "founder": [
+      "useMe"
+    ],
+    "partner": [
+      "useFeatures",
+      "useMe"
+    ],
+    "signed_out": [
+      "useFeatures"
+    ],
+    "under_18": [
+      "useFeatures",
+      "useMe"
+    ]
+  },
+  "build_log": {
+    "default": [
+      "useMediaUpload",
+      "useMemberPosts",
+      "usePost",
+      "usePostComposer",
+      "usePostReplies"
+    ],
+    "delete": [
+      "useDeletePost",
+      "useDeleteReply",
+      "usePostComposer",
+      "useReply"
+    ]
+  },
+  "circuits": {
+    "active": [
+      "useCircuits",
+      "useMarkDone",
+      "useRespondCircuit"
+    ],
+    "empty": [
+      "useCircuits"
+    ],
+    "features_off": [
+      "useCircuits"
+    ],
+    "priya_accepts": [
+      "useRespondCircuit"
+    ],
+    "proposed": [
+      "useCircuits",
+      "useRespondCircuit"
+    ],
+    "rate": [
+      "useCircuits",
+      "useRateHandover"
+    ]
+  },
+  "conversation": {
+    "awaiting_reply": [
+      "useConversation",
+      "useInbox"
+    ],
+    "decline": [
+      "useStartConversation"
+    ],
+    "decline_answer": [
+      "useDeclineRequest",
+      "useInbox"
+    ],
+    "default": [
+      "useConversation"
+    ],
+    "request": [
+      "useConversation",
+      "useInbox",
+      "useInboxDot"
+    ]
+  },
+  "discover": {
+    "empty": [
+      "useDiscoverPeople",
+      "useDiscoverSearch"
+    ],
+    "jobs": [
+      "useDiscoverJobs",
+      "useSkillsInDemand"
+    ],
+    "people": [
+      "useDiscoverPeople",
+      "useDiscoverSearch"
+    ],
+    "startups": [
+      "useDiscoverStartups",
+      "useMapPins"
+    ],
+    "under_18": [
+      "useDiscoverJobs",
+      "useDiscoverSearch",
+      "useDiscoverStartups",
+      "useSkillsInDemand"
+    ]
+  },
+  "errors": {
+    "beta_required": [
+      "useDiscoverJobs"
+    ],
+    "default": [
+      "useApply",
+      "useConversation",
+      "useDiscoverSearch",
+      "useOnboarding",
+      "useStartup"
+    ],
+    "rate_limited": [
+      "useOrganisationSearch"
+    ],
+    "signed_out": [
+      "useMe",
+      "useSettings"
+    ]
+  },
+  "home": {
+    "default": [
+      "useDailyDrop",
+      "useLiveWire",
+      "useMarkPulseSeen",
+      "useMarkUpdateSeen",
+      "useMatches",
+      "usePulse",
+      "useReact",
+      "useReport",
+      "useSkip"
+    ],
+    "empty": [
+      "useDailyDrop",
+      "useLiveWire",
+      "useMatches",
+      "usePulse",
+      "useUnreadCount"
+    ],
+    "features_off": [
+      "useDailyDrop",
+      "useLiveWire",
+      "useMatches",
+      "usePulse"
+    ],
+    "founder": [
+      "useDailyDrop",
+      "useLiveWire",
+      "usePulse"
+    ],
+    "under_18": [
+      "useDailyDrop",
+      "useLiveWire",
+      "useMatches",
+      "usePulse"
+    ]
+  },
+  "inbox": {
+    "default": [
+      "useConnections",
+      "useInbox",
+      "useInboxDot"
+    ],
+    "empty": [
+      "useInbox",
+      "useInboxDot"
+    ],
+    "under_18": [
+      "useInbox",
+      "useInboxDot"
+    ]
+  },
+  "intros": {
+    "broker": [
+      "useIntros",
+      "useRespondIntro"
+    ],
+    "default": [
+      "useIntroCapacity",
+      "useIntroPath",
+      "useIntros",
+      "useRequestIntro"
+    ],
+    "rating": [
+      "useRateIntro"
+    ],
+    "target": [
+      "useIntros",
+      "useRespondIntro"
+    ],
+    "under_18": [
+      "useIntroCapacity",
+      "useRequestIntro"
+    ]
+  },
+  "job": {
+    "default": [
+      "useApply",
+      "useJob",
+      "useMyApplications"
+    ],
+    "founder_posts": [
+      "useEditJob",
+      "useEditStartup",
+      "usePostJob"
+    ],
+    "team": [
+      "useJob"
+    ],
+    "under_18": [
+      "useApply",
+      "useJob"
+    ]
+  },
+  "notifications": {
+    "default": [
+      "useMarkRead",
+      "useNotifications",
+      "useUnreadCount"
+    ],
+    "empty": [
+      "useNotifications",
+      "useUnreadCount"
+    ]
+  },
+  "partner_dashboard": {
+    "default": [
+      "useDashboard",
+      "useOrganisation"
+    ],
+    "not_a_partner": [
+      "useDashboard"
+    ]
+  },
+  "profile": {
+    "connect_answer": [
+      "useConnect",
+      "useConnectionRequests",
+      "useConnections"
+    ],
+    "connect_ask": [
+      "useConnect",
+      "useConnectionRequests"
+    ],
+    "default": [
+      "useProfile"
+    ],
+    "hidden_or_blocked": [
+      "useProfile"
+    ]
+  },
+  "settings": {
+    "block_from_chat": [
+      "useBlock"
+    ],
+    "blocks": [
+      "useBlock",
+      "useBlocks"
+    ],
+    "default": [
+      "useAppearance",
+      "useBlocks",
+      "useExport",
+      "useNotificationPrefs",
+      "usePrivacy",
+      "useSettings",
+      "useSupport"
+    ],
+    "under_18": [
+      "usePrivacy",
+      "useSettings"
+    ]
+  },
+  "signup": {
+    "new_member": [
+      "useCapabilities",
+      "useDailyDrop",
+      "useOnboarding",
+      "useOrganisationSearch",
+      "useWhere"
+    ],
+    "under_18": [
+      "useMe",
+      "useOnboarding"
+    ]
+  },
+  "startup": {
+    "actions": [
+      "useApply",
+      "useFollow",
+      "useInterest",
+      "useWithdraw"
+    ],
+    "claim": [
+      "useStartClaim"
+    ],
+    "default": [
+      "useFollow",
+      "useFollows",
+      "useStartup",
+      "useStartupJobs"
+    ],
+    "team": [
+      "useStartup"
+    ],
+    "under_18": [
+      "useStartup"
+    ]
+  }
+}

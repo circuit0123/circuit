@@ -1,0 +1,22 @@
+{
+  "calls": [
+    {
+      "hook": "useDiscoverJobs",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs"
+      },
+      "response": {
+        "error": {
+          "code": "beta_required",
+          "details": null,
+          "message": "Circuit is invite-only for now. Enter an invite code or join the waitlist."
+        }
+      },
+      "status": 403
+    }
+  ],
+  "persona": "custom",
+  "scenario": "beta_required",
+  "screen": "errors"
+}

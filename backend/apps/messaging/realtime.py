@@ -15,3 +15,9 @@ def topic(conversation_id: int) -> str:
 
 def broadcast(conversation_id: int, message_id: int) -> None:
     _core.send(topic(conversation_id), "message", {"message_id": message_id, "conversation_id": conversation_id})
+
+
+def conversation_changed(member_id: int, conversation_id: int) -> None:
+    """A conversation this member has not listed yet (a new request) or one of theirs that changed state (accepted):
+    nudge their member channel so the Inbox refetches. Ids only; the same private channel notifications use."""
+    _core.send(f"member:{member_id}", "conversation", {"conversation_id": conversation_id})

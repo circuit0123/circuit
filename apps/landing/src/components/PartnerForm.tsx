@@ -2,10 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { Button } from "@circuit/ui/Button";
+import { WAITLIST_MODE } from "@/lib/env";
 import { usePicked } from "@/lib/join";
 import { useSrc } from "@/lib/src";
 import { fieldClass, MESSAGES, useReady, useWaitlistSubmit } from "@/lib/waitlist";
 import { Container } from "./Container";
+import { CtaLink } from "./CtaLink";
 
 const SRC = "landing-partners";
 
@@ -53,7 +55,9 @@ export function PartnerForm({ intro }: { intro?: string }) {
             {intro ? `${intro} ` : ""}Tell us about your organisation. We&rsquo;ll write to you to arrange a short call and to check the organisation before anyone gets admin powers.
           </p>
         </div>
-        {result === "ok" ? (
+        {WAITLIST_MODE ? (
+          <div><CtaLink button="secondary" src={SRC} role="partner">Join the waitlist</CtaLink></div>
+        ) : result === "ok" ? (
           <p role="status" className="t-body">Thanks. We&rsquo;ll write to you soon.</p>
         ) : (
           <form onSubmit={onSubmit} aria-describedby="partner-msg" className="max-w-[540px]">

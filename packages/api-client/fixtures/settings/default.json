@@ -1,0 +1,211 @@
+{
+  "calls": [
+    {
+      "hook": "useSettings",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/settings"
+      },
+      "response": {
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "blocked_count": 0,
+        "consent": {
+          "accepted_at": "2026-03-02T04:00:00Z",
+          "accepted_version": "2026-01",
+          "needs_consent": false,
+          "policy_version": "2026-01"
+        },
+        "export": null,
+        "notifications": {
+          "announcements": {
+            "email": false,
+            "in_app": true
+          },
+          "applications": {
+            "email": true,
+            "in_app": true
+          },
+          "circuits": {
+            "email": true,
+            "in_app": true
+          },
+          "intros": {
+            "email": true,
+            "in_app": true
+          },
+          "messages": {
+            "email": false,
+            "in_app": true
+          },
+          "pulse_replies": {
+            "email": false,
+            "in_app": true
+          }
+        },
+        "privacy": {
+          "allow_requests": true,
+          "circuits_opt_in": false,
+          "profile_visibility": "members",
+          "read_receipts": false,
+          "visible_to_org": true
+        },
+        "profile": {
+          "city": "Chennai",
+          "college": "Kaveri Institute of Technology",
+          "display_name": "Ravi Kumar",
+          "email_hint": "s***@example.org",
+          "is_minor": false,
+          "role": "student",
+          "verification_level": 1
+        },
+        "support": {
+          "grievance": {
+            "address": "<ADDRESS>",
+            "email": "grievance@example.com",
+            "name": "<GRIEVANCE_OFFICER>"
+          },
+          "support_email": "support@example.com"
+        }
+      },
+      "status": 200
+    },
+    {
+      "hook": "usePrivacy",
+      "request": {
+        "body": {
+          "read_receipts": true,
+          "visible_to_org": true
+        },
+        "method": "PATCH",
+        "path": "/api/me/privacy"
+      },
+      "response": {
+        "allow_requests": true,
+        "circuits_opt_in": false,
+        "profile_visibility": "members",
+        "read_receipts": true,
+        "visible_to_org": true
+      },
+      "status": 200
+    },
+    {
+      "hook": "useAppearance",
+      "request": {
+        "body": {
+          "accent": "mint",
+          "theme": "dark"
+        },
+        "method": "PATCH",
+        "path": "/api/me/appearance"
+      },
+      "response": {
+        "accent": "emerald",
+        "swipe_tabs": true,
+        "theme": "dark"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useNotificationPrefs",
+      "request": {
+        "body": {
+          "intros": {
+            "email": false
+          }
+        },
+        "method": "PATCH",
+        "path": "/api/me/notification-preferences"
+      },
+      "response": {
+        "announcements": {
+          "email": false,
+          "in_app": true
+        },
+        "applications": {
+          "email": true,
+          "in_app": true
+        },
+        "circuits": {
+          "email": true,
+          "in_app": true
+        },
+        "intros": {
+          "email": false,
+          "in_app": true
+        },
+        "messages": {
+          "email": false,
+          "in_app": true
+        },
+        "pulse_replies": {
+          "email": false,
+          "in_app": true
+        }
+      },
+      "status": 200
+    },
+    {
+      "hook": "useBlocks",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/blocks"
+      },
+      "response": {
+        "items": []
+      },
+      "status": 200
+    },
+    {
+      "hook": "useExport",
+      "request": {
+        "method": "POST",
+        "path": "/api/me/export"
+      },
+      "response": {
+        "expires_at": null,
+        "ready_at": null,
+        "requested_at": "2026-03-02T04:00:00Z",
+        "status": "pending"
+      },
+      "status": 202
+    },
+    {
+      "hook": "useSupport",
+      "request": {
+        "body": {
+          "kind": "question",
+          "message": "How do I change my college?"
+        },
+        "method": "POST",
+        "path": "/api/support"
+      },
+      "response": {
+        "reference": "S-8"
+      },
+      "status": 202
+    },
+    {
+      "hook": "useSupport",
+      "request": {
+        "method": "GET",
+        "path": "/api/support/contact"
+      },
+      "response": {
+        "grievance": {
+          "address": "<ADDRESS>",
+          "email": "grievance@example.com",
+          "name": "<GRIEVANCE_OFFICER>"
+        },
+        "support_email": "support@example.com"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "default",
+  "screen": "settings"
+}

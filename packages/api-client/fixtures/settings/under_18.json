@@ -1,0 +1,116 @@
+{
+  "calls": [
+    {
+      "hook": "useSettings",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/settings"
+      },
+      "response": {
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "blocked_count": 0,
+        "consent": {
+          "accepted_at": "2026-03-02T04:00:00Z",
+          "accepted_version": "2026-01",
+          "needs_consent": false,
+          "policy_version": "2026-01"
+        },
+        "export": null,
+        "notifications": {
+          "announcements": {
+            "email": false,
+            "in_app": true
+          },
+          "applications": {
+            "email": true,
+            "in_app": true
+          },
+          "circuits": {
+            "email": true,
+            "in_app": true
+          },
+          "intros": {
+            "email": true,
+            "in_app": true
+          },
+          "messages": {
+            "email": false,
+            "in_app": true
+          },
+          "pulse_replies": {
+            "email": false,
+            "in_app": true
+          }
+        },
+        "privacy": {
+          "allow_requests": true,
+          "circuits_opt_in": false,
+          "profile_visibility": "members",
+          "read_receipts": false,
+          "visible_to_org": false
+        },
+        "profile": {
+          "city": "Chennai",
+          "college": "Kaveri Institute of Technology",
+          "display_name": "Balaji Fernandes",
+          "email_hint": "s***@example.org",
+          "is_minor": true,
+          "role": "student",
+          "verification_level": 1
+        },
+        "support": {
+          "grievance": {
+            "address": "<ADDRESS>",
+            "email": "grievance@example.com",
+            "name": "<GRIEVANCE_OFFICER>"
+          },
+          "support_email": "support@example.com"
+        }
+      },
+      "status": 200
+    },
+    {
+      "hook": "usePrivacy",
+      "request": {
+        "body": {
+          "profile_visibility": "public"
+        },
+        "method": "PATCH",
+        "path": "/api/me/privacy"
+      },
+      "response": {
+        "error": {
+          "code": "under_18_restricted",
+          "details": null,
+          "message": "Members under 18 keep a private profile and cannot open requests to strangers"
+        }
+      },
+      "status": 403
+    },
+    {
+      "hook": "usePrivacy",
+      "request": {
+        "body": {
+          "allow_requests": true
+        },
+        "method": "PATCH",
+        "path": "/api/me/privacy"
+      },
+      "response": {
+        "error": {
+          "code": "under_18_restricted",
+          "details": null,
+          "message": "Members under 18 keep a private profile and cannot open requests to strangers"
+        }
+      },
+      "status": 403
+    }
+  ],
+  "persona": "custom",
+  "scenario": "under_18",
+  "screen": "settings"
+}

@@ -102,14 +102,18 @@ Defaults per environment and when to switch each on: PRODUCTION.md §2b.
 | `make fmt` | Auto-format Python with ruff (TypeScript formatting arrives with prettier) |
 | `make check` | lint + backend tests with demo stories PASS/FAIL + frontend type check + landing tests. Must be green before any push |
 | `make smoke URL=https://... ORIGIN=https://app.example.com` | Check a running API from the outside. See section 9 |
+| `make load-test URL=http://localhost:8080 [USERS=50,200] [SECONDS=60] [TOKENS=file] [JSON=out.json]` | Simulates the beta mix (sign-in, Home, Discover, Map, job page and apply, Inbox, send a message) at each user level and prints p50 / p95 / error rate per endpoint against PRODUCTION.md §9 (300 ms cached reads, 800 ms the rest). Without `TOKENS` it makes demo tokens for 200 seeded members (local and demo only; needs `make reset-demo` and `make daily` first). Staging needs a token file (RUNBOOK.md "Run a load test on staging"). **Refuses to run against production** (and against anything it cannot identify). Success: `RESULT: PASS`; `FAIL` names the endpoints over target |
+| `make funnel [DAYS=30]` | Per sign-up source: landing clicks, signed up, beta access, onboarding done, first match action. Counts under 5 show `<5`. No personal data. The same table is in Django admin → Metrics |
+| `make api-freeze [BASE=origin/main]` | Fails if `openapi.json` changed against BASE without a higher `info.version` and a change to `FRONTEND_HANDOFF.md`. CI runs it on every pull request |
 
 ## 7. API client
 | Command | What it does |
 |---|---|
 | `make api-client` | Export openapi.json from Django and regenerate packages/api-client (`make openapi` is an alias) |
+| `make contract-fixtures` | Rewrite `packages/api-client/fixtures/` from the real API: the demo world is seeded at a frozen clock, every screen's calls are made as `FRONTEND_HANDOFF.md` describes, each response is checked against openapi.json and written as JSON. Run it after a deliberate API change and commit the diff. Success: it ends with `1 passed`; `git diff packages/api-client/fixtures` shows exactly what changed for the frontend. Needs the test database (`make up`). The frontend's mock mode serves these same files |
 
-Run it after any endpoint change; commit openapi.json, the client, the handoff and the
-contract test together.
+Run both after any endpoint change; commit openapi.json, the client, the fixtures, `FRONTEND_HANDOFF.md` and the
+contract tests together. `make check` fails when they disagree, so a changed endpoint cannot be committed alone.
 
 ## 8. Build (the backend image)
 | Command | What it does, when to run it, what success looks like |

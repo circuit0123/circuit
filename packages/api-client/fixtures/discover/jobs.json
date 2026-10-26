@@ -1,0 +1,2826 @@
+{
+  "calls": [
+    {
+      "hook": "useDiscoverJobs",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs?limit=50"
+      },
+      "response": {
+        "count": 66,
+        "items": [
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "UI design",
+                "required": false,
+                "slug": "ui-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Divya Menon",
+              "id": 6,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-27T13:00:00Z",
+            "description": "Build screens in React with our designer.",
+            "distance_km": 5.83,
+            "duration_weeks": null,
+            "id": 66,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.042590507024766,
+            "lng": 80.23541556147727,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "saas",
+            "skill_match": 0.96,
+            "starts_on": null,
+            "startup_id": 3,
+            "startup_logo": null,
+            "startup_name": "Pixelwave Labs",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Frontend Intern"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T13:00:00Z",
+            "description": "",
+            "distance_km": 8.71,
+            "duration_weeks": null,
+            "id": 22,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.082512314751224,
+            "lng": 80.26395004091755,
+            "location": "Nungambakkam, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 41,
+            "startup_logo": null,
+            "startup_name": "Tatvagrid",
+            "startup_verified": false,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T13:00:00Z",
+            "description": "",
+            "distance_km": 6.52,
+            "duration_weeks": null,
+            "id": 16,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.06330571797163,
+            "lng": 80.27306216852651,
+            "location": "Nungambakkam, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 31,
+            "startup_logo": null,
+            "startup_name": "Zetapulse",
+            "startup_verified": false,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T03:00:00Z",
+            "description": "",
+            "distance_km": 4.77,
+            "duration_weeks": null,
+            "id": 28,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.02735673119612,
+            "lng": 80.23521343292563,
+            "location": "Guindy, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 51,
+            "startup_logo": null,
+            "startup_name": "Ojasbridge",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Rahul Srinivasan",
+              "id": 16,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-03-01T03:00:00Z",
+            "description": "",
+            "distance_km": 4.71,
+            "duration_weeks": null,
+            "id": 3,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.044996191655521,
+            "lng": 80.25928477786206,
+            "location": "T. Nagar, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 11,
+            "startup_logo": null,
+            "startup_name": "Tatvabridge",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T00:00:00Z",
+            "description": "",
+            "distance_km": 8.04,
+            "duration_weeks": null,
+            "id": 49,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.076794712319195,
+            "lng": 80.26847671560712,
+            "location": "Nungambakkam, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 114,
+            "startup_logo": null,
+            "startup_name": "Anucart",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Imran Joseph",
+              "id": 19,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-28T20:00:00Z",
+            "description": "",
+            "distance_km": 2.69,
+            "duration_weeks": null,
+            "id": 6,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.00639365132818,
+            "lng": 80.29730767313528,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 14,
+            "startup_logo": null,
+            "startup_name": "Cyberwave",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-28T02:00:00Z",
+            "description": "",
+            "distance_km": 11.21,
+            "duration_weeks": null,
+            "id": 55,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 12.918018391098874,
+            "lng": 80.3255503650386,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 121,
+            "startup_logo": null,
+            "startup_name": "Pranaloop",
+            "startup_verified": false,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-26T15:00:00Z",
+            "description": "",
+            "distance_km": 11.58,
+            "duration_weeks": null,
+            "id": 46,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 12.911463318765461,
+            "lng": 80.32022325062418,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 111,
+            "startup_logo": null,
+            "startup_name": "Indracraft",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Charulatha Reddy",
+              "id": 26,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-26T03:00:00Z",
+            "description": "",
+            "distance_km": 7.97,
+            "duration_weeks": null,
+            "id": 10,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.076281241138268,
+            "lng": 80.2728018965771,
+            "location": "Nungambakkam, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 21,
+            "startup_logo": null,
+            "startup_name": "Aeroworks",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T16:00:00Z",
+            "description": "",
+            "distance_km": 12.11,
+            "duration_weeks": null,
+            "id": 61,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.105019731630888,
+            "lng": 80.229192555087,
+            "location": "Anna Nagar, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 144,
+            "startup_logo": null,
+            "startup_name": "Ojasware",
+            "startup_verified": false,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Trainee – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T14:00:00Z",
+            "description": "",
+            "distance_km": 1.6,
+            "duration_weeks": null,
+            "id": 38,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.01497730467243,
+            "lng": 80.28280337486402,
+            "location": "Adyar, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 94,
+            "startup_logo": null,
+            "startup_name": "Pixellabs",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-24T17:00:00Z",
+            "description": "",
+            "distance_km": 5.5,
+            "duration_weeks": null,
+            "id": 58,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.052536764776415,
+            "lng": 80.2598303627194,
+            "location": "T. Nagar, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 131,
+            "startup_logo": null,
+            "startup_name": "Indrawave",
+            "startup_verified": false,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-24T04:00:00Z",
+            "description": "",
+            "distance_km": 8.03,
+            "duration_weeks": null,
+            "id": 23,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.076314537901014,
+            "lng": 80.26365551416602,
+            "location": "Nungambakkam, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 44,
+            "startup_logo": null,
+            "startup_name": "Vayunest",
+            "startup_verified": false,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-24T01:00:00Z",
+            "description": "",
+            "distance_km": 7.84,
+            "duration_weeks": null,
+            "id": 56,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.074905236052391,
+            "lng": 80.2779209739254,
+            "location": "Nungambakkam, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 124,
+            "startup_logo": null,
+            "startup_name": "Manthancraft",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-23T15:00:00Z",
+            "description": "",
+            "distance_km": 13.25,
+            "duration_weeks": null,
+            "id": 18,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.108504240099398,
+            "lng": 80.21263623305121,
+            "location": "Anna Nagar, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 34,
+            "startup_logo": null,
+            "startup_name": "Indralabs",
+            "startup_verified": false,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Trainee – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T21:00:00Z",
+            "description": "",
+            "distance_km": 19.89,
+            "duration_weeks": null,
+            "id": 43,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.15238462627868,
+            "lng": 80.16912204679547,
+            "location": "Ambattur, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 100,
+            "startup_logo": null,
+            "startup_name": "Sutragrid",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Trainee – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T01:00:00Z",
+            "description": "",
+            "distance_km": 5.72,
+            "duration_weeks": null,
+            "id": 21,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.036971836926496,
+            "lng": 80.23147827932493,
+            "location": "Guindy, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 40,
+            "startup_logo": null,
+            "startup_name": "Anumint",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-28T04:00:00Z",
+            "description": "",
+            "distance_km": 1.09,
+            "duration_weeks": null,
+            "id": 65,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.012740818851192,
+            "lng": 80.27815616333477,
+            "location": "Adyar, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 150,
+            "startup_logo": null,
+            "startup_name": "Ojasworks",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T21:00:00Z",
+            "description": "",
+            "distance_km": 1.9,
+            "duration_weeks": null,
+            "id": 27,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 12.989259034070162,
+            "lng": 80.26497973616155,
+            "location": "Velachery, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 50,
+            "startup_logo": null,
+            "startup_name": "Aerocart",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Bhavna Annamalai",
+              "id": 15,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-25T11:00:00Z",
+            "description": "",
+            "distance_km": 13.39,
+            "duration_weeks": null,
+            "id": 2,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.11515621136682,
+            "lng": 80.22347903464346,
+            "location": "Anna Nagar, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 10,
+            "startup_logo": null,
+            "startup_name": "Kaviloop",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Associate – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T05:00:00Z",
+            "description": "",
+            "distance_km": 3.12,
+            "duration_weeks": null,
+            "id": 37,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.01217679491272,
+            "lng": 80.3002465844658,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 90,
+            "startup_logo": null,
+            "startup_name": "Sutraware",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-23T18:00:00Z",
+            "description": "",
+            "distance_km": 20.23,
+            "duration_weeks": null,
+            "id": 32,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.160375132436908,
+            "lng": 80.17602106935028,
+            "location": "Ambattur, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 70,
+            "startup_logo": null,
+            "startup_name": "Ojascraft",
+            "startup_verified": false,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Intern – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-02T01:00:00Z",
+            "description": "",
+            "distance_km": 2.52,
+            "duration_weeks": null,
+            "id": 34,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 12.983458565287817,
+            "lng": 80.26437757957495,
+            "location": "Velachery, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 75,
+            "startup_logo": null,
+            "startup_name": "Kalpastack",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Intern – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Hardware design",
+                "required": true,
+                "slug": "hardware-design",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              },
+              {
+                "name": "Manufacturing",
+                "required": false,
+                "slug": "manufacturing",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-02T00:00:00Z",
+            "description": "",
+            "distance_km": 2.27,
+            "duration_weeks": null,
+            "id": 51,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.00897476508522,
+            "lng": 80.29304725358674,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "cleantech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 116,
+            "startup_logo": null,
+            "startup_name": "Quantabridge",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Associate – Hardware design"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Yamini Pandian",
+              "id": 23,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 3
+            },
+            "created_at": "2026-03-01T19:00:00Z",
+            "description": "",
+            "distance_km": 1.32,
+            "duration_weeks": null,
+            "id": 9,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.008829917121815,
+            "lng": 80.28391838442917,
+            "location": "Adyar, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 18,
+            "startup_logo": null,
+            "startup_name": "Pranaloop",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Intern – Biotech lab work"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T14:00:00Z",
+            "description": "",
+            "distance_km": 13.49,
+            "duration_weeks": null,
+            "id": 24,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.114929561197835,
+            "lng": 80.22073639009223,
+            "location": "Anna Nagar, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 45,
+            "startup_logo": null,
+            "startup_name": "Vedastack",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Associate – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Operations",
+                "required": false,
+                "slug": "operations",
+                "your_level": null
+              },
+              {
+                "name": "Data engineering",
+                "required": false,
+                "slug": "data-engineering",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Bhavna Venkatesh",
+              "id": 32,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 3
+            },
+            "created_at": "2026-03-01T12:00:00Z",
+            "description": "",
+            "distance_km": 1.87,
+            "duration_weeks": null,
+            "id": 14,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.006302179812993,
+            "lng": 80.28969948991326,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "logistics",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 27,
+            "startup_logo": null,
+            "startup_name": "Vayulabs",
+            "startup_verified": true,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Associate – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Hardware design",
+                "required": true,
+                "slug": "hardware-design",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              },
+              {
+                "name": "Manufacturing",
+                "required": false,
+                "slug": "manufacturing",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Abdul Patel",
+              "id": 21,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-03-01T12:00:00Z",
+            "description": "",
+            "distance_km": 5.47,
+            "duration_weeks": null,
+            "id": 8,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.038686848230364,
+            "lng": 80.23616433212229,
+            "location": "Guindy, Chennai",
+            "sector": "cleantech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 16,
+            "startup_logo": null,
+            "startup_name": "Hexaloop",
+            "startup_verified": true,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Hardware design"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T11:00:00Z",
+            "description": "",
+            "distance_km": 14.35,
+            "duration_weeks": null,
+            "id": 20,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.048472033940783,
+            "lng": 80.14795047551888,
+            "location": "Porur, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 38,
+            "startup_logo": null,
+            "startup_name": "Pixelstack",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Biotech lab work"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Mobile development",
+                "required": true,
+                "slug": "mobile-dev",
+                "your_level": null
+              },
+              {
+                "name": "Healthcare domain",
+                "required": false,
+                "slug": "healthcare-domain",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Suriya Subramanian",
+              "id": 28,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-03-01T11:00:00Z",
+            "description": "",
+            "distance_km": 12.41,
+            "duration_weeks": null,
+            "id": 12,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 12.908411537553965,
+            "lng": 80.3306273022431,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "healthtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 23,
+            "startup_logo": null,
+            "startup_name": "Zetacraft",
+            "startup_verified": true,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Trainee – Mobile development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T10:00:00Z",
+            "description": "",
+            "distance_km": 14.12,
+            "duration_weeks": null,
+            "id": 53,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.052492840523845,
+            "lng": 80.15179825151665,
+            "location": "Porur, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 118,
+            "startup_logo": null,
+            "startup_name": "Quantastack",
+            "startup_verified": false,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Intern – Biotech lab work"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Keerthana Narayanan",
+              "id": 20,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 1
+            },
+            "created_at": "2026-03-01T06:00:00Z",
+            "description": "",
+            "distance_km": 13.06,
+            "duration_weeks": null,
+            "id": 7,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.108901517658738,
+            "lng": 80.217011916401,
+            "location": "Anna Nagar, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 15,
+            "startup_logo": null,
+            "startup_name": "Pixelloop",
+            "startup_verified": true,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T02:00:00Z",
+            "description": "",
+            "distance_km": 1.5,
+            "duration_weeks": null,
+            "id": 41,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.014638491105742,
+            "lng": 80.28178439610797,
+            "location": "Adyar, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 98,
+            "startup_logo": null,
+            "startup_name": "Tatvastack",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Intern – Biotech lab work"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T01:00:00Z",
+            "description": "",
+            "distance_km": 13.98,
+            "duration_weeks": null,
+            "id": 50,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.116114028564489,
+            "lng": 80.21297909941411,
+            "location": "Anna Nagar, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 115,
+            "startup_logo": null,
+            "startup_name": "Pranagrid",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-28T19:00:00Z",
+            "description": "",
+            "distance_km": 1.5,
+            "duration_weeks": null,
+            "id": 57,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 13.003475370920954,
+            "lng": 80.28632170037581,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 125,
+            "startup_logo": null,
+            "startup_name": "Hexacraft",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Associate – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Hardware design",
+                "required": true,
+                "slug": "hardware-design",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              },
+              {
+                "name": "Manufacturing",
+                "required": false,
+                "slug": "manufacturing",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Rahul Narayanan",
+              "id": 31,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-28T19:00:00Z",
+            "description": "",
+            "distance_km": 13.69,
+            "duration_weeks": null,
+            "id": 13,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.04442430963304,
+            "lng": 80.15293896725241,
+            "location": "Porur, Chennai",
+            "sector": "cleantech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 26,
+            "startup_logo": null,
+            "startup_name": "Pranabridge",
+            "startup_verified": true,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Hardware design"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Mobile development",
+                "required": true,
+                "slug": "mobile-dev",
+                "your_level": null
+              },
+              {
+                "name": "Healthcare domain",
+                "required": false,
+                "slug": "healthcare-domain",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-28T02:00:00Z",
+            "description": "",
+            "distance_km": 11.53,
+            "duration_weeks": null,
+            "id": 48,
+            "is_open": true,
+            "is_team": false,
+            "kind": "full_time",
+            "lat": 12.915295206377575,
+            "lng": 80.32665511576609,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "healthtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 113,
+            "startup_logo": null,
+            "startup_name": "Vedamint",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Mobile development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-27T16:00:00Z",
+            "description": "",
+            "distance_km": 2.29,
+            "duration_weeks": null,
+            "id": 31,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 12.984266225301182,
+            "lng": 80.27561608965664,
+            "location": "Velachery, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 65,
+            "startup_logo": null,
+            "startup_name": "Lumisense",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Associate – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-27T10:00:00Z",
+            "description": "",
+            "distance_km": 1.5,
+            "duration_weeks": null,
+            "id": 59,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.014700157344517,
+            "lng": 80.2817679326357,
+            "location": "Adyar, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 138,
+            "startup_logo": null,
+            "startup_name": "Cyberforge",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Biotech lab work"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Hardware design",
+                "required": true,
+                "slug": "hardware-design",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              },
+              {
+                "name": "Manufacturing",
+                "required": false,
+                "slug": "manufacturing",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-27T00:00:00Z",
+            "description": "",
+            "distance_km": 10.45,
+            "duration_weeks": null,
+            "id": 25,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 12.921833709843932,
+            "lng": 80.31823649552372,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "cleantech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 46,
+            "startup_logo": null,
+            "startup_name": "Hexamint",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Intern – Hardware design"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Mobile development",
+                "required": true,
+                "slug": "mobile-dev",
+                "your_level": null
+              },
+              {
+                "name": "Healthcare domain",
+                "required": false,
+                "slug": "healthcare-domain",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-26T22:00:00Z",
+            "description": "",
+            "distance_km": 3.17,
+            "duration_weeks": null,
+            "id": 17,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 12.995315323031049,
+            "lng": 80.30020748255829,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "healthtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 33,
+            "startup_logo": null,
+            "startup_name": "Vedabridge",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Mobile development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Agritech domain",
+                "required": true,
+                "slug": "agritech-domain",
+                "your_level": null
+              },
+              {
+                "name": "Supply chain and logistics",
+                "required": false,
+                "slug": "supply-chain",
+                "your_level": null
+              },
+              {
+                "name": "Mobile development",
+                "required": false,
+                "slug": "mobile-dev",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Karthik Natarajan",
+              "id": 27,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-26T19:00:00Z",
+            "description": "",
+            "distance_km": 3.58,
+            "duration_weeks": null,
+            "id": 11,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 12.973218266817284,
+            "lng": 80.2799104010453,
+            "location": "Velachery, Chennai",
+            "sector": "agritech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 22,
+            "startup_logo": null,
+            "startup_name": "Tatvaworks",
+            "startup_verified": true,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Agritech domain"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Machine learning",
+                "required": true,
+                "slug": "machine-learning",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-26T13:00:00Z",
+            "description": "",
+            "distance_km": 13.84,
+            "duration_weeks": null,
+            "id": 42,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.046091658467848,
+            "lng": 80.152139208615,
+            "location": "Porur, Chennai",
+            "sector": "deeptech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 99,
+            "startup_logo": null,
+            "startup_name": "Quantacraft",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Associate – Machine learning"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Mobile development",
+                "required": true,
+                "slug": "mobile-dev",
+                "your_level": null
+              },
+              {
+                "name": "Healthcare domain",
+                "required": false,
+                "slug": "healthcare-domain",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-26T09:00:00Z",
+            "description": "",
+            "distance_km": 13.01,
+            "duration_weeks": null,
+            "id": 60,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.110514630059367,
+            "lng": 80.2214278034578,
+            "location": "Anna Nagar, Chennai",
+            "sector": "healthtech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 143,
+            "startup_logo": null,
+            "startup_name": "Agriloop",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Trainee – Mobile development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Machine learning",
+                "required": true,
+                "slug": "machine-learning",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-26T02:00:00Z",
+            "description": "",
+            "distance_km": 19.87,
+            "duration_weeks": null,
+            "id": 26,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.158792316679133,
+            "lng": 80.17979217726784,
+            "location": "Ambattur, Chennai",
+            "sector": "deeptech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 49,
+            "startup_logo": null,
+            "startup_name": "Setumint",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Machine learning"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Operations",
+                "required": false,
+                "slug": "operations",
+                "your_level": null
+              },
+              {
+                "name": "Data engineering",
+                "required": false,
+                "slug": "data-engineering",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-26T01:00:00Z",
+            "description": "",
+            "distance_km": 15.05,
+            "duration_weeks": null,
+            "id": 36,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.050243359499229,
+            "lng": 80.14173073258227,
+            "location": "Porur, Chennai",
+            "sector": "logistics",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 77,
+            "startup_logo": null,
+            "startup_name": "Indraware",
+            "startup_verified": false,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Intern – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Biotech lab work",
+                "required": true,
+                "slug": "biotech-lab",
+                "your_level": null
+              },
+              {
+                "name": "Clinical research",
+                "required": false,
+                "slug": "clinical-research",
+                "your_level": null
+              },
+              {
+                "name": "Regulatory affairs",
+                "required": false,
+                "slug": "regulatory-affairs",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T18:00:00Z",
+            "description": "",
+            "distance_km": 4.03,
+            "duration_weeks": null,
+            "id": 30,
+            "is_open": true,
+            "is_team": false,
+            "kind": "part_time",
+            "lat": 13.037660941673344,
+            "lng": 80.2571720334017,
+            "location": "T. Nagar, Chennai",
+            "sector": "biotech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 58,
+            "startup_logo": null,
+            "startup_name": "Setulabs",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Biotech lab work"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Social media",
+                "required": true,
+                "slug": "social-media",
+                "your_level": null
+              },
+              {
+                "name": "Performance marketing",
+                "required": false,
+                "slug": "performance-marketing",
+                "your_level": null
+              },
+              {
+                "name": "Graphic design",
+                "required": false,
+                "slug": "graphic-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T13:00:00Z",
+            "description": "",
+            "distance_km": 6.87,
+            "duration_weeks": null,
+            "id": 19,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.065886848237854,
+            "lng": 80.26449668202447,
+            "location": "Nungambakkam, Chennai",
+            "sector": "d2c",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 35,
+            "startup_logo": null,
+            "startup_name": "Terraware",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Social media"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Machine learning",
+                "required": true,
+                "slug": "machine-learning",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Embedded systems",
+                "required": false,
+                "slug": "embedded-systems",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T10:00:00Z",
+            "description": "",
+            "distance_km": 4.55,
+            "duration_weeks": null,
+            "id": 64,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.03698041603277,
+            "lng": 80.24676230972915,
+            "location": "Guindy, Chennai",
+            "sector": "deeptech",
+            "skill_match": 0.0,
+            "starts_on": null,
+            "startup_id": 149,
+            "startup_logo": null,
+            "startup_name": "Quantacart",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Associate – Machine learning"
+          }
+        ],
+        "next_offset": 50
+      },
+      "status": 200
+    },
+    {
+      "hook": "useSkillsInDemand",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs/skills-in-demand?within_km=10"
+      },
+      "response": [
+        {
+          "name": "Backend development",
+          "open_roles": 16,
+          "slug": "backend-dev"
+        },
+        {
+          "name": "Frontend development",
+          "open_roles": 16,
+          "slug": "frontend-dev"
+        },
+        {
+          "name": "Embedded systems",
+          "open_roles": 7,
+          "slug": "embedded-systems"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useDiscoverJobs",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs?kind=internship&max_distance_km=10&limit=10"
+      },
+      "response": {
+        "count": 26,
+        "items": [
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "UI design",
+                "required": false,
+                "slug": "ui-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Divya Menon",
+              "id": 6,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-27T13:00:00Z",
+            "description": "Build screens in React with our designer.",
+            "distance_km": 5.83,
+            "duration_weeks": null,
+            "id": 66,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.042590507024766,
+            "lng": 80.23541556147727,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "saas",
+            "skill_match": 0.96,
+            "starts_on": null,
+            "startup_id": 3,
+            "startup_logo": null,
+            "startup_name": "Pixelwave Labs",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Frontend Intern"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T13:00:00Z",
+            "description": "",
+            "distance_km": 6.52,
+            "duration_weeks": null,
+            "id": 16,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.06330571797163,
+            "lng": 80.27306216852651,
+            "location": "Nungambakkam, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 31,
+            "startup_logo": null,
+            "startup_name": "Zetapulse",
+            "startup_verified": false,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Intern – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T00:00:00Z",
+            "description": "",
+            "distance_km": 8.04,
+            "duration_weeks": null,
+            "id": 49,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.076794712319195,
+            "lng": 80.26847671560712,
+            "location": "Nungambakkam, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 114,
+            "startup_logo": null,
+            "startup_name": "Anucart",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T14:00:00Z",
+            "description": "",
+            "distance_km": 1.6,
+            "duration_weeks": null,
+            "id": 38,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.01497730467243,
+            "lng": 80.28280337486402,
+            "location": "Adyar, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 94,
+            "startup_logo": null,
+            "startup_name": "Pixellabs",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Content marketing",
+                "required": false,
+                "slug": "content-marketing",
+                "your_level": null
+              },
+              {
+                "name": "UX design",
+                "required": false,
+                "slug": "ux-design",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-24T17:00:00Z",
+            "description": "",
+            "distance_km": 5.5,
+            "duration_weeks": null,
+            "id": 58,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.052536764776415,
+            "lng": 80.2598303627194,
+            "location": "T. Nagar, Chennai",
+            "sector": "edtech",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 131,
+            "startup_logo": null,
+            "startup_name": "Indrawave",
+            "startup_verified": false,
+            "stipend_max": 25000,
+            "stipend_min": 15000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Backend development",
+                "required": false,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "DevOps and cloud",
+                "required": false,
+                "slug": "devops",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-24T01:00:00Z",
+            "description": "",
+            "distance_km": 7.84,
+            "duration_weeks": null,
+            "id": 56,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.074905236052391,
+            "lng": 80.2779209739254,
+            "location": "Nungambakkam, Chennai",
+            "sector": "saas",
+            "skill_match": 0.8,
+            "starts_on": null,
+            "startup_id": 124,
+            "startup_logo": null,
+            "startup_name": "Manthancraft",
+            "startup_verified": false,
+            "stipend_max": 8000,
+            "stipend_min": 5000,
+            "title": "Associate – Frontend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-03-01T01:00:00Z",
+            "description": "",
+            "distance_km": 5.72,
+            "duration_weeks": null,
+            "id": 21,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.036971836926496,
+            "lng": 80.23147827932493,
+            "location": "Guindy, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 40,
+            "startup_logo": null,
+            "startup_name": "Anumint",
+            "startup_verified": false,
+            "stipend_max": 12000,
+            "stipend_min": 8000,
+            "title": "Trainee – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-28T04:00:00Z",
+            "description": "",
+            "distance_km": 1.09,
+            "duration_weeks": null,
+            "id": 65,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.012740818851192,
+            "lng": 80.27815616333477,
+            "location": "Adyar, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 150,
+            "startup_logo": null,
+            "startup_name": "Ojasworks",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Associate – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T21:00:00Z",
+            "description": "",
+            "distance_km": 1.9,
+            "duration_weeks": null,
+            "id": 27,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 12.989259034070162,
+            "lng": 80.26497973616155,
+            "location": "Velachery, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 50,
+            "startup_logo": null,
+            "startup_name": "Aerocart",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Backend development"
+          },
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Backend development",
+                "required": true,
+                "slug": "backend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Frontend development",
+                "required": false,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "Cybersecurity",
+                "required": false,
+                "slug": "cybersecurity",
+                "your_level": null
+              }
+            ],
+            "contact": null,
+            "created_at": "2026-02-25T05:00:00Z",
+            "description": "",
+            "distance_km": 3.12,
+            "duration_weeks": null,
+            "id": 37,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.01217679491272,
+            "lng": 80.3002465844658,
+            "location": "Tidel Park, Taramani, Chennai",
+            "sector": "fintech",
+            "skill_match": 0.1,
+            "starts_on": null,
+            "startup_id": 90,
+            "startup_logo": null,
+            "startup_name": "Sutraware",
+            "startup_verified": false,
+            "stipend_max": 20000,
+            "stipend_min": 12000,
+            "title": "Intern – Backend development"
+          }
+        ],
+        "next_offset": 10
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "jobs",
+  "screen": "discover"
+}
