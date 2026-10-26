@@ -45,5 +45,11 @@ export function useJoinContext() {
   const ctx = useSyncExternalStore((cb) => { listeners.add(cb); return () => listeners.delete(cb); }, read, () => EMPTY);
   const save = useCallback((v: JoinContext) => write({ ...read(), ...Object.fromEntries(Object.entries(v).filter(([, x]) => x)) }), []);
   const clear = useCallback(() => write(null), []);
-  return { ...ctx, save, clear };
+  /** Forget single answers once they are used (an invite code that has been redeemed must not be tried again). */
+  const forget = useCallback((...keys: Array<keyof JoinContext>) => {
+    const next = { ...read() };
+    for (const k of keys) delete next[k];
+    write(Object.keys(next).length ? next : null);
+  }, []);
+  return { ...ctx, save, clear, forget };
 }

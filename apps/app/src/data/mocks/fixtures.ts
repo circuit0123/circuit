@@ -64,7 +64,7 @@ export const PERSONAS = [
 
 export const ONBOARDING = {
   branch: "default",
-  steps: ["welcome", "consent", "invite", "name", "role", "location", "need", "offer", "skills", "traits", "photo", "visibility", "colour", "ready"],
+  steps: ["invite", "name", "role", "age", "safety", "where", "work", "offers", "needs", "organisation", "photo", "colour", "ready"],
   skip: [],
   current_step: null,
   completed_at: minutes(60 * 24 * 3),

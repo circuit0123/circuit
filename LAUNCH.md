@@ -112,12 +112,12 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] packages/ui components listed in DESIGN.md §6, with dark and light themes — F1 added ThemeProvider, ListRow, GroupedList, ErrorState, Sheet with detents, TopBar, LargeTitleHeader and the TabBar presets. Still to come: PostComposer, ReplyThread, AccentPicker, CircuitRing (their screens)
 - [x] packages/api-client generated from the backend OpenAPI spec (script; mock spec until Stage 3 lands) (F1: regenerated from the frozen openapi.json; `make api-client`)
 - [ ] apps/landing: home + /students, /founders, /mentors, /investors, /partners per DESIGN.md §4 "Landing site"; role-aware CTAs (`/join?role=…&src=…`); waitlist form; SEO + OG per page; footer (privacy, terms, contact)
-- [ ] App `/join` route reads role, org, invite code and src; onboarding skips the steps they answer; src saved on the member
+- [x] App `/join` route reads role, org, invite code and src; onboarding skips the steps they answer; src saved on the member (F2: invite, role and college-email skips and `src` saving are tested)
 - [x] `useFeatures()` hook from `/api/config`; tabs, entry points and routes for an off flag are removed (DESIGN.md §3), and their URLs show the 404 screen (F1: tabs hide; `/circuits`, an unbuilt or off tab, shows the 404 page)
 - [x] Data layer: one hook per screen/action in apps/app/src/data; ESLint rule forbids API client, Supabase or fetch imports outside src/data; tested by `apps/app/tests/boundary.test.mjs` for the app and packages/ui (F1)
 - [ ] Mock mode: `pnpm dev:mock` with MSW handlers generated from contract fixtures and scenario switcher (empty, loading, error, slow 3G, under-18, partner, investor, features off) — F1 built `make mock` with temporary fixtures typed against openapi.json and the scenarios default, empty, loading, error, slow 3G, beta access missing, features off, under 18. Still open: partner and investor scenarios (their screens come later) and the B7 contract fixtures
 - [ ] apps/app shell: Supabase sign-in (Google + OTP), auth callback, navigation per DESIGN.md §3 (Home · Discover · Circuits · Inbox · Profile; create in top bar), environment banner, persona switcher (dev/demo)
-- [ ] Sign-up and onboarding per DESIGN.md §4 "Sign-up and onboarding": one thing per screen (steps 1–14), resumable, inference before asking, under-18 defaults, measured time-to-first-drop < 2 min (Playwright test with timing)
+- [x] Sign-up and onboarding per DESIGN.md §4 "Sign-up and onboarding": one thing per screen (steps 1–14), resumable, inference before asking, under-18 defaults, measured time-to-first-drop < 2 min (Playwright test with timing) (F2; the investor and partner branches arrive with their flags, and the photo step is mock-only until an avatar upload endpoint exists)
 - [ ] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end
 - [ ] Build log composer and post view (media pager, reactions, replies, report)
 - [ ] Discover: People, Startups, Jobs (+ job page, apply), Map
@@ -127,13 +127,13 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [ ] Founder applicants view, my applications, partner dashboard
 - [ ] Every screen: loading, empty, error states; works at 375px and 1280px
 - [ ] TabPager: swipe between tabs per DESIGN.md §3 gesture rules (Playwright touch tests: swipe commits, vertical scroll wins, no conflict with Live wire, Daily Drop, media pager, map) — F1: touch tests for the swipe commit and snap-back, vertical scroll, Live wire, Daily Drop, chips rows, segmented control, a swipe lock for the Map, sheets, text fields, scroll position, reduced motion and the toggle. Still open: the media pager and the real Map (F4, F6)
-- [ ] ThemeProvider + AccentPicker: accent applied before first paint, all six accents pass contrast checks in both themes — F1 built ThemeProvider (first paint, 250ms crossfade) and tested contrast for all six accents in both themes; the AccentPicker arrives with Settings → Appearance (F6)
+- [ ] ThemeProvider + AccentPicker: accent applied before first paint, all six accents pass contrast checks in both themes — F1 built ThemeProvider (first paint, 250ms crossfade) and tested contrast for all six accents in both themes; the AccentPicker is built and used on the sign-up Colour step (F2); Settings → Appearance arrives in F6
 - [ ] Playwright tests for the five demo stories at both widths; axe checks
 
 ## Stage 4b — Invite-only beta (F18)
 - [x] invite_codes, beta_access, waitlist models (+ allowlist, email outbox); Django admin to create codes, approve waitlist, revoke access
 - [x] Access gate on every member endpoint when BETA_MODE is on (except onboarding, waitlist and redeem-code); tests prove a non-beta member gets 403 everywhere else
-- [ ] App: "Enter invite code" + waitlist screen after sign-in; landing: waitlist form (rate-limited, no account needed)
+- [x] App: "Enter invite code" + waitlist screen after sign-in (F2 part 1); landing: waitlist form (rate-limited, no account needed) (L1–L2)
 - [x] Invite emails (Resend) with a one-tap link containing the code
 - [x] Each beta member can invite 3 others (codes tied to the inviter, logged)
 

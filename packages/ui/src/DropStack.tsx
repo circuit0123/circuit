@@ -77,6 +77,69 @@ export function DropStack({ cards, onAnswer, doneText, className }: Props) {
   );
 }
 
+/** The card's content without the gesture: used by the Daily Drop stack and by the last onboarding screen (static). */
+export function DropCardFace({ card, overlay, compact }: { card: DropCard; overlay?: React.ReactNode; /** The reveal at the end of sign-up (Ready.dc.html): the reason, the mutual and one line about the person; no picture, chips or detail. */ compact?: boolean }) {
+  const p = card.person;
+  return (
+    <>
+      <div className={cx("flex flex-col gap-3 px-surface pt-surface", compact ? "pb-surface" : "pb-4")}>
+        <h2 className="t-title3">
+          {card.helpWith ? (
+            <>{firstName(p.name)} can help you with <span className="font-semibold">{card.helpWith}</span></>
+          ) : (
+            card.reason
+          )}
+        </h2>
+        {card.via && (
+          <p className="t-footnote flex items-center gap-2 text-text-muted">
+            <span className="flex -space-x-1.5">
+              <Avatar id={card.via.id} name={card.via.name} src={card.via.photo} size={20} className="ring-2 ring-surface" />
+              <Avatar id={p.id} name={p.name} src={p.photo} size={20} className="ring-2 ring-surface" />
+            </span>
+            via {firstName(card.via.name)}, {card.via.role}
+          </p>
+        )}
+        {compact && (
+          <div className="mt-2 flex items-center gap-3">
+            <Avatar id={p.id} name={p.name} src={p.photo} size={44} />
+            <div className="min-w-0">
+              <h3 className="t-headline min-w-0">{p.name}</h3>
+              <p className="t-footnote text-text-muted">{[p.headline || p.role, p.place].filter(Boolean).join(" · ")}</p>
+            </div>
+          </div>
+        )}
+      </div>
+      {!compact && (<>
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2 lg:aspect-auto lg:h-[200px]">
+        {p.photo || card.image ? (
+          <img src={p.photo ?? card.image!.src} alt={p.photo ? "" : card.image!.alt} className="h-full w-full object-cover" />
+        ) : (
+          <PatternArt id={p.id} initial={p.name[0]} banner />
+        )}
+        {overlay}
+      </div>
+      <div className="flex flex-col gap-3 p-surface">
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="t-headline min-w-0">{p.name}</h3>
+            <VerifiedBadge level={p.level} />
+          </div>
+          <p className="t-footnote mt-1 text-text-muted">{[p.headline || p.role, p.place].filter(Boolean).join(", ")}</p>
+        </div>
+        {card.detail && <p className="t-body max-w-[540px]">{card.detail}</p>}
+        {(card.offers.length > 0 || card.strength || card.bridge) && (
+          <div className="flex flex-wrap items-center gap-2">
+            {card.offers.slice(0, 3).map((o) => <Chip key={o} label={o} />)}
+            <MatchStrength strength={card.strength} />
+            {card.bridge && <BridgeBadge />}
+          </div>
+        )}
+      </div>
+      </>)}
+    </>
+  );
+}
+
 type CardHandle = { throw: (a: "intro" | "skip") => void };
 
 const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | "skip") => void }>(function TopCard({ card, onThrow }, ref) {
@@ -97,7 +160,6 @@ const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | 
   };
   useImperativeHandle(ref, () => ({ throw: fling }));
 
-  const p = card.person;
   return (
     <motion.div
       ref={el}
@@ -116,50 +178,15 @@ const TopCard = forwardRef<CardHandle, { card: DropCard; onThrow: (a: "intro" | 
       animate={{ opacity: 1 }}
       transition={fade}
     >
-      <div className="flex flex-col gap-3 px-surface pb-4 pt-surface">
-        <h2 className="t-title3">
-          {card.helpWith ? (
-            <>{firstName(p.name)} can help you with <span className="font-semibold">{card.helpWith}</span></>
-          ) : (
-            card.reason
-          )}
-        </h2>
-        {card.via && (
-          <p className="t-footnote flex items-center gap-2 text-text-muted">
-            <span className="flex -space-x-1.5">
-              <Avatar id={card.via.id} name={card.via.name} src={card.via.photo} size={20} className="ring-2 ring-surface" />
-              <Avatar id={p.id} name={p.name} src={p.photo} size={20} className="ring-2 ring-surface" />
-            </span>
-            via {firstName(card.via.name)}, {card.via.role}
-          </p>
-        )}
-      </div>
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2 lg:aspect-auto lg:h-[200px]">
-        {p.photo || card.image ? (
-          <img src={p.photo ?? card.image!.src} alt={p.photo ? "" : card.image!.alt} className="h-full w-full object-cover" />
-        ) : (
-          <PatternArt id={p.id} initial={p.name[0]} banner />
-        )}
-        <motion.span style={{ opacity: introOpacity }} className="pointer-events-none absolute left-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Intro me</motion.span>
-        <motion.span style={{ opacity: skipOpacity }} className="pointer-events-none absolute right-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Skip</motion.span>
-      </div>
-      <div className="flex flex-col gap-3 p-surface">
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="t-headline min-w-0">{p.name}</h3>
-            <VerifiedBadge level={p.level} />
-          </div>
-          <p className="t-footnote mt-1 text-text-muted">{[p.headline || p.role, p.place].filter(Boolean).join(", ")}</p>
-        </div>
-        {card.detail && <p className="t-body max-w-[540px]">{card.detail}</p>}
-        {(card.offers.length > 0 || card.strength || card.bridge) && (
-          <div className="flex flex-wrap items-center gap-2">
-            {card.offers.slice(0, 3).map((o) => <Chip key={o} label={o} />)}
-            <MatchStrength strength={card.strength} />
-            {card.bridge && <BridgeBadge />}
-          </div>
-        )}
-      </div>
+      <DropCardFace
+        card={card}
+        overlay={
+          <>
+            <motion.span style={{ opacity: introOpacity }} className="pointer-events-none absolute left-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Intro me</motion.span>
+            <motion.span style={{ opacity: skipOpacity }} className="pointer-events-none absolute right-4 top-4 rounded-full bg-text px-3 py-1 t-footnote font-semibold text-bg" aria-hidden>Skip</motion.span>
+          </>
+        }
+      />
     </motion.div>
   );
 });

@@ -19,7 +19,7 @@ export default defineConfig({
     url: `http://localhost:${PORT}/design`,
     reuseExistingServer: true,
     timeout: 120_000,
-    env: { NEXT_DIST_DIR: ".next-mock-e2e", NEXT_PUBLIC_MOCK: "1", NEXT_PUBLIC_ENV: "dev", NEXT_PUBLIC_API_URL: `http://localhost:${PORT}` },
+    env: { NEXT_DIST_DIR: ".next-mock-e2e", NEXT_PUBLIC_MOCK: "1", NEXT_PUBLIC_ENV: "dev", NEXT_PUBLIC_API_URL: `http://localhost:${PORT}`, NEXT_PUBLIC_SUPABASE_URL: `http://localhost:${PORT}/mock-supabase`, NEXT_PUBLIC_SUPABASE_ANON_KEY: "mock" },
   },
   use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure", reducedMotion: "reduce" },
   projects: [

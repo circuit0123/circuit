@@ -1,3 +1,4 @@
+export * from "./AccentPicker";
 export * from "./Avatar";
 export * from "./Badge";
 export * from "./Sheet";

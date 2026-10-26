@@ -1,6 +1,7 @@
 import { delay, http, HttpResponse, type HttpHandler, type HttpResponseResolver } from "msw";
 import type { Schemas } from "@circuit/api-client";
 import { currentScenario, type Scenario } from "./config";
+import { isSignup, signupConfig, signupHandlers, signupMe } from "./signup";
 import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, ONBOARDING, PERSONAS, PULSE, dropOf } from "./fixtures";
 
 /**
@@ -20,6 +21,7 @@ const readAppearance = (): Schemas["AppearanceOut"] => {
 const answered = new Map<number, "intro" | "skip">();
 
 function me(s: Scenario): Schemas["MeOut"] {
+  if (isSignup()) return signupMe();
   const base = { ...ME, appearance: readAppearance() };
   if (s === "beta") return { ...base, beta_access: false };
   if (s === "under18") return { ...base, is_minor: true, allow_requests: false, profile_visibility: "organisation", bio: "Class 12 student. I build small apps for my school robotics club." };
@@ -27,6 +29,7 @@ function me(s: Scenario): Schemas["MeOut"] {
 }
 
 function config(s: Scenario): Schemas["ConfigOut"] {
+  if (isSignup()) return signupConfig();
   if (s === "beta") return { ...CONFIG, beta_mode: true, beta_access: false };
   if (s === "features_off") return { ...CONFIG, features: Object.fromEntries(Object.keys(CONFIG.features).map((k) => [k, false])) };
   return CONFIG;
@@ -48,6 +51,7 @@ function scenario(fn: (s: Scenario, info: Info) => Response | Promise<Response>)
 }
 
 export const handlers: HttpHandler[] = [
+  ...signupHandlers, // each answers only in the New member scenarios and otherwise lets the handlers below take over
   http.get(`${API}/config`, scenario((s) => HttpResponse.json(config(s)))),
   http.get(`${API}/me`, scenario((s) => HttpResponse.json(me(s)))),
   http.patch(`${API}/me/appearance`, scenario(async (_s, { request }) => {
