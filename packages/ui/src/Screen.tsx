@@ -35,6 +35,8 @@ type PushProps = {
   right?: React.ReactNode;
   /** Pinned to the bottom (a sticky Apply button, a message composer). */
   footer?: React.ReactNode;
+  /** No side padding on a phone, so rows and their hairlines run edge to edge; the content brings its own 16px (`px-4 lg:px-0`). */
+  bleed?: boolean;
   children: React.ReactNode;
   className?: string;
 };
@@ -43,7 +45,7 @@ type PushProps = {
  * A pushed screen: slides in from the right (0.4s, no bounce), has a back chevron, and a swipe from
  * the left edge goes back following the finger. Tab swiping is off here (DESIGN.md §3).
  */
-export function PushScreen({ title, largeTitle, backLabel, onBack, right, footer, children, className }: PushProps) {
+export function PushScreen({ title, largeTitle, backLabel, onBack, right, footer, bleed, children, className }: PushProps) {
   const reduce = useReducedMotion();
   const x = useMotionValue(0);
   const start = useRef<{ x0: number; y0: number; t: number; vx: number; lastX: number; lastT: number; on: boolean } | null>(null);
@@ -97,8 +99,8 @@ export function PushScreen({ title, largeTitle, backLabel, onBack, right, footer
         <span className="t-headline min-w-0 truncate text-center">{largeTitle ? null : title}</span>
         <div className="flex justify-end">{right}</div>
       </header>
-      <div className={cx("mx-auto w-full max-w-[600px] px-4 pb-24 pt-4", className)}>
-        {largeTitle && title && <h1 className="t-large -mt-4 pb-2 pt-1">{title}</h1>}
+      <div className={cx("mx-auto w-full max-w-[600px] pb-24 pt-4", bleed ? "lg:px-4" : "px-4", className)}>
+        {largeTitle && title && <h1 className={cx("t-large -mt-4 pb-2 pt-1", bleed && "px-4 lg:px-0")}>{title}</h1>}
         {children}
       </div>
       {footer && (

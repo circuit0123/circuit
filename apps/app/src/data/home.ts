@@ -102,7 +102,8 @@ function activityText(a: { type: string; startup_name?: string | null }): { type
 /** Pulse: chronological, last 7 days. `includeSeen` brings back what was already shown ("See earlier this week"). */
 export function usePulse(includeSeen: boolean) {
   const { key, enabled } = useKey("pulse", includeSeen);
-  const meId = useMe().data?.id;
+  const me = useMe().data;
+  const meId = me?.id;
   const features = useFeatures();
   const [hidden, setHidden] = useState<string[]>([]);
   const q = useInfiniteQuery({
@@ -123,7 +124,7 @@ export function usePulse(includeSeen: boolean) {
   });
   // Partner and promoted slots exist only when their flag is on, never first, at most one promoted per 8 items and one partner per 10
   // (DESIGN.md §4). The API sends neither yet, so mock mode shows stand-ins; a real build draws none.
-  if (MOCK && items.length >= 2 && features.raw("promotions") && !hidden.includes(PROMOTED_STAND_IN.key)) {
+  if (MOCK && items.length >= 2 && features.raw("promotions") && !hidden.includes(PROMOTED_STAND_IN.key) && (!me?.isMinor || PROMOTED_STAND_IN.verified)) {
     items.splice(2, 0, { kind: "promoted", key: PROMOTED_STAND_IN.key, startup: PROMOTED_STAND_IN.startup, role: PROMOTED_STAND_IN.role, why: PROMOTED_STAND_IN.why });
   }
   if (MOCK && items.length >= 4 && features.raw("partner_mode")) {

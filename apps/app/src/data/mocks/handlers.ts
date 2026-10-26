@@ -2,6 +2,7 @@ import { delay, http, HttpResponse, type HttpHandler, type HttpResponseResolver 
 import type { Schemas } from "@circuit/api-client";
 import { currentScenario, type Scenario } from "./config";
 import { isSignup, signupConfig, signupHandlers, signupMe } from "./signup";
+import { discoverHandlers } from "./discover";
 import { CONFIG, DROP_CARDS, INTRO, LIVEWIRE, MATCHES, ME, NOTIFICATIONS, ONBOARDING, PEOPLE, PERSONAS, PULSE, dropOf } from "./fixtures";
 
 /**
@@ -24,6 +25,7 @@ function me(s: Scenario): Schemas["MeOut"] {
   if (isSignup()) return signupMe();
   const base = { ...ME, appearance: readAppearance() };
   if (s === "beta") return { ...base, beta_access: false };
+  if (s === "founder") return { ...base, id: PEOPLE.priya.id, display_name: PEOPLE.priya.display_name, role: "founder", bio: "Co-founder of Aravind Pathology. Stock software for pharmacies." };
   if (s === "under18") return { ...base, is_minor: true, allow_requests: false, profile_visibility: "organisation", bio: "Class 12 student. I build small apps for my school robotics club." };
   return base;
 }
@@ -86,7 +88,9 @@ export const handlers: HttpHandler[] = [
     answered.set(Number(params.id), ((await request.json()) as { direction: "intro" | "skip" }).direction);
     return HttpResponse.json(dropOf(noDrop(s) ? [] : DROP_CARDS.map((c) => ({ ...c, outcome: answered.get(c.member.id) ?? null }))));
   })),
-  http.get(`${API}/matches`, scenario((s, { request }) => {
+  http.get(`${API}/matches`, scenario(async (s, { request }) => {
+    if (s === "discover_error") return envelope(500, "internal_error", "Something went wrong on our side.");
+    if (s === "discover_loading") await delay("infinite");
     const q = new URL(request.url).searchParams;
     const limit = Number(q.get("limit") ?? 20);
     const offset = Number(q.get("offset") ?? 0);
@@ -129,6 +133,8 @@ export const handlers: HttpHandler[] = [
     readIds.add(Number(params.id));
     return HttpResponse.json(NOTIFICATIONS.find((n) => n.id === Number(params.id)) ?? NOTIFICATIONS[0]);
   })),
+
+  ...discoverHandlers,
 
   // Anything else: not mocked yet.
   http.all(`${API}/*`, ({ request }) => {

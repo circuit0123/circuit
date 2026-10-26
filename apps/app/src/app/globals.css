@@ -1,3 +1,11 @@
 @import "tailwindcss";
 @import "@circuit/ui/tokens.css";
 @source "../../../../packages/ui/src";
+
+/* Map pins (Map.dc.html): a 44px tap target around a dot. Hiring = `current`, not hiring = a muted dot; the selected pin grows and gets a ring. */
+.map-pin { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; padding: 0; cursor: pointer; }
+.map-pin::after { content: ""; width: 16px; height: 16px; border-radius: 999px; border: 3px solid var(--bg); background: var(--surface-3); box-shadow: 0 0 0 1px var(--text-subtle); transition: width 150ms, height 150ms; }
+.map-pin[data-hiring="true"]::after { background: var(--current); box-shadow: none; }
+.map-pin[data-selected="true"]::after { width: 22px; height: 22px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--current) 30%, transparent); }
+.map-pin:focus-visible { outline: 2px solid var(--current); outline-offset: -4px; border-radius: 999px; }
+.maplibregl-ctrl-attrib { font-family: var(--font-sans); }

@@ -16,6 +16,9 @@ export const SCENARIOS = [
   { id: "home_off", label: "Pulse and Daily Drop off" },
   { id: "intros_used", label: "Intros used up" },
   { id: "under18", label: "Under 18" },
+  { id: "founder", label: "Founder" },
+  { id: "discover_loading", label: "Discover loading" },
+  { id: "discover_error", label: "Discover fails to load" },
   { id: "signup", label: "New member" },
   { id: "signup_ai_down", label: "New member, AI down" },
 ] as const;
