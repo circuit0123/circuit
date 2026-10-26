@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
-import { checkPage as axeCheck, inBothThemes } from "../e2e/helpers";
+import { checkPage as axeCheck, inBothThemes, isPhone } from "../e2e/helpers";
+import { drag } from "./touch";
 
 /**
  * F6 build logs on mock mode (no backend). The composer: media first (up to 4, cropped and shrunk on the phone, each uploading with its
@@ -244,6 +245,18 @@ test.describe("Post view", () => {
     const pager = page.getByRole("group", { name: "Images, 2" });
     await expect(pager).toBeVisible();
     await expect(page.locator("[data-no-swipe]").filter({ has: pager })).toHaveCount(1);
+  });
+
+  test("phone: a sideways swipe on a post's pictures stays with the pictures, not the tabs", async ({ page }, info) => {
+    test.skip(!isPhone(info), "tab swiping is a phone gesture");
+    await page.goto("/?scenario=default");
+    const img = page.getByRole("img", { name: /Dashboard listing four medicines/ });
+    await img.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+    const box = (await img.boundingBox())!;
+    await drag(page, { x: 330, y: box.y + box.height / 2 }, { x: 40, y: box.y + box.height / 2 + 4 });
+    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/\/(\?scenario=default)?$/);
   });
 
   test("under 18: no Intro me", async ({ page }) => {

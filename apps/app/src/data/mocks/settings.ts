@@ -37,8 +37,12 @@ type Prefs = Schemas["NotificationPrefsOut"];
 const both = (email: boolean) => ({ in_app: true, email });
 const prefs: Prefs = { intros: both(true), messages: both(true), applications: both(false), circuits: both(false), pulse_replies: both(false), announcements: both(false) };
 
-let privacy: Schemas["PrivacyOut"] = { profile_visibility: "members", visible_to_org: false, circuits_opt_in: true, allow_requests: true };
-const minorPrivacy = (): Schemas["PrivacyOut"] => ({ ...privacy, profile_visibility: privacy.profile_visibility === "public" ? "hidden" : privacy.profile_visibility === "members" ? "hidden" : privacy.profile_visibility, allow_requests: false });
+/** Privacy for the adult member and, separately, for the Under 18 scenario (hidden and no requests by default). */
+const privacy: Record<"adult" | "minor", Schemas["PrivacyOut"]> = {
+  adult: { profile_visibility: "members", visible_to_org: false, circuits_opt_in: true, allow_requests: true },
+  minor: { profile_visibility: "hidden", visible_to_org: true, circuits_opt_in: false, allow_requests: false },
+};
+const who = (s: Scenario) => (s === "under18" ? "minor" : "adult");
 let blocked: Schemas["PersonOut"][] = [{ id: 31, display_name: "Karthik Selvam", role: "student", verification_level: 1 }];
 let exported: Schemas["ExportStatus"] | null = null;
 
@@ -52,7 +56,7 @@ const SUPPORT: Schemas["SupportOut"] = {
 };
 
 /** Privacy as the member sees it now (handlers.ts puts it into /api/me too). */
-export const privacyFor = (s: Scenario) => (s === "under18" ? minorPrivacy() : privacy);
+export const privacyFor = (s: Scenario) => privacy[who(s)];
 
 /** `me` is handlers.ts's /api/me for the scenario, so the summary, appearance and consent match what the rest of the app shows. */
 export const settingsHandlers = (me: (s: Scenario) => Schemas["MeOut"]): HttpHandler[] => [
@@ -74,7 +78,7 @@ export const settingsHandlers = (me: (s: Scenario) => Schemas["MeOut"]): HttpHan
     const b = (await request.json()) as Schemas["PrivacyPatch"];
     if (s === "under18" && (b.profile_visibility === "public" || b.allow_requests === true)) return envelope(403, "under_18_restricted", "Not available for members under 18");
     if (b.circuits_opt_in === true && me(s).verification_level < 2) return envelope(403, "verification_required", "Verify your work email to join circuits");
-    privacy = { ...privacy, ...Object.fromEntries(Object.entries(b).filter(([, v]) => v !== null && v !== undefined)) };
+    privacy[who(s)] = { ...privacy[who(s)], ...Object.fromEntries(Object.entries(b).filter(([, v]) => v !== null && v !== undefined)) };
     return HttpResponse.json(privacyFor(s));
   })),
   http.patch(`${API}/me/notification-preferences`, scenario(async (_s, { request }) => {
