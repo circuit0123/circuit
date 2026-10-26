@@ -1,5 +1,7 @@
 """B7 part 1: the Startup page and the job page in one call each; private counts; under-18 sees verified startups only."""
 
+import re
+
 import pytest
 
 from apps.jobs.models import Application, Job, JobCapability
@@ -46,7 +48,8 @@ def test_nobody_else_sees_a_claimed_startups_counts(make_member, make_startup, c
     Startup.objects.filter(pk=s.pk).update(view_count=40)
     body = detail(client_for(make_member(role)), s)
     assert body["view_count"] is None and body["interest_count"] is None
-    assert "40" not in str({k: v for k, v in body.items() if k not in {"id"}})
+    # 40 as a whole number anywhere in the body (not inside another number such as a member id 1140)
+    assert not re.search(r"(?<![\w.])40(?![\w.])", str({k: v for k, v in body.items() if k not in {"id"}}))
 
 
 def test_a_founder_on_an_unclaimed_page_sees_counts_only_from_five(make_member, make_startup, client_for):

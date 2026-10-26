@@ -42,6 +42,9 @@ def filled(env: str, tmp_path):
         text = re.sub(r"<([a-z]+@[^>]+)>", r"\1", text)
         text = re.sub(r"<(Circuit [a-z]+ on-call [a-z]+)>", r"\1", text)
         text = text.replace("<age1...>", "age1" + "q" * 58)
+        # production.toml now holds the real project and billing account; the tests use their own so they do not depend on them
+        text = re.sub(r'(?m)^id\s*=\s*"[^"]*"', 'id = "circuit-test-1"', text)
+        text = re.sub(r'(?m)^billing_account\s*=\s*"[^"]*"', 'billing_account = "AAAAAA-BBBBBB-CCCCCC"', text)
         text = text.replace("<name>", "Asha Rao").replace("<postal address>", "1 Example Road, Chennai")
         toml.write_text(text)
     return tmp_path / env
@@ -509,6 +512,9 @@ def test_a_secret_the_deploy_mounts_is_a_variable_the_app_reads(cfg):
 
 def test_the_llm_key_mounted_is_the_one_for_the_provider_in_use(cfg):
     provider = cfg.env_vars["LLM_PROVIDER"]
+    if provider == "none":
+        assert not any(name.endswith("_API_KEY") and name != "RESEND_API_KEY" for name in cfg.secrets)
+        return
     assert f"{provider.upper()}_API_KEY" in cfg.secrets
 
 
@@ -527,3 +533,75 @@ def test_the_jobs_listing_shows_every_job_and_marks_the_unbuilt_ones(cli):
         assert job.key in text
     assert "reset-demo" not in text  # demo only
     assert "build-investor-picks" in text and "not built yet" in text
+
+
+def test_every_committed_deploy_file_is_valid_toml_with_no_repeated_keys():
+    import tomllib
+
+    for path in sorted((REPO / "deploy" / "gcp").glob("*.toml")):
+        tomllib.loads(path.read_text())  # a key written twice in one table raises here
+
+
+def test_alert_channels_never_block_a_deploy_but_do_block_make_monitoring(prod):
+    prod.monitoring["notification_channels"] = ["<Circuit production on-call email>"]
+    assert gcp.find_placeholders(prod, "deploy") == []
+    (line,) = gcp.find_placeholders(prod, "monitoring")
+    assert "notification_channels" in line and "Cloud Monitoring" in line
+
+
+def test_the_placeholder_error_lists_each_missing_value_with_a_hint(prod):
+    prod.env_vars["CORS_ALLOWED_ORIGINS"] = "<the app origin>"
+    prod.env_vars["SUPABASE_URL"] = "<https://xxxx.supabase.co>"
+    prod.env_vars["SOMETHING_NEW"] = "<?>"
+    lines = gcp.find_placeholders(prod)
+    assert len(lines) == 3
+    assert any("CORS_ALLOWED_ORIGINS" in x and "exact origin" in x for x in lines)
+    assert any("SUPABASE_URL" in x and "Project URL" in x for x in lines)
+    assert any("SOMETHING_NEW" in x and "only you know" in x for x in lines)
+
+
+def test_make_monitoring_with_no_channels_stops_with_a_clear_message(prod):
+    prod.monitoring["notification_channels"] = []
+    with pytest.raises(Exception, match="No notification channels"):
+        gcp.plan_monitoring(prod, "123456789")
+
+
+def test_production_cors_allows_exactly_the_origin_the_app_and_landing_are_served_from(prod):
+    from urllib.parse import urlparse
+
+    def origin(url):
+        u = urlparse(url)
+        return f"{u.scheme}://{u.netloc}"
+
+    cors = [o for o in prod.env_vars["CORS_ALLOWED_ORIGINS"].split(",") if o]
+    assert cors == [origin(prod.env_vars["APP_URL"])] == [origin(prod.env_vars["LANDING_URL"])]
+
+
+def test_links_built_from_the_production_app_url_land_inside_the_app(prod, settings):
+    from apps.beta.services import invite_link
+    from apps.notifications.unsubscribe import page_url
+
+    settings.APP_URL = prod.env_vars["APP_URL"]
+    assert invite_link("ABCD2345").startswith("https://circuit-phi.vercel.app/app/join?")
+    assert page_url("t").startswith("https://circuit-phi.vercel.app/app/unsubscribe?")
+    assert not prod.env_vars["LANDING_URL"].endswith("/app")
+
+
+def test_production_mounts_no_redis_secret_for_the_beta_but_staging_and_demo_do():
+    prod_cfg = gcp.load_config("production", REPO / "deploy" / "gcp")
+    assert "REDIS_URL" not in prod_cfg.secrets
+    for env in ("staging", "demo"):
+        assert "REDIS_URL" in gcp.load_config(env, REPO / "deploy" / "gcp").secrets
+
+
+def test_a_real_sender_with_angle_brackets_is_not_mistaken_for_a_placeholder(prod):
+    prod.env_vars["EMAIL_FROM"] = "Circuit <support@circuitapp.net>"
+    assert gcp.find_placeholders(prod) == []
+    prod.env_vars["EMAIL_FROM"] = "Circuit <hello@<yourdomain>>"
+    assert len(gcp.find_placeholders(prod)) == 1
+
+
+def test_the_committed_production_file_has_no_placeholders_left_for_a_deploy():
+    """Unlike the other tests this does not fill anything in: it is the file as committed, which `make deploy` will read."""
+    cfg = gcp.load_config("production", REPO / "deploy" / "gcp")
+    assert gcp.find_placeholders(cfg, "deploy") == []

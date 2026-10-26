@@ -52,6 +52,8 @@ class ProbeMiddleware:
             connection.close()  # drop the broken connection so the next probe starts clean
             log.error("ready.failed", postgres="down", error=type(exc).__name__)
             return self._json({"status": "fail", "postgres": "down"}, 503)
+        if not get_cache().configured:
+            return self._json({"status": "ok", "postgres": "ok", "redis": "not_configured"}, 200)
         if not get_cache().ping():
             log.warning("ready.degraded", redis="down", note="reading from Postgres instead")
             return self._json({"status": "degraded", "postgres": "ok", "redis": "down"}, 200)
@@ -91,7 +93,8 @@ def deps(request):
             cur.execute("SELECT 1")
     except Exception:
         pg = "down"
-    redis_state = "ok" if get_cache().ping() else "down"
+    cache = get_cache()
+    redis_state = "not_configured" if not cache.configured else "ok" if cache.ping() else "down"
     jwks = "skipped"
     if settings.SUPABASE_URL:
         from core.auth import jwks_reachable

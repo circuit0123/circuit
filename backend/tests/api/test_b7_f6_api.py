@@ -87,7 +87,11 @@ def test_an_under_18_members_highlights_are_for_them_alone(make_member, client_f
     ck = client_for(kid)
     assert ck.put("/api/me/highlights", {"items": [item(upload(ck, make_image("PNG", (300, 300))))]}).status_code == 200
     assert len(client_for(kid).get(f"/api/members/{kid.pk}").json()["highlights"]) == 1
-    assert client_for(friend).get(f"/api/members/{kid.pk}").json()["highlights"] == []
+    # an under-18 profile is a 404 to everyone else, so the highlights cannot be reached by any other route either
+    assert client_for(friend).get(f"/api/members/{kid.pk}").status_code == 404
+    from apps.accounts import highlights
+
+    assert highlights.rows_for(friend, kid) == []  # and the serializer itself hides them
 
 
 def test_highlights_of_a_hidden_member_are_a_404_to_strangers(make_member, client_for, make_image):
@@ -203,7 +207,10 @@ def test_push_quiet_hours_and_cap_have_defaults_and_can_change(make_member, clie
     n = c.get("/api/me/settings").json()["notifications"]
     assert n["intros"] == {"in_app": True, "email": True, "push": True} and n["announcements"]["push"] is False
     assert n["quiet_hours"] == {"start": 22, "end": 8} and n["push_daily_cap"] == 3 and n["quiet_hours_locked"] is False
-    r = c.patch("/api/me/notification-preferences", {"messages": {"push": False}, "quiet_hours": {"start": 23, "end": 7}, "push_daily_cap": 5})
+    r = c.patch(
+        "/api/me/notification-preferences",
+        {"messages": {"push": False}, "quiet_hours": {"start": 23, "end": 7}, "push_daily_cap": 5},
+    )
     assert r.status_code == 200
     body = r.json()
     assert body["messages"]["push"] is False and body["quiet_hours"] == {"start": 23, "end": 7} and body["push_daily_cap"] == 5
@@ -213,7 +220,13 @@ def test_push_quiet_hours_and_cap_have_defaults_and_can_change(make_member, clie
 
 @pytest.mark.parametrize(
     "bad",
-    [{"push_daily_cap": 0}, {"push_daily_cap": 11}, {"quiet_hours": {"start": 24, "end": 7}}, {"quiet_hours": {"start": 7, "end": 7}}, {"intros": {"sms": True}}],
+    [
+        {"push_daily_cap": 0},
+        {"push_daily_cap": 11},
+        {"quiet_hours": {"start": 24, "end": 7}},
+        {"quiet_hours": {"start": 7, "end": 7}},
+        {"intros": {"sms": True}},
+    ],
 )
 def test_bad_push_settings_are_a_422(make_member, client_for, bad):
     assert client_for(make_member()).patch("/api/me/notification-preferences", bad).status_code == 422
@@ -229,3 +242,10 @@ def test_an_under_18_member_cannot_change_quiet_hours_or_raise_the_cap(make_memb
         assert r.status_code == 403 and r.json()["error"]["code"] == "under_18_restricted"
     assert c.patch("/api/me/notification-preferences", {"push_daily_cap": 1}).json()["push_daily_cap"] == 1  # fewer is fine
     assert Member.objects.get(pk=kid.pk).notification_prefs["delivery"]["push_daily_cap"] == 1
+
+
+def test_every_event_the_highlights_code_records_is_a_known_event_type():
+    """The 500 on PUT /api/me/highlights was `record()` refusing an event name nobody had registered."""
+    from apps.events.services import EVENT_TYPES
+
+    assert "member.highlights_set" in EVENT_TYPES

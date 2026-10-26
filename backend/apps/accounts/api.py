@@ -73,7 +73,7 @@ def _me(m: Member, beta_access: bool) -> dict:
 
     return {
         "id": m.pk, "role": m.role, "display_name": m.display_name, "bio": m.bio, "headline": m.headline_line(), "city": m.city, "college": m.college,
-        "organisation_name": m.organisation.name if m.organisation_id else None,
+        "organisation_name": m.organisation.name if m.organisation else None,
         "lat": m.location.y if m.location else None, "lng": m.location.x if m.location else None,
         "verification_level": m.verification_level, "organisation_id": m.organisation_id, "is_minor": m.is_minor,
         "profile_visibility": m.profile_visibility, "visible_to_org": m.visible_to_org, "circuits_opt_in": m.circuits_opt_in,
@@ -344,7 +344,9 @@ class ProfileOut(Schema):
     build_logs: list[BuildLogTileOut]  # first picture of their latest build logs I may see; empty when Pulse is off
     circuits_closed: int | None  # mine, or a connection's; null for everyone else and when circuits are off
     strength: StrengthOut | None  # my own profile only: how complete it is
-    circuits_together: list[CircuitTogetherOut] | None  # circuits we are both in (running or finished); null on my own profile and when circuits are off
+    circuits_together: (
+        list[CircuitTogetherOut] | None
+    )  # circuits we are both in (running or finished); null on my own profile and when circuits are off
     highlights: list[HighlightOut]  # up to 6 pinned projects; empty for an under-18 member's profile seen by anyone else
     role: str
     display_name: str

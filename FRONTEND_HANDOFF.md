@@ -1,6 +1,6 @@
 # Circuit — Frontend handoff
 
-**API version:** 1.1.0 (frozen). Any change to `packages/api-client/openapi.json` needs a higher version here and in `backend/circuit/api.py`, and an entry in section 3; `make api-freeze` (and CI) fails otherwise.
+**API version:** 1.2.0 (frozen). Any change to `packages/api-client/openapi.json` needs a higher version here and in `backend/circuit/api.py`, and an entry in section 3; `make api-freeze` (and CI) fails otherwise.
 
 What the app's data layer (`apps/app/src/data`) can rely on from the backend. One section per screen: the hook that serves it, the
 endpoints it calls, what comes back, which errors to draw, the Realtime channels and the rate limits.
@@ -335,6 +335,11 @@ Fixtures `errors/{signed_out,default,rate_limited,beta_required}.json` show 401,
 | Profile highlights, GitHub summary | not scheduled | |
 
 ## 3. What changed in the API in B7 (for switching hooks from mocks)
+
+B7 part 3 (API 1.2.0; the 1.1.0 spec file had not been regenerated after these changes, so re-pull `packages/api-client`):
+new `PUT /api/me/highlights` (up to 6 pinned projects, see the endpoint description); `ProfileOut` gains `highlights` and `circuits_together`;
+`GET /api/members/{id}/posts` now returns a page `{items, next_cursor}` instead of a list; notification preferences gain a `push` flag per type
+and `quiet_hours`. Fixed: `PUT /api/me/highlights` answered 500 (unregistered event name).
 
 B7 part 2 (API 1.1.0): new `POST /api/join/visit` (above). Nothing else changed.
 

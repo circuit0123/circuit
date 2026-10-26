@@ -71,7 +71,8 @@ def strength(member: Member) -> dict:
     steps = [(k, text) for k, text in STRENGTH_STEPS if k != "post" or flags.enabled("pulse", member)]
     left = [(k, text) for k, text in steps if not done[k]]
     nxt = {"key": left[0][0], "text": left[0][1]} if left else None
-    return {"percent": round(100 * (len(steps) - len(left)) / len(steps)), "next_step": nxt}
+    percent = (200 * (len(steps) - len(left)) + len(steps)) // (2 * len(steps))  # half up: 5 of 8 is 63 (round() would give 62)
+    return {"percent": percent, "next_step": nxt}
 
 
 def circuits_closed(target: Member) -> int:

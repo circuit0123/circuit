@@ -19,9 +19,7 @@ def rows_for(viewer: Member, target: Member) -> list[dict]:
         return []
     items = list(Highlight.objects.filter(member=target).select_related("upload"))
     urls = media.urls_for(h.upload for h in items)
-    return [
-        {"id": h.pk, "title": h.title, "link": h.link, "image": {"alt_text": h.alt_text, **urls[h.upload_id]}} for h in items
-    ]
+    return [{"id": h.pk, "title": h.title, "link": h.link, "image": {"alt_text": h.alt_text, **urls[h.upload_id]}} for h in items]
 
 
 def replace(member: Member, items: list[dict]) -> list[dict]:

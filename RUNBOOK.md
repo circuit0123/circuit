@@ -31,7 +31,7 @@ Supabase project may belong to different Google accounts: they only meet through
    → Credentials → Create OAuth client ID → Web application. Authorised JavaScript origins: your app address and
    `http://localhost:3000`. Authorised redirect URI: `https://<ref>.supabase.co/auth/v1/callback`. Paste the client ID and secret
    into Supabase → Authentication → Providers → Google.
-3. **[YOU] Upstash.** Create a Redis database in the Mumbai region. Copy the address that starts with **`rediss://`** (two s: TLS),
+3. **[YOU] Upstash (optional for the beta).** The app runs fine with no Redis (it reads Postgres and counts rate limits there; the API logs one `redis_not_configured` warning). Add it when traffic grows. Create a Redis database in the Mumbai region. Copy the address that starts with **`rediss://`** (two s: TLS),
    not the REST address. The app refuses a plain `redis://` address in production.
 4. **[YOU] Resend.** Add your domain and publish the SPF, DKIM and DMARC records it shows. Production refuses Resend's
    `@resend.dev` test sender, so the app cannot start until `EMAIL_FROM` uses your verified domain. Create an API key.
@@ -65,9 +65,10 @@ Supabase project may belong to different Google accounts: they only meet through
     python3 -c "import secrets; print(secrets.token_urlsafe(50))"   # copy this for SECRET_KEY
     make secret ENV=production NAME=SECRET_KEY
     make secret ENV=production NAME=DATABASE_URL                 # the transaction pooler address from step 1
-    make secret ENV=production NAME=REDIS_URL                    # the rediss:// address from step 3
+    # optional, once you have Upstash: add "REDIS_URL" to `secrets` in deploy/gcp/production.toml, then:
+    # make secret ENV=production NAME=REDIS_URL                  # the rediss:// address from step 3
     make secret ENV=production NAME=SUPABASE_SERVICE_ROLE_KEY
-    make secret ENV=production NAME=ANTHROPIC_API_KEY
+    # no LLM key for the beta (LLM_PROVIDER=none in production.toml). To switch an LLM on: set LLM_PROVIDER, add <NAME>_API_KEY to `secrets`, `make secret` it
     make secret ENV=production NAME=RESEND_API_KEY
     ```
     The list for an environment is in `deploy/gcp/app.toml` and `<env>.toml`. `make deploy` refuses to start until every one has a value.

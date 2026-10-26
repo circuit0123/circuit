@@ -60,7 +60,7 @@ def test_a_minors_profile_posts_are_a_404_for_strangers_and_visible_to_the_org(c
     ghost = client_for(cast["stranger"]).get("/api/members/999999/posts")
     real = client_for(cast["stranger"]).get(f"/api/members/{cast['minor'].pk}/posts")
     assert real.status_code == 404 and real.json() == ghost.json()  # cannot tell a minor from a missing member
-    assert len(client_for(cast["mate"]).get(f"/api/members/{cast['minor'].pk}/posts").json()) == 1
+    assert len(client_for(cast["mate"]).get(f"/api/members/{cast['minor'].pk}/posts").json()["items"]) == 1
 
 
 def test_a_minors_post_does_not_show_in_a_strangers_pulse(cast, client_for, connect):

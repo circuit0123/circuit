@@ -739,6 +739,13 @@ CASES: list[Case] = [
             Call("useProfile", G, url("/api/members/{}", mid("lakshmi"))),
             Call("useProfile", G, url("/api/members/{}", mid("ravi"))),
             Call("useProfile", G, url("/api/members/{}/posts", mid("asha"))),
+            Call(
+                "useProfile",
+                PU,
+                "/api/me/highlights",
+                lambda w: {"items": [{**uploaded("highlight")(w), "title": "Shop", "alt_text": "The shop"}]},
+            ),
+            Call("useProfile", PU, "/api/me/highlights", {"items": []}),
         ],
     ),  # fmt: skip
     Case(

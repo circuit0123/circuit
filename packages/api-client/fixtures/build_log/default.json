@@ -121,48 +121,51 @@
         "method": "GET",
         "path": "/api/members/1/posts"
       },
-      "response": [
-        {
-          "author": {
-            "city": "Chennai",
-            "display_name": "Asha Raman",
-            "headline": "",
-            "id": 1,
-            "photo": null,
-            "role": "founder",
-            "verification_level": 2
-          },
-          "body": "Week 6 of the diagnostics dashboard: sample turnaround per lab, now with a late-sample flag. Looking for a marketer who has sold to labs.",
-          "capabilities": [
-            {
-              "name": "Brand marketing",
-              "slug": "brand-marketing"
-            }
-          ],
-          "created_at": "2026-03-02T01:00:00Z",
-          "id": 1,
-          "link": "",
-          "media": [
-            {
-              "alt_text": "Dashboard: 1,284 samples this week, 91.4% on time, 37 late, a bar chart of daily turnaround against a 6 hour limit, and a table of five labs",
-              "height": 1350,
-              "w1440": "https://storage.test/read/posts/post/1/seed0/w1440.webp?token=t",
-              "w480": "https://storage.test/read/posts/post/1/seed0/w480.webp?token=t",
-              "width": 1080
-            }
-          ],
-          "my_reactions": [],
-          "private_stats": {
-            "reactions": {
-              "helpful": 2,
-              "intro_me": 1
+      "response": {
+        "items": [
+          {
+            "author": {
+              "city": "Chennai",
+              "display_name": "Asha Raman",
+              "headline": "",
+              "id": 1,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
             },
-            "replies": 3
-          },
-          "status": "visible",
-          "visibility": "everyone"
-        }
-      ],
+            "body": "Week 6 of the diagnostics dashboard: sample turnaround per lab, now with a late-sample flag. Looking for a marketer who has sold to labs.",
+            "capabilities": [
+              {
+                "name": "Brand marketing",
+                "slug": "brand-marketing"
+              }
+            ],
+            "created_at": "2026-03-02T01:00:00Z",
+            "id": 1,
+            "link": "",
+            "media": [
+              {
+                "alt_text": "Dashboard: 1,284 samples this week, 91.4% on time, 37 late, a bar chart of daily turnaround against a 6 hour limit, and a table of five labs",
+                "height": 1350,
+                "w1440": "https://storage.test/read/posts/post/1/seed0/w1440.webp?token=t",
+                "w480": "https://storage.test/read/posts/post/1/seed0/w480.webp?token=t",
+                "width": 1080
+              }
+            ],
+            "my_reactions": [],
+            "private_stats": {
+              "reactions": {
+                "helpful": 2,
+                "intro_me": 1
+              },
+              "replies": 3
+            },
+            "status": "visible",
+            "visibility": "everyone"
+          }
+        ],
+        "next_cursor": null
+      },
       "status": 200
     },
     {
@@ -215,7 +218,7 @@
         "path": "/api/media/uploads"
       },
       "response": {
-        "id": 24,
+        "id": 25,
         "status": "pending",
         "upload_url": "<random>"
       },

@@ -103,7 +103,9 @@ def run(base: str, origins: list[str], expect_env: str | None, timeout: float, o
 
     status, _, body, took = get("/ready")
     ready = as_json(body) or {}
-    if status == 200 and ready.get("status") == "ok":
+    if status == 200 and ready.get("status") == "ok" and ready.get("redis") == "not_configured":
+        report.line("PASS", "/ready", f"200 ok, Postgres answers; Redis is not configured (cache off, rate limits in Postgres) ({took})")
+    elif status == 200 and ready.get("status") == "ok":
         report.line("PASS", "/ready", f"200 ok, Postgres and Redis answer ({took})")
     elif status == 200 and ready.get("status") == "degraded":
         report.line(

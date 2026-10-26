@@ -95,7 +95,7 @@ def test_a_removed_post_disappears_for_everyone_but_the_author(make_member, make
     post = make_post(author, "everyone")
     admin.site._registry[Post].remove(request, Post.objects.filter(pk=post.pk))
     assert client_for(reader).get(f"/api/posts/{post.pk}").status_code == 404
-    assert client_for(reader).get(f"/api/members/{author.pk}/posts").json() == []
+    assert client_for(reader).get(f"/api/members/{author.pk}/posts").json() == {"items": [], "next_cursor": None}
     assert client_for(author).get(f"/api/posts/{post.pk}").json()["status"] == "removed"
 
 

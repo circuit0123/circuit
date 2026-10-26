@@ -11,7 +11,7 @@ EVENT_TYPES = frozenset(
     {
         # accounts and verification
         "member.created", "member.profile_updated", "member.role_changed", "member.needs_set", "member.offers_set",
-        "member.skills_set", "member.traits_set", "member.marked_minor", "member.photo_set", "member.photo_removed", "onboarding.extracted", "verification.work_email_started",
+        "member.skills_set", "member.traits_set", "member.marked_minor", "member.photo_set", "member.photo_removed", "member.highlights_set", "onboarding.extracted", "verification.work_email_started",
         "verification.level_raised",
         # organisations
         "org.joined", "org.left", "org.member_removed",
