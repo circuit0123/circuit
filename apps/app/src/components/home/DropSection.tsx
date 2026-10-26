@@ -2,12 +2,13 @@
 
 import { DropSkeleton, DropStack, EmptyState, useToast, type DropStackHandle } from "@circuit/ui";
 import { useRef } from "react";
-import { loadFailed, useDailyDrop, useRequestIntro, useSkip } from "@/data";
+import { loadFailed, useDailyDrop, useSkip } from "@/data";
+import { useAskIntro } from "./IntroSheet";
 
 export function DropSection({ className }: { className?: string }) {
   const drop = useDailyDrop();
   const skip = useSkip();
-  const intro = useRequestIntro();
+  const ask = useAskIntro();
   const toast = useToast();
   const stack = useRef<DropStackHandle>(null);
 
@@ -22,12 +23,7 @@ export function DropSection({ className }: { className?: string }) {
       className={className}
       cards={drop.data.cards}
       onSkip={(id) => skip.mutate(id, { onError: () => toast({ text: "Couldn't save that. Try again." }) })}
-      onAskIntro={(id) =>
-        intro.mutate({ id, fromDrop: true }, {
-          onSuccess: () => { stack.current?.introSent(id); toast({ text: "Intro requested. We'll tell you when they reply." }); },
-          onError: () => toast({ text: "Couldn't send that. Try again." }),
-        })
-      }
+      onAskIntro={(id) => ask({ id, name: drop.data.cards.find((c) => c.id === id)?.person.name ?? "them", fromDrop: true }, () => stack.current?.introSent(id))}
     />
   );
 }

@@ -30,7 +30,9 @@ export function useIntroPath(targetId: number | null) {
     enabled: enabled && targetId !== null,
     retry: false,
     queryFn: async () => {
-      const p = await unwrap(api.GET("/api/intros/path/{target_id}", { params: { path: { target_id: targetId! } } }));
+      let p;
+      try { p = await unwrap(api.GET("/api/intros/path/{target_id}", { params: { path: { target_id: targetId! } } })); }
+      catch (e) { throw new IntroError(failureOf(e)); }
       return { via: p.via ? { id: p.via.id, name: p.via.display_name, role: roleLabel(p.via.role) } : null };
     },
   });

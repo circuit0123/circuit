@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/AppShell";
 import { EnvBanner } from "@/components/EnvBanner";
 import { Gate } from "@/components/Gate";
+import { IntroProvider } from "@/components/home/IntroSheet";
 
 /**
  * Everything signed-in lives under this layout: the environment banner (in every screen the gate can show, so a mock scenario or a
@@ -11,7 +12,9 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
     <>
       <EnvBanner />
       <Gate>
-        <AppShell>{children}</AppShell>
+        <IntroProvider>
+          <AppShell>{children}</AppShell>
+        </IntroProvider>
       </Gate>
     </>
   );

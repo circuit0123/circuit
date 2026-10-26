@@ -122,7 +122,7 @@ export function Sheet({ open, onClose, title, detent = "medium", detents = ["med
               aria-labelledby={id}
               tabIndex={-1}
               className={cx("relative flex w-full flex-col rounded-t-sheet bg-surface shadow-lift outline-none", className)}
-              style={{ height: full, y: reduce ? 0 : y }}
+              style={{ height: full, y: reduce ? stopY(at) : y }}
               initial={reduce ? { opacity: 0 } : { y: closedY }}
               animate={reduce ? { opacity: 1 } : { y: stopY(at) }}
               exit={reduce ? { opacity: 0 } : { y: closedY }}

@@ -322,3 +322,137 @@ test.describe("Desktop Home (Desktop.dc.html)", () => {
     }
   });
 });
+
+test.describe("Intro request flow", () => {
+  const sheet = (page: Page, name: string) => page.getByRole("dialog", { name });
+  const asked = "Intro requested. We'll tell you when they reply.";
+  const skipTo = async (page: Page, n: number) => {
+    for (let i = 0; i < n; i++) { await drop(page).getByRole("button", { name: "Skip" }).click(); await expect(counter(page)).toHaveText(`${i + 2} of 3`); }
+  };
+
+  test("Intro me opens the sheet first and the card waits; Send request sends it and the card leaves", async ({ page }) => {
+    await open(page);
+    await drop(page).getByRole("button", { name: "Intro me" }).click();
+    const s = sheet(page, "Intro to Asha");
+    await expect(s).toBeVisible();
+    await expect(s.getByText("Lakshmi, mentor, will introduce you to Asha.")).toBeVisible();
+    await expect(s.getByText("A request stays open for 7 days.")).toBeVisible();
+    await expect(counter(page)).toHaveText("1 of 3"); // nothing recorded yet
+    await s.getByRole("button", { name: "Send request" }).click();
+    await expect(s).toHaveCount(0);
+    await expect(page.getByText(asked)).toBeVisible();
+    await expect(counter(page)).toHaveText("2 of 3");
+  });
+
+  test("Cancel and Esc leave the card where it was, and Skip still works", async ({ page }) => {
+    await open(page);
+    await drop(page).getByRole("button", { name: "Intro me" }).click();
+    await sheet(page, "Intro to Asha").getByRole("button", { name: "Cancel" }).click();
+    await expect(sheet(page, "Intro to Asha")).toHaveCount(0);
+    await expect(counter(page)).toHaveText("1 of 3");
+    await drop(page).getByRole("button", { name: "Intro me" }).click();
+    await expect(sheet(page, "Intro to Asha")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(sheet(page, "Intro to Asha")).toHaveCount(0);
+    await expect(counter(page)).toHaveText("1 of 3");
+    await drop(page).getByRole("button", { name: "Skip" }).click();
+    await expect(counter(page)).toHaveText("2 of 3");
+  });
+
+  test("no shared connection: one sentence, no Send button, the card stays", async ({ page }) => {
+    await open(page);
+    await skipTo(page, 1);
+    await drop(page).getByRole("button", { name: "Intro me" }).click();
+    const s = sheet(page, "Intro to Kavya");
+    await expect(s.getByRole("alert")).toHaveText("You don't share a connection with Kavya yet.");
+    await expect(s.getByRole("button", { name: "Send request" })).toHaveCount(0);
+    await s.getByRole("button", { name: "Close" }).click();
+    await expect(counter(page)).toHaveText("2 of 3");
+  });
+
+  test("the person has no slots left: the message says so and the card stays", async ({ page }) => {
+    await open(page);
+    await skipTo(page, 2);
+    await drop(page).getByRole("button", { name: "Intro me" }).click();
+    const s = sheet(page, "Intro to Arjun");
+    await expect(s.getByText("You're already connected. We'll send your request straight to Arjun.")).toBeVisible();
+    await s.getByRole("button", { name: "Send request" }).click();
+    await expect(s.getByRole("alert")).toHaveText("Arjun isn't taking more intros this week. Try again next week.");
+    await expect(s.getByRole("button", { name: "Send request" })).toHaveCount(0); // retrying cannot help
+    await s.getByRole("button", { name: "Close" }).click();
+    await expect(counter(page)).toHaveText("3 of 3");
+    await expect(drop(page).getByRole("button", { name: "Skip" })).toBeVisible();
+  });
+
+  test("weekly capacity used up: the weekly message, and the card stays", async ({ page }) => {
+    await open(page, "intros_used");
+    await drop(page).getByRole("button", { name: "Intro me" }).click();
+    const s = sheet(page, "Intro to Asha");
+    await s.getByRole("button", { name: "Send request" }).click();
+    await expect(s.getByRole("alert")).toHaveText("You've used this week's intros. You can ask again next week.");
+    await s.getByRole("button", { name: "Close" }).click();
+    await expect(counter(page)).toHaveText("1 of 3");
+    await expect(page.getByText(asked)).toHaveCount(0);
+  });
+
+  test.describe("by swipe", () => {
+    test.use({ reducedMotion: "no-preference", hasTouch: true });
+    test("a swipe right springs the card back and opens the sheet", async ({ page }, info) => {
+      test.skip(!isPhone(info), "swiping the stack is a phone gesture");
+      await open(page);
+      const box = (await drop(page).locator("div.shadow-lift").first().boundingBox())!;
+      await drag(page, { x: box.x + 30, y: box.y + 60 }, { x: box.x + box.width - 5, y: box.y + 60 });
+      await expect(sheet(page, "Intro to Asha")).toBeVisible();
+      await expect(counter(page)).toHaveText("1 of 3");
+      await sheet(page, "Intro to Asha").getByRole("button", { name: "Send request" }).click();
+      await expect(counter(page)).toHaveText("2 of 3");
+    });
+  });
+
+  test("from the Update view: the view steps aside, the sheet opens, send confirms", async ({ page }) => {
+    await open(page);
+    await wireNode(page, 3).click(); // "joined": Divya, action Intro me
+    await update(page).getByRole("button", { name: "Intro me" }).click();
+    await expect(update(page)).toHaveCount(0);
+    const s = sheet(page, "Intro to Divya");
+    await expect(s).toBeVisible();
+    await s.getByRole("button", { name: "Send request" }).click();
+    await expect(page.getByText(asked)).toBeVisible();
+  });
+
+  test("under a build log: Intro me opens the sheet and is only recorded once sent", async ({ page }) => {
+    await open(page);
+    const first = page.getByRole("region", { name: "Pulse" }).locator("[data-feed-item]").first();
+    const intro = first.getByRole("button", { name: "Intro me" });
+    await intro.click();
+    const s = sheet(page, "Intro to Arjun");
+    await expect(s).toBeVisible();
+    await s.getByRole("button", { name: "Close" }).or(s.getByRole("button", { name: "Cancel" })).click();
+    await expect(intro).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("Helpful shows pressed at once", async ({ page }) => {
+    await open(page);
+    const helpful = page.getByRole("region", { name: "Pulse" }).locator("[data-feed-item]").first().getByRole("button", { name: "Helpful" });
+    await expect(helpful).toHaveAttribute("aria-pressed", "false");
+    await helpful.click();
+    await expect(helpful).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("in Discover's People list too", async ({ page }) => {
+    await open(page);
+    await page.getByRole("link", { name: "Discover" }).filter({ visible: true }).first().click();
+    const row = page.getByRole("region", { name: "People you may know" }).getByRole("listitem").filter({ hasText: "Sneha" });
+    await row.getByRole("button", { name: "Intro me" }).click();
+    await sheet(page, "Intro to Sneha").getByRole("button", { name: "Send request" }).click();
+    await expect(row.getByRole("button", { name: "Intro asked" })).toBeDisabled();
+  });
+
+  test("axe is clean with the sheet open, in both themes", async ({ page }) => {
+    await open(page);
+    await drop(page).getByRole("button", { name: "Intro me" }).click();
+    await expect(sheet(page, "Intro to Asha").getByRole("button", { name: "Send request" })).toBeVisible();
+    await page.waitForTimeout(500);
+    await inBothThemes(page, async (theme) => { await checkPage(page, `intro sheet ${theme}`); });
+  });
+});

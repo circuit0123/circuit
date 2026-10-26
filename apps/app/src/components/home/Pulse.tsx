@@ -2,9 +2,10 @@
 
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { motion, useReducedMotion } from "motion/react";
-import { ActivityCard, Sheet, Button, CaughtUp, FeedItem, PartnerItem, PostCard, PromotedItem, RoleCard, Section, Skeleton, spring, useToast, type ReactionKind } from "@circuit/ui";
+import { ActivityCard, Sheet, Button, CaughtUp, FeedItem, PartnerItem, PostCard, PromotedItem, RoleCard, Section, Skeleton, spring, useToast, type PostView, type ReactionKind } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAskIntro } from "./IntroSheet";
 import { loadFailed, memberHref, roleHref, useHome, useMarkPulseSeen, usePulse, useReact, useReport, type PulseEntry } from "@/data";
 
 const REASONS = ["Spam or scam", "Harassment or hate", "Misleading or fake", "Something else"];
@@ -21,6 +22,7 @@ export function Pulse() {
   const [menu, setMenu] = useState<number | null>(null);
   const [promo, setPromo] = useState<{ key: string; why: string } | null>(null);
   const { minor } = useHome();
+  const ask = useAskIntro();
 
   // "Skills in demand" belongs at the top of Discover → Jobs (DESIGN.md §4), so it is left out of Pulse.
   const items = q.items.filter((it): it is Exclude<PulseEntry, { kind: "skills" }> => it.kind !== "skills");
@@ -49,15 +51,16 @@ export function Pulse() {
   if (q.isPending) return <Section bleed label="Pulse"><PulseSkeleton /></Section>;
   if (q.isError) return <Section label="Pulse"><p role="alert" className="t-body text-danger">{loadFailed("Pulse")}</p></Section>;
 
-  const reactTo = (post: number) => (kind: ReactionKind, on: boolean) =>
-    react.mutate({ post, kind, on }, {
-      onSuccess: () => { if (on && kind === "intro_me") toast({ text: "Marked. They'll see you'd like an intro." }); },
-      onError: () => toast({ text: "Couldn't save that. Try again." }),
-    });
+  // "Intro me" under a post opens the intro sheet; the reaction is recorded once the request is sent.
+  const reactTo = (post: PostView) => (kind: ReactionKind, on: boolean) => {
+    const save = () => react.mutate({ post: post.id, kind, on }, { onError: () => toast({ text: "Couldn't save that. Try again." }) });
+    if (on && kind === "intro_me") ask({ id: post.author.id, name: post.author.name }, save);
+    else save();
+  };
 
   const renderItem = (it: (typeof items)[number]) => {
     if (it.kind === "post") {
-      return <FeedItem><PostCard post={it.post} onReact={reactTo(it.post.id)} onMore={() => setMenu(it.post.id)} onOpenAuthor={memberHref(it.post.author.id) ? () => router.push(memberHref(it.post.author.id)!) : undefined} priority={false} hideReactions={minor ? ["intro_me"] : undefined} /></FeedItem>;
+      return <FeedItem><PostCard post={it.post} onReact={reactTo(it.post)} onMore={() => setMenu(it.post.id)} onOpenAuthor={memberHref(it.post.author.id) ? () => router.push(memberHref(it.post.author.id)!) : undefined} priority={false} hideReactions={minor ? ["intro_me"] : undefined} /></FeedItem>;
     }
     if (it.kind === "role") return <FeedItem><RoleCard role={it.role} onOpen={() => router.push(roleHref(it.role.id))} /></FeedItem>;
     if (it.kind === "promoted") return <FeedItem><PromotedItem startup={it.startup} role={it.role} onOpen={() => router.push(roleHref(it.role.id))} onMenu={() => setPromo({ key: it.key, why: it.why })} /></FeedItem>;

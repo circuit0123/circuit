@@ -3,12 +3,13 @@
 import { LiveWire, LiveWireSkeleton, UpdateView, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { composeHref, loadFailed, useHome, useLiveWire, useMarkUpdateSeen, useRequestIntro, wireActionHref } from "@/data";
+import { composeHref, loadFailed, useHome, useLiveWire, useMarkUpdateSeen, wireActionHref } from "@/data";
+import { useAskIntro } from "./IntroSheet";
 
 export function LiveWireSection() {
   const wire = useLiveWire();
   const seen = useMarkUpdateSeen();
-  const intro = useRequestIntro();
+  const ask = useAskIntro();
   const router = useRouter();
   const toast = useToast();
   const { minor } = useHome();
@@ -37,11 +38,10 @@ export function LiveWireSection() {
           const { action } = items.find((x) => x.key === u.key)!;
           const href = wireActionHref(action);
           if (href) router.push(href);
-          else
-            intro.mutate({ id: action.target_id }, {
-              onSuccess: () => toast({ text: "Intro requested. We'll tell you when they reply." }),
-              onError: () => toast({ text: "Couldn't send that. Try again." }),
-            });
+          else {
+            setOpen(null); // one sheet at a time: the Update view steps aside for the confirm sheet
+            ask({ id: action.target_id, name: u.person.name });
+          }
         }}
       />
     </>

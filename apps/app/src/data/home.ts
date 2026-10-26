@@ -1,6 +1,7 @@
 "use client";
 
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type InfiniteData } from "@tanstack/react-query";
+import type { Schemas } from "@circuit/api-client";
 import { useState } from "react";
 import type { DropCard, MatchView, PostView, RoleView } from "@circuit/ui";
 import { roleLabel } from "@/lib/format";
@@ -146,7 +147,19 @@ export function useMarkPulseSeen() {
 }
 
 export function useReact() {
+  const qc = useQueryClient();
   return useMutation({
+    // The button shows its new state at once: every Pulse page in the cache gets the change, and a failure fetches the truth back.
+    onMutate: ({ post, kind, on }: { post: number; kind: "helpful" | "intro_me" | "lets_talk"; on: boolean }) => {
+      qc.setQueriesData<InfiniteData<Schemas["PulseOut"]>>({ queryKey: ["pulse"] }, (old) => old && {
+        ...old,
+        pages: old.pages.map((pg) => ({
+          ...pg,
+          items: pg.items.map((it) => it.post?.id === post ? { ...it, post: { ...it.post, my_reactions: on ? [...new Set([...it.post.my_reactions, kind])] : it.post.my_reactions.filter((k) => k !== kind) } } : it),
+        })),
+      });
+    },
+    onError: () => qc.invalidateQueries({ queryKey: ["pulse"] }),
     mutationFn: ({ post, kind, on }: { post: number; kind: "helpful" | "intro_me" | "lets_talk"; on: boolean }) =>
       on
         ? unwrap(api.PUT("/api/posts/{post_id}/reactions/{kind}", { params: { path: { post_id: post, kind } } }))
