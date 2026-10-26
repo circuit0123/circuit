@@ -9,6 +9,9 @@ export const ON = "http://localhost:3101";
 export const OFF = "http://localhost:3102";
 /** Flags on, NEXT_PUBLIC_JOIN_LIVE off: call to action buttons open the waitlist form instead of the app. */
 export const WAIT = "http://localhost:3103";
+/** NEXT_PUBLIC_LAUNCH_MODE=waitlist: every call to action opens FORM with role and src. */
+export const PRELAUNCH = "http://localhost:3104";
+export const FORM = "https://forms.test/circuit";
 /** Home plus every audience page that has shipped. */
 export const PATHS = ["/", ...PAGES.map((p) => `/${p.slug}/`)];
 /** Pages whose content changes when their feature flag is off: also checked on the flags-off build. */

@@ -11,8 +11,18 @@ const URLS = {
 
 export default function config(phase: string): NextConfig {
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
+  const mode = process.env.NEXT_PUBLIC_LAUNCH_MODE || "live";
+  if (mode !== "live" && mode !== "waitlist") throw new Error(`NEXT_PUBLIC_LAUNCH_MODE must be "waitlist" or "live", got "${mode}" (see .env.example)`);
+  if (mode === "waitlist") {
+    // Pre-launch: calls to action open the external form, so it must be a real absolute URL; the app is never linked.
+    let ok = false;
+    try { ok = /^https?:$/.test(new URL(process.env.NEXT_PUBLIC_WAITLIST_URL ?? "").protocol); } catch {}
+    if (!ok) throw new Error("NEXT_PUBLIC_LAUNCH_MODE=waitlist needs NEXT_PUBLIC_WAITLIST_URL to be an absolute http(s) URL (see .env.example)");
+  }
+  const required = mode === "waitlist" ? Object.keys(URLS).filter((k) => k !== "NEXT_PUBLIC_APP_URL") : Object.keys(URLS);
   const missing = Object.keys(URLS).filter((k) => !process.env[k]);
-  if (!dev && missing.length) throw new Error(`Missing build-time variables: ${missing.join(", ")} (see .env.example)`);
+  const missingRequired = missing.filter((k) => required.includes(k));
+  if (!dev && missingRequired.length) throw new Error(`Missing build-time variables: ${missingRequired.join(", ")} (see .env.example)`);
   return {
     output: "export",
     trailingSlash: true, // /privacy/index.html, so any static host (and `pnpm start`) serves it

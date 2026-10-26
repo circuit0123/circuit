@@ -19,9 +19,11 @@ sleep 1
 NEXT_DIST_DIR=.out-on   NEXT_PUBLIC_JOIN_LIVE=true NEXT_PUBLIC_API_URL=http://127.0.0.1:3201 pnpm build
 NEXT_DIST_DIR=.out-off  NEXT_PUBLIC_JOIN_LIVE=true NEXT_PUBLIC_API_URL=http://127.0.0.1:3202 pnpm build
 NEXT_DIST_DIR=.out-wait NEXT_PUBLIC_API_URL=http://127.0.0.1:3201 pnpm build
+NEXT_DIST_DIR=.out-prelaunch NEXT_PUBLIC_JOIN_LIVE=true NEXT_PUBLIC_LAUNCH_MODE=waitlist NEXT_PUBLIC_WAITLIST_URL='https://forms.test/circuit?ref=x' NEXT_PUBLIC_API_URL=http://127.0.0.1:3201 pnpm build
 kill $ON $OFF 2>/dev/null || true
 trap - EXIT
 
 python3 -m http.server 3101 -d .out-on >/dev/null 2>&1 &
 python3 -m http.server 3102 -d .out-off >/dev/null 2>&1 &
-exec python3 -m http.server 3103 -d .out-wait
+python3 -m http.server 3103 -d .out-wait >/dev/null 2>&1 &
+exec python3 -m http.server 3104 -d .out-prelaunch
