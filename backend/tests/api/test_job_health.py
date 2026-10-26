@@ -188,3 +188,17 @@ def test_all_clear(settings, make_member, client_for):
     settings.JOB_INTERVALS = {}
     body = client_for(make_member("super_admin")).get("/api/health/jobs").json()
     assert body == {"status": "ok", "overdue": 0, "jobs": []}
+
+
+def test_job_health_command_prints_a_table_and_says_when_nothing_is_expected(intervals, capsys, settings):
+    now = timezone.now()
+    JobRun.objects.create(
+        name="expire_items", running_until=now, last_status="failed", last_error="ValueError: x",
+        first_seen_at=now - timedelta(hours=1), last_success_at=now - timedelta(hours=1),
+    )  # fmt: skip
+    call_command("job_health")
+    out = capsys.readouterr().out
+    assert "expire_items" in out and "OVERDUE" in out and "last error: ValueError: x" in out and "1 overdue of 3." in out
+    settings.JOB_INTERVALS = {}
+    call_command("job_health")
+    assert "No scheduled jobs are expected here" in capsys.readouterr().out

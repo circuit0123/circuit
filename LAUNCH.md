@@ -229,17 +229,24 @@ Deployment (next session):
 - [x] Consent stored with version + timestamp; data request process; retention cleanup job (backend, B3)
 
 ## Stage 8 — Reliability and monitoring
-- [ ] Sentry (backend + app), uptime monitors, alerts to a phone
-- [ ] Timeouts/retries/fallbacks audit; job failure alerts; `expire_items` every 15 min
+- [x] Sentry for the backend with PII scrubbing and environment/release tags; uptime checks and alert policies (5xx, p95 latency, job failures, overdue jobs, usage) as code in `infra/monitoring/`, applied by `make monitoring` (B6)
+- [ ] Sentry in the app (frontend session); [YOU] create the email + phone notification channels, then `make monitoring ENV=production` so alerts reach a phone
+- [x] Job failure alerts; every job records last success and last error; `check_jobs` flags any job overdue (2x its interval); `GET /api/health/jobs` for super admins; `expire_items` every 5 min (B6)
+- [ ] Timeouts/retries/fallbacks audit
 - [ ] [YOU] Production Supabase (Pro), Upstash, Cloud Run, Vercel production project
-- [ ] Production backups + PITR; restore drill to staging
-- [ ] Budget alerts on all paid services
+- [x] Nightly encrypted `pg_dump` to a private bucket (30-day lifecycle), `make backup-now`, `make restore-drill` (B6, code)
+- [ ] [YOU] First production backup and restore drill (RUNBOOK.md "One-time setup", step 8); decide on PITR
+- [ ] Budget alerts on all paid services (Google Cloud: `make gcp-setup`, B5; the others are in their dashboards)
+- [x] Free-tier guards: image compression, retention for events/notifications/webhook records/snapshots, Resend daily budget with in-app fallback, Redis lean mode, `LLM_PROVIDER=none` and a daily LLM cap, weekly `usage_report` warning at 70% (B6)
 
 ## Stage 9 — CI/CD hardening
-- [ ] GitHub Actions on PR: ruff, mypy, pytest, tsc, ESLint, Playwright, axe; merge blocked on red
-- [ ] Merge → staging deploy + smoke; tag → demo; manual approval → production
-- [ ] Replace temporary keys with Workload Identity Federation; delete the old key and Vercel token
-- [ ] Rollback documented and tried once
+- [x] GitHub Actions on every pull request: ruff, mypy and `make check` (pytest, tsc, ESLint, Playwright, axe), uv and pnpm cached (B6)
+- [ ] [YOU] Branch protection on `main` requiring the `ci` check, so a red pull request cannot merge (RUNBOOK.md "One-time setup", step 7)
+- [x] Merge → staging deploy + smoke; tag → demo; manual approval → production (B6: `.github/workflows/deploy*.yml`; staging and demo switch on with a repository variable once they exist)
+- [x] Workload Identity Federation in code (`make gcp-setup`), no JSON key in any workflow (B6)
+- [ ] [YOU] Run `make gcp-setup`, set the GitHub variables, then delete the temporary deploy key and the Vercel token
+- [x] Rollback documented (RUNBOOK.md "Rollback"); the deploy rolls back by itself when the live smoke test fails (tested with fakes)
+- [ ] [YOU] Rollback tried once for real (RUNBOOK.md "One-time setup", step 9)
 
 ## Stage 10 — Quality and performance
 - [ ] Every row in PRODUCTION.md §14 has a passing automated test or a dated manual check in RUNBOOK.md

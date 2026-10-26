@@ -73,6 +73,8 @@ def _every(minutes: int) -> str:
 
 
 def status(now: datetime | None = None) -> list[JobStatus]:
+    if not expected_intervals():
+        return []  # a laptop: nothing is scheduled, so there is nothing to be late (and no query to run)
     now = now or timezone.now()
     rows = {r.name: r for r in JobRun.objects.all()}
     out = []
