@@ -45,7 +45,7 @@ test.describe("Discover: segments, search and filters", () => {
     const people = page.getByRole("list", { name: "People" });
     await expect(people.getByRole("listitem")).toHaveCount(5);
     await expect(people).toContainText("Bridge match");
-    await expect(people.getByRole("button", { name: /^Rohan Gupta.*Founder, logistics.*Good match.*Ask for an intro$/ })).toBeVisible();
+    await expect(people.getByRole("link", { name: /^Rohan Gupta.*Founder, logistics.*Good match/ })).toHaveAttribute("href", "/members/6");
     await segment(page, "People").focus();
     await page.keyboard.press("ArrowRight");
     await expect(segment(page, "Startups")).toHaveAttribute("aria-checked", "true");
@@ -54,9 +54,11 @@ test.describe("Discover: segments, search and filters", () => {
     await expect(startups).toContainText("Hiring · 2 roles");
   });
 
-  test("a person's tile opens the intro sheet", async ({ page }) => {
+  test("a person's tile opens their profile, where the intro is one tap away (F6)", async ({ page }) => {
     await discover(page, "people");
-    await page.getByRole("button", { name: /^Rohan Gupta/ }).click();
+    await page.getByRole("link", { name: /^Rohan Gupta/ }).click();
+    await expect(page).toHaveURL(/\/members\/6$/);
+    await page.getByRole("button", { name: /^Intro via/ }).click();
     await expect(page.getByRole("dialog")).toContainText("Rohan");
     await expect(page.getByRole("dialog").getByRole("button", { name: "Send request" })).toBeVisible();
   });

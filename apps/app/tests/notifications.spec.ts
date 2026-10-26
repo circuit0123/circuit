@@ -43,7 +43,7 @@ test.describe("Notifications", () => {
     expect(await href(/accepted your introduction/)).toBe("/inbox");
     expect(await href(/application has a new status/)).toBe("/discover/applications");
     expect(await href(/new circuit is waiting/)).toBe("/circuits");
-    expect(await href(/replied to your build log/)).toBe("/");
+    expect(await href(/replied to your build log/)).toBe("/posts/201"); // your own build log (F6)
     expect(await href(/sent you a message/)).toBe("/inbox/502");
     expect(await href(/showed interest in your startup/)).toBe("/startups/41");
   });

@@ -15,6 +15,13 @@ export const COMPANY_LEGAL_NAME = process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME ?? 
  */
 export const JOIN_LIVE = process.env.NEXT_PUBLIC_JOIN_LIVE === "true";
 
+/**
+ * `waitlist` = pre-launch: every call to action (and the waitlist section) opens NEXT_PUBLIC_WAITLIST_URL with `role` and `src` as query
+ * parameters, nothing links to the app and nothing is sent to our API. Overrides JOIN_LIVE. `live` (the default) = JOIN_LIVE decides.
+ */
+export const WAITLIST_MODE = process.env.NEXT_PUBLIC_LAUNCH_MODE === "waitlist";
+export const WAITLIST_URL = process.env.NEXT_PUBLIC_WAITLIST_URL ?? "";
+
 export type Role = "student" | "founder" | "mentor" | "investor" | "partner";
 
 /** A `src` label: lower-case letters, digits, `-` and `_`, up to 40 (the same rule as the API and the app). Anything else is ignored. */
@@ -26,4 +33,12 @@ export function joinUrl(src: string, role?: Role): string {
   if (role) q.set("role", role);
   q.set("src", src);
   return `${APP_URL}/join?${q.toString()}`;
+}
+
+/** Where every call to action goes in waitlist mode: the external form, with the role and the page it came from (its hidden fields read them). */
+export function waitlistUrl(src: string, role?: Role): string {
+  const u = new URL(WAITLIST_URL);
+  if (role) u.searchParams.set("role", role);
+  u.searchParams.set("src", src);
+  return u.toString();
 }

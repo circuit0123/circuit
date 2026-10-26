@@ -3,11 +3,12 @@
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@circuit/ui/Button";
 import { WAITLIST_ROLES } from "@/content/home";
-import type { Role } from "@/lib/env";
+import { WAITLIST_MODE, type Role } from "@/lib/env";
 import { usePicked } from "@/lib/join";
 import { useSrc } from "@/lib/src";
 import { fieldClass, MESSAGES, useReady, useWaitlistSubmit } from "@/lib/waitlist";
 import { Container } from "./Container";
+import { CtaLink } from "./CtaLink";
 
 type Props = {
   /** The page's own label (`landing-home`, `landing-investors` …); a valid `?src=` in the address replaces it. */
@@ -53,8 +54,9 @@ export function Waitlist({ src, role, layout = "section", heading = "Ask for an 
     });
   }
 
-  const form =
-    result === "ok" ? (
+  const form = WAITLIST_MODE ? (
+    <div><CtaLink button="secondary" src={src} role={role}>Join the waitlist</CtaLink></div>
+  ) : result === "ok" ? (
       <p role="status" className="t-body">You&rsquo;re on the list. We&rsquo;ll email you when there&rsquo;s a place for you.</p>
     ) : (
       <form onSubmit={onSubmit} aria-describedby="waitlist-msg" className="max-w-[540px]">

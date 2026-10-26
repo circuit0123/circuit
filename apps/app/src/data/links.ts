@@ -14,7 +14,7 @@ export function notificationHref(target: Target | null | undefined): string {
     case "circuit": return circuitsHref;
     case "application": return "/discover/applications";
     case "startup": return startupHref(target.id);
-    case "post": return "/"; // F6: /posts/{id}
+    case "post": return postHref(target.id);
     default: return "/";
   }
 }
@@ -26,8 +26,8 @@ export function wireActionHref(action: { kind: "intro" | "view_role" | "reply"; 
   return null;
 }
 
-/** The `+` in the top bar. Null until F6 builds the composer; the caller says so in a toast. */
-export const composeHref: string | null = null; // F6: "/compose"
+/** The `+` in the top bar: the build log composer. */
+export const composeHref: string | null = "/compose";
 
 /** A role's page. */
 export const roleHref = (id: number): string => `/discover/jobs/${id}`;
@@ -41,8 +41,14 @@ export const applicantsHref = (jobId: number): string => `/discover/jobs/${jobId
 /** "My applications". */
 export const applicationsHref = "/discover/applications";
 
-/** Someone's profile. Null until F6 builds it, so the name simply isn't a link yet. */
-export const memberHref = (_id: number): string | null => null; // F6: `/members/${id}`
+/** Someone's profile. */
+export const memberHref = (id: number): string | null => `/members/${id}`;
+
+/** One build log. */
+export const postHref = (id: number): string => `/posts/${id}`;
+
+/** Settings, or one of its screens ("privacy", "appearance", …). */
+export const settingsHref = (screen?: string): string => (screen ? `/settings/${screen}` : "/settings");
 
 /** The Circuits tab (only there while the `circuits` flag is on; the server sends no circuit notifications otherwise). */
 export const circuitsHref = "/circuits";
