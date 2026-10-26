@@ -4,7 +4,7 @@
       "AcceptanceGroup": {
         "properties": {
           "accepted": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "rate_percent": {
             "anyOf": [
@@ -18,7 +18,7 @@
             "title": "Rate Percent"
           },
           "requested": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           }
         },
         "required": [
@@ -144,7 +144,7 @@
         "properties": {
           "accent": {
             "enum": [
-              "mint",
+              "emerald",
               "sky",
               "indigo",
               "rose",
@@ -183,6 +183,7 @@
             "anyOf": [
               {
                 "enum": [
+                  "emerald",
                   "mint",
                   "sky",
                   "indigo",
@@ -286,6 +287,10 @@
             "title": "Level",
             "type": "integer"
           },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
           "proof_url": {
             "title": "Proof Url",
             "type": "string"
@@ -293,6 +298,7 @@
         },
         "required": [
           "capability",
+          "name",
           "level",
           "proof_url"
         ],
@@ -365,6 +371,17 @@
           "id": {
             "title": "Id",
             "type": "integer"
+          },
+          "photo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo"
           },
           "role": {
             "title": "Role",
@@ -461,6 +478,23 @@
         "title": "BlockedOut",
         "type": "object"
       },
+      "BuildLogTileOut": {
+        "properties": {
+          "image": {
+            "$ref": "#/components/schemas/PostMediaOut"
+          },
+          "post_id": {
+            "title": "Post Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "post_id",
+          "image"
+        ],
+        "title": "BuildLogTileOut",
+        "type": "object"
+      },
       "CapabilityOut": {
         "properties": {
           "category": {
@@ -500,6 +534,47 @@
           "name"
         ],
         "title": "CapabilityTagOut",
+        "type": "object"
+      },
+      "CapacityOut": {
+        "properties": {
+          "allowed": {
+            "title": "Allowed",
+            "type": "boolean"
+          },
+          "left": {
+            "title": "Left",
+            "type": "integer"
+          },
+          "next_frees_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Frees At"
+          },
+          "used": {
+            "title": "Used",
+            "type": "integer"
+          },
+          "weekly_limit": {
+            "title": "Weekly Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "allowed",
+          "weekly_limit",
+          "used",
+          "left",
+          "next_frees_at"
+        ],
+        "title": "CapacityOut",
         "type": "object"
       },
       "CellOut": {
@@ -610,6 +685,13 @@
             "type": "string"
           },
           "next_step": {
+            "enum": [
+              "answer",
+              "waiting",
+              "mark_done",
+              "rate",
+              "none"
+            ],
             "title": "Next Step",
             "type": "string"
           },
@@ -656,6 +738,34 @@
           "legs"
         ],
         "title": "CircuitOut",
+        "type": "object"
+      },
+      "CityOut": {
+        "properties": {
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lng": {
+            "title": "Lng",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "pilot": {
+            "title": "Pilot",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "lat",
+          "lng",
+          "pilot"
+        ],
+        "title": "CityOut",
         "type": "object"
       },
       "ClaimConfirmIn": {
@@ -722,13 +832,18 @@
             },
             "title": "Features",
             "type": "object"
+          },
+          "llm_available": {
+            "title": "Llm Available",
+            "type": "boolean"
           }
         },
         "required": [
           "env",
           "beta_mode",
           "beta_access",
-          "features"
+          "features",
+          "llm_available"
         ],
         "title": "ConfigOut",
         "type": "object"
@@ -922,31 +1037,6 @@
           "last_message"
         ],
         "title": "ConversationOut",
-        "type": "object"
-      },
-      "CountOut": {
-        "properties": {
-          "hidden": {
-            "title": "Hidden",
-            "type": "boolean"
-          },
-          "value": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Value"
-          }
-        },
-        "required": [
-          "value",
-          "hidden"
-        ],
-        "title": "CountOut",
         "type": "object"
       },
       "CursorParams": {
@@ -1330,6 +1420,44 @@
         "title": "FollowedStartupOut",
         "type": "object"
       },
+      "FounderOut": {
+        "properties": {
+          "connected": {
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "is_me": {
+            "title": "Is Me",
+            "type": "boolean"
+          },
+          "person": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "person",
+          "role",
+          "via",
+          "connected",
+          "is_me"
+        ],
+        "title": "FounderOut",
+        "type": "object"
+      },
       "GapOut": {
         "properties": {
           "capability": {
@@ -1349,13 +1477,13 @@
             "type": "string"
           },
           "needed_by": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "offered_by": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "offered_outside": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           }
         },
         "required": [
@@ -1770,6 +1898,19 @@
             "title": "Description",
             "type": "string"
           },
+          "duration_weeks": {
+            "anyOf": [
+              {
+                "maximum": 520,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Weeks"
+          },
           "kind": {
             "default": "internship",
             "enum": [
@@ -1785,6 +1926,18 @@
             "maxLength": 200,
             "title": "Location",
             "type": "string"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
           },
           "startup_id": {
             "title": "Startup Id",
@@ -1851,6 +2004,16 @@
             "title": "Capabilities",
             "type": "array"
           },
+          "contact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -1871,12 +2034,27 @@
             ],
             "title": "Distance Km"
           },
+          "duration_weeks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Weeks"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
           },
           "is_open": {
             "title": "Is Open",
+            "type": "boolean"
+          },
+          "is_team": {
+            "title": "Is Team",
             "type": "boolean"
           },
           "kind": {
@@ -1924,13 +2102,40 @@
             ],
             "title": "Skill Match"
           },
+          "starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
           "startup_id": {
             "title": "Startup Id",
             "type": "integer"
           },
+          "startup_logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Startup Logo"
+          },
           "startup_name": {
             "title": "Startup Name",
             "type": "string"
+          },
+          "startup_verified": {
+            "title": "Startup Verified",
+            "type": "boolean"
           },
           "stipend_max": {
             "anyOf": [
@@ -1972,6 +2177,12 @@
           "startup_id",
           "startup_name",
           "sector",
+          "startup_verified",
+          "startup_logo",
+          "duration_weeks",
+          "starts_on",
+          "contact",
+          "is_team",
           "lat",
           "lng",
           "distance_km",
@@ -2009,6 +2220,19 @@
               }
             ],
             "title": "Description"
+          },
+          "duration_weeks": {
+            "anyOf": [
+              {
+                "maximum": 520,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Weeks"
           },
           "is_open": {
             "anyOf": [
@@ -2048,6 +2272,18 @@
               }
             ],
             "title": "Location"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
           },
           "stipend_max": {
             "anyOf": [
@@ -2195,11 +2431,57 @@
         "title": "LineOut",
         "type": "object"
       },
+      "LogoIn": {
+        "additionalProperties": false,
+        "properties": {
+          "upload_id": {
+            "title": "Upload Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "upload_id"
+        ],
+        "title": "LogoIn",
+        "type": "object"
+      },
+      "MaskedCountOut": {
+        "properties": {
+          "hidden": {
+            "title": "Hidden",
+            "type": "boolean"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "hidden"
+        ],
+        "title": "MaskedCountOut",
+        "type": "object"
+      },
       "MatchOut": {
         "properties": {
           "candidate_id": {
             "title": "Candidate Id",
             "type": "integer"
+          },
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Capabilities",
+            "type": "array"
           },
           "city": {
             "title": "City",
@@ -2209,9 +2491,24 @@
             "title": "Display Name",
             "type": "string"
           },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
           "is_bridge": {
             "title": "Is Bridge",
             "type": "boolean"
+          },
+          "photo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo"
           },
           "reason": {
             "title": "Reason",
@@ -2261,7 +2558,9 @@
           "sector",
           "strength",
           "reason",
-          "is_bridge"
+          "is_bridge",
+          "headline",
+          "capabilities"
         ],
         "title": "MatchOut",
         "type": "object"
@@ -2279,6 +2578,19 @@
             ],
             "title": "Bridge"
           },
+          "capability": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Slug of something they offer",
+            "title": "Capability"
+          },
           "limit": {
             "default": 20,
             "maximum": 100,
@@ -2291,6 +2603,46 @@
             "minimum": 0,
             "title": "Offset",
             "type": "integer"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "enum": [
+                  "student",
+                  "founder",
+                  "mentor",
+                  "investor"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "verified": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified"
+          },
+          "within_km": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "5, 10, 25 or 50: lives within this distance of my location or the city centre",
+            "title": "Within Km"
           }
         },
         "title": "MatchParams",
@@ -2328,6 +2680,10 @@
           "display_name": {
             "title": "Display Name",
             "type": "string"
+          },
+          "has_needs_and_offers": {
+            "title": "Has Needs And Offers",
+            "type": "boolean"
           },
           "id": {
             "title": "Id",
@@ -2378,6 +2734,17 @@
             ],
             "title": "Organisation Id"
           },
+          "photo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo"
+          },
           "policy_version": {
             "title": "Policy Version",
             "type": "string"
@@ -2386,9 +2753,32 @@
             "title": "Profile Visibility",
             "type": "string"
           },
+          "read_receipts": {
+            "title": "Read Receipts",
+            "type": "boolean"
+          },
           "role": {
+            "enum": [
+              "student",
+              "founder",
+              "mentor",
+              "investor",
+              "partner_admin",
+              "super_admin"
+            ],
             "title": "Role",
             "type": "string"
+          },
+          "startup_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Startup Id"
           },
           "verification_level": {
             "title": "Verification Level",
@@ -2416,6 +2806,10 @@
           "circuits_opt_in",
           "allow_requests",
           "open_intro_slots",
+          "photo",
+          "read_receipts",
+          "startup_id",
+          "has_needs_and_offers",
           "beta_access",
           "needs_consent",
           "policy_version",
@@ -2584,6 +2978,48 @@
         "title": "MemberStatusOut",
         "type": "object"
       },
+      "MessageImageOut": {
+        "properties": {
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "w1440": {
+            "title": "W1440",
+            "type": "string"
+          },
+          "w480": {
+            "title": "W480",
+            "type": "string"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "width",
+          "height",
+          "w1440",
+          "w480"
+        ],
+        "title": "MessageImageOut",
+        "type": "object"
+      },
       "MessageOut": {
         "properties": {
           "body": {
@@ -2606,18 +3042,28 @@
           "image": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/MessageImageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mine": {
+            "title": "Mine",
+            "type": "boolean"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Image"
-          },
-          "mine": {
-            "title": "Mine",
-            "type": "boolean"
+            "title": "Read At"
           },
           "removed": {
             "title": "Removed",
@@ -2631,7 +3077,8 @@
           "body",
           "image",
           "removed",
-          "created_at"
+          "created_at",
+          "read_at"
         ],
         "title": "MessageOut",
         "type": "object"
@@ -2773,25 +3220,25 @@
       "NetworkOut": {
         "properties": {
           "applications": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "circuits_completed": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "intros_accepted": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "intros_requested": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "members": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "members_with_matches": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           },
           "new_members_30d": {
-            "$ref": "#/components/schemas/CountOut"
+            "$ref": "#/components/schemas/MaskedCountOut"
           }
         },
         "required": [
@@ -3212,6 +3659,34 @@
         "title": "OpenJobOut",
         "type": "object"
       },
+      "OrgFoundOut": {
+        "properties": {
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "city"
+        ],
+        "title": "OrgFoundOut",
+        "type": "object"
+      },
       "OrgMemberOut": {
         "properties": {
           "college": {
@@ -3282,6 +3757,37 @@
           "city"
         ],
         "title": "OrgOut",
+        "type": "object"
+      },
+      "OrgSearchParams": {
+        "properties": {
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "college",
+                  "incubator",
+                  "program"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "q": {
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Q",
+            "type": "string"
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "title": "OrgSearchParams",
         "type": "object"
       },
       "PageParams": {
@@ -3592,6 +4098,17 @@
             "title": "Id",
             "type": "integer"
           },
+          "photo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo"
+          },
           "role": {
             "title": "Role",
             "type": "string"
@@ -3646,6 +4163,20 @@
         "title": "PersonaChoice",
         "type": "object"
       },
+      "PhotoIn": {
+        "additionalProperties": false,
+        "properties": {
+          "upload_id": {
+            "title": "Upload Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "upload_id"
+        ],
+        "title": "PhotoIn",
+        "type": "object"
+      },
       "PinOut": {
         "properties": {
           "claimed": {
@@ -3678,6 +4209,17 @@
           "lng": {
             "title": "Lng",
             "type": "number"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo"
           },
           "match_pct": {
             "anyOf": [
@@ -3848,6 +4390,11 @@
           },
           "my_reactions": {
             "items": {
+              "enum": [
+                "helpful",
+                "intro_me",
+                "lets_talk"
+              ],
               "type": "string"
             },
             "title": "My Reactions",
@@ -3906,6 +4453,10 @@
             "title": "Profile Visibility",
             "type": "string"
           },
+          "read_receipts": {
+            "title": "Read Receipts",
+            "type": "boolean"
+          },
           "visible_to_org": {
             "title": "Visible To Org",
             "type": "boolean"
@@ -3915,7 +4466,8 @@
           "profile_visibility",
           "visible_to_org",
           "circuits_opt_in",
-          "allow_requests"
+          "allow_requests",
+          "read_receipts"
         ],
         "title": "PrivacyOut",
         "type": "object"
@@ -3961,6 +4513,17 @@
             ],
             "title": "Profile Visibility"
           },
+          "read_receipts": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read Receipts"
+          },
           "visible_to_org": {
             "anyOf": [
               {
@@ -3997,11 +4560,55 @@
         "title": "PrivateStatsOut",
         "type": "object"
       },
+      "ProfileActionsOut": {
+        "properties": {
+          "connect": {
+            "title": "Connect",
+            "type": "boolean"
+          },
+          "intro": {
+            "title": "Intro",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "connect",
+          "message",
+          "intro"
+        ],
+        "title": "ProfileActionsOut",
+        "type": "object"
+      },
       "ProfileOut": {
         "properties": {
+          "actions": {
+            "$ref": "#/components/schemas/ProfileActionsOut"
+          },
           "bio": {
             "title": "Bio",
             "type": "string"
+          },
+          "build_logs": {
+            "items": {
+              "$ref": "#/components/schemas/BuildLogTileOut"
+            },
+            "title": "Build Logs",
+            "type": "array"
+          },
+          "circuits_closed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Circuits Closed"
           },
           "city": {
             "title": "City",
@@ -4011,13 +4618,43 @@
             "title": "College",
             "type": "string"
           },
+          "connection": {
+            "enum": [
+              "self",
+              "connected",
+              "requested",
+              "requested_you",
+              "none"
+            ],
+            "title": "Connection",
+            "type": "string"
+          },
           "display_name": {
             "title": "Display Name",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
             "type": "string"
           },
           "id": {
             "title": "Id",
             "type": "integer"
+          },
+          "is_me": {
+            "title": "Is Me",
+            "type": "boolean"
+          },
+          "mutual_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mutual Count"
           },
           "needs": {
             "items": {
@@ -4033,6 +4670,28 @@
             "title": "Offers",
             "type": "array"
           },
+          "organisation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organisation"
+          },
+          "photo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo"
+          },
           "role": {
             "title": "Role",
             "type": "string"
@@ -4044,6 +4703,16 @@
             "title": "Skills",
             "type": "array"
           },
+          "strength": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StrengthOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "traits": {
             "items": {
               "type": "string"
@@ -4054,10 +4723,31 @@
           "verification_level": {
             "title": "Verification Level",
             "type": "integer"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
           "id",
+          "is_me",
+          "photo",
+          "headline",
+          "organisation",
+          "connection",
+          "actions",
+          "mutual_count",
+          "via",
+          "build_logs",
+          "circuits_closed",
+          "strength",
           "role",
           "display_name",
           "bio",
@@ -4463,6 +5153,53 @@
         "title": "RespondIn",
         "type": "object"
       },
+      "SearchOut": {
+        "properties": {
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/JobOut"
+            },
+            "title": "Jobs",
+            "type": "array"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/AuthorOut"
+            },
+            "title": "People",
+            "type": "array"
+          },
+          "startups": {
+            "items": {
+              "$ref": "#/components/schemas/PinOut"
+            },
+            "title": "Startups",
+            "type": "array"
+          }
+        },
+        "required": [
+          "people",
+          "startups",
+          "jobs"
+        ],
+        "title": "SearchOut",
+        "type": "object"
+      },
+      "SearchParams": {
+        "properties": {
+          "q": {
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Q",
+            "type": "string"
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "title": "SearchParams",
+        "type": "object"
+      },
       "SendIn": {
         "properties": {
           "body": {
@@ -4623,6 +5360,19 @@
         "title": "SkillsInDemandOut",
         "type": "object"
       },
+      "SkillsParams": {
+        "properties": {
+          "within_km": {
+            "default": 10,
+            "exclusiveMinimum": 0,
+            "maximum": 100,
+            "title": "Within Km",
+            "type": "number"
+          }
+        },
+        "title": "SkillsParams",
+        "type": "object"
+      },
       "StartIn": {
         "properties": {
           "body": {
@@ -4675,6 +5425,13 @@
             "title": "Address",
             "type": "string"
           },
+          "build_logs": {
+            "items": {
+              "$ref": "#/components/schemas/BuildLogTileOut"
+            },
+            "title": "Build Logs",
+            "type": "array"
+          },
           "claimed": {
             "title": "Claimed",
             "type": "boolean"
@@ -4682,6 +5439,13 @@
           "description": {
             "title": "Description",
             "type": "string"
+          },
+          "founders": {
+            "items": {
+              "$ref": "#/components/schemas/FounderOut"
+            },
+            "title": "Founders",
+            "type": "array"
           },
           "hiring": {
             "title": "Hiring",
@@ -4692,8 +5456,15 @@
             "type": "integer"
           },
           "interest_count": {
-            "title": "Interest Count",
-            "type": "integer"
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interest Count"
           },
           "interested": {
             "title": "Interested",
@@ -4724,6 +5495,17 @@
               }
             ],
             "title": "Lng"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo"
           },
           "match_pct": {
             "anyOf": [
@@ -4759,14 +5541,38 @@
             "title": "Stage",
             "type": "string"
           },
+          "team_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Size"
+          },
           "tech_stack": {
-            "items": {},
+            "items": {
+              "type": "string"
+            },
             "title": "Tech Stack",
             "type": "array"
           },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          },
           "view_count": {
-            "title": "View Count",
-            "type": "integer"
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "View Count"
           },
           "website_domain": {
             "title": "Website Domain",
@@ -4781,18 +5587,23 @@
           "sector",
           "stage",
           "address",
+          "team_size",
+          "logo",
           "lat",
           "lng",
           "hiring",
           "tech_stack",
           "claimed",
+          "verified",
           "source",
           "view_count",
           "interest_count",
           "interested",
           "is_team",
           "match_pct",
-          "open_jobs"
+          "open_jobs",
+          "founders",
+          "build_logs"
         ],
         "title": "StartupOut",
         "type": "object"
@@ -4872,6 +5683,19 @@
             ],
             "title": "Stage"
           },
+          "team_size": {
+            "anyOf": [
+              {
+                "maximum": 10000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Size"
+          },
           "tech_stack": {
             "anyOf": [
               {
@@ -4907,6 +5731,48 @@
           "status"
         ],
         "title": "StatusIn",
+        "type": "object"
+      },
+      "StrengthOut": {
+        "properties": {
+          "next_step": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StrengthStepOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "percent": {
+            "title": "Percent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "percent",
+          "next_step"
+        ],
+        "title": "StrengthOut",
+        "type": "object"
+      },
+      "StrengthStepOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text"
+        ],
+        "title": "StrengthStepOut",
         "type": "object"
       },
       "Suggestions": {
@@ -5058,6 +5924,37 @@
         "title": "TraitOut",
         "type": "object"
       },
+      "UnreadCountOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count"
+        ],
+        "title": "UnreadCountOut",
+        "type": "object"
+      },
+      "UnreadCountsOut": {
+        "properties": {
+          "chats": {
+            "title": "Chats",
+            "type": "integer"
+          },
+          "requests": {
+            "title": "Requests",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "chats",
+          "requests"
+        ],
+        "title": "UnreadCountsOut",
+        "type": "object"
+      },
       "UnreadOut": {
         "properties": {
           "marked": {
@@ -5150,7 +6047,9 @@
           "purpose": {
             "enum": [
               "post",
-              "message"
+              "message",
+              "avatar",
+              "startup_logo"
             ],
             "title": "Purpose",
             "type": "string"
@@ -5869,6 +6768,38 @@
         ]
       }
     },
+    "/api/cities": {
+      "get": {
+        "description": "The cities a member can choose in sign-up, each with its centre point. The pilot city is first.",
+        "operationId": "core_cities_cities",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CityOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Cities",
+        "tags": [
+          "config"
+        ]
+      }
+    },
     "/api/config": {
       "get": {
         "description": "Public. Environment, whether the invite-only beta is on, whether the caller may get past the beta gate (`beta_access`; false for anonymous visitors while the beta is on) and which features are on for the caller (anonymous visitors get the `everyone` audience). The app hides screens for features that are off.",
@@ -6169,6 +7100,34 @@
         ]
       }
     },
+    "/api/conversations/unread-count": {
+      "get": {
+        "description": "How many chats and requests have something I have not read: for the Inbox tab dot and the desktop rail.",
+        "operationId": "apps_messaging_api_unread_count",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCountsOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Unread conversations",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
     "/api/conversations/{conversation_id}": {
       "get": {
         "description": "404 unless I am one of the two people.",
@@ -6276,9 +7235,40 @@
         ]
       }
     },
+    "/api/conversations/{conversation_id}/decline": {
+      "post": {
+        "description": "'No thanks' to a request I received. It disappears for me; the sender is not told. Only the person the request was sent to; a conversation that is not a request is a 409 `not_a_request`.",
+        "operationId": "apps_messaging_api_decline",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Decline a request",
+        "tags": [
+          "messaging"
+        ]
+      }
+    },
     "/api/conversations/{conversation_id}/messages": {
       "get": {
-        "description": "Newest first. Pass next_cursor as cursor to load older ones. Read receipts are not shown to senders.",
+        "description": "Newest first. Pass next_cursor as cursor to load older ones. `read_at` on my own messages is set only when both of us have read receipts on.",
         "operationId": "apps_messaging_api_list_messages",
         "parameters": [
           {
@@ -6911,6 +7901,34 @@
         ]
       }
     },
+    "/api/intros/capacity": {
+      "get": {
+        "description": "How many of this week's introductions I have used and left, and when the next one frees up, so the request sheet can say '2 left' before I press Send. Only about me; how full another person is stays private.",
+        "operationId": "apps_intros_api_capacity",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapacityOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Introductions left this week",
+        "tags": [
+          "intros"
+        ]
+      }
+    },
     "/api/intros/path/{target_id}": {
       "get": {
         "description": "Who would introduce me to this person: the best mutual connection within two hops. 404 if the person is hidden or I have no mutual connection.",
@@ -7250,6 +8268,51 @@
         ]
       }
     },
+    "/api/jobs/skills-in-demand": {
+      "get": {
+        "description": "The top 3 capabilities asked for by open roles within `within_km` (default 10) of my location or the city centre. Role counts only, never people. Members under 18 count only verified startups' roles.",
+        "operationId": "apps_jobs_api_skills_in_demand",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "within_km",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "exclusiveMinimum": 0,
+              "maximum": 100,
+              "title": "Within Km",
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SkillDemandOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Skills in demand near me",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
     "/api/jobs/{job_id}": {
       "get": {
         "description": "One job. Students see their skill match and which required skills they have. A closed job is visible to its team only.",
@@ -7508,7 +8571,7 @@
     },
     "/api/matches": {
       "get": {
-        "description": "People who fit what I need and offer, best first, each with a one-line reason. Computed ahead of time, so this is a cheap read. bridge=true shows only Bridge matches (different sector), bridge=false only the rest. Partner admins and super admins have no matches.",
+        "description": "People who fit what I need and offer, best first, each with a one-line reason. Computed ahead of time, so this is a cheap read. bridge=true shows only Bridge matches (different sector), bridge=false only the rest. Filters: role, verified (level 2+), capability (a slug they offer) and within_km (5, 10, 25 or 50). The distance itself is never returned. Partner admins and super admins have no matches.",
         "operationId": "apps_matching_api_list_matches",
         "parameters": [
           {
@@ -7548,6 +8611,81 @@
                 }
               ],
               "title": "Bridge"
+            }
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "student",
+                    "founder",
+                    "mentor",
+                    "investor"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          },
+          {
+            "in": "query",
+            "name": "verified",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Verified"
+            }
+          },
+          {
+            "description": "Slug of something they offer",
+            "in": "query",
+            "name": "capability",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Slug of something they offer",
+              "title": "Capability"
+            }
+          },
+          {
+            "description": "5, 10, 25 or 50: lives within this distance of my location or the city centre",
+            "in": "query",
+            "name": "within_km",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "5, 10, 25 or 50: lives within this distance of my location or the city centre",
+              "title": "Within Km"
             }
           }
         ],
@@ -7640,7 +8778,7 @@
     },
     "/api/me/appearance": {
       "patch": {
-        "description": "Theme (system, dark, light), personal accent (mint, sky, indigo, rose, lime, mono) and swipe between tabs. Send only the fields to change. Any other value or field is a 422. Stored on the member so it follows them across devices.",
+        "description": "Theme (system, dark, light), personal accent (emerald, sky, indigo, rose, lime, mono; the old name 'mint' is still accepted and stored as emerald) and swipe between tabs. Send only the fields to change. Any other value or field is a 422. Stored on the member so it follows them across devices.",
         "operationId": "apps_accounts_settings_api_patch_appearance",
         "parameters": [],
         "requestBody": {
@@ -8153,6 +9291,70 @@
         ]
       }
     },
+    "/api/me/photo": {
+      "delete": {
+        "description": "Back to the circuit-pattern avatar. Safe to repeat.",
+        "operationId": "apps_accounts_api_remove_my_photo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Remove my profile photo",
+        "tags": [
+          "accounts"
+        ]
+      },
+      "put": {
+        "description": "Upload the image first (`POST /api/media/uploads` with purpose `avatar`, PUT the file, then complete) and send its id here. The previous photo is deleted. Someone else's upload is a 404. Under-18 members' photos are shown to nobody but them.",
+        "operationId": "apps_accounts_api_set_my_photo",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhotoIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Set my profile photo",
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
     "/api/me/privacy": {
       "patch": {
         "description": "Send only the fields to change: profile_visibility (public, members, hidden), visible_to_org, circuits_opt_in (needs verification level 2) and allow_requests (strangers may send requests). Members under 18 can never make the profile public or open requests to strangers: 403 `under_18_restricted`, whatever the client sends. Unknown fields are a 422.",
@@ -8525,7 +9727,7 @@
     },
     "/api/members/{member_id}": {
       "get": {
-        "description": "Another member's profile. Hidden, under-18, suspended, blocked and admin accounts are a 404.",
+        "description": "The whole Profile screen in one call: header (photo, headline, organisation for people in mine), what I can do with them (connect, message, intro via a mutual), mutual connections, needs and offers, skills, a grid of their build logs, closed circuits (mine or a connection's) and, on my own profile, the strength meter with its next step. Hidden, under-18, suspended, blocked and admin accounts are a 404. My own id works too.",
         "operationId": "apps_accounts_api_member_profile",
         "parameters": [
           {
@@ -8735,7 +9937,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CountOut"
+                  "$ref": "#/components/schemas/UnreadCountOut"
                 }
               }
             },
@@ -8763,7 +9965,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CountOut"
+                  "$ref": "#/components/schemas/UnreadCountOut"
                 }
               }
             },
@@ -9114,6 +10316,71 @@
           }
         ],
         "summary": "Remove a member",
+        "tags": [
+          "organisations"
+        ]
+      }
+    },
+    "/api/organisations/search": {
+      "get": {
+        "description": "For 'Where do you study?': up to 10 organisations whose name contains the text (at least 2 characters), best first. Never returns join codes or email domains. Picking one only fills in the college name; joining still needs the organisation's invite code or a verified email on its domain.",
+        "operationId": "apps_organisations_api_search",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 2,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "college",
+                    "incubator",
+                    "program"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OrgFoundOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Find an organisation by name",
         "tags": [
           "organisations"
         ]
@@ -9557,6 +10824,46 @@
         ]
       }
     },
+    "/api/search": {
+      "get": {
+        "description": "One call for the Discover search field: up to 10 people (by name), 10 startups (by name or sector) and 10 roles (by title, startup or skill). Hidden, under-18, blocked and deleted people never appear; members under 18 find only their connections and roles at verified startups. Rate limited.",
+        "operationId": "apps_startups_search_api_search_all",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 2,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Search people, startups and roles",
+        "tags": [
+          "startups"
+        ]
+      }
+    },
     "/api/startups/map": {
       "get": {
         "description": "Pins inside a bounding box (max about 2 degrees wide, max 500 pins). Hiring startups come first.",
@@ -9795,7 +11102,7 @@
     },
     "/api/startups/{startup_id}": {
       "get": {
-        "description": "Profile, open roles, and how many people viewed it or showed interest (a reason to claim it). Counts one view per member per day.",
+        "description": "Profile, open roles, founders (each with the warm path to them), the latest build log pictures and the logo. Counts one view per member per day. `view_count` and `interest_count` are private: only the startup's team, or a founder looking at an unclaimed page (a reason to claim it, never under 5), get them. Members under 18 see an unverified startup as not hiring, with no roles.",
         "operationId": "apps_startups_api_startup_detail",
         "parameters": [
           {
@@ -10088,6 +11395,90 @@
           }
         ],
         "summary": "I'm interested",
+        "tags": [
+          "startups"
+        ]
+      }
+    },
+    "/api/startups/{startup_id}/logo": {
+      "delete": {
+        "description": "The startup's team only. Safe to repeat.",
+        "operationId": "apps_startups_api_remove_logo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Remove the startup's logo",
+        "tags": [
+          "startups"
+        ]
+      },
+      "put": {
+        "description": "The startup's team only. Upload the image first (`POST /api/media/uploads` with purpose `startup_logo`, founders only), then send its id. The previous logo is deleted.",
+        "operationId": "apps_startups_api_set_logo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "startup_id",
+            "required": true,
+            "schema": {
+              "title": "Startup Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupOut"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "SupabaseAuth": []
+          }
+        ],
+        "summary": "Set the startup's logo",
         "tags": [
           "startups"
         ]
