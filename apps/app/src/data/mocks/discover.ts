@@ -11,7 +11,7 @@ import { delay, http, HttpResponse, type HttpHandler } from "msw";
 import type { Schemas } from "@circuit/api-client";
 import type { MissingJobFields } from "../missing";
 import { currentScenario, type Scenario } from "./config";
-import { ME } from "./fixtures";
+import { MATCHES, ME } from "./fixtures";
 
 const API = "*/api";
 const envelope = (status: number, code: string, message: string) => HttpResponse.json({ error: { code, message, details: null } }, { status });
@@ -119,6 +119,23 @@ function scenario(fn: (s: Scenario, info: { request: Request; params: Record<str
 const num = (q: URLSearchParams, k: string) => (q.get(k) === null || q.get(k) === "" ? null : Number(q.get(k)));
 
 export const discoverHandlers: HttpHandler[] = [
+  http.get(`${API}/jobs/skills-in-demand`, scenario((s) => {
+    const counts = new Map<string, { slug: string; name: string; open_roles: number }>();
+    for (const j of empty(s) ? [] : JOBS) for (const c of j.capabilities) if (c.required && (j.distance_km ?? Infinity) <= 10) counts.set(c.slug, { slug: c.slug, name: c.name, open_roles: (counts.get(c.slug)?.open_roles ?? 0) + 1 });
+    const skills = [...counts.values()].sort((a, b) => b.open_roles - a.open_roles || a.name.localeCompare(b.name)).slice(0, 3);
+    return HttpResponse.json(skills);
+  })),
+  http.get(`${API}/search`, scenario((s, { request }) => {
+    const q = (new URL(request.url).searchParams.get("q") ?? "").trim().toLowerCase();
+    if (q.length < 2) return envelope(422, "validation_error", "Type at least 2 characters.");
+    const has = (...x: string[]) => x.some((v) => v.toLowerCase().includes(q));
+    if (empty(s)) return HttpResponse.json({ people: [], startups: [], jobs: [] });
+    return HttpResponse.json({
+      people: MATCHES.filter((m) => has(m.display_name)).slice(0, 10).map((m) => ({ id: m.candidate_id, display_name: m.display_name, headline: m.headline ?? "", role: m.role, city: "Chennai", photo: null, verification_level: m.verification_level })),
+      startups: STARTUPS.filter((x) => has(x.name, x.sector)).slice(0, 10).map(pinOut),
+      jobs: JOBS.filter((j) => has(j.title, j.startup_name, j.sector)).slice(0, 10).map(jobOut),
+    });
+  })),
   http.get(`${API}/jobs`, scenario((s, { request }) => {
     const q = new URL(request.url).searchParams;
     const limit = num(q, "limit") ?? 20;
