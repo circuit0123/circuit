@@ -141,6 +141,7 @@ STORAGE_BUCKETS = {
     "message": "messages",
     "avatar": "avatars",
     "startup_logo": "avatars",
+    "highlight": "posts",  # same private bucket as build logs: the folder name (highlight/<member>/...) keeps them apart
     "export": "private",
     "ml": "private",  # trained ranker files under ml/models/<version>/
 }  # private buckets; reads use short-lived signed URLs

@@ -22,6 +22,9 @@ class Member(models.Model):
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.STUDENT)
     display_name = models.CharField(max_length=120, blank=True)
     bio = models.TextField(blank=True)
+    headline = models.CharField(
+        max_length=140, blank=True, db_default=""
+    )  # one line under the name ("Frontend developer, building a voice assistant"); blank = the first line of the bio (headline_line)
     location = gis.PointField(geography=False, srid=4326, null=True, blank=True)
     city = models.CharField(max_length=100, blank=True)
     college = models.CharField(max_length=200, blank=True)
@@ -85,6 +88,10 @@ class Member(models.Model):
         if self._state.adding and self.is_minor:
             self.allow_requests = False  # no Requests from strangers for under-18s (DESIGN.md §4 Inbox)
         super().save(*args, **kwargs)
+
+    def headline_line(self) -> str:
+        """The line shown under the name: their headline, or the start of their bio when they have not written one."""
+        return self.headline.strip() or (self.bio or "").strip()[:140]
 
     def __str__(self) -> str:
         return f"Member {self.pk} ({self.role})"

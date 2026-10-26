@@ -23,6 +23,12 @@ router = Router()
 class ChannelsOut(Schema):
     in_app: bool
     email: bool
+    push: bool  # stored only: nothing sends a push until F7
+
+
+class QuietHours(Schema):
+    start: int  # IST hour, 0-23: quiet from here ...
+    end: int  # ... until here
 
 
 class NotificationPrefsOut(Schema):
@@ -32,12 +38,16 @@ class NotificationPrefsOut(Schema):
     messages: ChannelsOut
     pulse_replies: ChannelsOut
     announcements: ChannelsOut
+    quiet_hours: QuietHours
+    push_daily_cap: int
+    quiet_hours_locked: bool  # true for under-18 members: the window is fixed
 
 
 class ChannelsPatch(Schema):
     model_config = ConfigDict(extra="forbid")
     in_app: StrictBool | None = None
     email: StrictBool | None = None
+    push: StrictBool | None = None
 
 
 class NotificationPrefsPatch(Schema):
@@ -48,6 +58,8 @@ class NotificationPrefsPatch(Schema):
     messages: ChannelsPatch | None = None
     pulse_replies: ChannelsPatch | None = None
     announcements: ChannelsPatch | None = None
+    quiet_hours: QuietHours | None = None
+    push_daily_cap: int | None = None
 
 
 class PrivacyOut(Schema):
@@ -159,7 +171,7 @@ def settings_for(m: Member) -> dict:
         },
         "privacy": _privacy(m),
         "appearance": appearance.resolved(m),
-        "notifications": prefs.resolved(m),
+        "notifications": prefs.full(m),
         "blocked_count": Block.objects.filter(blocker=m).count(),
         "export": last_export,
         "consent": {
@@ -216,7 +228,9 @@ def patch_appearance(request, body: AppearancePatch):
     "/me/notification-preferences",
     response=NotificationPrefsOut,
     summary="Update my notification preferences",
-    description="Per type (intros, applications, circuits, messages, pulse_replies, announcements) and channel (in_app, email). "
+    description="Per type (intros, applications, circuits, messages, pulse_replies, announcements) and channel (in_app, email, push), "
+    "plus quiet_hours {start, end} (IST hours, default 22 to 8) and push_daily_cap (1 to 10, default 3). Push is stored only: nothing "
+    "sends a push yet. Members under 18 cannot change quiet hours or raise the cap above 3 (403 `under_18_restricted`). "
     'Send only what changes, e.g. {"intros": {"email": false}}. Account notices (a warning from a moderator) are always shown '
     "in the app and cannot be turned off.",
 )

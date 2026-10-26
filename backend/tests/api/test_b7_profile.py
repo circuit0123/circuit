@@ -183,7 +183,11 @@ def test_strength_climbs_as_the_profile_fills_in(lists, make_member, client_for)
     Offer.objects.create(member=me, capability=Capability.objects.first())
     Need.objects.create(member=me, capability=Capability.objects.last())
     s = profile(client_for(me), me)["strength"]
-    assert s["next_step"]["key"] == "skills" and s["percent"] == 71  # 5 of the 7 steps are done
+    assert s["next_step"]["key"] == "headline" and s["percent"] == 63  # 5 of the 8 steps are done
+    me.headline = "Student, building tools for local shops"
+    me.save()
+    s = profile(client_for(me), me)["strength"]
+    assert s["next_step"]["key"] == "skills" and s["percent"] == 75  # 6 of 8
     MemberSkill.objects.create(member=me, capability=Capability.objects.first(), level=2, proof_url="https://example.com/a")
     picture_post(me)
     assert profile(client_for(me), me)["strength"] == {"percent": 100, "next_step": None}
