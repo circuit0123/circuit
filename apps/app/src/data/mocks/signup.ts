@@ -12,6 +12,20 @@ import { CONFIG, ME, dropOf } from "./fixtures";
 export const isSignup = () => currentScenario() === "signup" || currentScenario() === "signup_ai_down";
 
 /** The colleges the mock search knows. */
+/** The cities the mock knows; the first is the pilot. */
+const CITIES: ReadonlyArray<{ name: string; lat: number; lng: number }> = [
+  { name: "Chennai", lat: 13.08, lng: 80.27 },
+  { name: "Madurai", lat: 9.93, lng: 78.12 },
+  { name: "Coimbatore", lat: 11.02, lng: 76.96 },
+  { name: "Bengaluru", lat: 12.97, lng: 77.59 },
+  { name: "Hyderabad", lat: 17.39, lng: 78.49 },
+  { name: "Kochi", lat: 9.93, lng: 76.27 },
+  { name: "Mumbai", lat: 19.08, lng: 72.88 },
+  { name: "Pune", lat: 18.52, lng: 73.86 },
+  { name: "Delhi", lat: 28.61, lng: 77.21 },
+  { name: "Kolkata", lat: 22.57, lng: 88.36 },
+];
+
 const ORGANISATIONS: readonly string[] = [
   "Sri Venkateswara Institute of Technology",
   "Thiagarajar College of Engineering",
@@ -248,6 +262,8 @@ export const signupHandlers: HttpHandler[] = [
     const m = signupMe();
     return HttpResponse.json({ profile_visibility: m.profile_visibility, visible_to_org: false, circuits_opt_in: false, allow_requests: m.allow_requests });
   }),
+  http.get(`${API}/cities`, () => HttpResponse.json(CITIES.map((c, i) => ({ ...c, pilot: i === 0 }))),
+  ),
   http.get(`${API}/organisations/search`, ({ request }) => {
     if (!isSignup()) return;
     const q = (new URL(request.url).searchParams.get("q") ?? "").toLowerCase();

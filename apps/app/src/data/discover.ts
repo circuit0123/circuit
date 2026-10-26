@@ -7,8 +7,9 @@ import { api, unwrap } from "./client";
 import { useFeatures } from "./features";
 import { useKey } from "./keys";
 import { useMe, type Me } from "./me";
-import { CITIES, PROMOTED_STAND_IN, PROMOTED_STARTUP_STAND_IN, type MissingJobFields } from "./missing";
+import { PROMOTED_STAND_IN, PROMOTED_STARTUP_STAND_IN, type MissingJobFields } from "./missing";
 import { MOCK } from "./mocks/config";
+import { useCities } from "./where";
 
 export type Segment = "people" | "startups" | "jobs" | "map";
 export const SEGMENTS: { id: Segment; label: string }[] = [
@@ -40,10 +41,14 @@ export const FILTERS_FOR: Record<Segment, Array<keyof DiscoverFilters>> = {
 export const activeFilters = (f: DiscoverFilters, seg: Segment) =>
   FILTERS_FOR[seg].filter((k) => f[k] !== NO_FILTERS[k]).length;
 
+/** The pilot city's centre, only until `GET /api/cities` answers. */
+const PILOT_CENTRE = { lat: 13.08, lng: 80.27 };
+
 /** Where "near you" is measured from: the member's saved location, else the pilot city's centre. */
 export function useHere(): { lat: number; lng: number } {
   const loc = useMe().data?.location;
-  return loc ?? { lat: CITIES[0].lat, lng: CITIES[0].lng };
+  const pilot = useCities().data?.find((c) => c.pilot);
+  return loc ?? (pilot ? { lat: pilot.lat, lng: pilot.lng } : PILOT_CENTRE);
 }
 
 export type PersonTile = { id: number; name: string; line: string; fit: string | null; bridge: boolean; level: number };
