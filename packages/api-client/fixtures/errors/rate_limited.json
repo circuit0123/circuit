@@ -1,0 +1,40 @@
+{
+  "calls": [
+    {
+      "hook": "useOrganisationSearch",
+      "request": {
+        "method": "GET",
+        "path": "/api/organisations/search?q=kav"
+      },
+      "response": [
+        {
+          "city": "Chennai",
+          "id": 1,
+          "kind": "college",
+          "name": "Kaveri Institute of Technology"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useOrganisationSearch",
+      "request": {
+        "method": "GET",
+        "path": "/api/organisations/search?q=kav"
+      },
+      "response": {
+        "error": {
+          "code": "rate_limited",
+          "details": {
+            "retry_after": 3600
+          },
+          "message": "Too many requests, try again later"
+        }
+      },
+      "status": 429
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "rate_limited",
+  "screen": "errors"
+}

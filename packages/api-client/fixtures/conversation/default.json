@@ -1,0 +1,106 @@
+{
+  "calls": [
+    {
+      "hook": "useConversation",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations/1"
+      },
+      "response": {
+        "id": 1,
+        "last_message": {
+          "body": "Two days, paid. I will send the template.",
+          "conversation_id": 1,
+          "created_at": "2026-03-02T03:30:00Z",
+          "id": 2,
+          "image": null,
+          "mine": false,
+          "read_at": null,
+          "removed": false
+        },
+        "last_message_at": "2026-03-02T03:30:00Z",
+        "other": {
+          "city": "Chennai",
+          "display_name": "Arjun Mehta",
+          "headline": "",
+          "id": 3,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "started_by_me": true,
+        "status": "active",
+        "unread": 1
+      },
+      "status": 200
+    },
+    {
+      "hook": "useConversation",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations/1/messages"
+      },
+      "response": {
+        "items": [
+          {
+            "body": "Two days, paid. I will send the template.",
+            "conversation_id": 1,
+            "created_at": "2026-03-02T03:30:00Z",
+            "id": 2,
+            "image": null,
+            "mine": false,
+            "read_at": null,
+            "removed": false
+          },
+          {
+            "body": "Saw your hiring board. How long is a trial project?",
+            "conversation_id": 1,
+            "created_at": "2026-03-02T03:00:00Z",
+            "id": 1,
+            "image": null,
+            "mine": true,
+            "read_at": null,
+            "removed": false
+          }
+        ],
+        "next_cursor": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useConversation",
+      "request": {
+        "body": {
+          "body": "Thanks, talk soon."
+        },
+        "method": "POST",
+        "path": "/api/conversations/1/messages"
+      },
+      "response": {
+        "body": "Thanks, talk soon.",
+        "conversation_id": 1,
+        "created_at": "2026-03-02T04:00:00Z",
+        "id": 6,
+        "image": null,
+        "mine": true,
+        "read_at": null,
+        "removed": false
+      },
+      "status": 201
+    },
+    {
+      "hook": "useConversation",
+      "request": {
+        "method": "POST",
+        "path": "/api/conversations/1/read"
+      },
+      "response": {
+        "marked": 1
+      },
+      "status": 200
+    }
+  ],
+  "persona": "asha",
+  "scenario": "default",
+  "screen": "conversation"
+}

@@ -1,0 +1,151 @@
+{
+  "calls": [
+    {
+      "hook": "useIntroPath",
+      "request": {
+        "method": "GET",
+        "path": "/api/intros/path/9"
+      },
+      "response": {
+        "target": {
+          "display_name": "Vikram Anand",
+          "id": 9,
+          "photo": null,
+          "role": "investor",
+          "verification_level": 3
+        },
+        "via": {
+          "display_name": "Dr. Lakshmi Narayanan",
+          "id": 8,
+          "photo": null,
+          "role": "mentor",
+          "verification_level": 3
+        }
+      },
+      "status": 200
+    },
+    {
+      "hook": "useIntroCapacity",
+      "request": {
+        "method": "GET",
+        "path": "/api/intros/capacity"
+      },
+      "response": {
+        "allowed": true,
+        "left": 3,
+        "next_frees_at": null,
+        "used": 0,
+        "weekly_limit": 3
+      },
+      "status": 200
+    },
+    {
+      "hook": "useRequestIntro",
+      "request": {
+        "body": {
+          "message": "We are raising a seed round.",
+          "target_id": 9
+        },
+        "method": "POST",
+        "path": "/api/intros"
+      },
+      "response": {
+        "can_respond": false,
+        "created_at": "2026-03-02T04:00:00Z",
+        "expires_at": "2026-03-09T04:00:00Z",
+        "id": 1,
+        "message": "We are raising a seed round.",
+        "my_role": "requester",
+        "outcome_rating": null,
+        "requester": {
+          "display_name": "Sneha Pillai",
+          "id": 7,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "stage": "broker",
+        "status": "pending",
+        "target": {
+          "display_name": "Vikram Anand",
+          "id": 9,
+          "photo": null,
+          "role": "investor",
+          "verification_level": 3
+        },
+        "via": {
+          "display_name": "Dr. Lakshmi Narayanan",
+          "id": 8,
+          "photo": null,
+          "role": "mentor",
+          "verification_level": 3
+        }
+      },
+      "status": 201
+    },
+    {
+      "hook": "useIntroCapacity",
+      "request": {
+        "method": "GET",
+        "path": "/api/intros/capacity"
+      },
+      "response": {
+        "allowed": true,
+        "left": 2,
+        "next_frees_at": null,
+        "used": 1,
+        "weekly_limit": 3
+      },
+      "status": 200
+    },
+    {
+      "hook": "useIntros",
+      "request": {
+        "method": "GET",
+        "path": "/api/intros?box=sent"
+      },
+      "response": {
+        "count": 1,
+        "items": [
+          {
+            "can_respond": false,
+            "created_at": "2026-03-02T04:00:00Z",
+            "expires_at": "2026-03-09T04:00:00Z",
+            "id": 1,
+            "message": "We are raising a seed round.",
+            "my_role": "requester",
+            "outcome_rating": null,
+            "requester": {
+              "display_name": "Sneha Pillai",
+              "id": 7,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "stage": "broker",
+            "status": "pending",
+            "target": {
+              "display_name": "Vikram Anand",
+              "id": 9,
+              "photo": null,
+              "role": "investor",
+              "verification_level": 3
+            },
+            "via": {
+              "display_name": "Dr. Lakshmi Narayanan",
+              "id": 8,
+              "photo": null,
+              "role": "mentor",
+              "verification_level": 3
+            }
+          }
+        ],
+        "next_offset": null
+      },
+      "status": 200
+    }
+  ],
+  "persona": "sneha",
+  "scenario": "default",
+  "screen": "intros"
+}

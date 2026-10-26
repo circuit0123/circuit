@@ -1,0 +1,119 @@
+{
+  "calls": [
+    {
+      "hook": "useInbox",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations?folder=chats"
+      },
+      "response": [
+        {
+          "id": 1,
+          "last_message": {
+            "body": "Two days, paid. I will send the template.",
+            "conversation_id": 1,
+            "created_at": "2026-03-02T03:30:00Z",
+            "id": 2,
+            "image": null,
+            "mine": false,
+            "read_at": null,
+            "removed": false
+          },
+          "last_message_at": "2026-03-02T03:30:00Z",
+          "other": {
+            "city": "Chennai",
+            "display_name": "Arjun Mehta",
+            "headline": "",
+            "id": 3,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          },
+          "started_by_me": true,
+          "status": "active",
+          "unread": 1
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useInbox",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations?folder=requests"
+      },
+      "response": [],
+      "status": 200
+    },
+    {
+      "hook": "useInboxDot",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations/unread-count"
+      },
+      "response": {
+        "chats": 1,
+        "requests": 0
+      },
+      "status": 200
+    },
+    {
+      "hook": "useConnections",
+      "request": {
+        "method": "GET",
+        "path": "/api/connections"
+      },
+      "response": [
+        {
+          "city": "Chennai",
+          "display_name": "Balaji Iyer",
+          "headline": "",
+          "id": 274,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Bhavna Venkatesh",
+          "headline": "",
+          "id": 32,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 3
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Gokul Khan",
+          "headline": "",
+          "id": 253,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Imran Joseph",
+          "headline": "",
+          "id": 19,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        {
+          "city": "Chennai",
+          "display_name": "Rahul Murugan",
+          "headline": "",
+          "id": 228,
+          "photo": null,
+          "role": "student",
+          "verification_level": 1
+        }
+      ],
+      "status": 200
+    }
+  ],
+  "persona": "asha",
+  "scenario": "default",
+  "screen": "inbox"
+}

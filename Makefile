@@ -18,7 +18,7 @@ endef
 .DEFAULT_GOAL := help
 .PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
-	smoke api-client openapi build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report job-health
+	smoke api-client openapi contract-fixtures build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report job-health
 
 help: ## List every command
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  \033[1m%-22s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -214,6 +214,9 @@ api-client: ## Export openapi.json from Django and regenerate packages/api-clien
 	pnpm api:generate
 
 openapi: api-client ## Same as api-client
+
+contract-fixtures: ## Rewrite packages/api-client/fixtures from the real API (after a deliberate API change; commit the diff)
+	UPDATE_FIXTURES=1 $(BACKEND) pytest -p no:cacheprovider tests/contract
 
 # -- build ---------------------------------------------------------------------------------
 IMAGE ?= circuit-api

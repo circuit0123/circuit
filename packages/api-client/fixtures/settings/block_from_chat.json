@@ -1,0 +1,16 @@
+{
+  "calls": [
+    {
+      "hook": "useBlock",
+      "request": {
+        "method": "POST",
+        "path": "/api/conversations/1/block"
+      },
+      "response": null,
+      "status": 204
+    }
+  ],
+  "persona": "asha",
+  "scenario": "block_from_chat",
+  "screen": "settings"
+}

@@ -1,0 +1,141 @@
+{
+  "calls": [
+    {
+      "hook": "useFeatures",
+      "request": {
+        "method": "GET",
+        "path": "/api/config"
+      },
+      "response": {
+        "beta_access": true,
+        "beta_mode": false,
+        "env": "dev",
+        "features": {
+          "circuits": true,
+          "daily_drop": true,
+          "investor_mode": true,
+          "partner_mode": true,
+          "payments": true,
+          "promotions": true,
+          "pulse": true
+        },
+        "llm_available": true
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMe",
+      "request": {
+        "method": "GET",
+        "path": "/api/me"
+      },
+      "response": {
+        "allow_requests": true,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "Chennai",
+        "college": "Kaveri Institute of Technology",
+        "display_name": "Ravi Kumar",
+        "has_needs_and_offers": true,
+        "id": 10,
+        "is_minor": false,
+        "lat": 13.00463432753667,
+        "lng": 80.27255491686762,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": 1,
+        "photo": null,
+        "policy_version": "2026-01",
+        "profile_visibility": "members",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": true
+      },
+      "status": 200
+    },
+    {
+      "hook": "useSettings",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/settings"
+      },
+      "response": {
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "blocked_count": 0,
+        "consent": {
+          "accepted_at": "2026-03-02T04:00:00Z",
+          "accepted_version": "2026-01",
+          "needs_consent": false,
+          "policy_version": "2026-01"
+        },
+        "export": null,
+        "notifications": {
+          "announcements": {
+            "email": false,
+            "in_app": true
+          },
+          "applications": {
+            "email": true,
+            "in_app": true
+          },
+          "circuits": {
+            "email": true,
+            "in_app": true
+          },
+          "intros": {
+            "email": true,
+            "in_app": true
+          },
+          "messages": {
+            "email": false,
+            "in_app": true
+          },
+          "pulse_replies": {
+            "email": false,
+            "in_app": true
+          }
+        },
+        "privacy": {
+          "allow_requests": true,
+          "circuits_opt_in": false,
+          "profile_visibility": "members",
+          "read_receipts": false,
+          "visible_to_org": true
+        },
+        "profile": {
+          "city": "Chennai",
+          "college": "Kaveri Institute of Technology",
+          "display_name": "Ravi Kumar",
+          "email_hint": "s***@example.org",
+          "is_minor": false,
+          "role": "student",
+          "verification_level": 1
+        },
+        "support": {
+          "grievance": {
+            "address": "<ADDRESS>",
+            "email": "grievance@example.com",
+            "name": "<GRIEVANCE_OFFICER>"
+          },
+          "support_email": "support@example.com"
+        }
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "default",
+  "screen": "bootstrap"
+}

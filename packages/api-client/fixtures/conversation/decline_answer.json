@@ -1,0 +1,61 @@
+{
+  "calls": [
+    {
+      "hook": "useInbox",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations?folder=requests"
+      },
+      "response": [
+        {
+          "id": 4,
+          "last_message": {
+            "body": "Hi Ravi, can I ask you something?",
+            "conversation_id": 4,
+            "created_at": "2026-03-02T04:00:00Z",
+            "id": 7,
+            "image": null,
+            "mine": false,
+            "read_at": null,
+            "removed": false
+          },
+          "last_message_at": "2026-03-02T04:00:00Z",
+          "other": {
+            "city": "Chennai",
+            "display_name": "Sneha Pillai",
+            "headline": "",
+            "id": 7,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          },
+          "started_by_me": false,
+          "status": "request",
+          "unread": 1
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useDeclineRequest",
+      "request": {
+        "method": "POST",
+        "path": "/api/conversations/4/decline"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useInbox",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations?folder=requests"
+      },
+      "response": [],
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "decline_answer",
+  "screen": "conversation"
+}

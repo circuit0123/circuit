@@ -1,0 +1,174 @@
+{
+  "calls": [
+    {
+      "hook": "useStartup",
+      "request": {
+        "method": "GET",
+        "path": "/api/startups/3"
+      },
+      "response": {
+        "address": "OMR, Sholinganallur, Chennai",
+        "build_logs": [
+          {
+            "image": {
+              "alt_text": "Phone screen, Set up your studio, with two of four steps done and Pick your first campaign next",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/6/seed4/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/6/seed4/w480.webp?token=t",
+              "width": 1080
+            },
+            "post_id": 5
+          }
+        ],
+        "claimed": true,
+        "description": "Pixelwave Labs builds saas products for Indian customers.",
+        "founders": [
+          {
+            "connected": false,
+            "is_me": false,
+            "person": {
+              "display_name": "Divya Menon",
+              "id": 6,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "role": "founder",
+            "via": null
+          }
+        ],
+        "hiring": true,
+        "id": 3,
+        "interest_count": null,
+        "interested": false,
+        "is_team": false,
+        "lat": 13.042590507024766,
+        "lng": 80.23541556147727,
+        "logo": null,
+        "match_pct": 96,
+        "name": "Pixelwave Labs",
+        "open_jobs": [
+          {
+            "id": 66,
+            "kind": "internship",
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Frontend Intern"
+          }
+        ],
+        "sector": "saas",
+        "source": "seed",
+        "stage": "prototype",
+        "team_size": null,
+        "tech_stack": [
+          "arduino",
+          "flutter",
+          "react"
+        ],
+        "verified": true,
+        "view_count": null,
+        "website_domain": "pixelwavelabs.in"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useFollow",
+      "request": {
+        "method": "POST",
+        "path": "/api/startups/3/follow"
+      },
+      "response": null,
+      "status": 204
+    },
+    {
+      "hook": "useFollows",
+      "request": {
+        "method": "GET",
+        "path": "/api/me/follows"
+      },
+      "response": [
+        {
+          "hiring": true,
+          "id": 8,
+          "name": "Aeroforge",
+          "sector": "biotech"
+        },
+        {
+          "hiring": true,
+          "id": 10,
+          "name": "Kaviloop",
+          "sector": "fintech"
+        },
+        {
+          "hiring": true,
+          "id": 3,
+          "name": "Pixelwave Labs",
+          "sector": "saas"
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useStartupJobs",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs?startup_id=3"
+      },
+      "response": {
+        "count": 1,
+        "items": [
+          {
+            "applied": false,
+            "capabilities": [
+              {
+                "name": "Frontend development",
+                "required": true,
+                "slug": "frontend-dev",
+                "your_level": null
+              },
+              {
+                "name": "UI design",
+                "required": false,
+                "slug": "ui-design",
+                "your_level": null
+              }
+            ],
+            "contact": {
+              "display_name": "Divya Menon",
+              "id": 6,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "created_at": "2026-02-27T13:00:00Z",
+            "description": "Build screens in React with our designer.",
+            "distance_km": 5.83,
+            "duration_weeks": null,
+            "id": 66,
+            "is_open": true,
+            "is_team": false,
+            "kind": "internship",
+            "lat": 13.042590507024766,
+            "lng": 80.23541556147727,
+            "location": "OMR, Sholinganallur, Chennai",
+            "sector": "saas",
+            "skill_match": 0.96,
+            "starts_on": null,
+            "startup_id": 3,
+            "startup_logo": null,
+            "startup_name": "Pixelwave Labs",
+            "startup_verified": true,
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Frontend Intern"
+          }
+        ],
+        "next_offset": null
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "default",
+  "screen": "startup"
+}

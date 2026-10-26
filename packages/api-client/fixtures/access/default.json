@@ -1,0 +1,49 @@
+{
+  "calls": [
+    {
+      "hook": "useInviteLink",
+      "request": {
+        "method": "GET",
+        "path": "/api/invites"
+      },
+      "response": {
+        "items": [
+          {
+            "code": "<random>",
+            "link": "<random>",
+            "status": "available"
+          },
+          {
+            "code": "<random>",
+            "link": "<random>",
+            "status": "available"
+          },
+          {
+            "code": "<random>",
+            "link": "<random>",
+            "status": "available"
+          }
+        ]
+      },
+      "status": 200
+    },
+    {
+      "hook": "useConsent",
+      "request": {
+        "body": {
+          "policy_version": "2026-01"
+        },
+        "method": "POST",
+        "path": "/api/me/consent"
+      },
+      "response": {
+        "accepted_at": "2026-03-02T04:00:00Z",
+        "policy_version": "2026-01"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "default",
+  "screen": "access"
+}

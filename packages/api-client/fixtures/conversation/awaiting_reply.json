@@ -1,0 +1,95 @@
+{
+  "calls": [
+    {
+      "hook": "useInbox",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations?folder=requests"
+      },
+      "response": [
+        {
+          "id": 3,
+          "last_message": {
+            "body": "Hi, I am applying to the frontend internship. Happy to share my portfolio.",
+            "conversation_id": 3,
+            "created_at": "2026-03-02T03:30:00Z",
+            "id": 5,
+            "image": null,
+            "mine": true,
+            "read_at": null,
+            "removed": false
+          },
+          "last_message_at": "2026-03-02T03:30:00Z",
+          "other": {
+            "city": "Chennai",
+            "display_name": "Divya Menon",
+            "headline": "",
+            "id": 6,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          },
+          "started_by_me": true,
+          "status": "request",
+          "unread": 0
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useConversation",
+      "request": {
+        "method": "GET",
+        "path": "/api/conversations/3"
+      },
+      "response": {
+        "id": 3,
+        "last_message": {
+          "body": "Hi, I am applying to the frontend internship. Happy to share my portfolio.",
+          "conversation_id": 3,
+          "created_at": "2026-03-02T03:30:00Z",
+          "id": 5,
+          "image": null,
+          "mine": true,
+          "read_at": null,
+          "removed": false
+        },
+        "last_message_at": "2026-03-02T03:30:00Z",
+        "other": {
+          "city": "Chennai",
+          "display_name": "Divya Menon",
+          "headline": "",
+          "id": 6,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "started_by_me": true,
+        "status": "request",
+        "unread": 0
+      },
+      "status": 200
+    },
+    {
+      "hook": "useConversation",
+      "request": {
+        "body": {
+          "body": "Any update?"
+        },
+        "method": "POST",
+        "path": "/api/conversations/3/messages"
+      },
+      "response": {
+        "error": {
+          "code": "awaiting_reply",
+          "details": null,
+          "message": "Wait for a reply before sending more"
+        }
+      },
+      "status": 409
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "awaiting_reply",
+  "screen": "conversation"
+}

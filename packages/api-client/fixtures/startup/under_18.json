@@ -1,0 +1,78 @@
+{
+  "calls": [
+    {
+      "hook": "useStartup",
+      "request": {
+        "method": "GET",
+        "path": "/api/startups/3"
+      },
+      "response": {
+        "address": "OMR, Sholinganallur, Chennai",
+        "build_logs": [
+          {
+            "image": {
+              "alt_text": "Phone screen, Set up your studio, with two of four steps done and Pick your first campaign next",
+              "height": 1350,
+              "w1440": "https://storage.test/read/posts/post/6/seed4/w1440.webp?token=t",
+              "w480": "https://storage.test/read/posts/post/6/seed4/w480.webp?token=t",
+              "width": 1080
+            },
+            "post_id": 5
+          }
+        ],
+        "claimed": true,
+        "description": "Pixelwave Labs builds saas products for Indian customers.",
+        "founders": [
+          {
+            "connected": false,
+            "is_me": false,
+            "person": {
+              "display_name": "Divya Menon",
+              "id": 6,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "role": "founder",
+            "via": null
+          }
+        ],
+        "hiring": true,
+        "id": 3,
+        "interest_count": null,
+        "interested": false,
+        "is_team": false,
+        "lat": 13.042590507024766,
+        "lng": 80.23541556147727,
+        "logo": null,
+        "match_pct": 0,
+        "name": "Pixelwave Labs",
+        "open_jobs": [
+          {
+            "id": 66,
+            "kind": "internship",
+            "stipend_max": 15000,
+            "stipend_min": 10000,
+            "title": "Frontend Intern"
+          }
+        ],
+        "sector": "saas",
+        "source": "seed",
+        "stage": "prototype",
+        "team_size": null,
+        "tech_stack": [
+          "arduino",
+          "flutter",
+          "react"
+        ],
+        "verified": true,
+        "view_count": null,
+        "website_domain": "pixelwavelabs.in"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "under_18",
+  "screen": "startup"
+}

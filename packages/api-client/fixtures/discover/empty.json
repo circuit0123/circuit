@@ -1,0 +1,33 @@
+{
+  "calls": [
+    {
+      "hook": "useDiscoverPeople",
+      "request": {
+        "method": "GET",
+        "path": "/api/matches?limit=40"
+      },
+      "response": {
+        "count": 0,
+        "items": [],
+        "next_offset": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useDiscoverSearch",
+      "request": {
+        "method": "GET",
+        "path": "/api/search?q=zzzz"
+      },
+      "response": {
+        "jobs": [],
+        "people": [],
+        "startups": []
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "empty",
+  "screen": "discover"
+}

@@ -1,0 +1,1005 @@
+{
+  "calls": [
+    {
+      "hook": "useLiveWire",
+      "request": {
+        "method": "GET",
+        "path": "/api/livewire"
+      },
+      "response": [
+        {
+          "action": {
+            "kind": "view_role",
+            "target_id": 7
+          },
+          "actor": null,
+          "created_at": "2026-03-01T06:00:00Z",
+          "headline": "Pixelloop is hiring: Trainee – Social media",
+          "image": null,
+          "key": "job:7",
+          "kind": "hiring",
+          "reason": "Matches your skills in Graphic design · 10 km away",
+          "seen": false,
+          "startup": {
+            "id": 15,
+            "name": "Pixelloop"
+          }
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 106
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Imran Shaikh",
+            "headline": "",
+            "id": 106,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T00:00:00Z",
+          "headline": "Tried Figma for the first time. The auto layout clicked on day two.",
+          "image": {
+            "alt": "Figma window with a profile card selected and its auto layout settings: vertical, gap 8, padding 16",
+            "w1440": "https://storage.test/read/posts/post/106/seed14/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/post/106/seed14/w480.webp?token=t"
+          },
+          "key": "post:22",
+          "kind": "shipped",
+          "reason": "1 mutual connection · 24 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 103
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Suriya Nair",
+            "headline": "",
+            "id": 103,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-01T08:00:00Z",
+          "headline": "Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.",
+          "image": null,
+          "key": "post:11",
+          "kind": "shipped",
+          "reason": "1 mutual connection · 13 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 73
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Lavanya Reddy",
+            "headline": "",
+            "id": 73,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T04:00:00Z",
+          "headline": "Joined Kaveri Institute of Technology",
+          "image": null,
+          "key": "joined:1",
+          "kind": "joined",
+          "reason": "1 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 111
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Elango Pandian",
+            "headline": "",
+            "id": 111,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-01T08:00:00Z",
+          "headline": "Wrote my first cold email to a startup. Got a reply in an hour.",
+          "image": {
+            "alt": "Email reply from a startup founder asking for a 20 minute call tomorrow at 4 pm",
+            "w1440": "https://storage.test/read/posts/post/111/seed10/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/post/111/seed10/w480.webp?token=t"
+          },
+          "key": "post:14",
+          "kind": "shipped",
+          "reason": "under 1 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 64
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Priyanka Venkatesh",
+            "headline": "",
+            "id": 64,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T04:00:00Z",
+          "headline": "Joined Kaveri Institute of Technology",
+          "image": null,
+          "key": "joined:2",
+          "kind": "joined",
+          "reason": "10 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 10
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Ravi Kumar",
+            "headline": "",
+            "id": 10,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T02:00:00Z",
+          "headline": "Built a React Native attendance app for our department. First version works offline. Code is on GitHub, feedback welcome.",
+          "image": {
+            "alt": "Attendance app showing today's four classes, two present, one absent, one not marked, and an offline banner",
+            "w1440": "https://storage.test/read/posts/post/10/seed5/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/post/10/seed5/w480.webp?token=t"
+          },
+          "key": "post:6",
+          "kind": "shipped",
+          "reason": "14 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 71
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Bhavna Gupta",
+            "headline": "",
+            "id": 71,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T00:00:00Z",
+          "headline": "Finished the sensor wiring for our Arduino soil-moisture project. The pump switches on below 35%.",
+          "image": null,
+          "key": "post:15",
+          "kind": "shipped",
+          "reason": "11 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 97
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Balaji Thomas",
+            "headline": "",
+            "id": 97,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T00:00:00Z",
+          "headline": "Needs help with Mentoring: Looking for help with mentoring",
+          "image": null,
+          "key": "need:245",
+          "kind": "needs",
+          "reason": "16 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 79
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Harini Pillai",
+            "headline": "",
+            "id": 79,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-02T00:00:00Z",
+          "headline": "Needs help with Mentoring: Looking for help with mentoring",
+          "image": null,
+          "key": "need:214",
+          "kind": "needs",
+          "reason": "13 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 60
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Gokul Patel",
+            "headline": "",
+            "id": 60,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-01T19:00:00Z",
+          "headline": "Finished the sensor wiring for our Arduino soil-moisture project. The pump switches on below 35%.",
+          "image": {
+            "alt": "Serial monitor log of soil moisture readings; the pump turns on when moisture falls to 34%",
+            "w1440": "https://storage.test/read/posts/post/60/seed8/w1440.webp?token=t",
+            "w480": "https://storage.test/read/posts/post/60/seed8/w480.webp?token=t"
+          },
+          "key": "post:10",
+          "kind": "shipped",
+          "reason": "16 km away",
+          "seen": false,
+          "startup": null
+        },
+        {
+          "action": {
+            "kind": "intro",
+            "target_id": 110
+          },
+          "actor": {
+            "city": "Chennai",
+            "display_name": "Shruti Srinivasan",
+            "headline": "",
+            "id": 110,
+            "photo": null,
+            "role": "student",
+            "verification_level": 1
+          },
+          "created_at": "2026-03-01T13:00:00Z",
+          "headline": "Needs help with Accounting and bookkeeping: Looking for help with accounting and bookkeeping",
+          "image": null,
+          "key": "need:122",
+          "kind": "needs",
+          "reason": "24 km away",
+          "seen": false,
+          "startup": null
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useDailyDrop",
+      "request": {
+        "method": "GET",
+        "path": "/api/drop/today"
+      },
+      "response": {
+        "cards": [],
+        "date": "2026-03-02",
+        "done": false,
+        "next_drop_at": "2026-03-03T08:00:00+05:30"
+      },
+      "status": 200
+    },
+    {
+      "hook": "usePulse",
+      "request": {
+        "method": "GET",
+        "path": "/api/pulse"
+      },
+      "response": {
+        "caught_up": true,
+        "items": [
+          {
+            "activity": null,
+            "created_at": "2026-03-02T02:00:00Z",
+            "key": "post:6",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Ravi Kumar",
+                "headline": "",
+                "id": 10,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Built a React Native attendance app for our department. First version works offline. Code is on GitHub, feedback welcome.",
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "slug": "frontend-dev"
+                }
+              ],
+              "created_at": "2026-03-02T02:00:00Z",
+              "id": 6,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Attendance app showing today's four classes, two present, one absent, one not marked, and an offline banner",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/10/seed5/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/10/seed5/w480.webp?token=t",
+                  "width": 1080
+                },
+                {
+                  "alt_text": "Code editor showing the function that syncs saved attendance marks when the phone is back online",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/10/seed6/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/10/seed6/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-02T00:00:00Z",
+            "key": "post:22",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Imran Shaikh",
+                "headline": "",
+                "id": 106,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Tried Figma for the first time. The auto layout clicked on day two.",
+              "capabilities": [
+                {
+                  "name": "UI design",
+                  "slug": "ui-design"
+                }
+              ],
+              "created_at": "2026-03-02T00:00:00Z",
+              "id": 22,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Figma window with a profile card selected and its auto layout settings: vertical, gap 8, padding 16",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/106/seed14/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/106/seed14/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-02T00:00:00Z",
+            "key": "post:15",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Bhavna Gupta",
+                "headline": "",
+                "id": 71,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Finished the sensor wiring for our Arduino soil-moisture project. The pump switches on below 35%.",
+              "capabilities": [
+                {
+                  "name": "Embedded systems",
+                  "slug": "embedded-systems"
+                }
+              ],
+              "created_at": "2026-03-02T00:00:00Z",
+              "id": 15,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T19:00:00Z",
+            "key": "post:10",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Gokul Patel",
+                "headline": "",
+                "id": 60,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Finished the sensor wiring for our Arduino soil-moisture project. The pump switches on below 35%.",
+              "capabilities": [
+                {
+                  "name": "Embedded systems",
+                  "slug": "embedded-systems"
+                }
+              ],
+              "created_at": "2026-03-01T19:00:00Z",
+              "id": 10,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Serial monitor log of soil moisture readings; the pump turns on when moisture falls to 34%",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/60/seed8/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/60/seed8/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-02T00:00:00+05:30",
+            "key": "skills_in_demand:0",
+            "kind": "skills_in_demand",
+            "post": null,
+            "role": null,
+            "seen": false,
+            "skills_in_demand": {
+              "skills": [
+                {
+                  "name": "Backend development",
+                  "open_roles": 5,
+                  "slug": "backend-dev"
+                },
+                {
+                  "name": "Frontend development",
+                  "open_roles": 5,
+                  "slug": "frontend-dev"
+                },
+                {
+                  "name": "Embedded systems",
+                  "open_roles": 3,
+                  "slug": "embedded-systems"
+                }
+              ]
+            }
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T08:00:00Z",
+            "key": "post:14",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Elango Pandian",
+                "headline": "",
+                "id": 111,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Wrote my first cold email to a startup. Got a reply in an hour.",
+              "capabilities": [
+                {
+                  "name": "B2B / technical marketing",
+                  "slug": "b2b-marketing"
+                }
+              ],
+              "created_at": "2026-03-01T08:00:00Z",
+              "id": 14,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Email reply from a startup founder asking for a 20 minute call tomorrow at 4 pm",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/111/seed10/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/111/seed10/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T08:00:00Z",
+            "key": "post:11",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Suriya Nair",
+                "headline": "",
+                "id": 103,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.",
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "slug": "frontend-dev"
+                }
+              ],
+              "created_at": "2026-03-01T08:00:00Z",
+              "id": 11,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-03-01T06:00:00Z",
+            "key": "role:7",
+            "kind": "role",
+            "post": null,
+            "role": {
+              "applied": false,
+              "capabilities": [
+                {
+                  "name": "Social media",
+                  "required": true,
+                  "slug": "social-media",
+                  "your_level": null
+                },
+                {
+                  "name": "Performance marketing",
+                  "required": false,
+                  "slug": "performance-marketing",
+                  "your_level": null
+                },
+                {
+                  "name": "Graphic design",
+                  "required": false,
+                  "slug": "graphic-design",
+                  "your_level": null
+                }
+              ],
+              "contact": {
+                "display_name": "Keerthana Narayanan",
+                "id": 20,
+                "photo": null,
+                "role": "founder",
+                "verification_level": 1
+              },
+              "created_at": "2026-03-01T06:00:00Z",
+              "description": "",
+              "distance_km": 10.17,
+              "duration_weeks": null,
+              "id": 7,
+              "is_open": true,
+              "is_team": false,
+              "kind": "full_time",
+              "lat": 13.108901517658738,
+              "lng": 80.217011916401,
+              "location": "Anna Nagar, Chennai",
+              "sector": "d2c",
+              "skill_match": 0.08,
+              "starts_on": null,
+              "startup_id": 15,
+              "startup_logo": null,
+              "startup_name": "Pixelloop",
+              "startup_verified": true,
+              "stipend_max": 12000,
+              "stipend_min": 8000,
+              "title": "Trainee – Social media"
+            },
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-28T02:00:00Z",
+            "key": "post:19",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Karthik Chandrasekar",
+                "headline": "",
+                "id": 93,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Wrote my first cold email to a startup. Got a reply in an hour.",
+              "capabilities": [
+                {
+                  "name": "B2B / technical marketing",
+                  "slug": "b2b-marketing"
+                }
+              ],
+              "created_at": "2026-02-28T02:00:00Z",
+              "id": 19,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-28T02:00:00Z",
+            "key": "post:16",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Saravanan Thomas",
+                "headline": "",
+                "id": 89,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Our hackathon team shipped a bus-timing app in 24 hours. Slept 3.",
+              "capabilities": [
+                {
+                  "name": "Frontend development",
+                  "slug": "frontend-dev"
+                }
+              ],
+              "created_at": "2026-02-28T02:00:00Z",
+              "id": 16,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "App screen listing the next five buses at Hostel Gate with minutes to arrival",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/89/seed11/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/89/seed11/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-28T02:00:00Z",
+            "key": "post:13",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Varun Annamalai",
+                "headline": "",
+                "id": 55,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Learning SQL by cleaning our college library's CSV. 400 duplicate rows so far.",
+              "capabilities": [],
+              "created_at": "2026-02-28T02:00:00Z",
+              "id": 13,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "organisation"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-26T10:00:00Z",
+            "key": "post:12",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Yamini Krishnan",
+                "headline": "",
+                "id": 54,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Tried Figma for the first time. The auto layout clicked on day two.",
+              "capabilities": [
+                {
+                  "name": "UI design",
+                  "slug": "ui-design"
+                }
+              ],
+              "created_at": "2026-02-26T10:00:00Z",
+              "id": 12,
+              "link": "",
+              "media": [
+                {
+                  "alt_text": "Figma window with a profile card selected and its auto layout settings: vertical, gap 8, padding 16",
+                  "height": 1350,
+                  "w1440": "https://storage.test/read/posts/post/54/seed9/w1440.webp?token=t",
+                  "w480": "https://storage.test/read/posts/post/54/seed9/w480.webp?token=t",
+                  "width": 1080
+                }
+              ],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          },
+          {
+            "activity": null,
+            "created_at": "2026-02-25T04:00:00Z",
+            "key": "post:17",
+            "kind": "post",
+            "post": {
+              "author": {
+                "city": "Chennai",
+                "display_name": "Harini Pillai",
+                "headline": "",
+                "id": 79,
+                "photo": null,
+                "role": "student",
+                "verification_level": 1
+              },
+              "body": "Tried Figma for the first time. The auto layout clicked on day two.",
+              "capabilities": [
+                {
+                  "name": "UI design",
+                  "slug": "ui-design"
+                }
+              ],
+              "created_at": "2026-02-25T04:00:00Z",
+              "id": 17,
+              "link": "",
+              "media": [],
+              "my_reactions": [],
+              "private_stats": null,
+              "status": "visible",
+              "visibility": "everyone"
+            },
+            "role": null,
+            "seen": false,
+            "skills_in_demand": null
+          }
+        ],
+        "next_cursor": null
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMatches",
+      "request": {
+        "method": "GET",
+        "path": "/api/matches"
+      },
+      "response": {
+        "count": 8,
+        "items": [
+          {
+            "candidate_id": 96,
+            "capabilities": [
+              "Operations",
+              "Data science"
+            ],
+            "city": "Chennai",
+            "display_name": "Zoya Narayanan",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer operations and you offer graphic design. You both deal with remote-friendly.",
+            "role": "student",
+            "sector": null,
+            "strength": "good",
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 219,
+            "capabilities": [
+              "Embedded systems",
+              "Accounting and bookkeeping"
+            ],
+            "city": "Chennai",
+            "display_name": "Bhavna Pillai",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You offer graphic design, which they need. You both deal with first-time founder. You are already connected.",
+            "role": "student",
+            "sector": null,
+            "strength": null,
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 176,
+            "capabilities": [
+              "Operations",
+              "Biotech lab work"
+            ],
+            "city": "Chennai",
+            "display_name": "Divya Menon",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "They offer operations, which you need. You both deal with first-time founder, remote-friendly. You are already connected.",
+            "role": "student",
+            "sector": null,
+            "strength": null,
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 111,
+            "capabilities": [
+              "Operations",
+              "DevOps and cloud"
+            ],
+            "city": "Chennai",
+            "display_name": "Elango Pandian",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You can help each other: they offer operations and you offer market research.",
+            "role": "student",
+            "sector": null,
+            "strength": null,
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 89,
+            "capabilities": [
+              "Graphic design",
+              "Content marketing"
+            ],
+            "city": "Chennai",
+            "display_name": "Saravanan Thomas",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You offer market research, which they need. You both deal with first-time founder.",
+            "role": "student",
+            "sector": null,
+            "strength": null,
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 66,
+            "capabilities": [
+              "Backend development",
+              "Data science"
+            ],
+            "city": "Chennai",
+            "display_name": "Fathima Shaikh",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You offer market research, which they need.",
+            "role": "student",
+            "sector": null,
+            "strength": null,
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 101,
+            "capabilities": [
+              "Data science",
+              "UI design"
+            ],
+            "city": "Chennai",
+            "display_name": "Hemalatha Chandrasekar",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "You offer market research, which they need.",
+            "role": "student",
+            "sector": null,
+            "strength": null,
+            "verification_level": 1
+          },
+          {
+            "candidate_id": 64,
+            "capabilities": [
+              "Video production",
+              "Operations"
+            ],
+            "city": "Chennai",
+            "display_name": "Priyanka Venkatesh",
+            "headline": "",
+            "is_bridge": false,
+            "photo": null,
+            "reason": "They offer operations, which you need.",
+            "role": "student",
+            "sector": null,
+            "strength": null,
+            "verification_level": 1
+          }
+        ],
+        "next_offset": null
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "under_18",
+  "screen": "home"
+}

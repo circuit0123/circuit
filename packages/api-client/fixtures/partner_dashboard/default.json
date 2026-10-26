@@ -1,0 +1,573 @@
+{
+  "calls": [
+    {
+      "hook": "useDashboard",
+      "request": {
+        "method": "GET",
+        "path": "/api/dashboard/gaps"
+      },
+      "response": [
+        {
+          "capability": "mentoring",
+          "category": "people",
+          "is_gap": true,
+          "name": "Mentoring",
+          "needed_by": {
+            "hidden": false,
+            "value": 19
+          },
+          "offered_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 34
+          }
+        },
+        {
+          "capability": "regulatory-affairs",
+          "category": "legal",
+          "is_gap": true,
+          "name": "Regulatory affairs",
+          "needed_by": {
+            "hidden": false,
+            "value": 9
+          },
+          "offered_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_outside": {
+            "hidden": true,
+            "value": null
+          }
+        },
+        {
+          "capability": "ux-design",
+          "category": "design",
+          "is_gap": false,
+          "name": "UX design",
+          "needed_by": {
+            "hidden": false,
+            "value": 5
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 5
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 23
+          }
+        },
+        {
+          "capability": "frontend-dev",
+          "category": "engineering",
+          "is_gap": false,
+          "name": "Frontend development",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 5
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 22
+          }
+        },
+        {
+          "capability": "market-research",
+          "category": "strategy",
+          "is_gap": false,
+          "name": "Market research",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 6
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 11
+          }
+        },
+        {
+          "capability": "biotech-lab",
+          "category": "domain",
+          "is_gap": false,
+          "name": "Biotech lab work",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 5
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 25
+          }
+        },
+        {
+          "capability": "content-marketing",
+          "category": "marketing",
+          "is_gap": false,
+          "name": "Content marketing",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 7
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 18
+          }
+        },
+        {
+          "capability": "machine-learning",
+          "category": "engineering",
+          "is_gap": false,
+          "name": "Machine learning",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 6
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 20
+          }
+        },
+        {
+          "capability": "mobile-dev",
+          "category": "engineering",
+          "is_gap": false,
+          "name": "Mobile development",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 7
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 21
+          }
+        },
+        {
+          "capability": "performance-marketing",
+          "category": "marketing",
+          "is_gap": false,
+          "name": "Performance marketing",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 6
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 26
+          }
+        },
+        {
+          "capability": "seo",
+          "category": "marketing",
+          "is_gap": false,
+          "name": "SEO",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 6
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 16
+          }
+        },
+        {
+          "capability": "video-production",
+          "category": "design",
+          "is_gap": false,
+          "name": "Video production",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 7
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 18
+          }
+        },
+        {
+          "capability": "backend-dev",
+          "category": "engineering",
+          "is_gap": false,
+          "name": "Backend development",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 7
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 24
+          }
+        },
+        {
+          "capability": "graphic-design",
+          "category": "design",
+          "is_gap": false,
+          "name": "Graphic design",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 10
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 14
+          }
+        },
+        {
+          "capability": "accounting",
+          "category": "finance",
+          "is_gap": false,
+          "name": "Accounting and bookkeeping",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 11
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 27
+          }
+        },
+        {
+          "capability": "qa-testing",
+          "category": "engineering",
+          "is_gap": false,
+          "name": "QA and testing",
+          "needed_by": {
+            "hidden": true,
+            "value": null
+          },
+          "offered_by": {
+            "hidden": false,
+            "value": 13
+          },
+          "offered_outside": {
+            "hidden": false,
+            "value": 19
+          }
+        }
+      ],
+      "status": 200
+    },
+    {
+      "hook": "useDashboard",
+      "request": {
+        "method": "GET",
+        "path": "/api/dashboard/heatmap"
+      },
+      "response": {
+        "capability": null,
+        "cell_degrees": 0.02,
+        "cells": [
+          {
+            "count": 5,
+            "lat": 12.92,
+            "lng": 80.32
+          },
+          {
+            "count": 7,
+            "lat": 13.0,
+            "lng": 80.28
+          },
+          {
+            "count": 10,
+            "lat": 13.04,
+            "lng": 80.26
+          }
+        ]
+      },
+      "status": 200
+    },
+    {
+      "hook": "useDashboard",
+      "request": {
+        "method": "GET",
+        "path": "/api/dashboard/network"
+      },
+      "response": {
+        "applications": {
+          "hidden": true,
+          "value": null
+        },
+        "circuits_completed": {
+          "hidden": true,
+          "value": null
+        },
+        "intros_accepted": {
+          "hidden": true,
+          "value": null
+        },
+        "intros_requested": {
+          "hidden": true,
+          "value": null
+        },
+        "members": {
+          "hidden": false,
+          "value": 61
+        },
+        "members_with_matches": {
+          "hidden": false,
+          "value": 61
+        },
+        "new_members_30d": {
+          "hidden": false,
+          "value": 61
+        }
+      },
+      "status": 200
+    },
+    {
+      "hook": "useDashboard",
+      "request": {
+        "method": "GET",
+        "path": "/api/dashboard/acceptance"
+      },
+      "response": {
+        "bridge": {
+          "accepted": {
+            "hidden": true,
+            "value": null
+          },
+          "rate_percent": null,
+          "requested": {
+            "hidden": true,
+            "value": null
+          }
+        },
+        "local": {
+          "accepted": {
+            "hidden": true,
+            "value": null
+          },
+          "rate_percent": null,
+          "requested": {
+            "hidden": true,
+            "value": null
+          }
+        }
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOrganisation",
+      "request": {
+        "method": "GET",
+        "path": "/api/organisations/mine"
+      },
+      "response": {
+        "city": "Chennai",
+        "id": 1,
+        "join_code": "KIT-PILOT-2026",
+        "kind": "college",
+        "name": "Kaveri Institute of Technology"
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOrganisation",
+      "request": {
+        "method": "GET",
+        "path": "/api/organisations/mine/members"
+      },
+      "response": {
+        "count": 21,
+        "items": [
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Ravi Kumar",
+            "id": 10,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Karthik Pillai",
+            "id": 52,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Varun Annamalai",
+            "id": 55,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Balaji Thomas",
+            "id": 58,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Gokul Gupta",
+            "id": 61,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Priyanka Venkatesh",
+            "id": 64,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Gokul Natarajan",
+            "id": 67,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Varun Khan",
+            "id": 70,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Lavanya Reddy",
+            "id": 73,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Rahul Pillai",
+            "id": 76,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Harini Pillai",
+            "id": 79,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Aditya Annamalai",
+            "id": 82,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Arjun Menon",
+            "id": 85,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Deepak Thomas",
+            "id": 88,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Yamini Sharma",
+            "id": 91,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Sakthi Patel",
+            "id": 94,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Balaji Thomas",
+            "id": 97,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Dinesh Sundaram",
+            "id": 100,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Suriya Nair",
+            "id": 103,
+            "role": "student",
+            "verification_level": 1
+          },
+          {
+            "college": "Kaveri Institute of Technology",
+            "display_name": "Imran Shaikh",
+            "id": 106,
+            "role": "student",
+            "verification_level": 1
+          }
+        ],
+        "next_offset": 20
+      },
+      "status": 200
+    }
+  ],
+  "persona": "meenakshi",
+  "scenario": "default",
+  "screen": "partner_dashboard"
+}

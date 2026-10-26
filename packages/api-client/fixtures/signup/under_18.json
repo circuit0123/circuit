@@ -1,0 +1,145 @@
+{
+  "calls": [
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "answers": {
+            "age": {
+              "adult": false
+            }
+          },
+          "current_step": "age"
+        },
+        "method": "PATCH",
+        "path": "/api/onboarding/state"
+      },
+      "response": {
+        "answers": {
+          "age": {
+            "adult": false
+          }
+        },
+        "branch": "default",
+        "completed_at": null,
+        "current_step": "age",
+        "signup_source": "",
+        "skip": [
+          "invite"
+        ],
+        "steps": [
+          "invite",
+          "name",
+          "role",
+          "age",
+          "safety",
+          "where",
+          "work",
+          "offers",
+          "needs",
+          "organisation",
+          "photo",
+          "colour",
+          "ready"
+        ]
+      },
+      "status": 200
+    },
+    {
+      "hook": "useMe",
+      "request": {
+        "method": "GET",
+        "path": "/api/me"
+      },
+      "response": {
+        "allow_requests": false,
+        "appearance": {
+          "accent": "emerald",
+          "swipe_tabs": true,
+          "theme": "system"
+        },
+        "beta_access": true,
+        "bio": "",
+        "circuits_opt_in": false,
+        "city": "",
+        "college": "",
+        "display_name": "",
+        "has_needs_and_offers": false,
+        "id": 303,
+        "is_minor": true,
+        "lat": null,
+        "lng": null,
+        "needs_consent": false,
+        "open_intro_slots": 2,
+        "organisation_id": null,
+        "photo": null,
+        "policy_version": "2026-01",
+        "profile_visibility": "hidden",
+        "read_receipts": false,
+        "role": "student",
+        "startup_id": null,
+        "verification_level": 1,
+        "visible_to_org": false
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "method": "GET",
+        "path": "/api/onboarding/state"
+      },
+      "response": {
+        "answers": {
+          "age": {
+            "adult": false
+          }
+        },
+        "branch": "default",
+        "completed_at": null,
+        "current_step": "age",
+        "signup_source": "",
+        "skip": [
+          "invite"
+        ],
+        "steps": [
+          "invite",
+          "name",
+          "role",
+          "age",
+          "safety",
+          "where",
+          "work",
+          "offers",
+          "needs",
+          "organisation",
+          "photo",
+          "colour",
+          "ready"
+        ]
+      },
+      "status": 200
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "profile_visibility": "public"
+        },
+        "method": "PATCH",
+        "path": "/api/me/privacy"
+      },
+      "response": {
+        "error": {
+          "code": "under_18_restricted",
+          "details": null,
+          "message": "Members under 18 keep a private profile and cannot open requests to strangers"
+        }
+      },
+      "status": 403
+    }
+  ],
+  "persona": "custom",
+  "scenario": "under_18",
+  "screen": "signup"
+}

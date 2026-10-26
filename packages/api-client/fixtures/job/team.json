@@ -1,0 +1,60 @@
+{
+  "calls": [
+    {
+      "hook": "useJob",
+      "request": {
+        "method": "GET",
+        "path": "/api/jobs/66"
+      },
+      "response": {
+        "applied": null,
+        "capabilities": [
+          {
+            "name": "Frontend development",
+            "required": true,
+            "slug": "frontend-dev",
+            "your_level": null
+          },
+          {
+            "name": "UI design",
+            "required": false,
+            "slug": "ui-design",
+            "your_level": null
+          }
+        ],
+        "contact": {
+          "display_name": "Divya Menon",
+          "id": 6,
+          "photo": null,
+          "role": "founder",
+          "verification_level": 2
+        },
+        "created_at": "2026-02-27T13:00:00Z",
+        "description": "Build screens in React with our designer.",
+        "distance_km": null,
+        "duration_weeks": null,
+        "id": 66,
+        "is_open": true,
+        "is_team": true,
+        "kind": "internship",
+        "lat": 13.042590507024766,
+        "lng": 80.23541556147727,
+        "location": "OMR, Sholinganallur, Chennai",
+        "sector": "saas",
+        "skill_match": null,
+        "starts_on": null,
+        "startup_id": 3,
+        "startup_logo": null,
+        "startup_name": "Pixelwave Labs",
+        "startup_verified": true,
+        "stipend_max": 15000,
+        "stipend_min": 10000,
+        "title": "Frontend Intern"
+      },
+      "status": 200
+    }
+  ],
+  "persona": "custom",
+  "scenario": "team",
+  "screen": "job"
+}

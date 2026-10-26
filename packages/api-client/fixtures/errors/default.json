@@ -1,0 +1,107 @@
+{
+  "calls": [
+    {
+      "hook": "useStartup",
+      "request": {
+        "method": "GET",
+        "path": "/api/startups/999999"
+      },
+      "response": {
+        "error": {
+          "code": "not_found",
+          "details": null,
+          "message": "Not found"
+        }
+      },
+      "status": 404
+    },
+    {
+      "hook": "useOnboarding",
+      "request": {
+        "body": {
+          "not_a_field": 1
+        },
+        "method": "PATCH",
+        "path": "/api/me"
+      },
+      "response": {
+        "error": {
+          "code": "validation_error",
+          "details": [
+            {
+              "loc": [
+                "body",
+                "body",
+                "not_a_field"
+              ],
+              "msg": "Extra inputs are not permitted",
+              "type": "extra_forbidden"
+            }
+          ],
+          "message": "Invalid request"
+        }
+      },
+      "status": 422
+    },
+    {
+      "hook": "useDiscoverSearch",
+      "request": {
+        "method": "GET",
+        "path": "/api/search?q=a"
+      },
+      "response": {
+        "error": {
+          "code": "validation_error",
+          "details": [
+            {
+              "ctx": {
+                "min_length": 2
+              },
+              "loc": [
+                "query",
+                "q"
+              ],
+              "msg": "String should have at least 2 characters",
+              "type": "string_too_short"
+            }
+          ],
+          "message": "Invalid request"
+        }
+      },
+      "status": 422
+    },
+    {
+      "hook": "useApply",
+      "request": {
+        "method": "POST",
+        "path": "/api/jobs/999999/apply"
+      },
+      "response": {
+        "error": {
+          "code": "not_found",
+          "details": null,
+          "message": "Not found"
+        }
+      },
+      "status": 404
+    },
+    {
+      "hook": "useConversation",
+      "request": {
+        "method": "POST",
+        "path": "/api/conversations/999999/accept"
+      },
+      "response": {
+        "error": {
+          "code": "not_found",
+          "details": null,
+          "message": "Not found"
+        }
+      },
+      "status": 404
+    }
+  ],
+  "persona": "ravi",
+  "scenario": "default",
+  "screen": "errors"
+}

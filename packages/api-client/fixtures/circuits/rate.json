@@ -1,0 +1,330 @@
+{
+  "calls": [
+    {
+      "hook": "useRateHandover",
+      "request": {
+        "body": {
+          "rating": 5
+        },
+        "method": "POST",
+        "path": "/api/circuits/1/legs/2/rating"
+      },
+      "response": {
+        "consent_deadline": "2026-03-05T04:00:00Z",
+        "created_at": "2026-03-02T04:00:00Z",
+        "helps_you": {
+          "capability": "Fundraising",
+          "person": {
+            "display_name": "Arjun Mehta",
+            "id": 3,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          }
+        },
+        "id": 1,
+        "legs": [
+          {
+            "can_mark_done": false,
+            "can_rate": false,
+            "capability": "Hiring and recruiting",
+            "consent": "accepted",
+            "fulfilled": false,
+            "giver": {
+              "display_name": "Asha Raman",
+              "id": 1,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "i_give": false,
+            "i_receive": false,
+            "id": 1,
+            "rated": false,
+            "rating": null,
+            "receiver": {
+              "display_name": "Arjun Mehta",
+              "id": 3,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            }
+          },
+          {
+            "can_mark_done": false,
+            "can_rate": false,
+            "capability": "Fundraising",
+            "consent": "accepted",
+            "fulfilled": true,
+            "giver": {
+              "display_name": "Arjun Mehta",
+              "id": 3,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "i_give": false,
+            "i_receive": true,
+            "id": 2,
+            "rated": true,
+            "rating": 5,
+            "receiver": {
+              "display_name": "Priya Nair",
+              "id": 2,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            }
+          },
+          {
+            "can_mark_done": true,
+            "can_rate": false,
+            "capability": "Brand marketing",
+            "consent": "accepted",
+            "fulfilled": false,
+            "giver": {
+              "display_name": "Priya Nair",
+              "id": 2,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            },
+            "i_give": true,
+            "i_receive": false,
+            "id": 3,
+            "rated": false,
+            "rating": null,
+            "receiver": {
+              "display_name": "Asha Raman",
+              "id": 1,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            }
+          }
+        ],
+        "members": [
+          {
+            "consent": "accepted",
+            "done": false,
+            "is_me": false,
+            "person": {
+              "display_name": "Asha Raman",
+              "id": 1,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            }
+          },
+          {
+            "consent": "accepted",
+            "done": true,
+            "is_me": false,
+            "person": {
+              "display_name": "Arjun Mehta",
+              "id": 3,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            }
+          },
+          {
+            "consent": "accepted",
+            "done": false,
+            "is_me": true,
+            "person": {
+              "display_name": "Priya Nair",
+              "id": 2,
+              "photo": null,
+              "role": "founder",
+              "verification_level": 2
+            }
+          }
+        ],
+        "my_consent": "accepted",
+        "next_step": "mark_done",
+        "score_percent": 38,
+        "status": "active",
+        "time_left_seconds": null,
+        "week": "2026-W10",
+        "you_help": {
+          "capability": "Brand marketing",
+          "person": {
+            "display_name": "Asha Raman",
+            "id": 1,
+            "photo": null,
+            "role": "founder",
+            "verification_level": 2
+          }
+        }
+      },
+      "status": 200
+    },
+    {
+      "hook": "useCircuits",
+      "request": {
+        "method": "GET",
+        "path": "/api/circuits"
+      },
+      "response": {
+        "count": 1,
+        "items": [
+          {
+            "consent_deadline": "2026-03-05T04:00:00Z",
+            "created_at": "2026-03-02T04:00:00Z",
+            "helps_you": {
+              "capability": "Fundraising",
+              "person": {
+                "display_name": "Arjun Mehta",
+                "id": 3,
+                "photo": null,
+                "role": "founder",
+                "verification_level": 2
+              }
+            },
+            "id": 1,
+            "legs": [
+              {
+                "can_mark_done": false,
+                "can_rate": false,
+                "capability": "Hiring and recruiting",
+                "consent": "accepted",
+                "fulfilled": false,
+                "giver": {
+                  "display_name": "Asha Raman",
+                  "id": 1,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                },
+                "i_give": false,
+                "i_receive": false,
+                "id": 1,
+                "rated": false,
+                "rating": null,
+                "receiver": {
+                  "display_name": "Arjun Mehta",
+                  "id": 3,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                }
+              },
+              {
+                "can_mark_done": false,
+                "can_rate": false,
+                "capability": "Fundraising",
+                "consent": "accepted",
+                "fulfilled": true,
+                "giver": {
+                  "display_name": "Arjun Mehta",
+                  "id": 3,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                },
+                "i_give": false,
+                "i_receive": true,
+                "id": 2,
+                "rated": true,
+                "rating": 5,
+                "receiver": {
+                  "display_name": "Priya Nair",
+                  "id": 2,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                }
+              },
+              {
+                "can_mark_done": true,
+                "can_rate": false,
+                "capability": "Brand marketing",
+                "consent": "accepted",
+                "fulfilled": false,
+                "giver": {
+                  "display_name": "Priya Nair",
+                  "id": 2,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                },
+                "i_give": true,
+                "i_receive": false,
+                "id": 3,
+                "rated": false,
+                "rating": null,
+                "receiver": {
+                  "display_name": "Asha Raman",
+                  "id": 1,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                }
+              }
+            ],
+            "members": [
+              {
+                "consent": "accepted",
+                "done": false,
+                "is_me": false,
+                "person": {
+                  "display_name": "Asha Raman",
+                  "id": 1,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                }
+              },
+              {
+                "consent": "accepted",
+                "done": true,
+                "is_me": false,
+                "person": {
+                  "display_name": "Arjun Mehta",
+                  "id": 3,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                }
+              },
+              {
+                "consent": "accepted",
+                "done": false,
+                "is_me": true,
+                "person": {
+                  "display_name": "Priya Nair",
+                  "id": 2,
+                  "photo": null,
+                  "role": "founder",
+                  "verification_level": 2
+                }
+              }
+            ],
+            "my_consent": "accepted",
+            "next_step": "mark_done",
+            "score_percent": 38,
+            "status": "active",
+            "time_left_seconds": null,
+            "week": "2026-W10",
+            "you_help": {
+              "capability": "Brand marketing",
+              "person": {
+                "display_name": "Asha Raman",
+                "id": 1,
+                "photo": null,
+                "role": "founder",
+                "verification_level": 2
+              }
+            }
+          }
+        ],
+        "next_offset": null
+      },
+      "status": 200
+    }
+  ],
+  "persona": "priya",
+  "scenario": "rate",
+  "screen": "circuits"
+}
