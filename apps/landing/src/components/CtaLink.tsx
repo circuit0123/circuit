@@ -1,7 +1,7 @@
 "use client";
 
 import { LinkButton, type ButtonVariant } from "@circuit/ui/Button";
-import { JOIN_LIVE, joinUrl, type Role } from "@/lib/env";
+import { JOIN_LIVE, joinUrl, WAITLIST_MODE, waitlistUrl, type Role } from "@/lib/env";
 import { chooseRole } from "@/lib/join";
 import { useSrc } from "@/lib/src";
 
@@ -18,13 +18,14 @@ type Props = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
 };
 
 /**
- * A call to action. With NEXT_PUBLIC_JOIN_LIVE on it links into the app's join screen with the role pre-set:
+ * A call to action. In waitlist mode (NEXT_PUBLIC_LAUNCH_MODE=waitlist) it always opens `WAITLIST_URL?role=<role>&src=<src>`. Otherwise, with NEXT_PUBLIC_JOIN_LIVE on it links into the app's join screen with the role pre-set:
  * `APP_URL/join?role=<role>&src=<src>`. Otherwise it is an anchor to the form on the same page (works without JavaScript); a click also
  * remembers the role so the form can preselect it and focus its first field. The look and the label are the same either way.
  */
 export function CtaLink({ src, role, button, form = "waitlist", toForm, onClick, children, ...rest }: Props) {
-  const href = joinUrl(useSrc(src), role);
-  const toTheForm = toForm || !JOIN_LIVE;
+  const label = useSrc(src);
+  const href = WAITLIST_MODE ? waitlistUrl(label, role) : joinUrl(label, role);
+  const toTheForm = !WAITLIST_MODE && (toForm || !JOIN_LIVE);
   const props = toTheForm
     ? {
         href: `#${form}`,

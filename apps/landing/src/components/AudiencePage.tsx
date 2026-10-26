@@ -1,7 +1,7 @@
 import { INVITE_ONLY } from "@/content/home";
 import { page } from "@/content/pages";
 import type { Slug } from "@/content/types";
-import { JOIN_LIVE } from "@/lib/env";
+import { JOIN_LIVE, WAITLIST_MODE } from "@/lib/env";
 import { flagOn, getFeatures } from "@/lib/features";
 import { CtaLink } from "./CtaLink";
 import { Container } from "./Container";
@@ -41,9 +41,9 @@ export async function AudiencePage({ slug }: { slug: Slug }) {
   const p = page(slug);
   const features = await getFeatures();
   const src = `landing-${slug}`;
-  const waitlistOnly = slug === "investors" && !flagOn(features, "investor_mode");
-  const contactOnly = slug === "partners" && (!flagOn(features, "partner_mode") || !JOIN_LIVE);
-  const waitlistSection = !JOIN_LIVE && !waitlistOnly && slug !== "partners";
+  const waitlistOnly = !WAITLIST_MODE && slug === "investors" && !flagOn(features, "investor_mode");
+  const contactOnly = slug === "partners" && (WAITLIST_MODE || !flagOn(features, "partner_mode") || !JOIN_LIVE);
+  const waitlistSection = (WAITLIST_MODE || !JOIN_LIVE) && !waitlistOnly && slug !== "partners";
   const formId = contactOnly ? "partner-form" : "waitlist";
 
   return (
