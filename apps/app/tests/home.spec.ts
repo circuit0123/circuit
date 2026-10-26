@@ -241,3 +241,84 @@ test.describe("Home: accessibility", () => {
     }
   });
 });
+
+test("on a phone the picture comes first, edge to edge (DESIGN.md §4 Build log)", async ({ page }, info) => {
+  test.skip(!isPhone(info), "phone layout");
+  await open(page);
+  const post = page.getByRole("region", { name: "Pulse" }).locator("[data-feed-item]").first();
+  const text = (await post.locator("p.t-body").first().boundingBox())!;
+  const picture = (await post.locator("img").first().boundingBox())!;
+  expect(picture.y).toBeLessThan(text.y);
+  expect(picture.width).toBe(375);
+});
+
+test.describe("Desktop Home (Desktop.dc.html)", () => {
+  test.beforeEach(async ({}, info) => { test.skip(isPhone(info), "desktop layout"); });
+  const rail = (page: Page) => page.locator("aside").filter({ has: page.getByRole("navigation", { name: "Main" }) });
+
+  test("left rail: logo, 48px rows with the current one filled, New build log, notifications", async ({ page }) => {
+    await open(page);
+    const r = rail(page);
+    await expect(r.getByRole("link", { name: "Circuit, Home" })).toBeVisible();
+    const rows = r.getByRole("navigation", { name: "Main" }).getByRole("link");
+    await expect(rows).toHaveText(["Home", "Discover", "Inbox", "Profile"]);
+    for (const row of await rows.all()) expect((await row.boundingBox())!.height).toBe(48);
+    await expect(rows.first()).toHaveAttribute("aria-current", "page");
+    expect(await rows.first().evaluate((e) => getComputedStyle(e).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+    expect(await rows.nth(1).evaluate((e) => getComputedStyle(e).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
+    await expect(r.getByRole("button", { name: "New build log" })).toBeVisible();
+    await expect(r.getByRole("link", { name: /^Notifications/ })).toBeVisible();
+    expect((await r.boundingBox())!.width).toBe(240);
+  });
+
+  test("centre column is at most 600px, the Daily Drop rail at most 340px, 56px apart, and nothing else beside them", async ({ page }) => {
+    await open(page);
+    const column = (await page.locator("main").boundingBox())!;
+    const drop = (await page.getByRole("complementary", { name: "For you" }).boundingBox())!;
+    expect(column.width).toBeLessThanOrEqual(600);
+    expect(drop.width).toBeLessThanOrEqual(340);
+    expect(drop.width).toBeGreaterThanOrEqual(280);
+    expect(Math.round(drop.x - (column.x + column.width))).toBe(56);
+    await expect(page.getByRole("complementary", { name: "For you" }).getByRole("region", { name: "Daily Drop" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Today", level: 1 })).toHaveCSS("font-size", "36px");
+  });
+
+  test("on desktop the words come before the picture, then the reactions", async ({ page }) => {
+    await open(page);
+    const post = page.getByRole("region", { name: "Pulse" }).locator("[data-feed-item]").first();
+    const text = (await post.locator("p.t-body").first().boundingBox())!;
+    const picture = (await post.locator("img").first().boundingBox())!;
+    expect(text.y).toBeLessThan(picture.y);
+    const reactions = (await post.getByRole("group", { name: "React" }).boundingBox())!;
+    expect(reactions.y).toBeGreaterThan(picture.y + picture.height - 1);
+  });
+
+  test("Pulse off: the Daily Drop is the centre column and there is no rail, no New build log", async ({ page }) => {
+    await open(page, "pulse_off");
+    await expect(page.getByRole("complementary", { name: "For you" })).toHaveCount(0);
+    await expect(page.locator("main").getByRole("region", { name: "Daily Drop" })).toBeVisible();
+    await expect(rail(page).getByRole("button", { name: "New build log" })).toHaveCount(0);
+  });
+
+  test("Daily Drop off: no empty rail is left behind", async ({ page }) => {
+    await open(page, "drop_off");
+    await expect(page.getByRole("complementary", { name: "For you" })).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Pulse" })).toBeVisible();
+    const column = (await page.locator("main").boundingBox())!;
+    expect(column.width).toBeLessThanOrEqual(600);
+  });
+
+  test("both off: the empty state and still the rail", async ({ page }) => {
+    await open(page, "home_off");
+    await expect(page.getByText("Nothing on Home right now.")).toBeVisible();
+    await expect(rail(page).getByRole("navigation", { name: "Main" })).toBeVisible();
+  });
+
+  test("axe and overflow at 1280 and 1440, both themes", async ({ page }) => {
+    for (const width of [1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await open(page);
+      await inBothThemes(page, async (theme) => { await checkPage(page, `desktop home ${width} ${theme}`); });
+    }
+  });
+});

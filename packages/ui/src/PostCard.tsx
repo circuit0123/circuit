@@ -40,8 +40,9 @@ export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, hideRe
           <MoreHorizontal size={20} strokeWidth={1.75} />
         </button>
       </header>
-      <div className="lg:overflow-hidden lg:rounded-card"><MediaPager media={post.media} priority={priority} /></div>
-      <div className="flex flex-col gap-3 px-4 lg:px-0">
+      {/* On a phone the picture comes first and runs edge to edge; on desktop the words come first (Desktop.dc.html). */}
+      <div className="order-2 lg:order-3 lg:overflow-hidden lg:rounded-card"><MediaPager media={post.media} priority={priority} /></div>
+      <div className="order-3 flex flex-col gap-3 px-4 lg:order-2 lg:px-0 empty:hidden">
         <ClampedText text={post.body} />
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">{post.tags.map((t) => <Chip key={t} label={t} />)}</div>
@@ -52,8 +53,8 @@ export function PostCard({ post, onReact, onMore, onOpenAuthor, priority, hideRe
             <span className="t-body min-w-0 break-all">{host}</span>
           </a>
         )}
-        {!post.mine && <ReactionBar active={post.reactions} onToggle={onReact} hide={hideReactions} />}
       </div>
+      {!post.mine && <div className="order-4 px-4 lg:px-0"><ReactionBar active={post.reactions} onToggle={onReact} hide={hideReactions} /></div>}
     </article>
   );
 }

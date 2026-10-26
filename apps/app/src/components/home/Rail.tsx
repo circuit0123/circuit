@@ -8,7 +8,7 @@ export function HomeRail() {
   const home = useHome();
   if (!(home.ready && home.drop && home.pulse)) return null;
   return (
-    <aside aria-label="For you" className="sticky hidden w-[340px] shrink-0 self-start py-6 lg:block" style={{ top: "var(--dev-bar, 0px)" }}>
+    <aside aria-label="For you" className="sticky hidden w-[340px] shrink-0 self-start pb-6 pt-12 lg:block" style={{ top: "var(--dev-bar, 0px)" }}>
       <DropSection />
     </aside>
   );
