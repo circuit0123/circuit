@@ -22,7 +22,7 @@ Supabase project may belong to different Google accounts: they only meet through
      (ES256), which is what `SUPABASE_JWT_ALG` expects.
    - Authentication → URL configuration: Site URL = your app address; Redirect URLs = `<app address>/auth/callback` and
      `http://localhost:3000/auth/callback`.
-   - Storage: create the buckets the app uses: `posts`, `messages` and `private` (all private).
+   - Storage: create the buckets the app uses: `posts`, `messages`, `avatars` (profile photos and startup logos) and `private` (all private).
    - Connect → **Transaction pooler**: copy the address. It looks like
      `postgres://postgres.<ref>:<password>@aws-0-ap-south-1.pooler.supabase.com:6543/postgres`. Port **6543** is the point. If the
      password contains `@ : / #`, URL-encode them.

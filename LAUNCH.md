@@ -115,7 +115,7 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [x] App `/join` route reads role, org, invite code and src; onboarding skips the steps they answer; src saved on the member (F2: invite, role and college-email skips and `src` saving are tested)
 - [x] `useFeatures()` hook from `/api/config`; tabs, entry points and routes for an off flag are removed (DESIGN.md §3), and their URLs show the 404 screen (F1: tabs hide; `/circuits`, an unbuilt or off tab, shows the 404 page)
 - [x] Data layer: one hook per screen/action in apps/app/src/data; ESLint rule forbids API client, Supabase or fetch imports outside src/data; tested by `apps/app/tests/boundary.test.mjs` for the app and packages/ui (F1)
-- [ ] Mock mode: `pnpm dev:mock` with MSW handlers generated from contract fixtures and scenario switcher (empty, loading, error, slow 3G, under-18, partner, investor, features off) — F1 built `make mock` with temporary fixtures typed against openapi.json and the scenarios default, empty, loading, error, slow 3G, beta access missing, features off, under 18. Still open: partner and investor scenarios (their screens come later) and the B7 contract fixtures
+- [ ] Mock mode: `pnpm dev:mock` with MSW handlers generated from contract fixtures and scenario switcher (empty, loading, error, slow 3G, under-18, partner, investor, features off) — F1 built `make mock` with temporary fixtures typed against openapi.json and the scenarios default, empty, loading, error, slow 3G, beta access missing, features off, under 18. Still open: partner and investor scenarios (their screens come later). B7 part 1 made the contract fixtures (`packages/api-client/fixtures/`, one file per screen and scenario); pointing `make mock` at them is a frontend task
 - [ ] apps/app shell: Supabase sign-in (Google + OTP), auth callback, navigation per DESIGN.md §3 (Home · Discover · Circuits · Inbox · Profile; create in top bar), environment banner, persona switcher (dev/demo)
 - [x] Sign-up and onboarding per DESIGN.md §4 "Sign-up and onboarding": one thing per screen (steps 1–14), resumable, inference before asking, under-18 defaults, measured time-to-first-drop < 2 min (Playwright test with timing) (F2; the investor and partner branches arrive with their flags, and the photo step is mock-only until an avatar upload endpoint exists)
 - [x] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end (F3: mobile and desktop Home, Update view, Notifications, the intro confirm sheet; Pulse off / Daily Drop off / both off / under-18 states)
@@ -247,6 +247,16 @@ Deployment (next session):
 - [ ] [YOU] Run `make gcp-setup`, set the GitHub variables, then delete the temporary deploy key and the Vercel token
 - [x] Rollback documented (RUNBOOK.md "Rollback"); the deploy rolls back by itself when the live smoke test fails (tested with fakes)
 - [ ] [YOU] Rollback tried once for real (RUNBOOK.md "One-time setup", step 9)
+
+## B7 part 1 — API handoff and frontend gaps (backend session)
+- [x] Every "Frontend → API needed" entry in PROGRESS.md (F1–F5) built with its endpoint, field or Realtime event, permission and flag checks, IDOR tests, one success and one failure test; the two that need tables from Stages 4d and 4g are explained, not built (B7)
+- [x] Each DESIGN.md §4 screen checked against its endpoint: one call returns everything the screen shows (no per-card follow-ups), privacy-sensitive fields absent for people who may not see them, tests prove it (found and fixed: startup `view_count` / `interest_count` went to every viewer) (B7)
+- [x] FRONTEND_HANDOFF.md: per screen the hook, endpoints, shapes, errors (incl. `feature_off`), Realtime channels and payloads, rate limits (B7)
+- [x] Contract tests in `backend/tests/contract/` that make the handoff's calls against the seeded demo world, check them against openapi.json and compare with fixtures exported to `packages/api-client/fixtures/` (B7)
+- [x] openapi.json and `packages/api-client` regenerated; `make api-client` and `make contract-fixtures` documented in COMMANDS.md (B7)
+- [x] PROGRESS.md: each handled entry marked "done in B7", plus the list "Frontend: switch these hooks from mocks to the real API" (B7)
+- [ ] Frontend: update `apps/app` mocks to the new types (48 type errors), then switch the hooks in that list
+- [ ] Promoted and partner items in Pulse and Discover (Stage 4d and 4g backends first)
 
 ## Stage 10 — Quality and performance
 - [ ] Every row in PRODUCTION.md §14 has a passing automated test or a dated manual check in RUNBOOK.md
