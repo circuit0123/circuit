@@ -116,11 +116,12 @@ test.describe("Update view", () => {
     await expect(wireNode(page, 0)).not.toContainText(", new");
   });
 
-  test("the action does what it says: Reply opens Inbox, View role opens the job page", async ({ page }) => {
+  test("the action does what it says: Reply opens a message to them, View role opens the job page", async ({ page }) => {
     await open(page);
     await wireNode(page, 0).click();
     await update(page).getByRole("button", { name: "Reply" }).click();
-    await expect(page).toHaveURL(/\/inbox$/);
+    await expect(page).toHaveURL(/\/inbox\/new\?to=4$/);
+    await expect(page.getByRole("heading", { name: "Arjun Mehta", level: 1 })).toBeVisible();
     await open(page);
     await wireNode(page, 1).click();
     await update(page).getByRole("button", { name: "View role" }).click();
@@ -261,7 +262,7 @@ test.describe("Desktop Home (Desktop.dc.html)", () => {
     const r = rail(page);
     await expect(r.getByRole("link", { name: "Circuit, Home" })).toBeVisible();
     const rows = r.getByRole("navigation", { name: "Main" }).getByRole("link");
-    await expect(rows).toHaveText(["Home", "Discover", "Inbox", "Profile"]);
+    await expect(rows).toHaveText(["Home", "Discover", "Circuits", /^Inbox/, "Profile"]); // Inbox may carry ", unread messages"
     for (const row of await rows.all()) expect((await row.boundingBox())!.height).toBe(48);
     await expect(rows.first()).toHaveAttribute("aria-current", "page");
     expect(await rows.first().evaluate((e) => getComputedStyle(e).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");

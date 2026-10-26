@@ -192,7 +192,7 @@ export const NOTIFICATIONS = [
   note(2, "application.status", "Your application has a new status.", null, { type: "application", id: 9 }, 30, false),
   note(3, "circuit.proposed", "A new circuit is waiting for your answer.", null, { type: "circuit", id: 12 }, 50, true),
   note(4, "post.reply", `${PEOPLE.divya.display_name} replied to your build log.`, PEOPLE.divya, { type: "post", id: 101 }, 60 * 26, true),
-  note(5, "message.new", `${PEOPLE.arjun.display_name} sent you a message.`, PEOPLE.arjun, { type: "conversation", id: 3 }, 60 * 28, true),
+  note(5, "message.new", "Farhan Ali sent you a message.", author(22, "Farhan Ali", "student", "Maps and mobile, final year"), { type: "conversation", id: 502 }, 60 * 28, true), // a chat in mocks/inbox.ts
   note(6, "startup.interest", "Someone showed interest in your startup.", null, { type: "startup", id: 41 }, 60 * 24 * 3, true),
   note(7, "intro.received", `${PEOPLE.kavya.display_name} would like to meet you.`, PEOPLE.kavya, { type: "intro", id: 502 }, 60 * 24 * 3 + 40, true),
 ] satisfies Schemas["NotificationOut"][];

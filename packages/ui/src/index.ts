@@ -6,6 +6,7 @@ export * from "./Button";
 export * from "./Card";
 export * from "./ClampedText";
 export * from "./Chip";
+export * from "./CircuitRing";
 export * from "./DropStack";
 export * from "./EmptyState";
 export * from "./ErrorState";

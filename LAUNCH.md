@@ -121,8 +121,8 @@ built against FRONTEND_HANDOFF.md and DESIGN.md.
 - [x] Home: Live wire + Update view, reason-first Daily Drop stack, Pulse feed with build logs and "caught up" end (F3: mobile and desktop Home, Update view, Notifications, the intro confirm sheet; Pulse off / Daily Drop off / both off / under-18 states)
 - [ ] Build log composer and post view (media pager, reactions, replies, report)
 - [x] Discover: People, Startups, Jobs (+ job page, apply), Map (F4: search over all four, filters in a sheet, Skills in demand, the promoted slot, MapLibre map with the pin sheet and Back to the same pin and zoom, Startup page with Follow, founders and the claim flow; empty, loading, error, under-18 and features-off states)
-- [ ] Circuits: ring cards, live status, signature closing animation
-- [ ] Inbox: Chats + Requests, realtime messages, report/block
+- [x] Circuits: ring cards, live status, signature closing animation (F5: Accept/Decline with a confirm sheet, live segments through Realtime `circuit:<id>`, the §7 closing moment once per circuit and its reduced-motion version, mark done, rating, completed history, empty/under-18/loading/error/features-off; Realtime tested on the mock bus only, not yet against real Supabase)
+- [x] Inbox: Chats + Requests, realtime messages, report/block (F5: no Requests for under-18s, unread states and the tab dot, New message, conversation with optimistic send and Retry, image share, Accept for requests, report/block confirm sheets; Realtime `conversation:<id>` tested on the mock bus only, not yet against real Supabase)
 - [ ] Profile: header, needs/offers, highlights, build log grid, circuits, about; connect/follow/message/intro via mutual
 - [ ] Founder applicants view, my applications, partner dashboard — F4: founder applicant view (ranked by skill match, Shortlist / Not now / Hired) and "Your applications" are built. Still open: the partner dashboard
 - [ ] Every screen: loading, empty, error states; works at 375px and 1280px
