@@ -1,0 +1,27 @@
+# Staging deploys by itself after every green CI run on main. Switched on with the repository variable STAGING_DEPLOY_ENABLED=true,
+# once staging exists (PRODUCTION.md §2: production first, staging later).
+name: deploy staging
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staging:
+    if: >-
+      vars.STAGING_DEPLOY_ENABLED == 'true' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    permissions:
+      contents: read
+      checks: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: staging
+      ref: ${{ github.event.workflow_run.head_sha || github.sha }}

@@ -1,0 +1,42 @@
+# Demo deploys from a release tag (v1.2.3) and then resets the demo data (PRODUCTION.md §10). Switched on with the repository
+# variable DEMO_DEPLOY_ENABLED=true, once the demo environment exists.
+name: deploy demo
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  demo:
+    if: vars.DEMO_DEPLOY_ENABLED == 'true'
+    permissions:
+      contents: read
+      checks: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: demo
+      ref: ${{ github.sha }}
+
+  reset:
+    needs: demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: demo
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Reset the demo data (make reset-demo ENV=demo)
+        run: python3 scripts/gcp.py jobs-run --env demo --job reset_demo --yes

@@ -8,6 +8,11 @@
 #   secret             circuit-<env>-<name lowercased, _ -> ->      e.g. circuit-production-secret-key
 #   service accounts   circuit-run-<env> (API + jobs) and circuit-sched-<env> (only starts jobs)
 
+# The GitHub repository whose workflows may deploy (keyless: Workload Identity Federation, no JSON key anywhere). `make gcp-setup` restricts the
+# trust to exactly this repository, and each environment's deploy account to the GitHub Environment of the same name.
+[github]
+repository = "circuit0123/circuit"
+
 [service]
 cpu = "1"
 memory = "1Gi"                # gunicorn: 2 workers x 4 threads (circuit/gunicorn.py) + numpy/Pillow/OR-Tools; the model adds ~200 MB
