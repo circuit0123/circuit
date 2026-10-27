@@ -26,3 +26,10 @@ coverage/
 /deploy/gcp/.rendered/
 /backend/staticfiles/
 /backend/.backups/
+
+# landing build/test output (generated)
+apps/landing/.out-*/
+apps/landing/test-results/
+apps/landing/playwright-report/
+apps/app/test-results/
+apps/app/playwright-report/

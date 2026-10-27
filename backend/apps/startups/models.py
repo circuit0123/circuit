@@ -19,6 +19,9 @@ class Startup(models.Model):
     tech_stack = models.JSONField(default=list, blank=True)
     team_size = models.PositiveSmallIntegerField(null=True, blank=True)  # set by the team; unknown until then
     logo_path = models.CharField(max_length=200, blank=True, db_default="")  # folder of the logo in the avatars bucket
+    details = models.JSONField(
+        default=dict, blank=True, db_default={}
+    )  # loader extras: careers_url, funding_evidence, address_source…
     claimed_by = models.ForeignKey(
         "accounts.Member", null=True, blank=True, on_delete=models.SET_NULL, related_name="claimed_startups"
     )

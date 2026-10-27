@@ -17,7 +17,7 @@ EVENT_TYPES = frozenset(
         "org.joined", "org.left", "org.member_removed",
         # startups
         "startup.viewed", "startup.interest_added", "startup.interest_removed", "startup.updated", "startup.claim_started",
-        "startup.claimed", "startup.logo_set",
+        "startup.claimed", "startup.logo_set", "startup.created",
         # jobs
         "job.created", "job.updated", "application.created", "application.withdrawn", "application.status_changed",
         # circuits

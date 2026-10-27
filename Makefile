@@ -17,7 +17,7 @@ endef
 
 .DEFAULT_GOAL := help
 .PHONY: landing-screens simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
-	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
+	reset-demo load-startups admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
 	smoke load-test funnel api-freeze api-client openapi contract-fixtures build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report job-health
 
 help: ## List every command
@@ -90,6 +90,16 @@ else ifeq ($(ENV),demo)
 	$(GCP) jobs-run --env demo --job reset_demo
 else
 	@echo "reset-demo refuses to run on ENV=$(ENV)."; exit 1
+endif
+
+load-startups: ## Load startups from a CSV as unclaimed profiles: make load-startups FILE=backend/data/startups_2026-10.csv [ENV=local|staging|production] [DRY=1]
+	@test -f "$(FILE)" || { echo "usage: make load-startups FILE=backend/data/startups_2026-10.csv [ENV=local|staging|production] [DRY=1]"; exit 1; }
+ifeq ($(ENV),local)
+	$(MANAGE) load_startups "$(abspath $(FILE))" $(if $(DRY),--dry-run)
+else
+	@case "$(ENV)" in production|staging) ;; *) echo "ENV must be local, staging or production"; exit 1;; esac
+	@if [ "$(ENV)" = production ]; then read -r -p "Type the environment name (production) to continue: " a; [ "$$a" = production ] || { echo "Cancelled."; exit 1; }; fi
+	@read -rs -p "$(ENV) DATABASE_URL: " PGURL; echo; DATABASE_URL="$$PGURL" DATABASE_POOLER=transaction $(MANAGE) load_startups "$(abspath $(FILE))" $(if $(DRY),--dry-run)
 endif
 
 admin-user: ## Create a Django admin user (USER_NAME=name); prints the 2FA setup link
