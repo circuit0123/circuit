@@ -764,7 +764,6 @@ def _job_steps(cfg: Cfg, image: str, state: DeployState, jobs: list[Job]) -> lis
                     "--role=roles/run.invoker",
                     *r,
                     *p,
-                    "--condition=None",
                 ),
                 f"Let the scheduler account start '{name}' and nothing else.",
             )
@@ -879,7 +878,6 @@ def plan_deploy(
                 "--role=roles/run.invoker",
                 *r,
                 *p,
-                "--condition=None",
             ),
             "Let the internet reach the API (members still need a valid sign-in token for everything except the public endpoints).",
         )
