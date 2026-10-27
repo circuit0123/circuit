@@ -373,8 +373,8 @@ test.describe("Startup page", () => {
     await expect(sheet.getByRole("alert")).toHaveText("Use an email address at medisetu.in.");
     await sheet.getByLabel("Work email at medisetu.in").fill("priya@medisetu.in");
     await sheet.getByRole("button", { name: "Send code" }).click();
-    await expect(sheet).toContainText("Enter the 6-digit code we sent to priya@medisetu.in.");
-    await sheet.getByLabel("Digit 1 of 6").fill("123456"); // a paste fills every box
+    await expect(sheet).toContainText("Enter the 8-character code we sent to priya@medisetu.in.");
+    await sheet.getByLabel("Character 1 of 8").fill("K7M2P9QX"); // a paste fills every box
     await expect(sheet).toHaveCount(0);
     await expect(page.getByText("Claimed by its team")).toBeVisible();
     await expect(page.getByRole("region", { name: "Claim this startup" })).toHaveCount(0);

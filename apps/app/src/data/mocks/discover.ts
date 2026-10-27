@@ -4,7 +4,7 @@
  * `missing.ts` that the API does not send yet.
  *
  * Mock rules worth knowing in tests: Sutragrid (43) and Medisetu (44) are unclaimed (so under-18 members never see Sutragrid's role);
- * Medisetu can be claimed with any address @medisetu.in and the code 123456; in the Founder scenario the signed-in member is on Aravind
+ * Medisetu can be claimed with any address @medisetu.in and the code K7M2P9QX; in the Founder scenario the signed-in member is on Aravind
  * Pathology's team (41) and sees the applicants for its Frontend intern role (301).
  */
 import { delay, http, HttpResponse, type HttpHandler } from "msw";
@@ -207,13 +207,13 @@ export const discoverHandlers: HttpHandler[] = [
     if (!x) return envelope(404, "not_found", "No such startup.");
     const { email } = (await request.json()) as { email: string };
     if (!email.toLowerCase().endsWith(`@${x.website_domain}`)) return envelope(400, "email_domain_mismatch", `Use an email address at ${x.website_domain}.`);
-    return HttpResponse.json({ sent: true, dev_code: "123456" });
+    return HttpResponse.json({ sent: true, dev_code: "K7M2P9QX" });
   })),
   http.post(`${API}/startups/:id/claim/verify`, scenario(async (s, { params, request }) => {
     const x = STARTUPS.find((y) => y.id === Number(params.id));
     if (!x) return envelope(404, "not_found", "No such startup.");
     const { code } = (await request.json()) as { code: string };
-    if (code !== "123456") return envelope(400, "invalid_code", "That code is wrong or has expired.");
+    if (code !== "K7M2P9QX") return envelope(400, "invalid_code", "That code is wrong or has expired.");
     claimedNow.add(x.id);
     return HttpResponse.json(startupOut(x, s));
   })),

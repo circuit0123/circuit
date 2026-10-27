@@ -299,10 +299,10 @@ test.describe("Verification: work email", () => {
     await expect(sheet.getByRole("alert")).toHaveText("Use your work email, not a personal one.");
     await sheet.getByLabel("Work email").fill("ravi@aravindpath.in");
     await sheet.getByRole("button", { name: "Send code" }).click();
-    await expect(sheet).toContainText("Enter the 6-digit code we sent to ravi@aravindpath.in.");
-    await sheet.getByLabel("Digit 1 of 6").fill("000000");
+    await expect(sheet).toContainText("Enter the 8-character code we sent to ravi@aravindpath.in.");
+    await sheet.getByLabel("Character 1 of 8").fill("AAAAAAAA");
     await expect(sheet.getByRole("alert")).toHaveText("That code isn't right. Check it and try again.");
-    await sheet.getByLabel("Digit 1 of 6").fill("123456");
+    await sheet.getByLabel("Character 1 of 8").fill("K7M2P9QX");
     await expect(sheet).toHaveCount(0);
     await expect(page.getByText("Your work email is verified.")).toBeVisible();
     await expect(page.getByText("Level 2")).toBeVisible();
