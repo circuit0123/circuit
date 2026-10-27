@@ -6,7 +6,8 @@ import { api } from "./client";
 /** What a landing or invite link told us (`/join?role=student&src=landing-students&code=…`). Kept across the sign-in redirect. */
 export type JoinContext = { role?: string; src?: string; code?: string; org?: string };
 const KEY = "circuit.join";
-const ROLES = ["student", "founder", "mentor", "investor", "partner"];
+// No "partner": partner sign-up (and its dashboard) is not in this build, so a `role=partner` link is treated as no role and the person sees the normal Role question, which has no partner row.
+const ROLES = ["student", "founder", "mentor", "investor"];
 const SRC = /^[a-z0-9_-]{1,40}$/;
 const EMPTY: JoinContext = {};
 

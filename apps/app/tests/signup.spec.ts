@@ -643,6 +643,16 @@ test.describe("onboarding: photo, colour, ready", () => {
     expect(seconds).toBeLessThan(120);
   });
 
+  test("a partner link is not a sign-up path in this build: Role is asked, with no partner row, and the source is kept", async ({ page }) => {
+    await intoOnboarding(page, "/join?role=partner&src=landing-partners");
+    await page.getByLabel("First name").fill("Meera");
+    await page.getByLabel("Last name").fill("Krishnan");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(heading(page, "What brings you here?")).toBeVisible(); // not skipped by the link
+    await expect(page.getByRole("button", { name: /Run a college or incubator programme/ })).toHaveCount(0);
+    expect((await serverState(page)).signup_source).toBe("landing-partners");
+  });
+
   test("a role link skips Role, keeps the source and gets all the way in", async ({ page }) => {
     await intoOnboarding(page, "/join?role=student&src=landing-students");
     await page.getByLabel("First name").fill("Ravi");
