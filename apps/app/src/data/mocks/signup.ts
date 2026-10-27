@@ -264,6 +264,12 @@ export const signupHandlers: HttpHandler[] = [
     const m = signupMe();
     return HttpResponse.json({ profile_visibility: m.profile_visibility, visible_to_org: false, circuits_opt_in: false, allow_requests: m.allow_requests });
   }),
+  // Funnel count: the mock keeps the sources it was told about, so a test can read them.
+  http.post(`${API}/join/visit`, async ({ request }) => {
+    const { src } = (await request.json()) as { src: string };
+    try { sessionStorage.setItem("circuit.mock.visits", JSON.stringify([...JSON.parse(sessionStorage.getItem("circuit.mock.visits") ?? "[]"), src])); } catch { /* ignore */ }
+    return new HttpResponse(null, { status: 204 });
+  }),
   http.get(`${API}/cities`, () => HttpResponse.json(CITIES.map((c, i) => ({ ...c, pilot: i === 0 }))),
   ),
   http.get(`${API}/organisations/search`, ({ request }) => {

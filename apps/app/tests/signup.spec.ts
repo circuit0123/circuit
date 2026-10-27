@@ -661,6 +661,8 @@ test.describe("onboarding: photo, colour, ready", () => {
     expect(s.signup_source).toBe("landing-students");
     expect(s.me.role).toBe("student");
     expect(s.onboarding.completed_at).not.toBeNull();
+    // The click on the link was counted once for the funnel.
+    expect(await page.evaluate(() => sessionStorage.getItem("circuit.mock.visits"))).toBe('["landing-students"]');
   });
 
   test("Replay onboarding (the banner) starts again at Welcome with nothing remembered", async ({ page }) => {

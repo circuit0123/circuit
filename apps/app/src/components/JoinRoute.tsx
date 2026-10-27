@@ -3,7 +3,7 @@
 import { Skeleton } from "@circuit/ui";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { parseJoin, useJoinContext } from "@/data";
+import { parseJoin, reportJoinVisit, useJoinContext } from "@/data";
 import { Centered } from "./Centered";
 
 /**
@@ -17,7 +17,9 @@ export function JoinRoute() {
   const join = useJoinContext();
   useEffect(() => {
     join.clear(); // the newest link wins; an old invite code must not linger
-    join.save(parseJoin(params));
+    const link = parseJoin(params);
+    join.save(link);
+    reportJoinVisit(link.src);
     router.replace("/");
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
   }, []);
