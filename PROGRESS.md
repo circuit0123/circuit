@@ -1163,3 +1163,8 @@ Nothing is broken. Weak spots to remember: (a) none of the Supabase / Resend / s
 
 ### Startup load (one-off, branch `startup-load`)
 `manage.py load_startups <csv> [--dry-run]` / `make load-startups`: 148 Chennai + Bengaluru startups from `backend/data/startups_2026-10.csv`, unclaimed, `source=crawler`, extras in the new `startups.details` json. Nominatim pins (cached), none for empty or area-only addresses. Startups without a pin have a page but are not on the map until an address is fixed in Django admin (Startups → latitude / longitude). Tests: `tests/unit/test_load_startups.py`.
+
+### Discover fixes (branch `fix-discover-search-map`)
+- People found by Discover search now open their profile (they were plain cards with no link, so nobody could message them or ask for an intro from there).
+- Zoomed out past a city, the map says "Zoom in to see startups." instead of "Couldn't load" (the API only serves areas up to 2° wide). The mock map handler returns the same 422.
+- Not code, still to do in production: load the startup CSV (`make load-startups ... ENV=production`) and run `make jobs-run ENV=production JOB=compute_matches` once (the job was created after its first 07:30 IST slot, so matches were empty).

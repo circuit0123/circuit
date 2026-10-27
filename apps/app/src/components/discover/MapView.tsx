@@ -210,7 +210,8 @@ export function MapView({ visible, filters, onFilters, onOpenFilters, segment }:
           </button>
         </div>
         {pins.isError && <p role="alert" className="material rounded-control px-3 py-2 t-subhead">{loadFailed("startups on the map")}</p>}
-        {(bounds || broken) && !pins.isPending && !pins.isError && pins.pins.length === 0 && <p className="material rounded-control px-3 py-2 t-subhead">No startups here match these filters. Zoom out or clear a filter.</p>}
+        {pins.tooWide && <p role="status" className="material rounded-control px-3 py-2 t-subhead">Zoom in to see startups.</p>}
+        {(bounds || broken) && !pins.isPending && !pins.isError && !pins.tooWide && pins.pins.length === 0 &&<p className="material rounded-control px-3 py-2 t-subhead">No startups here match these filters. Zoom out or clear a filter.</p>}
       </div>
 
       {sel && <PinSheet pin={sel} onClose={() => setSelected(null)} />}

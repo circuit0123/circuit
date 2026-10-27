@@ -203,7 +203,10 @@ function SearchResults({ query }: { query: string }) {
       {r.people.length > 0 && (
         <section aria-label="People found">
           <Header title="People" />
-          <TileGrid label="People found">{r.people.slice(0, 6).map((p) => <li key={p.id}><PersonTileCard person={p} /></li>)}</TileGrid>
+          <TileGrid label="People found">{r.people.slice(0, 6).map((p) => {
+            const href = memberHref(p.id);
+            return <li key={p.id}>{href ? <Link href={href}><PersonTileCard person={p} /></Link> : <PersonTileCard person={p} />}</li>;
+          })}</TileGrid>
         </section>
       )}
     </div>

@@ -187,5 +187,6 @@ export function useMapPins(bounds: Bounds | null, filters: DiscoverFilters) {
   const pins: Array<StartupTile & { lat: number; lng: number }> = (q.data ?? [])
     .map((p) => ({ ...toStartupTile(p), lat: p.lat, lng: p.lng }))
     .filter((p) => filters.distanceKm === null || (p.km !== null && p.km <= filters.distanceKm));
-  return { pins, isPending: q.isPending && !!b, isError: q.isError, refetch: q.refetch };
+  const tooWide = q.error instanceof ApiError && q.error.code === "bbox_too_large"; // the server only serves a city-sized area
+  return { pins, isPending: q.isPending && !!b, isError: q.isError && !tooWide, tooWide, refetch: q.refetch };
 }
