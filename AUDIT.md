@@ -118,7 +118,7 @@ Fix (given `vercel.json` as it is): `APP_URL = "https://circuit-phi.vercel.app/a
 
 **H5 — "I'm interested" does nothing** **[fixed in fix-frontend-h4-h7]** · `POST/DELETE /api/startups/{id}/interest` is unused (grep: `interest` appears only as displayed counts in `data/startups.ts:38-78` and `StartupScreen.tsx`). F2 and the unclaimed-profile claim nudge (F3) rely on it: without taps the "N students are interested" number stays 0. · **M** · frontend.
 
-**H6 — Several hooks still run on stand-ins in real mode** (PROGRESS.md "Frontend: switch these hooks from mocks to the real API", not done; LAUNCH.md line 258 unticked):
+**H6 — Several hooks still run on stand-ins in real mode** **[fixed in fix-frontend-h4-h7, except the startup logo upload and `GET /api/traits`, which no screen needs yet]** (PROGRESS.md "Frontend: switch these hooks from mocks to the real API", not done; LAUNCH.md line 258 unticked):
 - `useWhere` / city list: hard-coded `CITIES` (`data/missing.ts:9`, `data/where.ts:35`); `GET /api/cities` unused.
 - `useOrganisationSearch`: filters the hard-coded `ORGANISATIONS` array (`data/organisations.ts:4,13`); in a real build "accept the typed name" (`missing.ts:23`). `GET /api/organisations/search`, `/join`, `/leave`, `/mine` unused.
 - `useDiscoverSearch`: searches the loaded lists, `GET /api/search` unused; skills in demand makes a second `/api/jobs` call (`GET /api/jobs/skills-in-demand` unused).
