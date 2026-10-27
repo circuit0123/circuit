@@ -24,8 +24,7 @@ for (const p of PAGES) {
       expect(primaries).toEqual([p.cta]);
     });
 
-    test("three steps, a proof section, 4 to 6 FAQ answers", async ({ page }) => {
-      await expect(page.locator("#how-h ~ ol > li, section[aria-labelledby=how-h] ol > li")).toHaveCount(3);
+    test("a proof section, 4 to 6 FAQ answers", async ({ page }) => {
       await expect(page.locator("section[aria-labelledby=proof-h]")).toHaveCount(1);
       const faq = await page.locator("section[aria-labelledby=faq-h] details").count();
       expect(faq).toBeGreaterThanOrEqual(4);

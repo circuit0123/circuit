@@ -7,7 +7,7 @@ export function PartnersProof() {
   return (
     <Proof heading="See what your members need, and who can help" lede="A chart and a heatmap of what your members ask for and offer, so a gap such as legal help or fundraising shows up before it costs you a startup. Counts under 5 are hidden.">
       <Example label="Demo data" className="max-w-[720px]">
-        <ScreenList ids={["partner-home"]} />
+        <ScreenList ids={[{ id: "partner-home", caption: "Partner home: what needs attention, and how your members are doing. Members join with your invite link, or when they verify an email on your domain." }]} />
       </Example>
     </Proof>
   );

@@ -5,7 +5,7 @@ import { Proof } from "./Proof";
 export function StudentsProof() {
   return (
     <Proof heading="Roles near you, matched on your skills" lede="Each role shows how well your skills fit it, how far it is, and what it pays. Founders see your skills first, not your college.">
-      <ScreenList ids={["discover-jobs", "map", "job"]} />
+      <ScreenList ids={["discover-jobs", "map", { id: "job", caption: "A job page: what it pays, what it needs, and your fit. Apply with your profile in one tap; founders see applicants ranked by skill match, not by college." }]} />
     </Proof>
   );
 }

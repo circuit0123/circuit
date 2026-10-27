@@ -5,11 +5,10 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { HeroVideo } from "@/components/HeroVideo";
-import { HowItWorks } from "@/components/HowItWorks";
 import { ScreenTour } from "@/components/Screens";
 import { PilotCity } from "@/components/PilotCity";
 import { Waitlist } from "@/components/Waitlist";
-import { FAQ, INVITE_ONLY, SRC, STEPS } from "@/content/home";
+import { FAQ, INVITE_ONLY, SRC } from "@/content/home";
 import { JOIN_LIVE } from "@/lib/env";
 import { flagOn, getFeatures } from "@/lib/features";
 
@@ -27,8 +26,12 @@ export default async function Page() {
           media={<HeroVideo />}
         />
         <Audiences investorOpen={flagOn(features, "investor_mode")} />
-        <HowItWorks steps={STEPS} />
-        <ScreenTour heading="A look inside" lede="Matches with a reason, jobs and startups on a map, and circuits where three people help each other." ids={["home-main", "discover-jobs", "map", "circuits"]} />
+        <ScreenTour heading="A look inside" lede="Matches with a reason, jobs and startups on a map, and circuits where three people help each other." ids={[
+          { id: "home-main", caption: "Today: three matches a day. Each comes with the reason and the mutual connection who can introduce you." },
+          "discover-jobs",
+          "map",
+          { id: "circuits", caption: "Circuits: warm intros and three-way loops where everyone helps someone." },
+        ]} />
         {/* Hidden until real counts exist: no public stats endpoint yet, so nothing is passed (never fake numbers). */}
         <PilotCity stats={null} />
         {JOIN_LIVE ? (

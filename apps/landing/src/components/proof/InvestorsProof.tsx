@@ -16,7 +16,7 @@ export function InvestorsProof() {
         <p className="mt-4 t-body">Fits your focus: logistics, seed stage, within reach of Pune. The founders posted a build log last week and are hiring.</p>
         <p className="mt-3 t-body text-text-muted">The founders have chosen to be seen by investors. You can ask for an introduction, and they decide.</p>
       </Example>
-      <ScreenList ids={["investor-picks"]} />
+      <ScreenList ids={[{ id: "investor-picks", caption: "Today\u2019s picks: a short list that stays the same all day, each with the reason it fits. The founder decides whether to say yes; unverified investors can browse but can\u2019t request introductions." }]} />
       </div>
     </Proof>
   );
