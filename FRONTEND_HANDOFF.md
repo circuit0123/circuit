@@ -1,6 +1,6 @@
 # Circuit — Frontend handoff
 
-**API version:** 1.2.0 (frozen). Any change to `packages/api-client/openapi.json` needs a higher version here and in `backend/circuit/api.py`, and an entry in section 3; `make api-freeze` (and CI) fails otherwise.
+**API version:** 1.3.0 (frozen). Any change to `packages/api-client/openapi.json` needs a higher version here and in `backend/circuit/api.py`, and an entry in section 3; `make api-freeze` (and CI) fails otherwise.
 
 What the app's data layer (`apps/app/src/data`) can rely on from the backend. One section per screen: the hook that serves it, the
 endpoints it calls, what comes back, which errors to draw, the Realtime channels and the rate limits.
@@ -198,7 +198,7 @@ Realtime: `member:<id>` / `notification`. **Fixtures:** `notifications/{default,
 | Call | Returns |
 |---|---|
 | `GET /api/matches?bridge=&role=&verified=&capability=&within_km=&limit=&offset=` | `Page<MatchOut>` `{candidate_id, display_name, role, verification_level, city, sector?, strength?, reason, is_bridge, photo?, headline, capabilities[]}`. `role` = student|founder|mentor|investor; `verified=true` = level 2+; `capability` = a slug they offer; `within_km` = 5, 10, 25 or 50 (else 422). No distance is returned |
-| `GET /api/startups/nearby?lat=&lng=&radius_km=&hiring=&capability=&limit=` | `PinOut[]` `{id, name, lat, lng, hiring, sector, claimed, open_roles, match_pct?, distance_km?, logo?}` |
+| `GET /api/startups/nearby?lat=&lng=&radius_km=&hiring=&capability=&limit=` | `PinOut[]` `{id, name, lat, lng, hiring, sector, claimed, open_roles, match_pct?, distance_km?, logo?, careers_url?}` (`careers_url`: the startup's own careers page from the import, or null; null for under-18s on an unverified startup) |
 | `GET /api/startups/map?min_lng=&min_lat=&max_lng=&max_lat=&hiring=&capability=` | `PinOut[]` (the box may be about 2° wide; 500 pins) |
 | `GET /api/jobs?kind=&capability=&startup_id=&max_distance_km=&min_stipend=&limit=&offset=` | `Page<JobOut>` (see `job`). Students: best skill match first |
 | `GET /api/jobs/skills-in-demand?within_km=10` | `[{slug, name, open_roles}]` top 3. Role counts only |
@@ -231,7 +231,7 @@ Founders post roles with `POST /api/jobs` and edit or close them with `PATCH /ap
 **Hooks:** `useStartup`, `useFollows`, `useFollow`, `useInterest`, `useEditStartup`, `useStartClaim`, `useVerifyClaim` (the code arrives by email, so no fixture), `useStartupJobs`.
 | Call | Returns / errors |
 |---|---|
-| `GET /api/startups/{id}` | `StartupOut` `{id, name, website_domain, description, sector, stage, address, team_size?, logo?, lat?, lng?, hiring, tech_stack[], claimed, verified, source, view_count?, interest_count?, interested, is_team, match_pct?, open_jobs[], founders[], build_logs[]}`. **One call draws the page:** `founders: [{person, role, via?, connected, is_me}]` carry the warm path (no call per founder); `build_logs: [{post_id, image}]` is the first picture of the team's latest build logs I may see (empty with `pulse` off). `view_count` / `interest_count` are **null** unless I'm on the team, or I'm a founder on an unclaimed page (then not under 5). Counts one view per member per day; the map sheet, which uses `GET /api/jobs?startup_id=`, counts none |
+| `GET /api/startups/{id}` | `StartupOut` `{id, name, website_domain, description, sector, stage, address, team_size?, logo?, careers_url?, lat?, lng?, hiring, tech_stack[], claimed, verified, source, view_count?, interest_count?, interested, is_team, match_pct?, open_jobs[], founders[], build_logs[]}`. **One call draws the page:** `founders: [{person, role, via?, connected, is_me}]` carry the warm path (no call per founder); `build_logs: [{post_id, image}]` is the first picture of the team's latest build logs I may see (empty with `pulse` off). `view_count` / `interest_count` are **null** unless I'm on the team, or I'm a founder on an unclaimed page (then not under 5). Counts one view per member per day; the map sheet, which uses `GET /api/jobs?startup_id=`, counts none |
 | `POST` / `DELETE /api/startups/{id}/follow` | `204` |
 | `GET /api/me/follows` | followed startups |
 | `POST` / `DELETE /api/startups/{id}/interest` | `204` (students) |
@@ -335,6 +335,8 @@ Fixtures `errors/{signed_out,default,rate_limited,beta_required}.json` show 401,
 | Profile highlights, GitHub summary | not scheduled | |
 
 ## 3. What changed in the API in B7 (for switching hooks from mocks)
+
+B7 part 4 (API 1.3.0): `PinOut` (map, nearby, search) and `StartupOut` gain `careers_url` (string or null). Nothing else changed.
 
 B7 part 3 (API 1.2.0; the 1.1.0 spec file had not been regenerated after these changes, so re-pull `packages/api-client`):
 new `PUT /api/me/highlights` (up to 6 pinned projects, see the endpoint description); `ProfileOut` gains `highlights` and `circuits_together`;

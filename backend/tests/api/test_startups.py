@@ -304,3 +304,29 @@ def test_expire_claims_marks_old_requests(make_member, make_startup):
         startup=s, member=f, email_domain="acme.io", token_hash="x", expires_at=timezone.now() - timedelta(hours=1)
     )
     assert expire_claims() == 1 and ClaimRequest.objects.get().status == "expired"
+
+
+# -- careers_url ------------------------------------------------------------------------
+def test_careers_url_comes_from_the_import_on_pins_and_the_page(make_member, make_startup, client_for):
+    s = make_startup("Jobs", "jobs.io", 13.09, 80.28, details={"careers_url": "https://jobs.io/careers"})
+    make_startup("None", "none.io", 13.1, 80.28)
+    make_startup("Bad", "bad.io", 13.11, 80.28, details={"careers_url": "javascript:alert(1)"})
+    c = client_for(make_member())
+    by_name = {p["name"]: p for p in pins(nearby(c))}
+    assert by_name["Jobs"]["careers_url"] == "https://jobs.io/careers"
+    assert by_name["None"]["careers_url"] is None and by_name["Bad"]["careers_url"] is None
+    box = "min_lng=80.2&min_lat=13.0&max_lng=80.4&max_lat=13.2"
+    assert {p["name"]: p["careers_url"] for p in pins(c.get("/api/startups/map?" + box))}["Jobs"] == "https://jobs.io/careers"
+    assert c.get(f"/api/startups/{s.pk}").json()["careers_url"] == "https://jobs.io/careers"
+
+
+def test_careers_url_is_hidden_from_an_under_18_on_an_unverified_startup(make_member, make_startup, client_for):
+    details = {"careers_url": "https://x.io/jobs"}
+    open_s = make_startup("Open", "open.io", 13.09, 80.28, details=details)
+    owner = make_member("founder")
+    verified = make_startup("Verified", "verified.io", 13.1, 80.28, claimed_by=owner, details=details)
+    kid = client_for(make_member(is_minor=True))
+    by_name = {p["name"]: p for p in pins(nearby(kid))}
+    assert by_name["Open"]["careers_url"] is None and by_name["Verified"]["careers_url"] == "https://x.io/jobs"
+    assert kid.get(f"/api/startups/{open_s.pk}").json()["careers_url"] is None
+    assert kid.get(f"/api/startups/{verified.pk}").json()["careers_url"] == "https://x.io/jobs"

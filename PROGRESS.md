@@ -1168,3 +1168,6 @@ Nothing is broken. Weak spots to remember: (a) none of the Supabase / Resend / s
 - People found by Discover search now open their profile (they were plain cards with no link, so nobody could message them or ask for an intro from there).
 - Zoomed out past a city, the map says "Zoom in to see startups." instead of "Couldn't load" (the API only serves areas up to 2° wide). The mock map handler returns the same 422.
 - Not code, still to do in production: load the startup CSV (`make load-startups ... ENV=production`) and run `make jobs-run ENV=production JOB=compute_matches` once (the job was created after its first 07:30 IST slot, so matches were empty).
+
+### careers_url (branch `careers-url`, API 1.3.0)
+`PinOut` (map, nearby, search) and `StartupOut` now carry `careers_url`: the careers page the startup import stored in `startups.details`, only if it is an http(s) link, and null for an under-18 on an unverified startup. Nothing else changed. Contract fixtures pin `SUPPORT_EMAIL` so they no longer depend on the address in `.env`. Tests: `tests/api/test_startups.py`, `tests/api/test_b7_search.py`.

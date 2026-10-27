@@ -999,6 +999,7 @@
         ],
         "startups": [
           {
+            "careers_url": null,
             "claimed": false,
             "distance_km": null,
             "hiring": false,
@@ -1012,6 +1013,7 @@
             "sector": "cleantech"
           },
           {
+            "careers_url": null,
             "claimed": false,
             "distance_km": null,
             "hiring": true,
@@ -1025,6 +1027,7 @@
             "sector": "saas"
           },
           {
+            "careers_url": null,
             "claimed": false,
             "distance_km": null,
             "hiring": false,
@@ -1038,6 +1041,7 @@
             "sector": "d2c"
           },
           {
+            "careers_url": null,
             "claimed": false,
             "distance_km": null,
             "hiring": true,
@@ -1051,6 +1055,7 @@
             "sector": "fintech"
           },
           {
+            "careers_url": null,
             "claimed": false,
             "distance_km": null,
             "hiring": false,
@@ -1064,6 +1069,7 @@
             "sector": "deeptech"
           },
           {
+            "careers_url": null,
             "claimed": true,
             "distance_km": null,
             "hiring": false,
@@ -1077,6 +1083,7 @@
             "sector": "deeptech"
           },
           {
+            "careers_url": null,
             "claimed": true,
             "distance_km": null,
             "hiring": false,
@@ -1090,6 +1097,7 @@
             "sector": "cleantech"
           },
           {
+            "careers_url": null,
             "claimed": false,
             "distance_km": null,
             "hiring": false,
@@ -1103,6 +1111,7 @@
             "sector": "cleantech"
           },
           {
+            "careers_url": null,
             "claimed": true,
             "distance_km": null,
             "hiring": true,
@@ -1116,6 +1125,7 @@
             "sector": "cleantech"
           },
           {
+            "careers_url": null,
             "claimed": false,
             "distance_km": null,
             "hiring": true,

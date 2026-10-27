@@ -3682,6 +3682,8 @@ export interface components {
         };
         /** PinOut */
         PinOut: {
+            /** Careers Url */
+            careers_url?: string | null;
             /** Claimed */
             claimed: boolean;
             /** Distance Km */
@@ -4128,6 +4130,8 @@ export interface components {
             address: string;
             /** Build Logs */
             build_logs: components["schemas"]["BuildLogTileOut"][];
+            /** Careers Url */
+            careers_url?: string | null;
             /** Claimed */
             claimed: boolean;
             /** Description */

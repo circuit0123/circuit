@@ -25,6 +25,7 @@ class PinOut(Schema):
     match_pct: int | None = None  # students only; None when the startup has no open role
     distance_km: float | None = None
     logo: str | None = None  # signed link, or null (draw the circuit-pattern square)
+    careers_url: str | None = None  # the startup's own careers page; null when unknown or hidden from an under-18
 
 
 class NearbyParams(Schema):
@@ -93,6 +94,7 @@ class StartupOut(Schema):
     address: str
     team_size: int | None
     logo: str | None
+    careers_url: str | None = None  # same as on the pin
     lat: float | None
     lng: float | None
     hiring: bool
