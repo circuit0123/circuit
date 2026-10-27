@@ -183,6 +183,7 @@ export const discoverHandlers: HttpHandler[] = [
   http.get(`${API}/startups/map`, scenario((s, { request }) => {
     const q = new URL(request.url).searchParams;
     const [w, so, e, n] = ["min_lng", "min_lat", "max_lng", "max_lat"].map((k) => Number(q.get(k)));
+    if (e - w > 2 || n - so > 2) return envelope(422, "bbox_too_large", "Zoom in: that map area is too large"); // the API's MAX_BBOX_DEGREES
     const pins = (empty(s) ? [] : STARTUPS).filter((x) => x.lng >= w && x.lng <= e && x.lat >= so && x.lat <= n && (q.get("hiring") !== "true" || hiring(x)) && hasCapability(x, q.get("capability"))).map(pinOut);
     return HttpResponse.json(pins);
   })),

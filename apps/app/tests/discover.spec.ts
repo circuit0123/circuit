@@ -98,6 +98,7 @@ test.describe("Discover: segments, search and filters", () => {
     await expect(page.getByRole("region", { name: "People found" })).toHaveCount(0);
     await page.getByRole("searchbox").fill("kavya");
     await expect(page.getByRole("region", { name: "People found" })).toContainText("Kavya");
+    await expect(page.getByRole("region", { name: "People found" }).getByRole("link", { name: /Kavya/ })).toHaveAttribute("href", "/members/5");
     await page.getByRole("searchbox").fill("zzzz");
     await expect(page.getByText("Nothing matches “zzzz”. Try a skill, a startup or a role.")).toBeVisible();
     await page.getByRole("searchbox").fill("");
@@ -245,6 +246,13 @@ const pin = (page: Page, name: RegExp | string) => page.getByRole("button", { na
 const mapView = (page: Page) => page.evaluate(() => JSON.parse(sessionStorage.getItem("circuit.discover.map") ?? "null"));
 
 test.describe("Map", () => {
+  test("zoomed out past a city, the map asks to zoom in instead of showing an error", async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem("circuit.discover.map", JSON.stringify({ lat: 13.08, lng: 80.27, zoom: 6, selected: null })));
+    await discover(page, "map");
+    await expect(page.getByText("Zoom in to see startups.")).toBeVisible();
+    await expect(page.getByRole("alert").filter({ hasText: "Couldn't load startups on the map." })).toHaveCount(0);
+  });
+
   test("pins by hiring status; a tap opens the sheet and never navigates", async ({ page }) => {
     await discover(page, "map");
     await expect(page.getByRole("region", { name: "Map of startups near you" })).toBeVisible();
