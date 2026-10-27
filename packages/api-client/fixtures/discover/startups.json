@@ -8,6 +8,7 @@
       },
       "response": [
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 0.12,
           "hiring": false,
@@ -21,6 +22,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 0.93,
           "hiring": false,
@@ -34,6 +36,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.0,
           "hiring": false,
@@ -47,6 +50,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.09,
           "hiring": true,
@@ -60,6 +64,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.09,
           "hiring": false,
@@ -73,6 +78,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 1.32,
           "hiring": true,
@@ -86,6 +92,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.42,
           "hiring": false,
@@ -99,6 +106,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.44,
           "hiring": false,
@@ -112,6 +120,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.46,
           "hiring": false,
@@ -125,6 +134,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.46,
           "hiring": false,
@@ -138,6 +148,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.46,
           "hiring": false,
@@ -151,6 +162,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.5,
           "hiring": true,
@@ -164,6 +176,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.5,
           "hiring": true,
@@ -177,6 +190,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.5,
           "hiring": true,
@@ -190,6 +204,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 1.52,
           "hiring": true,
@@ -203,6 +218,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.55,
           "hiring": false,
@@ -216,6 +232,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.6,
           "hiring": true,
@@ -229,6 +246,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.81,
           "hiring": false,
@@ -242,6 +260,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 1.85,
           "hiring": false,
@@ -255,6 +274,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 1.85,
           "hiring": false,
@@ -268,6 +288,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.87,
           "hiring": true,
@@ -281,6 +302,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 1.87,
           "hiring": true,
@@ -294,6 +316,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.87,
           "hiring": false,
@@ -307,6 +330,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.9,
           "hiring": true,
@@ -320,6 +344,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.98,
           "hiring": false,
@@ -333,6 +358,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.04,
           "hiring": false,
@@ -346,6 +372,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.14,
           "hiring": false,
@@ -359,6 +386,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.15,
           "hiring": false,
@@ -372,6 +400,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.2,
           "hiring": true,
@@ -385,6 +414,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.27,
           "hiring": true,
@@ -398,6 +428,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.29,
           "hiring": true,
@@ -411,6 +442,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 2.35,
           "hiring": false,
@@ -424,6 +456,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.43,
           "hiring": false,
@@ -437,6 +470,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.47,
           "hiring": false,
@@ -450,6 +484,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.52,
           "hiring": true,
@@ -463,6 +498,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.54,
           "hiring": true,
@@ -476,6 +512,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 2.69,
           "hiring": true,
@@ -489,6 +526,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 2.94,
           "hiring": false,
@@ -502,6 +540,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 3.0,
           "hiring": false,
@@ -515,6 +554,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 3.12,
           "hiring": true,
@@ -538,6 +578,7 @@
       },
       "response": [
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -551,6 +592,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -564,6 +606,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -577,6 +620,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -590,6 +634,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -603,6 +648,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -616,6 +662,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -629,6 +676,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -642,6 +690,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -655,6 +704,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -668,6 +718,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -681,6 +732,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -694,6 +746,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -707,6 +760,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -720,6 +774,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -733,6 +788,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": true,
@@ -746,6 +802,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -759,6 +816,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -772,6 +830,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -785,6 +844,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -798,6 +858,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -811,6 +872,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -824,6 +886,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -837,6 +900,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -850,6 +914,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -863,6 +928,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -876,6 +942,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -889,6 +956,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -902,6 +970,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -915,6 +984,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -928,6 +998,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -941,6 +1012,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -954,6 +1026,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -967,6 +1040,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -980,6 +1054,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -993,6 +1068,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1006,6 +1082,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1019,6 +1096,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1032,6 +1110,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1045,6 +1124,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1058,6 +1138,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1071,6 +1152,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1084,6 +1166,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1097,6 +1180,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1110,6 +1194,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1123,6 +1208,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1136,6 +1222,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1149,6 +1236,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1162,6 +1250,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1175,6 +1264,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1188,6 +1278,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1201,6 +1292,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1214,6 +1306,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1227,6 +1320,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1240,6 +1334,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1253,6 +1348,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1266,6 +1362,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1279,6 +1376,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1292,6 +1390,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1305,6 +1404,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1318,6 +1418,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1331,6 +1432,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1344,6 +1446,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1357,6 +1460,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1370,6 +1474,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1383,6 +1488,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": true,
@@ -1396,6 +1502,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1409,6 +1516,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1422,6 +1530,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1435,6 +1544,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1448,6 +1558,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1461,6 +1572,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1474,6 +1586,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1487,6 +1600,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1500,6 +1614,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1513,6 +1628,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1526,6 +1642,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1539,6 +1656,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1552,6 +1670,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1565,6 +1684,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": null,
           "hiring": false,
@@ -1578,6 +1698,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1591,6 +1712,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1604,6 +1726,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1617,6 +1740,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1630,6 +1754,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1643,6 +1768,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1656,6 +1782,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1669,6 +1796,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1682,6 +1810,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1695,6 +1824,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1708,6 +1838,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1721,6 +1852,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1734,6 +1866,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1747,6 +1880,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1760,6 +1894,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1773,6 +1908,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1786,6 +1922,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1799,6 +1936,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1812,6 +1950,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1825,6 +1964,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1838,6 +1978,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1851,6 +1992,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1864,6 +2006,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1877,6 +2020,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1890,6 +2034,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1903,6 +2048,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1916,6 +2062,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1929,6 +2076,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1942,6 +2090,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1955,6 +2104,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1968,6 +2118,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1981,6 +2132,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -1994,6 +2146,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2007,6 +2160,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2020,6 +2174,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2033,6 +2188,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2046,6 +2202,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2059,6 +2216,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2072,6 +2230,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2085,6 +2244,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2098,6 +2258,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2111,6 +2272,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2124,6 +2286,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2137,6 +2300,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2150,6 +2314,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2163,6 +2328,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2176,6 +2342,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2189,6 +2356,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2202,6 +2370,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2215,6 +2384,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2228,6 +2398,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2241,6 +2412,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2254,6 +2426,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2267,6 +2440,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2280,6 +2454,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2293,6 +2468,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2306,6 +2482,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2319,6 +2496,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2332,6 +2510,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2345,6 +2524,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2358,6 +2538,7 @@
           "sector": "healthtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2371,6 +2552,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2384,6 +2566,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2397,6 +2580,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2410,6 +2594,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2423,6 +2608,7 @@
           "sector": "deeptech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2436,6 +2622,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2449,6 +2636,7 @@
           "sector": "edtech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2462,6 +2650,7 @@
           "sector": "agritech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2475,6 +2664,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": null,
           "hiring": false,
@@ -2498,6 +2688,7 @@
       },
       "response": [
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.09,
           "hiring": true,
@@ -2511,6 +2702,7 @@
           "sector": "fintech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 1.32,
           "hiring": true,
@@ -2524,6 +2716,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.5,
           "hiring": true,
@@ -2537,6 +2730,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.5,
           "hiring": true,
@@ -2550,6 +2744,7 @@
           "sector": "d2c"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.5,
           "hiring": true,
@@ -2563,6 +2758,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 1.52,
           "hiring": true,
@@ -2576,6 +2772,7 @@
           "sector": "biotech"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.6,
           "hiring": true,
@@ -2589,6 +2786,7 @@
           "sector": "saas"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.87,
           "hiring": true,
@@ -2602,6 +2800,7 @@
           "sector": "cleantech"
         },
         {
+          "careers_url": null,
           "claimed": true,
           "distance_km": 1.87,
           "hiring": true,
@@ -2615,6 +2814,7 @@
           "sector": "logistics"
         },
         {
+          "careers_url": null,
           "claimed": false,
           "distance_km": 1.9,
           "hiring": true,

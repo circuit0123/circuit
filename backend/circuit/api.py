@@ -29,7 +29,7 @@ from core.health import router as health_router
 
 api = NinjaAPI(
     title="Circuit API",
-    version="1.2.0",
+    version="1.3.0",
     description="Circuit backend. Errors always use {error: {code, message, details}}; lists use {items, count, next_offset}.",
     openapi_url=None if settings.ENV == "production" else "/openapi.json",  # no public API map in production
     docs_url=None if settings.ENV == "production" else "/docs",

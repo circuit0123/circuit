@@ -105,3 +105,11 @@ def test_search_results_carry_no_private_fields(town, make_member, client_for):
     body = client_for(make_member("student")).get("/api/search", {"q": "an"}).content.decode()
     for word in ("email", "view_count", "interest_count", "score"):
         assert word not in body
+
+
+def test_search_startups_carry_careers_url(town, make_member, client_for):
+    _, verified, _, _ = town
+    verified.details = {"careers_url": "https://anand.io/careers"}
+    verified.save()
+    found = search(client_for(make_member()), "Anand")["startups"]
+    assert found[0]["careers_url"] == "https://anand.io/careers"

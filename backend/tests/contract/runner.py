@@ -64,6 +64,7 @@ def run_case(case: Case, world, client_for, settings) -> tuple[dict, list[str]]:
     """Make the case's calls; return (the fixture document, problems found)."""
     from core import flags
 
+    settings.SUPPORT_EMAIL = "support@example.com"  # fixtures must not depend on the real address in .env
     settings.FEATURES = case.features or ",".join(f"{n}:everyone" for n in flags.FLAGS)
     saved = {k: getattr(settings, k) for k in case.overrides}
     for key, value in case.overrides.items():

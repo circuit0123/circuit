@@ -91,13 +91,21 @@ def student_match_pcts(member: Member, startup_ids: list[int]) -> dict[int, int]
     return out
 
 
+def careers_url(s: Startup, hide: bool) -> str | None:
+    """The careers page from the import (details json). Only a web link, and nothing for an under-18 on an unverified startup."""
+    url = s.details.get("careers_url") if isinstance(s.details, dict) else None
+    if hide or not isinstance(url, str) or not url.startswith(("http://", "https://")):
+        return None
+    return url
+
+
 def _pin(s: Startup, roles: dict[int, int], pcts: dict[int, int], minor: bool = False) -> dict:
     loc = cast(Point, s.location)  # every search filters on location__isnull=False
     hide = minor and not is_verified(s)  # under-18: an unverified startup looks like one with no roles
     return {
         "id": s.pk, "name": s.name, "lat": loc.y, "lng": loc.x, "hiring": s.hiring and not hide, "sector": s.sector,
         "claimed": s.claimed_by_id is not None, "open_roles": 0 if hide else roles.get(s.pk, 0),
-        "match_pct": None if hide else pcts.get(s.pk), "logo": media.logo_of(s),
+        "match_pct": None if hide else pcts.get(s.pk), "logo": media.logo_of(s), "careers_url": careers_url(s, hide),
     }  # fmt: skip
 
 
@@ -232,7 +240,7 @@ def detail(member: Member, startup: Startup, count_view: bool = True) -> dict:
     return {
         "id": startup.pk, "name": startup.name, "website_domain": startup.website_domain, "description": startup.description,
         "sector": startup.sector, "stage": startup.stage, "address": startup.address, "team_size": startup.team_size,
-        "logo": media.logo_of(startup),
+        "logo": media.logo_of(startup), "careers_url": careers_url(startup, hide),
         "lat": startup.location.y if startup.location else None, "lng": startup.location.x if startup.location else None,
         "hiring": startup.hiring and not hide, "tech_stack": startup.tech_stack, "claimed": is_verified(startup),
         "verified": is_verified(startup), "source": startup.source, "view_count": views, "interest_count": interested,
