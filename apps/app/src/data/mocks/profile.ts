@@ -82,11 +82,11 @@ export const profileHandlers: HttpHandler[] = [
   http.post(`${API}/me/verify/work-email`, scenario(async (_s, { request }) => {
     const { email } = (await request.json()) as { email: string };
     if (/@(gmail|yahoo|outlook|hotmail|proton)\./i.test(email)) return envelope(422, "personal_email", "Use your work email, not a personal one.");
-    return HttpResponse.json({ sent: true, dev_code: "123456" });
+    return HttpResponse.json({ sent: true, dev_code: "K7M2P9QX" });
   })),
   http.post(`${API}/me/verify/work-email/confirm`, scenario(async (_s, { request }) => {
     const { code } = (await request.json()) as { code: string };
-    if (code !== "123456") return envelope(400, "wrong_code", "That code isn't right. Check it and try again.");
+    if (code !== "K7M2P9QX") return envelope(400, "wrong_code", "That code isn't right. Check it and try again.");
     mePatch.verification_level = 2;
     return HttpResponse.json({ ok: true });
   })),

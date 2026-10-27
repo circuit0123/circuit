@@ -62,16 +62,20 @@ type CodeProps = {
   /** Called once all digits are in. */
   onComplete?: (v: string) => void;
   length?: number;
+  /** `digits` (the sign-in code, 6 digits) or `code`: letters and digits, shown in capitals (the codes our own emails carry, 8 characters). */
+  kind?: "digits" | "code";
   label: string;
   error?: string | null;
   disabled?: boolean;
 };
 
-/** A one-time code: one box per digit, auto-advance, backspace goes back, paste fills every box. */
-export function CodeField({ value, onChange, onComplete, length = 6, label, error, disabled }: CodeProps) {
+/** A one-time code: one box per character, auto-advance, backspace goes back, paste fills every box. */
+export function CodeField({ value, onChange, onComplete, length = 6, kind = "digits", label, error, disabled }: CodeProps) {
   const uid = useId();
+  const clean = (text: string) => (kind === "code" ? text.replace(/[^A-Za-z0-9]/g, "").toUpperCase() : text.replace(/\D/g, ""));
+  const unit = kind === "code" ? "Character" : "Digit";
   const set = (next: string) => {
-    const v = next.replace(/\D/g, "").slice(0, length);
+    const v = clean(next).slice(0, length);
     onChange(v);
     if (v.length === length) onComplete?.(v);
   };
@@ -83,17 +87,18 @@ export function CodeField({ value, onChange, onComplete, length = 6, label, erro
           <input
             key={i}
             id={`${uid}-${i}`}
-            inputMode="numeric"
+            inputMode={kind === "code" ? "text" : "numeric"}
             autoComplete={i === 0 ? "one-time-code" : "off"}
-            pattern="[0-9]*"
+            autoCapitalize={kind === "code" ? "characters" : undefined}
+            pattern={kind === "code" ? undefined : "[0-9]*"}
             maxLength={length}
             disabled={disabled}
-            aria-label={`Digit ${i + 1} of ${length}`}
+            aria-label={`${unit} ${i + 1} of ${length}`}
             aria-invalid={!!error}
             value={value[i] ?? ""}
             onFocus={(e) => e.currentTarget.select()}
             onChange={(e) => {
-              const digits = e.target.value.replace(/\D/g, "");
+              const digits = clean(e.target.value);
               if (!digits) return;
               // One digit types in place; several (paste, autofill) fill from this box on.
               set(value.slice(0, i) + digits + value.slice(i + digits.length));

@@ -28,11 +28,11 @@ export function WorkEmailSheet({ open, onClose }: { open: boolean; onClose: () =
           <Button type="submit" variant="primary" className="w-full" disabled={!email.trim() || start.isPending}>{start.isPending ? "Sending…" : "Send code"}</Button>
         </form>
       ) : (
-        <form className="flex flex-col gap-6 pt-2" onSubmit={(e) => { e.preventDefault(); if (code.length === 6) check(code); }}>
-          <p className="t-body text-text-muted">Enter the 6-digit code we sent to {email}.</p>
+        <form className="flex flex-col gap-6 pt-2" onSubmit={(e) => { e.preventDefault(); if (code.length === 8) check(code); }}>
+          <p className="t-body text-text-muted">Enter the 8-character code we sent to {email}.</p>
           {start.data?.dev_code && <p className="t-subhead text-text-muted">Test builds only: the code is <span className="num">{start.data.dev_code}</span>.</p>}
-          <CodeField label="Code" value={code} onChange={setCode} onComplete={check} error={problem(confirm.error)} disabled={confirm.isPending} />
-          <Button type="submit" variant="primary" className="w-full" disabled={code.length !== 6 || confirm.isPending}>{confirm.isPending ? "Checking…" : "Verify"}</Button>
+          <CodeField kind="code" length={8} label="Code" value={code} onChange={setCode} onComplete={check} error={problem(confirm.error)} disabled={confirm.isPending} />
+          <Button type="submit" variant="primary" className="w-full" disabled={code.length !== 8 || confirm.isPending}>{confirm.isPending ? "Checking…" : "Verify"}</Button>
           <Button variant="text" className="w-full" onClick={() => { start.reset(); setCode(""); }}>Use a different email</Button>
         </form>
       )}
