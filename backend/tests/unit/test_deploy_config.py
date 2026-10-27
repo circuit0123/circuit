@@ -566,7 +566,7 @@ def test_make_monitoring_with_no_channels_stops_with_a_clear_message(prod):
         gcp.plan_monitoring(prod, "123456789")
 
 
-def test_production_cors_allows_exactly_the_origin_the_app_and_landing_are_served_from(prod):
+def test_production_cors_allows_exactly_the_origin_the_app_is_served_from(prod):
     from urllib.parse import urlparse
 
     def origin(url):
@@ -574,7 +574,7 @@ def test_production_cors_allows_exactly_the_origin_the_app_and_landing_are_serve
         return f"{u.scheme}://{u.netloc}"
 
     cors = [o for o in prod.env_vars["CORS_ALLOWED_ORIGINS"].split(",") if o]
-    assert cors == [origin(prod.env_vars["APP_URL"])] == [origin(prod.env_vars["LANDING_URL"])]
+    assert cors == [origin(prod.env_vars["APP_URL"])]
 
 
 def test_links_built_from_the_production_app_url_land_inside_the_app(prod, settings):
@@ -582,8 +582,8 @@ def test_links_built_from_the_production_app_url_land_inside_the_app(prod, setti
     from apps.notifications.unsubscribe import page_url
 
     settings.APP_URL = prod.env_vars["APP_URL"]
-    assert invite_link("ABCD2345").startswith("https://circuit-phi.vercel.app/app/join?")
-    assert page_url("t").startswith("https://circuit-phi.vercel.app/app/unsubscribe?")
+    assert invite_link("ABCD2345").startswith("https://app.circuitapp.net/join?")
+    assert page_url("t").startswith("https://app.circuitapp.net/unsubscribe?")
     assert not prod.env_vars["LANDING_URL"].endswith("/app")
 
 
@@ -605,3 +605,14 @@ def test_the_committed_production_file_has_no_placeholders_left_for_a_deploy():
     """Unlike the other tests this does not fill anything in: it is the file as committed, which `make deploy` will read."""
     cfg = gcp.load_config("production", REPO / "deploy" / "gcp")
     assert gcp.find_placeholders(cfg, "deploy") == []
+
+
+def test_run_iam_bindings_have_no_condition_flag_but_other_bindings_keep_it(prod):
+    # `gcloud run jobs|services add-iam-policy-binding` rejects --condition; secrets and projects accept it.
+    steps = gcp.plan_setup(prod) + gcp.plan_deploy(prod, "abc", STATE)
+    bindings = [s.argv for s in steps if "add-iam-policy-binding" in s.argv]
+    run = [a for a in bindings if a[1:2] == ["run"]]
+    assert {a[2] for a in run} == {"jobs", "services"}
+    assert not any(x.startswith("--condition") for a in run for x in a)
+    kept = [a for a in bindings if a[1] in ("secrets", "projects")]
+    assert kept and all("--condition=None" in a for a in kept)
