@@ -57,6 +57,8 @@ const person = (id: number): Schemas["PersonOut"] => {
 const NO_PATH = 5;
 const CONNECTED = 4;
 const FULL = 4;
+/** Intros asked for in this page load, for the capacity call. */
+let introsSent = 0;
 
 /** Notifications read in this page load. */
 const readIds = new Set<number>();
@@ -112,11 +114,16 @@ export const handlers: HttpHandler[] = [
     if (id === NO_PATH) return envelope(404, "no_warm_path", "You have no mutual connection with this person");
     return HttpResponse.json({ target: person(id), via: id === CONNECTED ? null : person(PEOPLE.lakshmi.id) });
   })),
+  http.get(`${API}/intros/capacity`, scenario((s) => {
+    const used = s === "intros_used" ? 3 : s === "under18" ? 0 : introsSent;
+    return HttpResponse.json({ allowed: s !== "under18", weekly_limit: 3, used, left: Math.max(0, 3 - used), next_frees_at: used >= 3 ? new Date(Date.now() + 2 * 86_400_000).toISOString() : null });
+  })),
   http.post(`${API}/intros`, scenario(async (s, { request }) => {
     const { target_id } = (await request.json()) as { target_id: number };
     if (s === "intros_used") return envelope(409, "intro_weekly_limit", "You have used this week's introductions");
     if (target_id === NO_PATH) return envelope(404, "no_warm_path", "You have no mutual connection with this person");
     if (target_id === FULL) return envelope(409, "target_full", "This person is not taking more introductions this week");
+    introsSent++;
     return HttpResponse.json({ ...INTRO, target: person(target_id) }, { status: 201 });
   })),
 

@@ -40,6 +40,20 @@ export function useIntroPath(targetId: number | null) {
   });
 }
 
+/** How many intros I can still ask for this week, so the sheet can say so before Send. About me only; never how full anyone else is. */
+export function useIntroCapacity(on: boolean) {
+  const { key, enabled } = useKey("intro-capacity");
+  return useQuery({
+    queryKey: key,
+    enabled: enabled && on,
+    retry: false,
+    queryFn: async () => {
+      const c = await unwrap(api.GET("/api/intros/capacity"));
+      return { allowed: c.allowed, left: c.left, used: c.used, weeklyLimit: c.weekly_limit, nextFreesAt: c.next_frees_at };
+    },
+  });
+}
+
 /**
  * Asks for an intro (the backend routes it via a mutual if one exists). From the Daily Drop it also records the swipe, so the card
  * stays answered after a reload. Failures come back as an `IntroError` with a `failure` the sheet can put in one sentence.
@@ -47,6 +61,7 @@ export function useIntroPath(targetId: number | null) {
 export function useRequestIntro() {
   const qc = useQueryClient();
   const { key: dropKey } = useKey("drop");
+  const { key: capacityKey } = useKey("intro-capacity");
   return useMutation({
     mutationFn: async ({ id, fromDrop }: { id: number; fromDrop?: boolean }) => {
       try {
@@ -60,6 +75,7 @@ export function useRequestIntro() {
       }
     },
     onSuccess: (_d, { id, fromDrop }) => {
+      qc.invalidateQueries({ queryKey: capacityKey });
       if (fromDrop) qc.setQueryData<DailyDrop>(dropKey, (old) => old && { ...old, cards: old.cards.map((c) => (c.id === id ? { ...c, answered: "intro" } : c)) });
     },
   });
