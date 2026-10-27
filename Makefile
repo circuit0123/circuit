@@ -16,7 +16,7 @@ define not_yet
 endef
 
 .DEFAULT_GOAL := help
-.PHONY: simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
+.PHONY: landing-screens simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
 	reset-demo admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
 	smoke load-test funnel api-freeze api-client openapi contract-fixtures build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report job-health
 
@@ -49,6 +49,9 @@ app: ## Only the product app on :3000
 
 landing: ## Only the landing site on :3001
 	pnpm --filter @circuit/landing dev
+
+landing-screens: ## Re-render the landing site's app pictures (AVIF, WebP, PNG) from docs/design-reference: make landing-screens [SCREENS="map job"]
+	node scripts/landing-screens.mjs $(SCREENS)
 
 mock: ## App on mock data on :3000, no backend and no login. Switch scenario in the banner, or add ?scenario=empty to the address
 	pnpm --filter @circuit/app dev:mock

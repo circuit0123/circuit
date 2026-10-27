@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { PAGES } from "../src/content/pages";
 import { APP, ON } from "./support";
 
-/** What each proof section must say it is (DESIGN.md §12: never fake numbers or people). Students has real placeholders instead. */
+/** What each proof section must say it is (DESIGN.md §12: never fake numbers or people). Students shows real app screens instead. */
 const PROOF_LABEL: Record<string, string | null> = { students: null, founders: "Example", mentors: "Example", investors: "Example", partners: "Demo data" };
 
 for (const p of PAGES) {
@@ -36,7 +36,7 @@ for (const p of PAGES) {
       const proof = page.locator("section[aria-labelledby=proof-h]");
       const label = PROOF_LABEL[p.slug];
       if (label) await expect(proof.getByText(label, { exact: true })).toHaveCount(1);
-      else await expect(proof.getByRole("img", { name: /App screenshot coming/ }).first()).toBeVisible();
+      else await expect(proof.getByRole("img", { name: /Jobs tab/ })).toHaveCount(1);
     });
 
     test("the call to action carries this page's role and src, in the hero and after the FAQ", async ({ page }) => {

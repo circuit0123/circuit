@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { HeroVideo } from "@/components/HeroVideo";
 import { HowItWorks } from "@/components/HowItWorks";
+import { ScreenTour } from "@/components/Screens";
 import { PilotCity } from "@/components/PilotCity";
 import { Waitlist } from "@/components/Waitlist";
 import { FAQ, INVITE_ONLY, SRC, STEPS } from "@/content/home";
@@ -27,6 +28,7 @@ export default async function Page() {
         />
         <Audiences investorOpen={flagOn(features, "investor_mode")} />
         <HowItWorks steps={STEPS} />
+        <ScreenTour heading="A look inside" lede="Matches with a reason, jobs and startups on a map, and circuits where three people help each other." ids={["home-main", "discover-jobs", "map", "circuits"]} />
         {/* Hidden until real counts exist: no public stats endpoint yet, so nothing is passed (never fake numbers). */}
         <PilotCity stats={null} />
         {JOIN_LIVE ? (

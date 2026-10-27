@@ -753,6 +753,36 @@ Not exercised: `admin-user` interactively (unit-tested with a mocked password pr
 - **Onboarding** (DESIGN.md §4): read `GET /api/onboarding/state` on launch to resume at `current_step`; save each screen with `PATCH` (the answer under its step key; e.g. `role: {"choice": "invest" | "partner" | …}` decides the branch); skip the screens in `skip`; send `signup_source` from `/join?src=…` on the first call; send `completed: true` at the end.
 - Nothing visible for the ranker: members see no difference except a different order once a model is promoted.
 
+## L4 — Landing screenshots (`landing-screenshots`, from `main`): done, waiting for your OK
+
+Real app screens now sit on the home page and all five audience pages. Only `apps/landing` changed, plus `scripts/landing-screens.mjs`, one Make target (`make landing-screens`) and its COMMANDS.md entry. `apps/app`, `packages/` and `backend/` are untouched; nothing deployed.
+
+**Where each screen is** (files `apps/landing/public/screens/<name>.{avif,webp,png}`; 780×1688 px = a 390×844 phone at 2x, each file ≤ 150 KB, largest is the PNG at 139 KB)
+
+| Page | Section | Screens (reference file) |
+|---|---|---|
+| `/` | new "A look inside" after How it works | Home (Main), Jobs (Discover), Map, Circuits |
+| `/students` | the proof section (was two "screenshot coming" boxes) | Jobs (Discover), Map, Job |
+| `/founders` | new "What founders see" before the proof | match card with Bridge badge (Main, second card), People, Inbox |
+| `/mentors` | new "What mentors see" before the proof | People, Circuits, Chat |
+| `/investors` | beside the example pick | **InvestorHome** ("Today's picks", the exact screen, so I used it instead of Main/People) |
+| `/partners` | inside the "Demo data" proof (was a "Gap map coming" box) | **PartnerHome** (no gap map or Desktop dashboard exists in the references, so the gap map is still not drawn) |
+
+**How the pictures are made.** The reference files are a mock's template language and their `support.js` is not in the repo, so `scripts/landing-screens.mjs` expands that small syntax itself, runs each file's own sample data, and screenshots the phone in Chromium. It encodes through Pillow (AVIF, WebP, PNG; the PNG is lossless). `make landing-screens [SCREENS="map job"]` redoes them. Nothing from `docs/design-reference` is shipped, only the rendered pictures.
+
+**Content check (item 2).** I changed these in the reference copy before rendering: startup names Tatvagrid, Sutragrid, Zetapulse, Medisetu, Kalam Labs, Neerflow became "Sample Agritech/Logistics/Deeptech/Healthtech/Edtech/Climate Co."; the partner name Kaveri Tech became "Sample Incubator"; people (Sakthi Vel, Kavya Raman, Harini Prasad, Yamini Iyer, Meera Krishnan, Farhan Ali, Divya Subramanian, Arun Prakash, Ishaan Reddy) became first names only; "RSVPs 90% full" became "RSVPs open". Every picture also carries a small "Sample data" label, and each list of phones says so in words. No logos, emails, phone numbers or testimonials were in the references. **Left in on purpose:** the partner dashboard's counts (148 members and so on) and the circuit's "Priya / Arjun / Asha" story names; they are sample data under the label, but you may prefer none on `/partners`.
+
+**On the page.** `<picture>` AVIF → WebP → PNG with width and height, `loading="lazy"` (all of them are below the fold), alt text that says what the screen does (`content/screens.ts`), a CSS phone frame with no brand or notch (the frame follows the page theme). Motion: they use the existing section reveal (fade and rise, staggered), which `prefers-reduced-motion` already turns off; I added no new animation. On a phone the row is a swipeable strip (focusable with the keyboard, the page itself never scrolls sideways); from 1024px it is a grid. `NEXT_PUBLIC_LAUNCH_MODE` and the join switch were not touched (all four builds pass).
+
+**Checks.** Typecheck and lint clean. Landing Playwright (375px and 1280px, both themes, including axe on every page and the premium rules): 401 passed, 1 skipped (tile hover on phone, as before); new `e2e/screens.spec.ts` checks every page's screens (formats, size attributes, alt, lazy, loads as AVIF, strip focusable, no sideways scroll). Lighthouse mobile (simulated slow 4G, brotli-compressed server, 3 runs): home performance 100 (LCP 1.4–1.6 s, CLS 0), `/students` 100, `/investors` 100; page weight 273 KiB because the screens are lazy. A plain unzipped Python server scored 84–89 on the same build; that is the server, not the page.
+
+**Decisions / skipped**
+1. **Dark only.** All references are dark (only Appearance previews light, and it is not on the list), so there is no light version of any picture. The dark phone in its frame looks fine on the light theme. A light set would need a light colour pass over the references (the README gives the light tokens): tell me if you want it.
+2. **Pasted images:** none arrived in this chat, so `public/screens/source/` does not exist yet.
+3. **Step 03 now uses real screens:** home (Circuits), `/students` "Apply in one tap" (Job) and `/mentors` "Join a circuit" (Circuits), as the top of the screen cropped into the step's frame (`Step.screen`). On home and `/mentors` the Circuits picture therefore appears twice (step and tour). **Still placeholders:** home step 01, students steps 01–02 are fine (02 is the Daily Drop), founders steps 01 and 02, mentors step 01 (no onboarding or claim reference screens were on the list).
+4. `next build` on its own needs the `NEXT_PUBLIC_*` variables (same as before); the static builds in `make test-landing` are the build check.
+5. The sandbox's Playwright browser was one version behind the repo's: I linked it locally outside the repo; nothing to do on your machine.
+
 ## L3 — Landing motion (`landing-pages`): done, waiting for your OK
 
 `make check` is green (ruff, mypy, backend tests, frontend types, landing Playwright: 361 passed, 1 skipped = tile hover, which needs a pointer, on the phone project). Screenshots and recordings: `screenshots/landing-motion/` (script: `screenshots/landing-motion.mjs`).
