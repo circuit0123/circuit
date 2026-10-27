@@ -2,10 +2,12 @@
 
 import { Button, ErrorState, GroupedList, ListRow, PushScreen, Skeleton } from "@circuit/ui";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { APP_VERSION } from "@/lib/env";
-import { loadFailed, settingsHref, useSettings, useSignOut } from "@/data";
+import { loadFailed, settingsHref, useMe, useSettings, useSignOut } from "@/data";
 import { goBack } from "../jobs/JobScreen";
 import { ROW_INSET } from "../sheets";
+import { WorkEmailSheet } from "./WorkEmailSheet";
 
 /** A settings sub-screen: pushed, with a Large title and Back to where it came from (Settings.dc.html, Appearance.dc.html). */
 export function SettingsScreen({ title, backLabel = "Settings", back = settingsHref(), footer, children }: { title: string; backLabel?: string; back?: string; footer?: React.ReactNode; children: React.ReactNode }) {
@@ -24,6 +26,8 @@ export function SettingsScreen({ title, backLabel = "Settings", back = settingsH
 export function SettingsHome() {
   const router = useRouter();
   const s = useSettings();
+  const me = useMe().data;
+  const [verify, setVerify] = useState(false);
   const out = useSignOut();
   const v = s.summary;
   // Client-side moves (not <a href>), so the app and its cache stay put.
@@ -36,6 +40,7 @@ export function SettingsHome() {
         <>
           <GroupedList header="Account">
             <ListRow className={ROW_INSET} title="Edit profile" subtitle={`${v.name} · ${v.emailHint}`} onClick={go(settingsHref("profile"))} />
+            <ListRow className={ROW_INSET} title="Verification" value={me?.level && me.level >= 2 ? `Level ${me.level}` : "Level 1"} subtitle={me?.level && me.level >= 2 ? undefined : "Verify your work email"} onClick={me?.level && me.level >= 2 ? undefined : () => setVerify(true)} />
             <ListRow className={ROW_INSET} title="Privacy" value={v.privacy} onClick={go(settingsHref("privacy"))} />
             <ListRow className={ROW_INSET} title="Notifications" value={v.notifications} onClick={go(settingsHref("notifications"))} />
             <ListRow className={ROW_INSET} title="Blocked people" value={v.blocked ? String(v.blocked) : "None"} onClick={go(settingsHref("blocked"))} />
@@ -60,6 +65,7 @@ export function SettingsHome() {
           </div>
         </>
       )}
+      <WorkEmailSheet open={verify} onClose={() => setVerify(false)} />
     </SettingsScreen>
   );
 }

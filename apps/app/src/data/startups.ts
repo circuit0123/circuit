@@ -35,10 +35,13 @@ export type StartupPage = {
   /** The signed-in member is on this startup's team: they see its private counts and its applicants. */
   isTeam: boolean;
   /** Only for the team (DESIGN.md §4: never public). */
-  privateCounts: { views: number; interested: number } | null;
+  privateCounts: { views: number | null; interested: number | null } | null;
   /** Shown to founders on an unclaimed page, to say why claiming is worth it (CLAUDE.md F3). */
-  claimNudge: { views: number; interested: number } | null;
+  claimNudge: { views: number | null; interested: number | null } | null;
   canClaim: boolean;
+  /** Students can tell a startup they're interested; everyone else has no such button. */
+  canShowInterest: boolean;
+  interested: boolean;
   teamSize: number | null;
   founders: StartupFounder[];
   logs: StartupLog[];
@@ -77,6 +80,8 @@ export function useStartup(id: number) {
     privateCounts: s.is_team ? { views: s.view_count, interested: s.interest_count } : null,
     claimNudge: !s.claimed && me?.role === "founder" ? { views: s.view_count, interested: s.interest_count } : null,
     canClaim: !s.claimed && me?.role === "founder",
+    canShowInterest: me?.role === "student",
+    interested: s.interested,
     teamSize: extras?.teamSize ?? null,
     founders: extras?.founders ?? [],
     logs: features.on("pulse") ? extras?.logs ?? [] : [],
@@ -107,6 +112,26 @@ export function useFollow() {
     },
     onError: () => qc.invalidateQueries({ queryKey: key }),
   });
+}
+
+/**
+ * "I'm interested" (students only): shown at once, put back if the call fails. The API has no list of startups I'm interested in, so the
+ * answer lives in the cache: the Startup page seeds it from `interested`; the map popup doesn't know and starts from "no" (the call is safe to repeat).
+ */
+export function useInterest(id: number, seed = false) {
+  const qc = useQueryClient();
+  const { key, enabled } = useKey("interest", id);
+  const state = useQuery({ queryKey: key, enabled, staleTime: Infinity, queryFn: async () => seed });
+  const set = useMutation({
+    mutationFn: (on: boolean) =>
+      on ? unwrap(api.POST("/api/startups/{startup_id}/interest", { params: { path: { startup_id: id } } }))
+        : unwrap(api.DELETE("/api/startups/{startup_id}/interest", { params: { path: { startup_id: id } } })),
+    onMutate: (on) => { const before = qc.getQueryData<boolean>(key); qc.setQueryData(key, on); return { before }; },
+    onError: (_e, _on, ctx) => qc.setQueryData(key, ctx?.before ?? false),
+  });
+  /** Resolves true when saved, false when it failed (and was put back). */
+  const setInterested = async (on: boolean) => { try { await set.mutateAsync(on); return true; } catch { return false; } };
+  return { interested: state.data ?? seed, set: setInterested, pending: set.isPending };
 }
 
 export type ClaimFailure = "wrong_domain" | "wrong_code" | "failed";

@@ -1,14 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import type { Schemas } from "@circuit/api-client";
 import { kindLabel, kmText, roleLabel, rupees, sectorLabel, skillFit } from "@/lib/format";
 import { api, unwrap } from "./client";
 import { useFeatures } from "./features";
 import { useKey } from "./keys";
 import { useMe, type Me } from "./me";
-import { CITIES, PROMOTED_STAND_IN, PROMOTED_STARTUP_STAND_IN, type MissingJobFields } from "./missing";
+import { PROMOTED_STAND_IN, PROMOTED_STARTUP_STAND_IN, type MissingJobFields } from "./missing";
 import { MOCK } from "./mocks/config";
+import { useCities } from "./where";
 
 export type Segment = "people" | "startups" | "jobs" | "map";
 export const SEGMENTS: { id: Segment; label: string }[] = [
@@ -40,10 +42,14 @@ export const FILTERS_FOR: Record<Segment, Array<keyof DiscoverFilters>> = {
 export const activeFilters = (f: DiscoverFilters, seg: Segment) =>
   FILTERS_FOR[seg].filter((k) => f[k] !== NO_FILTERS[k]).length;
 
+/** The pilot city's centre, only until `GET /api/cities` answers. */
+const PILOT_CENTRE = { lat: 13.08, lng: 80.27 };
+
 /** Where "near you" is measured from: the member's saved location, else the pilot city's centre. */
 export function useHere(): { lat: number; lng: number } {
   const loc = useMe().data?.location;
-  return loc ?? { lat: CITIES[0].lat, lng: CITIES[0].lng };
+  const pilot = useCities().data?.find((c) => c.pilot);
+  return loc ?? (pilot ? { lat: pilot.lat, lng: pilot.lng } : PILOT_CENTRE);
 }
 
 export type PersonTile = { id: number; name: string; line: string; fit: string | null; bridge: boolean; level: number };
@@ -149,34 +155,41 @@ export function useSkillsInDemand(on = true) {
   const q = useQuery({
     queryKey: key,
     enabled: enabled && on,
-    queryFn: async () => (await unwrap(api.GET("/api/jobs", { params: { query: { limit: 100, max_distance_km: 10 } } }))).items,
+    queryFn: () => unwrap(api.GET("/api/jobs/skills-in-demand", { params: { query: { within_km: 10 } } })),
   });
-  const counts = new Map<string, number>();
-  for (const j of q.data ?? []) for (const c of j.capabilities) if (c.required) counts.set(c.name, (counts.get(c.name) ?? 0) + 1);
-  const top = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 3).map(([n]) => n);
+  const names = (q.data ?? []).slice(0, 3).map((s) => s.name);
   const lower = (n: string) => (/^[A-Z]{2}/.test(n) ? n : n[0].toLowerCase() + n.slice(1));
-  const names = top.map((n, i) => (i === 0 ? n : lower(n)));
-  const text = names.length === 0 ? null
-    : names.length === 1 ? `${names[0]} has the most open roles within 10 km.`
-    : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]} have the most open roles within 10 km.`;
+  const shown = names.map((n, i) => (i === 0 ? n : lower(n)));
+  const text = shown.length === 0 ? null
+    : shown.length === 1 ? `${shown[0]} has the most open roles within 10 km.`
+    : `${shown.slice(0, -1).join(", ")} and ${shown[shown.length - 1]} have the most open roles within 10 km.`;
   return { text, isPending: q.isPending && on, isError: q.isError };
 }
 
-/** Search across all four segments (the map's pins are the startups), over what the lists already hold. See PROGRESS.md "API needed". */
+/** Search across people (by name), startups and roles in one call: `GET /api/search`, asked 250 ms after the last key, from 2 characters. */
 export function useDiscoverSearch(query: string) {
-  const q = query.trim().toLowerCase();
-  const on = q.length > 0;
-  const people = useDiscoverPeople(NO_FILTERS, on);
-  const startups = useDiscoverStartups(NO_FILTERS, on);
-  const jobs = useDiscoverJobs(NO_FILTERS, on);
-  const has = (...s: string[]) => s.some((x) => x.toLowerCase().includes(q));
+  const typed = query.trim();
+  const on = typed.length >= 2;
+  const [q, setQ] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setQ(typed), 250);
+    return () => clearTimeout(t);
+  }, [typed]);
+  const me = useMe().data;
+  const { key, enabled } = useKey("discover-search", q);
+  const found = useQuery({
+    queryKey: key,
+    enabled: enabled && on && q.length >= 2,
+    queryFn: () => unwrap(api.GET("/api/search", { params: { query: { q } } })),
+  });
+  const ready = on && q === typed && !!found.data;
   return {
     on,
-    isPending: people.isPending || startups.isPending || jobs.isPending,
-    isError: people.isError && startups.isError && jobs.isError,
-    people: people.items.filter((p) => has(p.name, p.line)),
-    startups: startups.items.filter((s) => has(s.name, s.sector)),
-    jobs: jobs.items.filter((j) => has(j.title, j.startup, j.sector)),
+    isPending: on && !found.isError && !ready,
+    isError: on && found.isError,
+    people: ready ? found.data!.people.map((p): PersonTile => ({ id: p.id, name: p.display_name, line: p.headline || roleLabel(p.role), fit: null, bridge: false, level: p.verification_level })) : [],
+    startups: ready ? found.data!.startups.map(toStartupTile) : [],
+    jobs: ready ? (found.data!.jobs as JobIn[]).map(toJobRow).filter(visibleTo(me)) : [],
   };
 }
 

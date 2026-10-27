@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
+import { api } from "./client";
 
 /** What a landing or invite link told us (`/join?role=student&src=landing-students&code=…`). Kept across the sign-in redirect. */
 export type JoinContext = { role?: string; src?: string; code?: string; org?: string };
 const KEY = "circuit.join";
-const ROLES = ["student", "founder", "mentor", "investor", "partner"];
+// No "partner": partner sign-up (and its dashboard) is not in this build, so a `role=partner` link is treated as no role and the person sees the normal Role question, which has no partner row.
+const ROLES = ["student", "founder", "mentor", "investor"];
 const SRC = /^[a-z0-9_-]{1,40}$/;
 const EMPTY: JoinContext = {};
 
@@ -52,4 +54,17 @@ export function useJoinContext() {
     write(Object.keys(next).length ? next : null);
   }, []);
   return { ...ctx, save, clear, forget };
+}
+
+/**
+ * Counts a click on a landing or invite link for the per-source funnel (`POST /api/join/visit`): once per browser session, fire and
+ * forget. Stores only a per-day count on the server, never who clicked.
+ */
+export function reportJoinVisit(src: string | undefined) {
+  if (!src) return;
+  try {
+    if (sessionStorage.getItem("circuit.visit") === src) return;
+    sessionStorage.setItem("circuit.visit", src);
+  } catch { /* no storage: count it anyway */ }
+  void Promise.resolve(api.POST("/api/join/visit", { body: { src } })).catch(() => {});
 }

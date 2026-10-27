@@ -1,10 +1,12 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Schemas } from "@circuit/api-client";
 import { roleLabel } from "@/lib/format";
 import { api, ApiError, unwrap } from "./client";
 import type { DailyDrop } from "./home";
 import { useKey } from "./keys";
+import { useMe } from "./me";
 
 /** Why an intro could not be sent, in the words a screen needs. */
 export type IntroFailure = "weekly_limit" | "target_full" | "no_path" | "under_18" | "failed";
@@ -38,6 +40,20 @@ export function useIntroPath(targetId: number | null) {
   });
 }
 
+/** How many intros I can still ask for this week, so the sheet can say so before Send. About me only; never how full anyone else is. */
+export function useIntroCapacity(on: boolean) {
+  const { key, enabled } = useKey("intro-capacity");
+  return useQuery({
+    queryKey: key,
+    enabled: enabled && on,
+    retry: false,
+    queryFn: async () => {
+      const c = await unwrap(api.GET("/api/intros/capacity"));
+      return { allowed: c.allowed, left: c.left, used: c.used, weeklyLimit: c.weekly_limit, nextFreesAt: c.next_frees_at };
+    },
+  });
+}
+
 /**
  * Asks for an intro (the backend routes it via a mutual if one exists). From the Daily Drop it also records the swipe, so the card
  * stays answered after a reload. Failures come back as an `IntroError` with a `failure` the sheet can put in one sentence.
@@ -45,6 +61,7 @@ export function useIntroPath(targetId: number | null) {
 export function useRequestIntro() {
   const qc = useQueryClient();
   const { key: dropKey } = useKey("drop");
+  const { key: capacityKey } = useKey("intro-capacity");
   return useMutation({
     mutationFn: async ({ id, fromDrop }: { id: number; fromDrop?: boolean }) => {
       try {
@@ -58,7 +75,100 @@ export function useRequestIntro() {
       }
     },
     onSuccess: (_d, { id, fromDrop }) => {
+      qc.invalidateQueries({ queryKey: capacityKey });
       if (fromDrop) qc.setQueryData<DailyDrop>(dropKey, (old) => old && { ...old, cards: old.cards.map((c) => (c.id === id ? { ...c, answered: "intro" } : c)) });
     },
+  });
+}
+
+export type IntroBox = "received" | "sent" | "brokered";
+
+export type IntroRow = {
+  id: number;
+  /** Where the viewer stands in this intro. */
+  myRole: "requester" | "broker" | "target";
+  status: string;
+  /** Whose turn it is: the mutual connection ("broker"), the person asked ("target"), or finished. */
+  stage: string;
+  /** The viewer is the one who has to answer now. */
+  canRespond: boolean;
+  requester: { id: number; name: string };
+  target: { id: number; name: string };
+  via: { id: number; name: string } | null;
+  message: string;
+  /** 1–5 once the person who asked has rated it. */
+  rating: number | null;
+  expiresAt: string;
+  /** One line a list row can show under the names. */
+  line: string;
+};
+
+const person = (p: { id: number; display_name: string }) => ({ id: p.id, name: p.display_name });
+
+function introLine(i: { my_role: string; status: string; stage: string; via?: { display_name: string } | null; target: { display_name: string } }): string {
+  if (i.status === "accepted" || i.status === "completed") return "Accepted";
+  if (i.status === "declined") return "Not this time";
+  if (i.status === "expired") return "Expired with no answer";
+  if (i.my_role === "requester") return i.stage === "broker" && i.via ? `Waiting for ${i.via.display_name} to pass it on` : `Waiting for ${i.target.display_name}`;
+  return "Waiting for your answer";
+}
+
+export function toIntroRow(i: Schemas["IntroOut"]): IntroRow {
+  return {
+    id: i.id,
+    myRole: i.my_role,
+    status: i.status,
+    stage: i.stage,
+    canRespond: i.can_respond,
+    requester: person(i.requester),
+    target: person(i.target),
+    via: i.via ? person(i.via) : null,
+    message: i.message,
+    rating: i.outcome_rating ?? null,
+    expiresAt: i.expires_at,
+    line: introLine(i),
+  };
+}
+
+/** Why answering or rating failed, in one sentence. */
+export function introAnswerProblem(e: unknown): string {
+  if (e instanceof ApiError) {
+    if (e.code === "not_your_turn") return "It isn't your turn on this one yet.";
+    if (e.code === "intro_expired") return "This intro has expired.";
+    if (e.code === "intro_not_accepted") return "You can rate it once it's accepted.";
+  }
+  return "Couldn't save that. Try again.";
+}
+
+/**
+ * Intros the viewer is part of, one box at a time (`received` = asked of me, `brokered` = I'm the mutual connection, `sent` = I asked).
+ * Members under 18 can't use intros (the server answers 403), so nothing is asked for them.
+ */
+export function useIntros(box: IntroBox) {
+  const me = useMe().data;
+  const { enabled } = useKey();
+  const q = useQuery({
+    queryKey: ["intros", box],
+    enabled: enabled && !!me && !me.isMinor,
+    queryFn: async () => (await unwrap(api.GET("/api/intros", { params: { query: { box, limit: 50 } } }))).items.map(toIntroRow),
+  });
+  return { rows: q.data ?? [], isPending: q.isPending && q.fetchStatus !== "idle", isError: q.isError, refetch: q.refetch };
+}
+
+/** Accept or decline an intro when it's your turn (the mutual connection answers first, then the person). Safe to repeat. */
+export function useRespondIntro() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, accept }: { id: number; accept: boolean }) => unwrap(api.POST("/api/intros/{intro_id}/respond", { params: { path: { intro_id: id } }, body: { accept } })),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["intros"] }); qc.invalidateQueries({ queryKey: ["unread"] }); },
+  });
+}
+
+/** The person who asked rates an accepted intro 1–5. */
+export function useRateIntro() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, rating }: { id: number; rating: number }) => unwrap(api.POST("/api/intros/{intro_id}/rating", { params: { path: { intro_id: id } }, body: { rating } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["intros"] }),
   });
 }

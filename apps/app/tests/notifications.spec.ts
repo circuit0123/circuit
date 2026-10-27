@@ -48,6 +48,17 @@ test.describe("Notifications", () => {
     expect(await href(/showed interest in your startup/)).toBe("/startups/41");
   });
 
+  test("Mark all as read clears every dot and the bell, and then the button goes", async ({ page }) => {
+    await home(page);
+    await openFromBell(page);
+    await expect(unreadDots(page)).toHaveCount(2);
+    await page.getByRole("button", { name: "Mark all as read" }).click();
+    await expect(unreadDots(page)).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Mark all as read" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Today" }).click();
+    await expect(page.getByRole("heading", { name: "Today", level: 1 })).toBeVisible();
+    await expect(bell(page)).toHaveAccessibleName("Notifications");
+  });
   test("tapping an unread one marks it read, opens it, and the bell drops by one", async ({ page }, info) => {
     await page.goto("/notifications?scenario=default");
     await expect(unreadDots(page)).toHaveCount(2);

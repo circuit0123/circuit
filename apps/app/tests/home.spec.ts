@@ -385,12 +385,19 @@ test.describe("Intro request flow", () => {
     await expect(drop(page).getByRole("button", { name: "Skip" })).toBeVisible();
   });
 
+  test("the sheet says how many intros are left this week", async ({ page }) => {
+    await open(page);
+    await drop(page).getByRole("button", { name: "Intro me" }).click();
+    await expect(sheet(page, "Intro to Asha").getByText("3 intros left this week.")).toBeVisible();
+  });
+
   test("weekly capacity used up: the weekly message, and the card stays", async ({ page }) => {
     await open(page, "intros_used");
     await drop(page).getByRole("button", { name: "Intro me" }).click();
     const s = sheet(page, "Intro to Asha");
-    await s.getByRole("button", { name: "Send request" }).click();
-    await expect(s.getByRole("alert")).toHaveText("You've used this week's intros. You can ask again next week.");
+    // The sheet knows before Send (GET /api/intros/capacity) and says when the next one frees up.
+    await expect(s.getByRole("alert")).toContainText("You've used this week's intros. You can ask again next week. The next one frees up on");
+    await expect(s.getByRole("button", { name: "Send request" })).toHaveCount(0);
     await s.getByRole("button", { name: "Close" }).click();
     await expect(counter(page)).toHaveText("1 of 3");
     await expect(page.getByText(asked)).toHaveCount(0);

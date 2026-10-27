@@ -111,6 +111,21 @@ export function useMarkRead() {
   });
 }
 
+/** Marks everything read: the dots go and the bell clears at once; a failure brings them back. */
+export function useMarkAllRead() {
+  const qc = useQueryClient();
+  const { key } = useKey("notifications");
+  const unread = useKey("unread").key;
+  return useMutation({
+    mutationFn: () => unwrap(api.POST("/api/notifications/read-all")),
+    onMutate: () => {
+      qc.setQueryData<InfiniteData<Page>>(key, (old) => old && { ...old, pages: old.pages.map((p) => ({ ...p, items: p.items.map((n) => ({ ...n, read: true })) })) });
+      qc.setQueryData<number>(unread, 0);
+    },
+    onError: () => { qc.invalidateQueries({ queryKey: key }); qc.invalidateQueries({ queryKey: unread }); },
+  });
+}
+
 /**
  * Listens on the member's own Realtime channel (`member:<id>`, event `notification`, id only) and refreshes the bell and the list when one
  * arrives. Used once, by the shell. Does nothing without a Supabase session (dev personas, mock mode); the minute poll covers those.

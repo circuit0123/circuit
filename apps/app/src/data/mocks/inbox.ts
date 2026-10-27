@@ -11,20 +11,20 @@
  * - Connections ("New message"): the five chat people plus Dr. Lakshmi Narayanan (7), who has no conversation yet.
  * - Uploads (shared with build logs, F6): each PUT takes about half a second; "Uploads fail once" (upload_fails) fails the first try of
  *   each picture.
- * - Decline (POST …/decline) is a mock-only stand-in: the API has no such call yet (PROGRESS.md "Frontend → API needed").
+ * - Decline (POST …/decline) says no to a request without blocking; the sender is not told.
  */
 import { delay, http, HttpResponse, type HttpHandler } from "msw";
 import type { Schemas } from "@circuit/api-client";
 import { emit } from "./bus";
 import { currentScenario, type Scenario } from "./config";
-import { author, PEOPLE } from "./fixtures";
+import { author, ME, PEOPLE } from "./fixtures";
 
 const API = "*/api";
 const envelope = (status: number, code: string, message: string) => HttpResponse.json({ error: { code, message, details: null } }, { status });
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
 
 type Author = Schemas["AuthorOut"];
-type Msg = Omit<Schemas["MessageOut"], "conversation_id"> & { read: boolean };
+type Msg = Omit<Schemas["MessageOut"], "conversation_id" | "read_at"> & { read: boolean };
 type Conv = { id: number; other: Author; status: "request" | "active"; started_by_me: boolean; messages: Msg[] };
 
 export const INBOX_PEOPLE = {
@@ -36,6 +36,8 @@ export const INBOX_PEOPLE = {
 };
 
 let nextId = 9000;
+/** Minutes since noon yesterday (local), so "Yesterday" is true whatever the time of day. */
+const sinceYesterdayNoon = () => { const d = new Date(); d.setDate(d.getDate() - 1); d.setHours(12, 0, 0, 0); return Math.round((Date.now() - d.getTime()) / 60_000); };
 const m = (mine: boolean, body: string, minutes: number, read = true): Msg => ({ id: ++nextId, mine, body, image: null, removed: false, created_at: minutesAgo(minutes), read: mine || read });
 
 const fresh = (): Conv[] => [
@@ -50,8 +52,8 @@ const fresh = (): Conv[] => [
     m(false, "Can you share the map prototype?", 95, false),
   ] },
   { id: 503, other: INBOX_PEOPLE.divyaS, status: "active", started_by_me: true, messages: [
-    m(true, "Try sending the reminder at 7 pm, when parents are home.", 30 * 60),
-    m(false, "Thanks, that helped a lot.", 29 * 60),
+    m(true, "Try sending the reminder at 7 pm, when parents are home.", sinceYesterdayNoon() + 60),
+    m(false, "Thanks, that helped a lot.", sinceYesterdayNoon()),
   ] },
   { id: 504, other: INBOX_PEOPLE.arun, status: "active", started_by_me: false, messages: [
     m(false, "Your team is on at 3:40 pm, after the agritech teams.", 3 * 24 * 60 + 20),
@@ -71,6 +73,8 @@ const fresh = (): Conv[] => [
 
 let store: Conv[] = fresh();
 const uploads = new Map<number, { src: string; width: number; height: number }>();
+/** The profile photo the mock member has set (kept until the page reloads). */
+export let mockPhoto: string | null = null;
 const failedUploads = new Set<number>();
 /** What an upload id holds (posts.ts builds post media from it). */
 export const uploadOf = (id: number) => uploads.get(id);
@@ -90,7 +94,7 @@ const REPLIES: Record<number, string> = {
 /** Under-18 members never get requests from strangers (backend rule). */
 const visible = (s: Scenario) => (s === "empty" ? [] : s === "under18" ? store.filter((c) => c.status !== "request") : store);
 
-const msgOut = (c: Conv, x: Msg): Schemas["MessageOut"] => ({ id: x.id, conversation_id: c.id, mine: x.mine, body: x.body, image: x.image, removed: x.removed, created_at: x.created_at });
+const msgOut = (c: Conv, x: Msg): Schemas["MessageOut"] => ({ id: x.id, conversation_id: c.id, mine: x.mine, body: x.body, image: x.image, removed: x.removed, created_at: x.created_at, read_at: x.read ? x.created_at : null });
 const convOut = (c: Conv): Schemas["ConversationOut"] => {
   const last = c.messages[c.messages.length - 1] ?? null;
   return {
@@ -131,6 +135,10 @@ const find = (s: Scenario, id: unknown) => visible(s).find((c) => c.id === Numbe
 const notFound = () => envelope(404, "not_found", "Not found");
 
 export const inboxHandlers: HttpHandler[] = [
+  http.get(`${API}/conversations/unread-count`, scenario((s) => {
+    const unread = (status: Conv["status"]) => visible(s).filter((c) => c.status === status && c.messages.some((x) => !x.mine && !x.read)).length;
+    return HttpResponse.json({ chats: unread("active"), requests: unread("request") });
+  })),
   http.get(`${API}/conversations`, scenario((s, { request }) => {
     const folder = new URL(request.url).searchParams.get("folder") ?? "chats";
     scheduleLive(s);
@@ -205,7 +213,7 @@ export const inboxHandlers: HttpHandler[] = [
     store = store.filter((x) => x.id !== c.id);
     return new HttpResponse(null, { status: 204 });
   })),
-  // Mock-only stand-in (API needed): say no to a request without blocking.
+  // Say no to a request without blocking.
   http.post(`${API}/conversations/:id/decline`, scenario((s, { params }) => {
     const c = find(s, params.id);
     if (!c || c.status !== "request") return notFound();
@@ -239,13 +247,19 @@ export const inboxHandlers: HttpHandler[] = [
     uploads.set(Number(params.id), { src, width, height });
     return new HttpResponse(null, { status: 200 });
   }),
+  http.put(`${API}/me/photo`, scenario(async (_s, { request }) => {
+    const { upload_id } = (await request.json()) as { upload_id: number };
+    mockPhoto = uploads.get(upload_id)?.src ?? null;
+    return HttpResponse.json({ ...ME, photo: mockPhoto });
+  })),
+  http.delete(`${API}/me/photo`, scenario(() => { mockPhoto = null; return HttpResponse.json({ ...ME, photo: null }); })),
   http.post(`${API}/media/uploads/:id/complete`, scenario((_s, { params }) => {
     const u = uploads.get(Number(params.id));
     return HttpResponse.json({ id: Number(params.id), status: "ready", width: u?.width ?? null, height: u?.height ?? null });
   })),
 ];
 
-function imageOf(uploadId: number): Record<string, unknown> | null {
+function imageOf(uploadId: number): Schemas["MessageImageOut"] | null {
   const u = uploads.get(uploadId);
   return u ? { width: u.width, height: u.height, w480: u.src, w1440: u.src } : null;
 }

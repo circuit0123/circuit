@@ -532,7 +532,7 @@ const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
 const accentSaved = (page: import("@playwright/test").Page) => page.evaluate(() => JSON.parse(localStorage.getItem("circuit.mock.appearance") ?? "{}").accent as string | undefined);
 
 test.describe("onboarding: photo, colour, ready", () => {
-  test("Photo: a chosen picture previews and is noted; Continue waits for one", async ({ page }, info) => {
+  test("Photo: a chosen picture previews and is uploaded; Continue waits for one", async ({ page }, info) => {
     await toPhoto(page);
     await expect(page.getByRole("button", { name: "Continue" })).toBeDisabled();
     await checkStep(page, info, "photo");
@@ -540,7 +540,7 @@ test.describe("onboarding: photo, colour, ready", () => {
     await expect(page.getByRole("button", { name: "Choose a different photo" }).locator("img")).toBeVisible();
     await page.getByRole("button", { name: "Continue" }).click();
     await onScreen(page, "Pick your colour.");
-    expect((await serverState(page)).onboarding.answers.photo).toEqual({ chosen: true, type: "image/png", size: PNG.length });
+    expect((await serverState(page)).onboarding.answers.photo).toEqual({ chosen: true });
   });
 
   test("Photo: something that isn't a picture gets one sentence; Skip notes nothing", async ({ page }) => {
@@ -576,7 +576,7 @@ test.describe("onboarding: photo, colour, ready", () => {
     await page.getByRole("button", { name: "Skip" }).click();
     await onScreen(page, "You're on the circuit.");
     await expect(page.locator("html")).not.toHaveAttribute("data-accent", /.+/);
-    await expect.poll(() => accentSaved(page)).toBe("mint");
+    await expect.poll(() => accentSaved(page)).toBe("emerald");
   });
 
   test("a reload on Colour resumes on Colour with the colour you tried", async ({ page }) => {
@@ -643,6 +643,16 @@ test.describe("onboarding: photo, colour, ready", () => {
     expect(seconds).toBeLessThan(120);
   });
 
+  test("a partner link is not a sign-up path in this build: Role is asked, with no partner row, and the source is kept", async ({ page }) => {
+    await intoOnboarding(page, "/join?role=partner&src=landing-partners");
+    await page.getByLabel("First name").fill("Meera");
+    await page.getByLabel("Last name").fill("Krishnan");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(heading(page, "What brings you here?")).toBeVisible(); // not skipped by the link
+    await expect(page.getByRole("button", { name: /Run a college or incubator programme/ })).toHaveCount(0);
+    expect((await serverState(page)).signup_source).toBe("landing-partners");
+  });
+
   test("a role link skips Role, keeps the source and gets all the way in", async ({ page }) => {
     await intoOnboarding(page, "/join?role=student&src=landing-students");
     await page.getByLabel("First name").fill("Ravi");
@@ -661,6 +671,8 @@ test.describe("onboarding: photo, colour, ready", () => {
     expect(s.signup_source).toBe("landing-students");
     expect(s.me.role).toBe("student");
     expect(s.onboarding.completed_at).not.toBeNull();
+    // The click on the link was counted once for the funnel.
+    expect(await page.evaluate(() => sessionStorage.getItem("circuit.mock.visits"))).toBe('["landing-students"]');
   });
 
   test("Replay onboarding (the banner) starts again at Welcome with nothing remembered", async ({ page }) => {

@@ -193,9 +193,9 @@ export function useConversation(id: number) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["inbox"] }),
   });
   const report = useReport();
-  /** API needed: there is no "decline a request" call yet. Mock mode only (missing.ts); a real build offers Block instead. */
+  /** Say no to a request without blocking: it disappears for me, the sender is not told. */
   const decline = useMutation({
-    mutationFn: () => unwrap((api.POST as unknown as (p: string, o: object) => Promise<{ data?: unknown; error?: unknown; response: Response }>)("/api/conversations/{conversation_id}/decline", { params: { path: { conversation_id: id } } })),
+    mutationFn: () => unwrap(api.POST("/api/conversations/{conversation_id}/decline", { params: { path: { conversation_id: id } } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["inbox"] }),
   });
 
@@ -227,7 +227,7 @@ export function useConversation(id: number) {
     accept,
     block,
     report: (reason: string) => report.mutateAsync({ target_type: "member", target_id: head?.other.id ?? 0, reason }),
-    canDecline: MOCK,
+    canDecline: head?.request === "received",
     decline,
   };
 }

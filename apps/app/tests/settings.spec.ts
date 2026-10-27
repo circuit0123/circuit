@@ -266,3 +266,45 @@ test.describe("Settings: accessibility", () => {
     });
   }
 });
+
+test.describe("Edit profile: photo", () => {
+  const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
+  test("add a photo, then remove it", async ({ page }) => {
+    await page.goto("/settings/profile?scenario=default");
+    await expect(page.getByRole("button", { name: "Add a photo" })).toBeVisible();
+    await page.getByLabel("Photo file").setInputFiles({ name: "me.png", mimeType: "image/png", buffer: PNG });
+    await expect(page.getByText("Photo updated.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Change photo" })).toBeVisible();
+    await page.getByRole("button", { name: "Remove photo" }).click();
+    await expect(page.getByText("Photo removed.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Add a photo" })).toBeVisible();
+  });
+
+  test("something that isn't a picture is refused in one sentence", async ({ page }) => {
+    await page.goto("/settings/profile?scenario=default");
+    await page.getByLabel("Photo file").setInputFiles({ name: "cv.txt", mimeType: "text/plain", buffer: Buffer.from("hello") });
+    await expect(page.getByText("That isn't a photo. Choose a JPG, PNG or WebP.")).toBeVisible();
+  });
+});
+
+test.describe("Verification: work email", () => {
+  test("a personal address is refused in words; a work address and the code raise the level", async ({ page }) => {
+    await page.goto("/settings?scenario=default");
+    const row = page.getByRole("button", { name: /^Verification/ });
+    await expect(row).toContainText("Level 1");
+    await row.click();
+    const sheet = page.getByRole("dialog", { name: "Verify your work email" });
+    await sheet.getByLabel("Work email").fill("ravi@gmail.com");
+    await sheet.getByRole("button", { name: "Send code" }).click();
+    await expect(sheet.getByRole("alert")).toHaveText("Use your work email, not a personal one.");
+    await sheet.getByLabel("Work email").fill("ravi@aravindpath.in");
+    await sheet.getByRole("button", { name: "Send code" }).click();
+    await expect(sheet).toContainText("Enter the 6-digit code we sent to ravi@aravindpath.in.");
+    await sheet.getByLabel("Digit 1 of 6").fill("000000");
+    await expect(sheet.getByRole("alert")).toHaveText("That code isn't right. Check it and try again.");
+    await sheet.getByLabel("Digit 1 of 6").fill("123456");
+    await expect(sheet).toHaveCount(0);
+    await expect(page.getByText("Your work email is verified.")).toBeVisible();
+    await expect(page.getByText("Level 2")).toBeVisible();
+  });
+});

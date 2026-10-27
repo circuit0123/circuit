@@ -6,10 +6,37 @@
  */
 import { http, HttpResponse, type HttpHandler } from "msw";
 import type { Schemas } from "@circuit/api-client";
+import { mockPhoto } from "./inbox";
 import { currentScenario } from "./config";
 import { CONFIG, ME, dropOf } from "./fixtures";
 
 export const isSignup = () => currentScenario() === "signup" || currentScenario() === "signup_ai_down";
+
+/** The colleges the mock search knows. */
+/** The cities the mock knows; the first is the pilot. */
+const CITIES: ReadonlyArray<{ name: string; lat: number; lng: number }> = [
+  { name: "Chennai", lat: 13.08, lng: 80.27 },
+  { name: "Madurai", lat: 9.93, lng: 78.12 },
+  { name: "Coimbatore", lat: 11.02, lng: 76.96 },
+  { name: "Bengaluru", lat: 12.97, lng: 77.59 },
+  { name: "Hyderabad", lat: 17.39, lng: 78.49 },
+  { name: "Kochi", lat: 9.93, lng: 76.27 },
+  { name: "Mumbai", lat: 19.08, lng: 72.88 },
+  { name: "Pune", lat: 18.52, lng: 73.86 },
+  { name: "Delhi", lat: 28.61, lng: 77.21 },
+  { name: "Kolkata", lat: 22.57, lng: 88.36 },
+];
+
+const ORGANISATIONS: readonly string[] = [
+  "Sri Venkateswara Institute of Technology",
+  "Thiagarajar College of Engineering",
+  "PSG College of Technology",
+  "Anna University, Guindy",
+  "Loyola College",
+  "SRM Institute of Science and Technology",
+  "Madras Institute of Technology",
+  "Government College of Technology, Coimbatore",
+];
 
 const KEY = "circuit.mock.member";
 const API = "*/api";
@@ -68,7 +95,7 @@ export function signupMe(): Schemas["MeOut"] {
     ...ME,
     id: 99,
     display_name: s.me.name,
-    role: s.me.role,
+    role: s.me.role as Schemas["MeOut"]["role"],
     bio: s.me.bio,
     city: s.me.city,
     college: s.me.college,
@@ -81,6 +108,7 @@ export function signupMe(): Schemas["MeOut"] {
     beta_access: s.beta,
     needs_consent: !s.consent,
     appearance: appearance(),
+    photo: mockPhoto,
   };
 }
 export const signupConfig = (): Schemas["ConfigOut"] => ({ ...CONFIG, beta_mode: true, beta_access: read().beta });
@@ -235,6 +263,20 @@ export const signupHandlers: HttpHandler[] = [
     });
     const m = signupMe();
     return HttpResponse.json({ profile_visibility: m.profile_visibility, visible_to_org: false, circuits_opt_in: false, allow_requests: m.allow_requests });
+  }),
+  // Funnel count: the mock keeps the sources it was told about, so a test can read them.
+  http.post(`${API}/join/visit`, async ({ request }) => {
+    const { src } = (await request.json()) as { src: string };
+    try { sessionStorage.setItem("circuit.mock.visits", JSON.stringify([...JSON.parse(sessionStorage.getItem("circuit.mock.visits") ?? "[]"), src])); } catch { /* ignore */ }
+    return new HttpResponse(null, { status: 204 });
+  }),
+  http.get(`${API}/cities`, () => HttpResponse.json(CITIES.map((c, i) => ({ ...c, pilot: i === 0 }))),
+  ),
+  http.get(`${API}/organisations/search`, ({ request }) => {
+    if (!isSignup()) return;
+    const q = (new URL(request.url).searchParams.get("q") ?? "").toLowerCase();
+    const hits = q.length < 2 ? [] : ORGANISATIONS.filter((o) => o.toLowerCase().includes(q)).slice(0, 10);
+    return HttpResponse.json(hits.map((name, i) => ({ id: 100 + i, name, kind: "college", city: "Chennai" })));
   }),
   http.post(`${API}/organisations/join-by-email`, ({ request }) => {
     if (!isSignup()) return;

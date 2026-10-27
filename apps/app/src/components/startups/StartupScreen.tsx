@@ -5,7 +5,7 @@ import { Avatar, BarButton, Button, Chip, ErrorState, PushScreen, Sheet, Skeleto
 import { notFound, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  kmOrNull, loadFailed, metaLine, useFollow, useFollows, useIntroPath, useMe, useReport, useStartup, useStartupJobs, type StartupFounder, type StartupPage,
+  kmOrNull, loadFailed, metaLine, useFollow, useFollows, useInterest, useIntroPath, useMe, useReport, useStartup, useStartupJobs, type StartupFounder, type StartupPage,
 } from "@/data";
 import { JobRowItem, RowsSkeleton } from "../discover/parts";
 import { useAskIntro } from "../home/IntroSheet";
@@ -44,6 +44,8 @@ function Page({ s }: { s: StartupPage }) {
   const follows = useFollows();
   const follow = useFollow();
   const jobs = useStartupJobs(s.hiring ? s.id : null);
+  const interest = useInterest(s.id, s.interested);
+  const toast = useToast();
   const [claim, setClaim] = useState(false);
   const following = follows.data?.has(s.id) ?? false;
   const roles = jobs.data ?? [];
@@ -55,6 +57,10 @@ function Page({ s }: { s: StartupPage }) {
     if (window.location.hash === "#hiring" && !jobs.isPending) document.getElementById("hiring")?.scrollIntoView({ block: "start" });
   }, [jobs.isPending]);
 
+  const toggleInterest = async () => {
+    const ok = await interest.set(!interest.interested);
+    if (!ok) toast({ text: "Couldn't save that. Try again.", tone: "error" });
+  };
   const toggle = () => follow.mutate({ id: s.id, on: !following });
 
   return (
@@ -70,6 +76,11 @@ function Page({ s }: { s: StartupPage }) {
           <p className="t-footnote mt-2 text-text-muted">Unclaimed · from public sources</p>
         )}
         <Button variant={following ? "secondary" : "primary"} aria-pressed={following} className="mt-6 w-full" onClick={toggle}>{following ? "Following" : "Follow"}</Button>
+        {s.canShowInterest && (
+          <Button aria-pressed={interest.interested} className="mt-3 w-full" disabled={interest.pending} onClick={toggleInterest}>
+            {interest.interested ? "Interested · tap to withdraw" : "I'm interested"}
+          </Button>
+        )}
         {s.privateCounts && (
           <p className="t-subhead mt-4 text-text-muted">
             Only your team sees this: <span className="num text-text">{s.privateCounts.views}</span> views and <span className="num text-text">{s.privateCounts.interested}</span> interested this month.
@@ -81,8 +92,8 @@ function Page({ s }: { s: StartupPage }) {
         <section aria-label="Claim this startup" className="mx-4 lg:mx-0 mt-section rounded-card bg-surface p-surface">
           <h2 className="t-title3">Is this your startup?</h2>
           <p className="t-body mt-2 text-text-muted">
-            {s.claimNudge && s.claimNudge.views > 0
-              ? `${s.claimNudge.views} students looked at this page and ${s.claimNudge.interested} are interested. Claim it to post roles and keep it right.`
+            {s.claimNudge && s.claimNudge.views != null && s.claimNudge.views > 0
+              ? `${s.claimNudge.views} students looked at this page${s.claimNudge.interested != null ? ` and ${s.claimNudge.interested} are interested` : ""}. Claim it to post roles and keep it right.`
               : "Claim it to post roles and keep it right."}
           </p>
           <Button variant="secondary" className="mt-4 w-full" onClick={() => setClaim(true)}>Claim this startup</Button>

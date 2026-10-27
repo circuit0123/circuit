@@ -11,7 +11,7 @@ import { delay, http, HttpResponse, type HttpHandler } from "msw";
 import type { Schemas } from "@circuit/api-client";
 import type { MissingJobFields } from "../missing";
 import { currentScenario, type Scenario } from "./config";
-import { ME } from "./fixtures";
+import { MATCHES, ME } from "./fixtures";
 
 const API = "*/api";
 const envelope = (status: number, code: string, message: string) => HttpResponse.json({ error: { code, message, details: null } }, { status });
@@ -25,7 +25,7 @@ function km(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
 }
 const HOME = { lat: ME.lat, lng: ME.lng };
 
-type Startup = Omit<Schemas["StartupOut"], "interested" | "is_team" | "match_pct" | "open_jobs" | "hiring"> & { lat: number; lng: number; match_pct: number | null };
+type Startup = Omit<Schemas["StartupOut"], "interested" | "is_team" | "match_pct" | "open_jobs" | "hiring" | "build_logs" | "founders" | "logo" | "team_size" | "verified"> & { lat: number; lng: number; match_pct: number | null };
 
 export const STARTUPS: Startup[] = [
   { id: 41, name: "Aravind Pathology", website_domain: "aravindpath.in", description: "Stock and reorder software for neighbourhood pharmacies and pathology labs in Adyar and Velachery. Pharmacists check it before they open.", sector: "healthtech", stage: "seed", address: "Gandhi Nagar, Adyar, Chennai", lat: 13.0067, lng: 80.2573, claimed: true, source: "user", tech_stack: ["React", "Django", "PostgreSQL"], view_count: 214, interest_count: 18, match_pct: 82 },
@@ -37,11 +37,11 @@ export const STARTUPS: Startup[] = [
   { id: 47, name: "Neerflow", website_domain: "neerflow.in", description: "Rainwater harvesting audits for apartment associations.", sector: "climate", stage: "idea", address: "Velachery, Chennai", lat: 12.9791, lng: 80.2209, claimed: true, source: "user", tech_stack: ["Flutter"], view_count: 31, interest_count: 2, match_pct: null },
 ];
 
-type Job = Schemas["JobOut"] & MissingJobFields;
+type Job = Schemas["JobOut"];
 const cap = (slug: string, name: string, required: boolean, your_level: number | null) => ({ slug, name, required, your_level });
 const job = (id: number, s: Startup, title: string, kind: string, min: number | null, max: number | null, match: number | null, description: string, caps: Schemas["JobCapabilityOut"][], hours: number): Job => ({
   id, title, description, kind, is_open: true, sector: s.sector, startup_id: s.id, startup_name: s.name, location: s.address.split(",").slice(-2).join(",").trim(),
-  lat: s.lat, lng: s.lng, distance_km: km(HOME, s), stipend_min: min, stipend_max: max, skill_match: match, applied: false, created_at: hoursAgo(hours), capabilities: caps,
+  lat: s.lat, lng: s.lng, distance_km: km(HOME, s), stipend_min: min, stipend_max: max, skill_match: match, applied: false, contact: null, duration_weeks: null, is_team: false, starts_on: null, startup_logo: null, created_at: hoursAgo(hours), capabilities: caps,
   startup_verified: s.claimed,
 });
 
@@ -57,6 +57,7 @@ export const JOBS: Job[] = [
 /** What the mock remembers in this page load. */
 const applied = new Map<number, { id: number; status: string; created_at: string }>([[305, { id: 9001, status: "shortlisted", created_at: hoursAgo(72) }]]);
 const followed = new Set<number>([45]);
+const interestedIn = new Set<number>([42]);
 const claimedNow = new Set<number>();
 const applicantStatus = new Map<number, string>();
 
@@ -73,7 +74,12 @@ function startupOut(s: Startup, sc: Scenario): Schemas["StartupOut"] {
     ...s,
     claimed: s.claimed || claimedNow.has(s.id),
     hiring: hiring(s),
-    interested: false,
+    interested: interestedIn.has(s.id),
+    build_logs: [],
+    founders: [],
+    logo: null,
+    team_size: null,
+    verified: s.claimed,
     is_team: isTeam(sc, s.id),
     open_jobs: openJobs(s.id).map((j) => ({ id: j.id, title: j.title, kind: j.kind, stipend_min: j.stipend_min, stipend_max: j.stipend_max })),
   };
@@ -91,7 +97,7 @@ function applicationOut(jobId: number): Schemas["ApplicationOut"] {
   return { id: a.id, job_id: j.id, job_title: j.title, startup_id: j.startup_id, startup_name: j.startup_name, status: a.status, skill_match: j.skill_match ?? 0, created_at: a.created_at };
 }
 
-const skill = (capability: string, level: number, proof_url = "") => ({ capability, level, proof_url });
+const skill = (capability: string, level: number, proof_url = "") => ({ capability, name: capability, level, proof_url });
 const APPLICANTS: Schemas["ApplicantOut"][] = [
   { application_id: 7001, student_id: 21, display_name: "Karthik Selvam", skill_match: 0.91, status: "submitted", applied_at: hoursAgo(5), skills: [skill("frontend-dev", 3, "https://github.com/karthik-selvam/ration-tracker"), skill("ui-design", 2), skill("data-viz", 3, "https://karthik.dev/dashboards")] },
   { application_id: 7002, student_id: 22, display_name: "Fathima Rizwana", skill_match: 0.78, status: "shortlisted", applied_at: hoursAgo(20), skills: [skill("frontend-dev", 2, "https://github.com/fathimarizwana"), skill("ui-design", 3)] },
@@ -113,6 +119,23 @@ function scenario(fn: (s: Scenario, info: { request: Request; params: Record<str
 const num = (q: URLSearchParams, k: string) => (q.get(k) === null || q.get(k) === "" ? null : Number(q.get(k)));
 
 export const discoverHandlers: HttpHandler[] = [
+  http.get(`${API}/jobs/skills-in-demand`, scenario((s) => {
+    const counts = new Map<string, { slug: string; name: string; open_roles: number }>();
+    for (const j of empty(s) ? [] : JOBS) for (const c of j.capabilities) if (c.required && (j.distance_km ?? Infinity) <= 10) counts.set(c.slug, { slug: c.slug, name: c.name, open_roles: (counts.get(c.slug)?.open_roles ?? 0) + 1 });
+    const skills = [...counts.values()].sort((a, b) => b.open_roles - a.open_roles || a.name.localeCompare(b.name)).slice(0, 3);
+    return HttpResponse.json(skills);
+  })),
+  http.get(`${API}/search`, scenario((s, { request }) => {
+    const q = (new URL(request.url).searchParams.get("q") ?? "").trim().toLowerCase();
+    if (q.length < 2) return envelope(422, "validation_error", "Type at least 2 characters.");
+    const has = (...x: string[]) => x.some((v) => v.toLowerCase().includes(q));
+    if (empty(s)) return HttpResponse.json({ people: [], startups: [], jobs: [] });
+    return HttpResponse.json({
+      people: MATCHES.filter((m) => has(m.display_name)).slice(0, 10).map((m) => ({ id: m.candidate_id, display_name: m.display_name, headline: m.headline ?? "", role: m.role, city: "Chennai", photo: null, verification_level: m.verification_level })),
+      startups: STARTUPS.filter((x) => has(x.name, x.sector)).slice(0, 10).map(pinOut),
+      jobs: JOBS.filter((j) => has(j.title, j.startup_name, j.sector)).slice(0, 10).map(jobOut),
+    });
+  })),
   http.get(`${API}/jobs`, scenario((s, { request }) => {
     const q = new URL(request.url).searchParams;
     const limit = num(q, "limit") ?? 20;
@@ -175,6 +198,8 @@ export const discoverHandlers: HttpHandler[] = [
     return x ? HttpResponse.json(startupOut(x, s)) : envelope(404, "not_found", "No such startup.");
   })),
   http.post(`${API}/startups/:id/follow`, scenario((_s, { params }) => { followed.add(Number(params.id)); return new HttpResponse(null, { status: 204 }); })),
+  http.post(`${API}/startups/:id/interest`, scenario((_s, { params }) => { interestedIn.add(Number(params.id)); return new HttpResponse(null, { status: 204 }); })),
+  http.delete(`${API}/startups/:id/interest`, scenario((_s, { params }) => { interestedIn.delete(Number(params.id)); return new HttpResponse(null, { status: 204 }); })),
   http.delete(`${API}/startups/:id/follow`, scenario((_s, { params }) => { followed.delete(Number(params.id)); return new HttpResponse(null, { status: 204 }); })),
   http.get(`${API}/me/follows`, scenario((s) => HttpResponse.json(empty(s) ? [] : STARTUPS.filter((x) => followed.has(x.id)).map((x) => ({ id: x.id, name: x.name, sector: x.sector, hiring: hiring(x) }))))),
   http.post(`${API}/startups/:id/claim`, scenario(async (_s, { params, request }) => {

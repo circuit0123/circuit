@@ -76,13 +76,14 @@ export function useMemberPosts(id: number | undefined) {
     enabled: enabled && on && !!id,
     queryFn: () => unwrap(api.GET("/api/members/{member_id}/posts", { params: { path: { member_id: id! } } })),
   });
-  const posts: PostView[] = (q.data ?? []).map((p) => toPost(p, me?.id));
+  const posts: PostView[] = (q.data?.items ?? []).map((p) => toPost(p, me?.id));
   return { on, posts, isPending: on && q.isPending, isError: q.isError, refetch: q.refetch };
 }
 
 /**
- * Someone else's profile. Connection state, mutual count, under-18 privacy, highlights and shared circuits aren't in `ProfileOut` yet:
- * mock mode reads them from a marked stand-in (missing.ts), a real build leaves those parts out and the server refuses what isn't allowed.
+ * Someone else's profile. Connection state, mutual count and what the viewer may do come from `ProfileOut`; under-18 privacy, highlights and
+ * shared circuits aren't in it yet: mock mode reads those from a marked stand-in (missing.ts), a real build leaves them out and the server
+ * refuses what isn't allowed.
  */
 export function useProfile(id: number) {
   const names = useNames();
@@ -99,7 +100,8 @@ export function useProfile(id: number) {
   const sent = useQuery({ queryKey: connKey, queryFn: () => null as Connection | null, staleTime: Infinity, gcTime: Infinity }).data ?? null;
   const p = q.data;
   const x = MOCK && p ? PROFILE_EXTRAS[p.id] ?? {} : {};
-  const connection: Connection = sent ?? x.connection ?? "none";
+  const fromApi: Connection = p?.connection === "connected" ? "connected" : p?.connection === "requested" ? "pending" : p?.connection === "requested_you" ? "incoming" : "none";
+  const connection: Connection = sent ?? (MOCK ? x.connection : undefined) ?? fromApi;
   const data: PersonView | undefined = p && {
     id: p.id,
     name: p.display_name,
@@ -117,8 +119,8 @@ export function useProfile(id: number) {
     minor: x.minor ?? false,
     hidden: !!x.hidden && connection !== "connected",
     connection,
-    mutuals: x.mutuals ?? null,
-    canMessage: x.canMessage ?? true,
+    mutuals: MOCK ? x.mutuals ?? null : p.mutual_count,
+    canMessage: MOCK ? x.canMessage ?? true : p.actions.message,
   };
 
   const connect = useMutation({
@@ -128,6 +130,14 @@ export function useProfile(id: number) {
     },
     onMutate: () => { qc.setQueryData(connKey, "pending"); },
     onError: () => { qc.setQueryData(connKey, null); },
+  });
+  const remove = useMutation({
+    mutationFn: () => unwrap(api.DELETE("/api/connections/{member_id}", { params: { path: { member_id: id } } })),
+    onSuccess: () => {
+      qc.setQueryData(connKey, "none");
+      qc.invalidateQueries({ queryKey: ["connections"] });
+      qc.invalidateQueries({ queryKey: ["inbox"] });
+    },
   });
   const report = useReport();
   const block = useMutation({
@@ -142,6 +152,7 @@ export function useProfile(id: number) {
     notFound: (q.error as { status?: number } | null)?.status === 404 || !valid,
     refetch: q.refetch,
     connect,
+    remove,
     block,
     report: (reason: string) => report.mutateAsync({ target_type: "member", target_id: id, reason }),
   };

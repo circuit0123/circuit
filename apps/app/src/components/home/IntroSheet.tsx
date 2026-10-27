@@ -2,7 +2,7 @@
 
 import { Button, Sheet, Skeleton, firstName, useToast } from "@circuit/ui";
 import { createContext, useCallback, useContext, useState } from "react";
-import { IntroError, useIntroPath, useRequestIntro, type IntroFailure } from "@/data";
+import { IntroError, useIntroCapacity, useIntroPath, useRequestIntro, type IntroFailure } from "@/data";
 
 type Target = { id: number; name: string; /** From the Daily Drop: the swipe is recorded with the intro. */ fromDrop?: boolean };
 type Ask = (target: Target, onSent?: () => void) => void;
@@ -37,13 +37,17 @@ function IntroSheet({ open, onClose }: { open: { target: Target; onSent?: () => 
   const target = open?.target;
   const path = useIntroPath(target?.id ?? null);
   const send = useRequestIntro();
+  const capacity = useIntroCapacity(!!target);
   const toast = useToast();
   const name = target ? firstName(target.name) : "";
 
   // What the sheet says. Errors from sending win over what the path said.
   const sendFailure = send.error instanceof IntroError ? send.error.failure : send.isError ? "failed" : null;
   const pathFailure: IntroFailure | null = path.isError ? (path.error instanceof IntroError ? path.error.failure : "failed") : null;
-  const failure = sendFailure ?? pathFailure;
+  const cap = capacity.data;
+  // Used up already: say so before Send, with when the next one frees up.
+  const capFailure: IntroFailure | null = cap && !cap.allowed ? "under_18" : cap && cap.left === 0 ? "weekly_limit" : null;
+  const failure = sendFailure ?? pathFailure ?? capFailure;
   const blocked = failure !== null && failure !== "failed";
   const via = path.data?.via;
 
@@ -77,7 +81,8 @@ function IntroSheet({ open, onClose }: { open: { target: Target; onSent?: () => 
               </p>
             </>
           ) : null}
-          {failure && <p role="alert" className="t-body mt-2 text-danger">{introFailureText(failure, name)}</p>}
+          {failure && <p role="alert" className="t-body mt-2 text-danger">{introFailureText(failure, name)}{failure === "weekly_limit" && cap?.nextFreesAt && !sendFailure ? ` The next one frees up on ${new Date(cap.nextFreesAt).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Kolkata" })}.` : ""}</p>}
+          {!failure && cap && cap.allowed && cap.left > 0 && <p className="t-footnote text-text-muted">{cap.left === 1 ? "1 intro left this week." : `${cap.left} intros left this week.`}</p>}
           <div className="mt-6 flex flex-col">
             {!blocked && <Button variant="primary" className="w-full" disabled={path.isPending || !!pathFailure || send.isPending} onClick={submit}>{send.isPending ? "Sending" : "Send request"}</Button>}
             <button type="button" onClick={close} className="flex min-h-11 w-full items-center justify-center t-body text-text-muted active:opacity-80">{blocked ? "Close" : "Cancel"}</button>
