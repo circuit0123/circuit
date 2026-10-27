@@ -11,9 +11,6 @@ const SHOWN: Record<string, ScreenId[]> = {
   "/partners/": ["partner-home"],
 };
 
-/** Steps with a screen of their own ("How it works", step 03), besides the strip. */
-const STEP_SCREENS: Record<string, ScreenId[]> = { "/": ["circuits"], "/students/": ["job"], "/mentors/": ["circuits"] };
-
 test.use({ reducedMotion: "reduce" });
 
 for (const [path, ids] of Object.entries(SHOWN)) {
@@ -35,8 +32,7 @@ for (const [path, ids] of Object.entries(SHOWN)) {
       await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth)).toBe(780);
       await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(new RegExp(`/screens/${id}\\.avif$`));
     }
-    await expect(page.locator("main img[src^='/screens/']")).toHaveCount(ids.length + (STEP_SCREENS[path]?.length ?? 0));
-    for (const id of STEP_SCREENS[path] ?? []) await expect(page.locator(`li img[src="/screens/${id}.png"]`).first()).toHaveAttribute("alt", SCREENS[id].alt);
+    await expect(page.locator("main img[src^='/screens/']")).toHaveCount(ids.length);
     await expect(page.getByText("The screens show sample data, not real people or startups.")).toHaveCount(1);
   });
 }
@@ -48,4 +44,13 @@ test("the phone strip can be reached with the keyboard on a phone and never wide
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   if (info.project.name === "phone") expect(await strip.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
   else expect(await strip.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+});
+
+test("no page has the old steps section or a \"screenshot coming\" box", async ({ page }) => {
+  for (const path of Object.keys(SHOWN)) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "How it works" }), path).toHaveCount(0);
+    await expect(page.getByText(/screenshot coming/i), path).toHaveCount(0);
+    await expect(page.locator("[data-bridge], [data-step-n]"), path).toHaveCount(0);
+  }
 });

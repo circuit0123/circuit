@@ -7,7 +7,7 @@ import { hover, inView, press, spring } from "motion";
 
 /**
  * Landing site motion (DESIGN.md §7), switched on once the page has loaded. Renders nothing.
- * The server HTML is complete and readable; this only adds movement on top. Rules: transform, opacity and stroke-dashoffset only,
+ * The server HTML is complete and readable; this only adds movement on top. Rules: transform and opacity only,
  * everything plays once, nothing moves the layout, and with prefers-reduced-motion nothing is touched at all.
  * (The hero headline is plain CSS in globals.css, so it starts at first paint without waiting for this code.)
  */
@@ -53,75 +53,6 @@ function reveals(): Stop[] {
     stops.push(stop);
   });
   return stops;
-}
-
-/**
- * The Bridge arch: a thin `current` line drawn once between the three "How it works" steps (1 → 2, then 2 → 3, 450ms each).
- * It is built here, so it exists only when motion does. With the steps in a row it arches over the empty part of the number row;
- * stacked on a phone it bows through the page's left gutter. Absolutely positioned, so it never affects the layout.
- */
-function bridge(): Stop[] {
-  const wrap = document.querySelector<HTMLElement>("[data-bridge]");
-  const numbers = wrap ? Array.from(wrap.querySelectorAll<HTMLElement>("[data-step-n]")) : [];
-  if (!wrap || numbers.length < 3) return [];
-
-  const NS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("aria-hidden", "true");
-  svg.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none";
-  const paths = [0, 1].map(() => {
-    const p = document.createElementNS(NS, "path");
-    p.setAttribute("fill", "none");
-    p.setAttribute("stroke-width", "1.5");
-    p.setAttribute("pathLength", "1");
-    p.style.cssText = "stroke:var(--current);stroke-dasharray:1;stroke-dashoffset:1";
-    svg.append(p);
-    return p;
-  });
-  wrap.append(svg);
-
-  const place = () => {
-    const base = wrap.getBoundingClientRect();
-    const at = numbers.map((n) => {
-      const range = document.createRange();
-      range.selectNodeContents(n);
-      const b = range.getBoundingClientRect();
-      // The middle of the digits, not of the text box (which has room for descenders): about 0.57em above the box bottom.
-      return { x: b.left - base.left, y: b.bottom - base.top - 0.57 * parseFloat(getComputedStyle(n).fontSize), w: b.width };
-    });
-    const inARow = Math.abs(at[0].y - at[1].y) < 4;
-    paths.forEach((p, i) => {
-      const a = at[i];
-      const b = at[i + 1];
-      if (inARow) {
-        const x1 = a.x + a.w + 12;
-        const x2 = b.x - 12;
-        p.setAttribute("d", `M${x1} ${a.y} Q${(x1 + x2) / 2} ${a.y - 28} ${x2} ${b.y}`);
-      } else {
-        p.setAttribute("d", `M-3 ${a.y + 12} C-14 ${a.y + 90} -14 ${b.y - 90} -3 ${b.y - 12}`);
-      }
-    });
-  };
-  place();
-  const resize = new ResizeObserver(place);
-  resize.observe(wrap);
-  void document.fonts?.ready.then(place);
-
-  // The second line waits for the first, so it reads as one line going 1 → 2 → 3, however the steps come into view.
-  let drawn: PromiseLike<unknown> = Promise.resolve();
-  const draw = (p: SVGPathElement) => {
-    drawn = drawn.then(() => animate(p, { strokeDashoffset: [1, 0] }, { duration: 0.45, ease: [0.4, 0, 0.2, 1] })).then(() => {
-      p.style.strokeDashoffset = "0";
-    });
-  };
-  const stops = [1, 2].map((n) => {
-    const stop = inView(numbers[n], () => {
-      stop();
-      draw(paths[n - 1]);
-    }, { margin: "0px 0px -15% 0px" });
-    return stop;
-  });
-  return [...stops, () => { resize.disconnect(); svg.remove(); }];
 }
 
 /** Audience tiles: hover or keyboard focus lifts 2px and nudges the arrow 4px; press scales to 0.98. */
@@ -205,7 +136,7 @@ export function LandingMotion() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
     document.documentElement.dataset.motion = "";
-    const stops = [...reveals(), ...bridge(), ...tiles(), ...buttons(), ...faq()];
+    const stops = [...reveals(), ...tiles(), ...buttons(), ...faq()];
     return () => {
       stops.forEach((stop) => stop());
       delete document.documentElement.dataset.motion;

@@ -46,12 +46,12 @@ test("the video file is under 1 MB and the poster is plain HTML (visible without
 });
 
 /**
- * Landing motion (DESIGN.md §7): hero words, the Bridge arch, section reveals, tiles, buttons and the FAQ, on every page.
- * Rules under test: only transform, opacity and stroke-dashoffset; plays once; no layout shift; visible without JavaScript; reduced motion = static.
+ * Landing motion (DESIGN.md §7): hero words, section reveals, tiles, buttons and the FAQ, on every page.
+ * Rules under test: only transform and opacity; plays once; no layout shift; visible without JavaScript; reduced motion = static.
  */
-const ALLOWED = new Set(["opacity", "transform", "strokeDashoffset", "stroke-dashoffset"]);
+const ALLOWED = new Set(["opacity", "transform"]);
 
-/** Scrolls the whole page slowly enough for every reveal and the arch to trigger. */
+/** Scrolls the whole page slowly enough for every reveal to trigger. */
 async function scrollThrough(page: Page) {
   await page.evaluate(async () => {
     for (let y = 0; y < document.body.scrollHeight; y += 250) {
@@ -67,13 +67,12 @@ const REVEALABLE = "main > section:not(:first-child) > div > *, main > section:n
 test.describe("reduced motion: everything is static", () => {
   test.use({ reducedMotion: "reduce" });
   for (const path of PATHS) {
-    test(`${path}: nothing animates, nothing is hidden, no arch`, async ({ page }, info) => {
+    test(`${path}: nothing animates, nothing is hidden`, async ({ page }, info) => {
       await page.goto(path);
       await page.waitForTimeout(800);
       await scrollThrough(page);
       expect(await page.evaluate(() => document.getAnimations().length), "animations running").toBe(0);
       expect(await page.evaluate(() => document.documentElement.hasAttribute("data-motion"))).toBe(false);
-      await expect(page.locator("[data-bridge] svg")).toHaveCount(0);
       const words = await page.locator(".hero-word").evaluateAll((els) => els.map((el) => [getComputedStyle(el).animationName, getComputedStyle(el).opacity, getComputedStyle(el).transform]));
       expect(words.length).toBeGreaterThan(1);
       for (const w of words) expect(w).toEqual(["none", "1", "none"]);
@@ -96,7 +95,7 @@ test.describe("normal motion", () => {
   test.use({ reducedMotion: "no-preference" });
 
   for (const path of PATHS) {
-    test(`${path}: hero words rise once and end at rest; reveals, arch and FAQ play once`, async ({ page }) => {
+    test(`${path}: hero words rise once and end at rest; reveals and FAQ play once`, async ({ page }) => {
       // Record every property any animation touches (script-driven ones here; the CSS keyframes are read from the stylesheet below).
       await page.addInitScript(() => {
         const w = window as unknown as { __props: Set<string>; __easings: Set<string>; __calls: number };
@@ -130,12 +129,8 @@ test.describe("normal motion", () => {
       await expect(faqTitle).toHaveCSS("opacity", "1");
       await expect.poll(() => faqTitle.evaluate((el) => el.getAttribute("style") ?? "")).toBe("");
 
-      // The Bridge arch: two paths, both fully drawn once the steps have been scrolled past.
-      await page.locator("[data-bridge]").scrollIntoViewIfNeeded();
+      // Every other reveal plays during one slow pass down the page.
       await scrollThrough(page);
-      await expect(page.locator("[data-bridge] svg path")).toHaveCount(2);
-      await expect.poll(() => page.locator("[data-bridge] svg path").evaluateAll((ps) => ps.map((p) => parseFloat(getComputedStyle(p).strokeDashoffset))), { timeout: 4000 }).toEqual([0, 0]);
-      expect(await page.locator("[data-bridge] svg").getAttribute("aria-hidden")).toBe("true");
 
       // FAQ: opens with the answer fading in, closes again.
       const first = page.locator("details[data-faq]").first();
@@ -161,7 +156,7 @@ test.describe("normal motion", () => {
       const easings = await page.evaluate(() => [...(window as unknown as { __easings: Set<string> }).__easings]);
       expect(easings.some((e) => e.startsWith("linear(")), `easings seen: ${easings.join(" | ")}`).toBe(true);
 
-      // Only transform, opacity and stroke-dashoffset, in script-driven animations and in the CSS keyframes.
+      // Only transform and opacity, in script-driven animations and in the CSS keyframes.
       const props = await page.evaluate(() => [...(window as unknown as { __props: Set<string> }).__props]);
       expect(props.length).toBeGreaterThan(0);
       for (const prop of props) expect(ALLOWED.has(prop), `animated property ${prop}`).toBe(true);
@@ -242,7 +237,6 @@ test.describe("without JavaScript", () => {
       expect(h1.trim().split(/\s+/).length).toBeGreaterThan(2);
       expect(await page.locator(".hero-word").evaluateAll((els) => els.every((el) => getComputedStyle(el).opacity === "1"))).toBe(true);
       expect(await page.locator(REVEALABLE).evaluateAll((els) => els.filter((el) => getComputedStyle(el).opacity !== "1").length)).toBe(0);
-      await expect(page.locator("[data-bridge] svg")).toHaveCount(0);
       // The FAQ still opens natively.
       await page.locator("summary").first().click();
       await expect(page.locator("details[open]")).toHaveCount(1);

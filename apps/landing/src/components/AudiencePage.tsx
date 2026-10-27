@@ -9,7 +9,6 @@ import { Faq } from "./Faq";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { Hero } from "./Hero";
-import { HowItWorks } from "./HowItWorks";
 import { FoundersProof } from "./proof/FoundersProof";
 import { InvestorsProof } from "./proof/InvestorsProof";
 import { MentorsProof } from "./proof/MentorsProof";
@@ -28,10 +27,10 @@ const PROOF: Partial<Record<Slug, React.ReactNode>> = {
   partners: <PartnersProof />,
 };
 
-/** Extra screens that sit between the three steps and the proof. Students, investors and partners show theirs inside their proof section instead. */
+/** Extra screens that sit between the hero and the proof. Students, investors and partners show theirs inside their proof section instead. */
 const TOUR: Partial<Record<Slug, React.ReactNode>> = {
-  founders: <ScreenTour heading="What founders see" lede="A match with the reason, people near you, and the conversation that turns it into an introduction." ids={["home-match", "people", "inbox"]} />,
-  mentors: <ScreenTour heading="What mentors see" lede="People who need what you know, circuits that need your yes, and the conversation that starts it." ids={["people", "circuits", "chat"]} />,
+  founders: <ScreenTour heading="What founders see" lede="A match with the reason, people near you, and the conversation that turns it into an introduction." ids={[{ id: "home-match", caption: "Every match says why, and shows the mutual connection who can introduce you. A Bridge badge marks a match across sectors." }, "people", "inbox"]} />,
+  mentors: <ScreenTour heading="What mentors see" lede="People who need what you know, circuits that need your yes, and the conversation that starts it." ids={[{ id: "people", caption: "Each introduction shows the reason before you decide anything." }, { id: "circuits", caption: "Circuits: three people, each helping the next. Nothing starts without your yes." }, "chat"]} />,
 };
 
 const closing = "inline-flex min-h-11 items-center t-body font-medium underline underline-offset-4";
@@ -71,7 +70,6 @@ export async function AudiencePage({ slug }: { slug: Slug }) {
             )
           }
         />
-        <HowItWorks steps={p.steps} />
         {TOUR[slug]}
         {PROOF[slug]}
         {contactOnly ? <PartnerForm intro={JOIN_LIVE ? undefined : INVITE_ONLY.heading + "."} /> : null}

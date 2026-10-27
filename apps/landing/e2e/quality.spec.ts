@@ -16,13 +16,6 @@ for (const theme of THEMES) {
       }
     });
 
-    test("app screenshot follows the theme", async ({ page }) => {
-      await page.goto("/");
-      const img = page.getByRole("img", { name: /Daily Drop in the Circuit app/ });
-      await img.scrollIntoViewIfNeeded();
-      await expect(img).toBeVisible();
-      await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(new RegExp(`daily-drop-${theme}\\.(avif|webp)$`));
-    });
   });
 }
 
@@ -52,12 +45,6 @@ test("makes no request outside the landing origin, and shows no placeholder text
   expect(text).not.toMatch(/lorem|john doe/i);
   expect(digitsIn(text)).toBeNull();
   await expect(page.getByRole("region", { name: /Live in/ })).toHaveCount(0);
-});
-
-test("the screen that doesn't exist yet is a labelled placeholder", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.getByRole("img", { name: "App screenshot coming: You offer screen" })).toBeVisible();
-  await expect(page.getByRole("img", { name: "App screenshot coming: Circuit ring screen" })).toHaveCount(0);
 });
 
 test("SEO: title, description, canonical, Open Graph, Twitter, icons, robots and sitemap", async ({ page, request }) => {
