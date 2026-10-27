@@ -21,6 +21,8 @@ export type Me = {
   appearance: Appearance;
   allowRequests: boolean;
   location: { lat: number; lng: number } | null;
+  /** The profile photo's address, or null for the circuit-pattern avatar. */
+  photo: string | null;
 };
 
 /** The signed-in member. Not behind the beta or consent gates, so it works on every gate screen. */
@@ -46,6 +48,7 @@ export function useMe() {
         policyVersion: m.policy_version,
         appearance: { theme: m.appearance.theme, accent: m.appearance.accent, swipeTabs: m.appearance.swipe_tabs },
         allowRequests: m.allow_requests,
+        photo: m.photo ?? null,
         location: m.lat != null && m.lng != null ? { lat: m.lat, lng: m.lng } : null,
       };
     },

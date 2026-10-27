@@ -3,6 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Accent } from "@circuit/ui";
+import { useProfilePhoto } from "./photo";
 import { useAppearance } from "./appearance";
 import { api, unwrap } from "./client";
 import { problemOf } from "./errors";
@@ -10,7 +11,6 @@ import { useFeatures } from "./features";
 import { useJoinContext } from "./join";
 import { useKey } from "./keys";
 import { useMe } from "./me";
-import { MOCK } from "./mocks/config";
 import type { Place } from "./where";
 import { useSession } from "./session";
 
@@ -100,7 +100,7 @@ function visibleSteps(o: { steps: string[]; skipped: string[]; answers: Answers;
       case "safety": return o.answers.age?.adult === false; // the server can't know the age answer yet (PROGRESS.md "Frontend → API needed")
       case "role": return !o.joinRole;
       case "organisation": return o.roleChoice === "student" && !o.organisationKnown && !o.skipped.includes(s);
-      case "photo": return MOCK && !o.skipped.includes(s); // API needed: no avatar upload endpoint yet
+      case "photo": return !o.skipped.includes(s);
       default: return !o.skipped.includes(s);
     }
   });
@@ -128,6 +128,7 @@ export function useOnboarding() {
   const join = useJoinContext();
   const roleRows = useRoleChoices();
   const { appearance, save: saveAppearance } = useAppearance();
+  const profilePhoto = useProfilePhoto();
 
   // The server's "skip" list is read once, when the flow opens: saving the name makes the server skip it, and the screen must not vanish under the person.
   const [skipped] = useState(() => state?.skip ?? []);
@@ -275,8 +276,12 @@ export function useOnboarding() {
         await patchMe({ college: name.trim().slice(0, 200) });
         return { name: name.trim() };
       }),
-    // API needed (PROGRESS.md): there is no avatar upload endpoint, so the photo is only noted (type and size), never sent anywhere.
-    photo: (file: File | null) => run("photo", async () => (file ? { chosen: true, type: file.type, size: file.size } : { skipped: true })),
+    photo: (file: File | null) =>
+      run("photo", async () => {
+        if (!file) return { skipped: true };
+        await profilePhoto.set.mutateAsync(file);
+        return { chosen: true };
+      }),
     colour: (skip: boolean) =>
       run("colour", async () => {
         if (skip) saveAppearance.mutate({ accent: startAccent.current ?? "emerald" });

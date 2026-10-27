@@ -4,7 +4,7 @@ import { currentScenario, type Scenario } from "./config";
 import { isSignup, signupConfig, signupHandlers, signupMe } from "./signup";
 import { circuitHandlers } from "./circuits";
 import { discoverHandlers } from "./discover";
-import { inboxHandlers } from "./inbox";
+import { inboxHandlers, mockPhoto } from "./inbox";
 import { postHandlers } from "./posts";
 import { requestHandlers } from "./requests";
 import { SHORT_BIO, mePatch, profileFirstHandlers, profileHandlers } from "./profile";
@@ -30,7 +30,7 @@ const answered = new Map<number, "intro" | "skip">();
 function me(s: Scenario): Schemas["MeOut"] {
   if (isSignup()) return signupMe();
   // Privacy and Edit profile changes (F6) show up here too, as they would from the real /api/me.
-  const base = { ...ME, appearance: readAppearance(), ...privacyFor(s), ...(s === "profile_empty" || s === "empty" ? { bio: SHORT_BIO } : {}), ...mePatch };
+  const base = { ...ME, photo: mockPhoto, appearance: readAppearance(), ...privacyFor(s), ...(s === "profile_empty" || s === "empty" ? { bio: SHORT_BIO } : {}), ...mePatch };
   if (s === "beta") return { ...base, beta_access: false };
   if (s === "founder") return { ...base, id: PEOPLE.priya.id, display_name: PEOPLE.priya.display_name, role: "founder", bio: "Co-founder of Aravind Pathology. Stock software for pharmacies." };
   if (s === "under18") return { ...base, is_minor: true, bio: "Class 12 student. I build small apps for my school robotics club.", ...mePatch };

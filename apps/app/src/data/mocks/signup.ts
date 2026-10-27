@@ -6,6 +6,7 @@
  */
 import { http, HttpResponse, type HttpHandler } from "msw";
 import type { Schemas } from "@circuit/api-client";
+import { mockPhoto } from "./inbox";
 import { currentScenario } from "./config";
 import { CONFIG, ME, dropOf } from "./fixtures";
 
@@ -107,6 +108,7 @@ export function signupMe(): Schemas["MeOut"] {
     beta_access: s.beta,
     needs_consent: !s.consent,
     appearance: appearance(),
+    photo: mockPhoto,
   };
 }
 export const signupConfig = (): Schemas["ConfigOut"] => ({ ...CONFIG, beta_mode: true, beta_access: read().beta });

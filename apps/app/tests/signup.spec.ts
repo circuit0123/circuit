@@ -532,7 +532,7 @@ const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
 const accentSaved = (page: import("@playwright/test").Page) => page.evaluate(() => JSON.parse(localStorage.getItem("circuit.mock.appearance") ?? "{}").accent as string | undefined);
 
 test.describe("onboarding: photo, colour, ready", () => {
-  test("Photo: a chosen picture previews and is noted; Continue waits for one", async ({ page }, info) => {
+  test("Photo: a chosen picture previews and is uploaded; Continue waits for one", async ({ page }, info) => {
     await toPhoto(page);
     await expect(page.getByRole("button", { name: "Continue" })).toBeDisabled();
     await checkStep(page, info, "photo");
@@ -540,7 +540,7 @@ test.describe("onboarding: photo, colour, ready", () => {
     await expect(page.getByRole("button", { name: "Choose a different photo" }).locator("img")).toBeVisible();
     await page.getByRole("button", { name: "Continue" }).click();
     await onScreen(page, "Pick your colour.");
-    expect((await serverState(page)).onboarding.answers.photo).toEqual({ chosen: true, type: "image/png", size: PNG.length });
+    expect((await serverState(page)).onboarding.answers.photo).toEqual({ chosen: true });
   });
 
   test("Photo: something that isn't a picture gets one sentence; Skip notes nothing", async ({ page }) => {

@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aspectFor, cropAndResize, imageSize, type Aspect } from "@/lib/image";
+import { putWithProgress } from "@/lib/upload";
 import { api, ApiError, unwrap } from "./client";
 import { MAX_IMAGE_BYTES } from "./conversation";
 import { useMe } from "./me";
@@ -43,21 +44,6 @@ export const photoProblemText: Record<PhotoProblem, string> = {
   too_big: "That photo is too big. Choose one under 30 MB.",
   unreadable: "Couldn't read that photo. Try a JPEG or PNG.",
 };
-
-/** PUT to the signed storage URL with progress (fetch can't report upload progress, so this is the one XMLHttpRequest in the app). */
-function putWithProgress(url: string, blob: Blob, onProgress: (f: number) => void): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", url);
-    xhr.setRequestHeader("content-type", blob.type);
-    xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(e.loaded / e.total); };
-    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`upload ${xhr.status}`)));
-    xhr.onerror = () => reject(new Error("upload failed"));
-    xhr.ontimeout = () => reject(new Error("upload timed out"));
-    xhr.timeout = 120_000;
-    xhr.send(blob);
-  });
-}
 
 const validLink = (s: string) => {
   if (!s.trim()) return true;

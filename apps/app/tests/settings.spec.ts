@@ -266,3 +266,23 @@ test.describe("Settings: accessibility", () => {
     });
   }
 });
+
+test.describe("Edit profile: photo", () => {
+  const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
+  test("add a photo, then remove it", async ({ page }) => {
+    await page.goto("/settings/profile?scenario=default");
+    await expect(page.getByRole("button", { name: "Add a photo" })).toBeVisible();
+    await page.getByLabel("Photo file").setInputFiles({ name: "me.png", mimeType: "image/png", buffer: PNG });
+    await expect(page.getByText("Photo updated.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Change photo" })).toBeVisible();
+    await page.getByRole("button", { name: "Remove photo" }).click();
+    await expect(page.getByText("Photo removed.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Add a photo" })).toBeVisible();
+  });
+
+  test("something that isn't a picture is refused in one sentence", async ({ page }) => {
+    await page.goto("/settings/profile?scenario=default");
+    await page.getByLabel("Photo file").setInputFiles({ name: "cv.txt", mimeType: "text/plain", buffer: Buffer.from("hello") });
+    await expect(page.getByText("That isn't a photo. Choose a JPG, PNG or WebP.")).toBeVisible();
+  });
+});

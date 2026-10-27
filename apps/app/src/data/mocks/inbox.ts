@@ -17,7 +17,7 @@ import { delay, http, HttpResponse, type HttpHandler } from "msw";
 import type { Schemas } from "@circuit/api-client";
 import { emit } from "./bus";
 import { currentScenario, type Scenario } from "./config";
-import { author, PEOPLE } from "./fixtures";
+import { author, ME, PEOPLE } from "./fixtures";
 
 const API = "*/api";
 const envelope = (status: number, code: string, message: string) => HttpResponse.json({ error: { code, message, details: null } }, { status });
@@ -73,6 +73,8 @@ const fresh = (): Conv[] => [
 
 let store: Conv[] = fresh();
 const uploads = new Map<number, { src: string; width: number; height: number }>();
+/** The profile photo the mock member has set (kept until the page reloads). */
+export let mockPhoto: string | null = null;
 const failedUploads = new Set<number>();
 /** What an upload id holds (posts.ts builds post media from it). */
 export const uploadOf = (id: number) => uploads.get(id);
@@ -245,6 +247,12 @@ export const inboxHandlers: HttpHandler[] = [
     uploads.set(Number(params.id), { src, width, height });
     return new HttpResponse(null, { status: 200 });
   }),
+  http.put(`${API}/me/photo`, scenario(async (_s, { request }) => {
+    const { upload_id } = (await request.json()) as { upload_id: number };
+    mockPhoto = uploads.get(upload_id)?.src ?? null;
+    return HttpResponse.json({ ...ME, photo: mockPhoto });
+  })),
+  http.delete(`${API}/me/photo`, scenario(() => { mockPhoto = null; return HttpResponse.json({ ...ME, photo: null }); })),
   http.post(`${API}/media/uploads/:id/complete`, scenario((_s, { params }) => {
     const u = uploads.get(Number(params.id));
     return HttpResponse.json({ id: Number(params.id), status: "ready", width: u?.width ?? null, height: u?.height ?? null });

@@ -20,6 +20,7 @@ export * from "./me";
 export * from "./notifications";
 export * from "./onboarding";
 export * from "./organisations";
+export * from "./photo";
 export * from "./posts";
 export * from "./profile";
 export * from "./settings";

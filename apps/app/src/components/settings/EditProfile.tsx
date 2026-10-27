@@ -1,15 +1,40 @@
 "use client";
 
-import { AddChip, Button, Chip, Skeleton, TextArea, TextField, useToast } from "@circuit/ui";
+import { AddChip, Avatar, Button, Chip, Skeleton, TextArea, TextField, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useCapabilities, useProfileDraft, useSaveProfile, type ProfileEdit } from "@/data";
+import { useEffect, useRef, useState } from "react";
+import { photoProblem, useCapabilities, useMe, useProfileDraft, useProfilePhoto, useSaveProfile, type ProfileEdit } from "@/data";
 import { goBack } from "../jobs/JobScreen";
 import { CapabilitySheet, ConfirmSheet } from "../sheets";
 import { SettingsScreen } from "./SettingsHome";
 
 const LIMITS = { offers: 5, needs: 3, skills: 8 } as const;
 type ListKey = keyof typeof LIMITS;
+
+/** The profile photo saves on its own as soon as it is chosen; it is not part of Save. */
+function PhotoRow() {
+  const me = useMe().data;
+  const photo = useProfilePhoto();
+  const toast = useToast();
+  const input = useRef<HTMLInputElement>(null);
+  const choose = (f: File | undefined) => {
+    if (!f) return;
+    const why = photoProblem(f);
+    if (why) return toast({ text: why, tone: "error" });
+    photo.set.mutate(f, { onSuccess: () => toast({ text: "Photo updated." }), onError: () => toast({ text: "Couldn't upload that photo. Try again.", tone: "error" }) });
+  };
+  const busy = photo.set.isPending || photo.remove.isPending;
+  return (
+    <div className="flex items-center gap-4">
+      <Avatar id={me?.id ?? 0} name={me?.name || "You"} src={me?.photo ?? null} size={64} />
+      <div className="flex flex-col items-start">
+        <Button variant="text" className="-ml-5" disabled={busy} onClick={() => input.current?.click()}>{photo.set.isPending ? "Uploading…" : me?.photo ? "Change photo" : "Add a photo"}</Button>
+        {me?.photo && <Button variant="text" className="-ml-5" disabled={busy} onClick={() => photo.remove.mutate(undefined, { onSuccess: () => toast({ text: "Photo removed." }) })}>Remove photo</Button>}
+      </div>
+      <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" aria-label="Photo file" hidden onChange={(e) => { choose(e.target.files?.[0]); e.target.value = ""; }} />
+    </div>
+  );
+}
 
 /**
  * Edit profile: name, a few lines about you, city and college, what you offer and need (from the fixed list), and skills with a
@@ -73,6 +98,7 @@ export function EditProfile() {
       ) : (
         <>
           <div className="flex flex-col gap-5 px-4 lg:px-0">
+            <PhotoRow />
             <TextField label="Name" value={draft.name} onChange={(e) => set({ name: e.target.value })} maxLength={120} autoComplete="name" error={nameError} />
             <div id="bio" className="scroll-mt-16">
               <TextArea label="About you" value={draft.bio} onChange={(e) => set({ bio: e.target.value })} maxLength={2000} hint="Two lines on what you're building or learning." className="[&_textarea]:h-32" />
