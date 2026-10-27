@@ -58,6 +58,8 @@ Stop everything with Ctrl+C, then `make down`.
 | `make migrations` | Create migrations after a model change (review them before committing) |
 | `make reset-demo` | Wipe local data and reload seed + the five demo stories (idempotent) |
 | `make reset-demo ENV=demo` | Same on the demo environment: runs the `reset-demo` job in Google Cloud (asks you to type `demo`) |
+| `make load-startups FILE=backend/data/startups_2026-10.csv [DRY=1]` | One-off: load startups from a CSV as unclaimed, visible profiles (source `crawler`). Matches on website domain, never touches a claimed startup, running it again changes nothing. Looks up pins on OpenStreetMap (1 request a second, answers cached in `backend/data/geocode_cache.json`); no address or "area only" means no pin. Prints the sector mapping, created / updated / skipped, and geocode hits / misses. `DRY=1` writes nothing |
+| `make load-startups FILE=... ENV=staging` or `ENV=production` | Same against the cloud database: asks you to type `production` first, then for the `DATABASE_URL` (hidden), and runs from your laptop like RUNBOOK step 16 |
 | `make admin-user USER_NAME=asha` | Create a Django admin user (asks for a password) and print the 2FA setup link (`otpauth://…`) to add to an authenticator app. Run again to reset someone's 2FA |
 
 | `make invite-codes N=10` | Create invite codes for the beta and print each with its one-tap link (`APP_URL/join?code=…&src=invite`). Optional: `USES=5` (people per code, default 1), `DAYS=30` (expiry), `ORG=3` (whoever redeems joins organisation 3), `NOTE="pilot cohort"`. Audit-logged |

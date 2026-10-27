@@ -1140,3 +1140,6 @@ Nothing is broken. Weak spots to remember: (a) none of the Supabase / Resend / s
 3. **Fix before B7 (can ride in B4):** add `members.onboarding` and `members.signup_source` (additive migration).
 4. **Add two boxes** so they are not forgotten: in Stage 4d and 4e, "block switching off `promotions` / `payments` while a paid campaign or an open order exists" (B0 left only a comment).
 5. After B4: B3b–B3e (when you want them), then B5, B6, B7.
+
+### Startup load (one-off, branch `startup-load`)
+`manage.py load_startups <csv> [--dry-run]` / `make load-startups`: 148 Chennai + Bengaluru startups from `backend/data/startups_2026-10.csv`, unclaimed, `source=crawler`, extras in the new `startups.details` json. Nominatim pins (cached), none for empty or area-only addresses. Startups without a pin have a page but are not on the map until an address is fixed in Django admin (Startups → latitude / longitude). Tests: `tests/unit/test_load_startups.py`.

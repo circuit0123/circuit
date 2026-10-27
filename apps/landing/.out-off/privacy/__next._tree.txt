@@ -1,5 +1,5 @@
-:HL["/_next/static/chunks/1tqetyaosqruu.css","style"]
+:HL["/_next/static/chunks/1ky_u2djn1__j.css","style"]
 :HL["/_next/static/media/Geist_Variable-s.p.2py-ke1f706a6.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 2:[["children",{"s":"__PAGE__","h":160}]]
 1:[["children",{"s":"privacy","h":96,"c":"$Q2"}]]
-0:{"b":"nSo9Kb1bnqRF9TjmNEhVe","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"uPhKfaSxNcitv_nzw8Hhp","t":{"t":{"s":"","h":80,"c":"$Q1"}}}

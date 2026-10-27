@@ -68,3 +68,6 @@ Priority: P1 = during pilot · P2 = after pilot · Later = only when data says s
 - Microservices / Kubernetes at pilot scale
 - Neo4j for the pilot
 - Another backend rewrite before the pilot
+
+## Note — sector list (from the startup load, Oct 2026)
+The code has 10 fixed sectors (`seed/data.py`); CLAUDE.md plans ~25. `load_startups` folds the CSV's 22 sector words into the 10 (ai and spacetech → deeptech, climate → cleantech, mobility → logistics, ecommerce/consumer/media/gaming → d2c, proptech/hrtech/legaltech → saas). When the sector list grows, re-map and re-run the load.
