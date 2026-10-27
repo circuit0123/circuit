@@ -76,11 +76,17 @@ export function useInbox(folder: Folder) {
   return { rows, allowed, isPending: allowed && q.isPending, isError: q.isError, refetch: q.refetch };
 }
 
-/** Whether the Inbox tab gets its dot: anything unread in Chats, or in Requests for members who have them. */
+/**
+ * Whether the Inbox tab gets its dot: any conversation with something unread (`GET /api/conversations/unread-count`; Requests is always
+ * 0 for under-18s). Refreshed by the member's own Realtime channel and every minute.
+ */
 export function useInboxDot(): boolean {
-  const chats = useInbox("chats");
-  const requests = useInbox("requests");
-  return chats.rows.some((r) => r.unread) || (requests.allowed && requests.rows.some((r) => r.unread));
+  const qc = useQueryClient();
+  const me = useMe().data;
+  const { key, enabled } = useKey("inbox", "unread");
+  const q = useQuery({ queryKey: key, enabled, refetchInterval: 60_000, queryFn: () => unwrap(api.GET("/api/conversations/unread-count")) });
+  useChannels(me ? [`member:${me.id}`] : [], "conversation", () => qc.invalidateQueries({ queryKey: ["inbox"] }));
+  return (q.data?.chats ?? 0) + (q.data?.requests ?? 0) > 0;
 }
 
 export type Connection = { id: number; name: string; line: string };

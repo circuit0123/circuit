@@ -11,7 +11,7 @@
  * - Connections ("New message"): the five chat people plus Dr. Lakshmi Narayanan (7), who has no conversation yet.
  * - Uploads (shared with build logs, F6): each PUT takes about half a second; "Uploads fail once" (upload_fails) fails the first try of
  *   each picture.
- * - Decline (POST …/decline) is a mock-only stand-in: the API has no such call yet (PROGRESS.md "Frontend → API needed").
+ * - Decline (POST …/decline) says no to a request without blocking; the sender is not told.
  */
 import { delay, http, HttpResponse, type HttpHandler } from "msw";
 import type { Schemas } from "@circuit/api-client";
@@ -133,6 +133,10 @@ const find = (s: Scenario, id: unknown) => visible(s).find((c) => c.id === Numbe
 const notFound = () => envelope(404, "not_found", "Not found");
 
 export const inboxHandlers: HttpHandler[] = [
+  http.get(`${API}/conversations/unread-count`, scenario((s) => {
+    const unread = (status: Conv["status"]) => visible(s).filter((c) => c.status === status && c.messages.some((x) => !x.mine && !x.read)).length;
+    return HttpResponse.json({ chats: unread("active"), requests: unread("request") });
+  })),
   http.get(`${API}/conversations`, scenario((s, { request }) => {
     const folder = new URL(request.url).searchParams.get("folder") ?? "chats";
     scheduleLive(s);
@@ -207,7 +211,7 @@ export const inboxHandlers: HttpHandler[] = [
     store = store.filter((x) => x.id !== c.id);
     return new HttpResponse(null, { status: 204 });
   })),
-  // Mock-only stand-in (API needed): say no to a request without blocking.
+  // Say no to a request without blocking.
   http.post(`${API}/conversations/:id/decline`, scenario((s, { params }) => {
     const c = find(s, params.id);
     if (!c || c.status !== "request") return notFound();
