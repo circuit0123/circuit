@@ -138,6 +138,11 @@ export const handlers: HttpHandler[] = [
     const all = notifications(s).filter((n) => q.get("unread") !== "true" || !n.read);
     return HttpResponse.json({ items: all.slice(offset, offset + limit), count: all.length, next_offset: offset + limit < all.length ? offset + limit : null });
   })),
+  http.post(`${API}/notifications/read-all`, scenario((s) => {
+    const changed = notifications(s).filter((n) => !n.read);
+    for (const n of changed) readIds.add(n.id);
+    return HttpResponse.json({ count: changed.length });
+  })),
   http.post(`${API}/notifications/:id/read`, scenario((_s, { params }) => {
     readIds.add(Number(params.id));
     return HttpResponse.json(NOTIFICATIONS.find((n) => n.id === Number(params.id)) ?? NOTIFICATIONS[0]);

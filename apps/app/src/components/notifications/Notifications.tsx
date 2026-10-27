@@ -3,13 +3,15 @@
 import { Avatar, Button, EmptyState, PushScreen, Skeleton } from "@circuit/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { loadFailed, useMarkRead, useNotifications, type NotificationRow } from "@/data";
+import { loadFailed, useMarkAllRead, useMarkRead, useNotifications, type NotificationRow } from "@/data";
 
 /** Notifications (Notifications.dc.html, DESIGN.md §4): grouped by day, an unread dot, a tap opens what it is about. */
 export function Notifications() {
   const router = useRouter();
   const list = useNotifications();
   const read = useMarkRead();
+  const readAll = useMarkAllRead();
+  const anyUnread = list.groups.some((g) => g.items.some((n) => n.unread));
   const back = () => (window.history.length > 1 ? router.back() : router.push("/"));
   const empty = !list.isPending && !list.isError && list.groups.length === 0;
 
@@ -23,6 +25,11 @@ export function Notifications() {
         </div>
       )}
       {empty && <EmptyState className="px-4 pt-8" text="Nothing new. We'll tell you when someone wants to meet you or replies." />}
+      {anyUnread && (
+        <div className="px-4 pt-2">
+          <Button variant="text" className="-ml-5" disabled={readAll.isPending} onClick={() => readAll.mutate()}>Mark all as read</Button>
+        </div>
+      )}
       {list.groups.map((g) => (
         <section key={g.day} aria-label={g.day} className="mt-8 first:mt-5">
           <h2 className="t-headline mb-1 px-4">{g.day}</h2>
