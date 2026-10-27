@@ -1,8 +1,8 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Appearance } from "./appearance";
-import { api, unwrap } from "./client";
+import { api, ApiError, unwrap } from "./client";
 import { useKey } from "./keys";
 
 export type Me = {
@@ -54,3 +54,21 @@ export function useMe() {
     },
   });
 }
+
+/**
+ * Verification level 2 (CLAUDE.md F7): a code goes to a work email (not a personal mailbox); entering it raises the level. The server's
+ * sentence for a refused address ("Use your work email, not a personal one.") is passed on as it is.
+ */
+export function useWorkEmail() {
+  const qc = useQueryClient();
+  const start = useMutation({ mutationFn: (email: string) => unwrap(api.POST("/api/me/verify/work-email", { body: { email } })) });
+  const confirm = useMutation({
+    mutationFn: (code: string) => unwrap(api.POST("/api/me/verify/work-email/confirm", { body: { code } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["me"] }),
+  });
+  return { start, confirm };
+}
+
+/** One sentence for why a work-email step failed: the server's own words for a refused address or code, a generic line for the rest. */
+export const workEmailProblem = (e: unknown): string | null =>
+  !e ? null : e instanceof ApiError && e.status < 500 && e.message ? e.message : "Couldn't do that. Check your connection and try again.";

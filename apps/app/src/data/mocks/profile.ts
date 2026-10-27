@@ -79,6 +79,17 @@ const listHandlers = (name: keyof Lists): HttpHandler[] => [
 export const profileFirstHandlers: HttpHandler[] = [...listHandlers("needs"), ...listHandlers("offers"), ...listHandlers("skills")];
 
 export const profileHandlers: HttpHandler[] = [
+  http.post(`${API}/me/verify/work-email`, scenario(async (_s, { request }) => {
+    const { email } = (await request.json()) as { email: string };
+    if (/@(gmail|yahoo|outlook|hotmail|proton)\./i.test(email)) return envelope(422, "personal_email", "Use your work email, not a personal one.");
+    return HttpResponse.json({ sent: true, dev_code: "123456" });
+  })),
+  http.post(`${API}/me/verify/work-email/confirm`, scenario(async (_s, { request }) => {
+    const { code } = (await request.json()) as { code: string };
+    if (code !== "123456") return envelope(400, "wrong_code", "That code isn't right. Check it and try again.");
+    mePatch.verification_level = 2;
+    return HttpResponse.json({ ok: true });
+  })),
   http.patch(`${API}/me`, scenario(async (_s, { request }) => {
     const b = (await request.json()) as Schemas["MePatch"];
     for (const [k, v] of Object.entries(b)) if (v !== null && v !== undefined) (mePatch as Record<string, unknown>)[k] = v;
