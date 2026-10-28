@@ -777,17 +777,16 @@ def _job_steps(cfg: Cfg, image: str, state: DeployState, jobs: list[Job]) -> lis
             f"--uri={uri}",
             "--http-method=POST",
             f"--oauth-service-account-email={cfg.scheduler_sa}",
-            "--headers=Content-Type=application/json",
             "--message-body={}",
             *p,
         ]
         steps.append(
             Step(
-                gcloud("scheduler", "jobs", "create", "http", *common),
+                gcloud("scheduler", "jobs", "create", "http", *common, "--headers=Content-Type=application/json"),
                 f"Start '{name}' on schedule '{job.schedule}' (India time). If the trigger exists, it is updated instead.",
                 use_if_exists=(
                     gcloud("scheduler", "jobs", "describe", name, f"--location={cfg.region}", *p, "--format=value(name)"),
-                    gcloud("scheduler", "jobs", "update", "http", *common),
+                    gcloud("scheduler", "jobs", "update", "http", *common, "--update-headers=Content-Type=application/json"),
                 ),
             )
         )
