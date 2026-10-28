@@ -1,11 +1,11 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
+import { ExternalLink, MoreHorizontal } from "lucide-react";
 import { Avatar, BarButton, Button, Chip, ErrorState, PushScreen, Sheet, Skeleton, VerifiedBadge, firstName, useToast } from "@circuit/ui";
 import { notFound, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  kmOrNull, loadFailed, metaLine, useFollow, useFollows, useInterest, useIntroPath, useMe, useReport, useStartup, useStartupJobs, type StartupFounder, type StartupPage,
+  hiringState, kmOrNull, loadFailed, metaLine, useFollow, useFollows, useInterest, useIntroPath, useMe, useReport, useStartup, useStartupJobs, type StartupFounder, type StartupPage,
 } from "@/data";
 import { JobRowItem, RowsSkeleton } from "../discover/parts";
 import { useAskIntro } from "../home/IntroSheet";
@@ -43,14 +43,15 @@ function Page({ s }: { s: StartupPage }) {
   const me = useMe().data;
   const follows = useFollows();
   const follow = useFollow();
-  const jobs = useStartupJobs(s.hiring ? s.id : null);
+  const jobs = useStartupJobs(s.hiring && s.openRoles > 0 ? s.id : null);
   const interest = useInterest(s.id, s.interested);
   const toast = useToast();
   const [claim, setClaim] = useState(false);
   const following = follows.data?.has(s.id) ?? false;
   const roles = jobs.data ?? [];
-  // For under-18 members, roles from an unverified startup are filtered out, so the startup shows as not hiring.
-  const hiring = s.hiring && (jobs.isPending || roles.length > 0);
+  // `hiring` comes from the API alone (it already says false to an under-18 on an unverified startup); roles never decide it.
+  const state = hiringState(s);
+  const hiring = state !== "none";
 
   // `See open roles` and deep links land on Hiring.
   useEffect(() => {
@@ -103,12 +104,17 @@ function Page({ s }: { s: StartupPage }) {
 
       <section id="hiring" aria-label="Hiring" className="mt-section scroll-mt-16">
         <h2 className="t-title3 mb-1 px-4 lg:px-0">{hiring ? "Hiring" : "Not hiring right now"}</h2>
-        {hiring ? (
+        {state === "roles" ? (
           jobs.isPending ? <RowsSkeleton rows={2} /> : jobs.isError ? <ErrorState className="px-4 lg:px-0" text={loadFailed("open roles")} onRetry={() => jobs.refetch()} /> : (
             <ul aria-label="Open roles">{roles.map((j) => <li key={j.id}><JobRowItem job={j} showStartup={false} /></li>)}</ul>
           )
         ) : (
           <div className="px-4 lg:px-0">
+            {state === "careers" && (
+              <a href={s.careersUrl!} target="_blank" rel="noreferrer" className="t-body inline-flex min-h-11 items-center gap-1 underline underline-offset-2">
+                Hiring · see their careers page<ExternalLink size={14} strokeWidth={1.75} aria-hidden /><span className="sr-only">(opens in a new tab)</span>
+              </a>
+            )}
             <p className="t-body text-text-muted">{following ? "You're following. We'll tell you when they post a role." : "Follow to hear when they post a role."}</p>
             {!following && <Button variant="text" className="-ml-5 mt-1" onClick={toggle}>Follow for updates</Button>}
           </div>

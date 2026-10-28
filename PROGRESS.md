@@ -1171,3 +1171,6 @@ Nothing is broken. Weak spots to remember: (a) none of the Supabase / Resend / s
 
 ### careers_url (branch `careers-url`, API 1.3.0)
 `PinOut` (map, nearby, search) and `StartupOut` now carry `careers_url`: the careers page the startup import stored in `startups.details`, only if it is an http(s) link, and null for an under-18 on an unverified startup. Nothing else changed. Contract fixtures pin `SUPPORT_EMAIL` so they no longer depend on the address in `.env`. Tests: `tests/api/test_startups.py`, `tests/api/test_b7_search.py`.
+
+### Hiring with a careers page (branch `hiring-label`, app only)
+A startup that is hiring but has no roles on Circuit no longer reads "Not hiring" or "0 roles". `hiringState()` (`data/discover.ts`) turns the API's `hiring`, `open_roles` and `careers_url` into `roles | careers | hiring | none`. The map sheet shows "See open roles", a "Hiring · see their careers page" link (new tab), or Follow; the startup page and the Startups grid follow the same rule. `hiring` from the API stays the only truth, so an under-18 on an unverified startup still sees "not hiring". Mock mode has a new startup, Ledgerly (#48), with only a careers page, and its under-18 hiding now matches the API. Tests: 3 new in `tests/discover.spec.ts`; the whole Discover spec passes on mock mode at 375px and 1280px (97 passed).

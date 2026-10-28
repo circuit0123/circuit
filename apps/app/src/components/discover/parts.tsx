@@ -4,7 +4,7 @@ import { MoreHorizontal } from "lucide-react";
 import { Avatar, Button, PatternArt, Sheet, Skeleton, VerifiedBadge, cx } from "@circuit/ui";
 import Link from "next/link";
 import { useState } from "react";
-import { kmOrNull, metaLine, roleHref, startupHref, type JobRow, type PersonTile, type Promotion, type StartupTile } from "@/data";
+import { hiringState, kmOrNull, metaLine, roleHref, startupHref, type JobRow, type PersonTile, type Promotion, type StartupTile } from "@/data";
 
 /** A role as a row (Discover.dc.html): startup mark, title, "Startup · Sector · 3.2 km", then the stipend in mono and the fit in words. No box. */
 export function JobRowItem({ job, showStartup = true, className }: { job: JobRow; showStartup?: boolean; className?: string }) {
@@ -44,7 +44,8 @@ export function PersonTileCard({ person, onOpen }: { person: PersonTile; onOpen?
 
 /** A startup, picture first: its mark (circuit pattern until logos exist), name, sector and distance, and whether it is hiring. */
 export function StartupTileCard({ startup }: { startup: StartupTile }) {
-  const status = startup.hiring ? `Hiring · ${startup.openRoles} ${startup.openRoles === 1 ? "role" : "roles"}` : startup.fit ?? "Not hiring right now";
+  const state = hiringState(startup);
+  const status = state === "roles" ? `Hiring · ${startup.openRoles} ${startup.openRoles === 1 ? "role" : "roles"}` : state === "none" ? startup.fit ?? "Not hiring right now" : "Hiring";
   return (
     <Link href={startupHref(startup.id)} className="block min-w-0 active:opacity-80">
       <span className="block aspect-square overflow-hidden rounded-card"><PatternArt id={`s${startup.id}`} initial={startup.name[0]} banner /></span>

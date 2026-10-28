@@ -32,6 +32,8 @@ export type StartupPage = {
   claimed: boolean;
   fromPublicSources: boolean;
   hiring: boolean;
+  openRoles: number;
+  careersUrl: string | null;
   /** The signed-in member is on this startup's team: they see its private counts and its applicants. */
   isTeam: boolean;
   /** Only for the team (DESIGN.md §4: never public). */
@@ -76,6 +78,8 @@ export function useStartup(id: number) {
     claimed: s.claimed,
     fromPublicSources: !s.claimed && s.source !== "user",
     hiring: s.hiring,
+    openRoles: s.open_jobs.length,
+    careersUrl: s.careers_url ?? null,
     isTeam: s.is_team,
     privateCounts: s.is_team ? { views: s.view_count, interested: s.interest_count } : null,
     claimNudge: !s.claimed && me?.role === "founder" ? { views: s.view_count, interested: s.interest_count } : null,
