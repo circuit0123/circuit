@@ -87,6 +87,7 @@ class LocalStorage:
 class SupabaseStorage:
     def _call(self, method: str, url: str, **kw) -> httpx.Response:
         headers = {"Authorization": f"Bearer {settings.SUPABASE_SERVICE_ROLE_KEY}", "apikey": settings.SUPABASE_SERVICE_ROLE_KEY}
+        headers.update(kw.pop("headers", None) or {})
         last: Exception | None = None
         for attempt in range(RETRIES):
             try:
