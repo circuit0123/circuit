@@ -307,6 +307,18 @@ test.describe("Map", () => {
     await expect(sheet.getByRole("button", { name: "Following" })).toHaveAttribute("aria-pressed", "true");
   });
 
+  test("hiring with no roles on Circuit: the sheet links to their careers page", async ({ page }) => {
+    await discover(page, "map");
+    await pin(page, "Ledgerly, hiring").dispatchEvent("click");
+    const sheet = page.getByRole("region", { name: "Selected startup" });
+    const link = sheet.getByRole("link", { name: /Hiring · see their careers page/ });
+    await expect(link).toHaveAttribute("href", "https://ledgerly.in/careers");
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(sheet).not.toContainText("Not hiring");
+    await expect(sheet.getByRole("button", { name: "See open roles" })).toHaveCount(0);
+    await inBothThemes(page, () => checkPage(page, "map sheet, careers page"));
+  });
+
   test.describe("by touch", () => {
     test.use({ reducedMotion: "no-preference", hasTouch: true });
     test("a sideways swipe on the map pans the map and never changes tab (DESIGN.md §3)", async ({ page }, info) => {
@@ -356,6 +368,24 @@ test.describe("Startup page", () => {
     await expect(page.getByText(/Only your team sees this/)).toHaveCount(0);
     await page.goto("/startups/41?scenario=founder");
     await expect(page.getByText(/Only your team sees this: 214 views/)).toBeVisible();
+  });
+
+  test("hiring with no roles on Circuit: Hiring, with a link to their careers page", async ({ page }) => {
+    await page.goto("/startups/48");
+    await expect(page.getByRole("heading", { name: "Hiring", exact: true })).toBeVisible();
+    const link = page.getByRole("link", { name: /Hiring · see their careers page/ });
+    await expect(link).toHaveAttribute("href", "https://ledgerly.in/careers");
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(page.getByText("Not hiring")).toHaveCount(0);
+    await inBothThemes(page, () => checkPage(page, "startup page, careers page"));
+  });
+
+  test("Startups grid says Hiring, not 0 roles, for a startup with only a careers page", async ({ page }) => {
+    await discover(page, "startups");
+    const tile = page.getByRole("list", { name: "Startups" }).getByRole("link", { name: /Ledgerly/ });
+    await expect(tile).toContainText("Hiring");
+    await expect(tile).not.toContainText("0 roles");
+    await expect(tile).not.toContainText("Not hiring");
   });
 
   test("not hiring: says so, with Follow for updates", async ({ page }) => {

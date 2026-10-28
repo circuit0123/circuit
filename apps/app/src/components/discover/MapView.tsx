@@ -1,13 +1,13 @@
 "use client";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import { SlidersHorizontal, X } from "lucide-react";
-import { Avatar, Button, Chip, ErrorState, cx, useToast } from "@circuit/ui";
+import { ExternalLink, SlidersHorizontal, X } from "lucide-react";
+import { Avatar, Button, Chip, ErrorState, LinkButton, cx, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  activeFilters, kmOrNull, loadFailed, metaLine, roleHref, startupHref, useFollow, useFollows, useHere, useInterest, useMapPins, useMe, useStartupJobs,
+  activeFilters, hiringState, kmOrNull, loadFailed, metaLine, roleHref, startupHref, useFollow, useFollows, useHere, useInterest, useMapPins, useMe, useStartupJobs,
   type Bounds, type DiscoverFilters, type StartupTile,
 } from "@/data";
 import { MAP_TILES_URL } from "@/lib/env";
@@ -192,7 +192,7 @@ export function MapView({ visible, filters, onFilters, onOpenFilters, segment }:
             {pins.pins.map((p) => (
               <li key={p.id}>
                 <button type="button" onClick={() => setSelected(p.id)} aria-pressed={p.id === selected} aria-label={`${p.name}, ${p.hiring ? "hiring" : "not hiring"}`} className="flex min-h-row w-full items-center justify-between gap-4 border-b border-separator text-left">
-                  <span className="t-body">{p.name}</span><span className="t-subhead text-text-muted">{p.hiring ? "Hiring" : "Not hiring"}</span>
+                  <span className="t-body">{p.name}</span><span className="t-subhead text-text-muted">{p.hiring ? "Hiring" : "Not hiring right now"}</span>
                 </button>
               </li>
             ))}
@@ -224,7 +224,7 @@ export function MapView({ visible, filters, onFilters, onOpenFilters, segment }:
 function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
   const router = useRouter();
   const me = useMe().data;
-  const jobs = useStartupJobs(pin.hiring ? pin.id : null);
+  const jobs = useStartupJobs(pin.hiring && pin.openRoles > 0 ? pin.id : null);
   const follows = useFollows();
   const follow = useFollow();
   const following = follows.data?.has(pin.id) ?? false;
@@ -234,12 +234,17 @@ function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
     if (!(await interest.set(!interest.interested))) toast({ text: "Couldn't save that. Try again.", tone: "error" });
   };
   const roles = jobs.data ?? [];
-  // Under-18 members only see roles from verified startups; for them an unverified startup is simply not hiring.
-  const hiring = pin.hiring && (!me?.isMinor || pin.verified);
+  // `hiring` comes from the API (it already says false to an under-18 on an unverified startup); roles and the careers page only pick the action.
+  const state = hiringState(pin);
   const best = [...roles].sort((a, b) => Number(!!b.fit) - Number(!!a.fit))[0];
-  const summary = hiring
+  const summary = state === "roles"
     ? metaLine("Hiring", roles.length === 1 ? roles[0].title : `${pin.openRoles} open roles`, best?.fit)
-    : "Not hiring right now · Follow for updates";
+    : state === "hiring" ? "Hiring" : state === "careers" ? null : "Not hiring right now · Follow for updates";
+  const followButton = (
+    <Button variant={following ? "secondary" : "primary"} className="w-full" aria-pressed={following} onClick={() => follow.mutate({ id: pin.id, on: !following })}>
+      {following ? "Following" : "Follow"}
+    </Button>
+  );
 
   return (
     <section
@@ -255,9 +260,9 @@ function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
         </div>
         <button type="button" onClick={onClose} aria-label="Close" className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-text-muted"><X size={20} strokeWidth={1.75} /></button>
       </div>
-      <p className="t-subhead mt-4 text-text-muted">{summary}</p>
+      {summary && <p className="t-subhead mt-4 text-text-muted">{summary}</p>}
       <div className="mt-4 flex flex-col gap-1">
-        {hiring ? (
+        {state === "roles" ? (
           <Button
             variant="primary"
             className="w-full"
@@ -266,11 +271,11 @@ function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
           >
             See open roles
           </Button>
-        ) : (
-          <Button variant={following ? "secondary" : "primary"} className="w-full" aria-pressed={following} onClick={() => follow.mutate({ id: pin.id, on: !following })}>
-            {following ? "Following" : "Follow"}
-          </Button>
-        )}
+        ) : state === "careers" ? (
+          <LinkButton variant="primary" href={pin.careersUrl!} target="_blank" rel="noreferrer" className="w-full">
+            Hiring · see their careers page<ExternalLink size={16} strokeWidth={1.75} aria-hidden /><span className="sr-only">(opens in a new tab)</span>
+          </LinkButton>
+        ) : followButton}
         {me?.role === "student" && (
           <Button variant="text" className="w-full" aria-pressed={interest.interested} disabled={interest.pending} onClick={toggleInterest}>
             {interest.interested ? "Interested · tap to withdraw" : "I'm interested"}

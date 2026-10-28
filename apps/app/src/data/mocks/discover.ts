@@ -25,7 +25,7 @@ function km(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
 }
 const HOME = { lat: ME.lat, lng: ME.lng };
 
-type Startup = Omit<Schemas["StartupOut"], "interested" | "is_team" | "match_pct" | "open_jobs" | "hiring" | "build_logs" | "founders" | "logo" | "team_size" | "verified"> & { lat: number; lng: number; match_pct: number | null };
+type Startup = Omit<Schemas["StartupOut"], "interested" | "is_team" | "match_pct" | "open_jobs" | "hiring" | "build_logs" | "founders" | "logo" | "team_size" | "verified"> & { lat: number; lng: number; match_pct: number | null; careers_url?: string; hiring?: boolean };
 
 export const STARTUPS: Startup[] = [
   { id: 41, name: "Aravind Pathology", website_domain: "aravindpath.in", description: "Stock and reorder software for neighbourhood pharmacies and pathology labs in Adyar and Velachery. Pharmacists check it before they open.", sector: "healthtech", stage: "seed", address: "Gandhi Nagar, Adyar, Chennai", lat: 13.0067, lng: 80.2573, claimed: true, source: "user", tech_stack: ["React", "Django", "PostgreSQL"], view_count: 214, interest_count: 18, match_pct: 82 },
@@ -35,6 +35,7 @@ export const STARTUPS: Startup[] = [
   { id: 45, name: "Kalam Labs", website_domain: "kalamlabs.in", description: "Science kits and weekend workshops for government school students.", sector: "edtech", stage: "seed", address: "Mylapore, Chennai", lat: 13.0339, lng: 80.2619, claimed: true, source: "user", tech_stack: ["Next.js", "Firebase"], view_count: 77, interest_count: 9, match_pct: null },
   { id: 46, name: "Zetapulse", website_domain: "zetapulse.io", description: "Low-power vibration sensors for pumps in textile mills.", sector: "deeptech", stage: "pre_seed", address: "Guindy Industrial Estate, Chennai", lat: 13.0108, lng: 80.2125, claimed: true, source: "user", tech_stack: ["C", "Rust", "STM32"], view_count: 58, interest_count: 4, match_pct: 67 },
   { id: 47, name: "Neerflow", website_domain: "neerflow.in", description: "Rainwater harvesting audits for apartment associations.", sector: "climate", stage: "idea", address: "Velachery, Chennai", lat: 12.9791, lng: 80.2209, claimed: true, source: "user", tech_stack: ["Flutter"], view_count: 31, interest_count: 2, match_pct: null },
+  { id: 48, name: "Ledgerly", website_domain: "ledgerly.in", description: "Bookkeeping and GST filing for small traders in Chennai. Hires through its own careers page.", sector: "fintech", stage: "seed", address: "Anna Nagar, Chennai", lat: 13.0850, lng: 80.2101, claimed: true, source: "user", tech_stack: ["Python", "React"], view_count: 52, interest_count: 5, match_pct: 64, hiring: true, careers_url: "https://ledgerly.in/careers" },
 ];
 
 type Job = Schemas["JobOut"];
@@ -67,13 +68,16 @@ const empty = (s: Scenario) => s === "empty";
 
 const jobOut = (j: Job): Job => ({ ...j, applied: applied.has(j.id) });
 const openJobs = (id: number) => JOBS.filter((j) => j.startup_id === id);
-const hiring = (s: Startup) => openJobs(s.id).length > 0;
+const hiring = (s: Startup) => s.hiring ?? openJobs(s.id).length > 0;
+/** Like the API: to an under-18 an unverified startup has no hiring, roles or careers page. */
+const hidden = (s: Startup, sc: Scenario) => sc === "under18" && !s.claimed;
 
 function startupOut(s: Startup, sc: Scenario): Schemas["StartupOut"] {
   return {
     ...s,
     claimed: s.claimed || claimedNow.has(s.id),
-    hiring: hiring(s),
+    hiring: hiring(s) && !hidden(s, sc),
+    careers_url: hidden(s, sc) ? null : s.careers_url ?? null,
     interested: interestedIn.has(s.id),
     build_logs: [],
     founders: [],
@@ -81,12 +85,12 @@ function startupOut(s: Startup, sc: Scenario): Schemas["StartupOut"] {
     team_size: null,
     verified: s.claimed,
     is_team: isTeam(sc, s.id),
-    open_jobs: openJobs(s.id).map((j) => ({ id: j.id, title: j.title, kind: j.kind, stipend_min: j.stipend_min, stipend_max: j.stipend_max })),
+    open_jobs: hidden(s, sc) ? [] : openJobs(s.id).map((j) => ({ id: j.id, title: j.title, kind: j.kind, stipend_min: j.stipend_min, stipend_max: j.stipend_max })),
   };
 }
 
-const pinOut = (s: Startup): Schemas["PinOut"] => ({
-  id: s.id, name: s.name, sector: s.sector, lat: s.lat, lng: s.lng, hiring: hiring(s), open_roles: openJobs(s.id).length,
+const pinOut = (s: Startup, sc: Scenario): Schemas["PinOut"] => ({
+  id: s.id, name: s.name, sector: s.sector, lat: s.lat, lng: s.lng, hiring: hiring(s) && !hidden(s, sc), open_roles: hidden(s, sc) ? 0 : openJobs(s.id).length, careers_url: hidden(s, sc) ? null : s.careers_url ?? null,
   claimed: s.claimed || claimedNow.has(s.id), distance_km: km(HOME, s), match_pct: s.match_pct,
 });
 const hasCapability = (s: Startup, slug: string | null) => !slug || openJobs(s.id).some((j) => j.capabilities.some((c) => c.slug === slug));
@@ -132,7 +136,7 @@ export const discoverHandlers: HttpHandler[] = [
     if (empty(s)) return HttpResponse.json({ people: [], startups: [], jobs: [] });
     return HttpResponse.json({
       people: MATCHES.filter((m) => has(m.display_name)).slice(0, 10).map((m) => ({ id: m.candidate_id, display_name: m.display_name, headline: m.headline ?? "", role: m.role, city: "Chennai", photo: null, verification_level: m.verification_level })),
-      startups: STARTUPS.filter((x) => has(x.name, x.sector)).slice(0, 10).map(pinOut),
+      startups: STARTUPS.filter((x) => has(x.name, x.sector)).slice(0, 10).map((x) => pinOut(x, s)),
       jobs: JOBS.filter((j) => has(j.title, j.startup_name, j.sector)).slice(0, 10).map(jobOut),
     });
   })),
@@ -184,13 +188,13 @@ export const discoverHandlers: HttpHandler[] = [
     const q = new URL(request.url).searchParams;
     const [w, so, e, n] = ["min_lng", "min_lat", "max_lng", "max_lat"].map((k) => Number(q.get(k)));
     if (e - w > 2 || n - so > 2) return envelope(422, "bbox_too_large", "Zoom in: that map area is too large"); // the API's MAX_BBOX_DEGREES
-    const pins = (empty(s) ? [] : STARTUPS).filter((x) => x.lng >= w && x.lng <= e && x.lat >= so && x.lat <= n && (q.get("hiring") !== "true" || hiring(x)) && hasCapability(x, q.get("capability"))).map(pinOut);
+    const pins = (empty(s) ? [] : STARTUPS).filter((x) => x.lng >= w && x.lng <= e && x.lat >= so && x.lat <= n && (q.get("hiring") !== "true" || (hiring(x) && !hidden(x, s))) && hasCapability(x, q.get("capability"))).map((x) => pinOut(x, s));
     return HttpResponse.json(pins);
   })),
   http.get(`${API}/startups/nearby`, scenario((s, { request }) => {
     const q = new URL(request.url).searchParams;
     const radius = num(q, "radius_km") ?? 25;
-    const pins = (empty(s) ? [] : STARTUPS).map(pinOut).filter((p) => (p.distance_km ?? 0) <= radius && (q.get("hiring") !== "true" || p.hiring) && hasCapability(by(p.id), q.get("capability")))
+    const pins = (empty(s) ? [] : STARTUPS).map((x) => pinOut(x, s)).filter((p) => (p.distance_km ?? 0) <= radius && (q.get("hiring") !== "true" || p.hiring) && hasCapability(by(p.id), q.get("capability")))
       .sort((a, b) => (a.distance_km ?? 0) - (b.distance_km ?? 0)).slice(0, num(q, "limit") ?? 20);
     return HttpResponse.json(pins);
   })),

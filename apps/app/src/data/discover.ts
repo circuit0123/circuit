@@ -75,7 +75,16 @@ export function useDiscoverPeople(filters: DiscoverFilters, on = true) {
   return { items, isPending: q.isPending && on, isError: q.isError, refetch: q.refetch };
 }
 
-export type StartupTile = { id: number; name: string; sector: string; km: number | null; hiring: boolean; openRoles: number; fit: string | null; verified: boolean };
+export type StartupTile = { id: number; name: string; sector: string; km: number | null; hiring: boolean; openRoles: number; careersUrl: string | null; fit: string | null; verified: boolean };
+
+/**
+ * What a startup says about hiring. `hiring` from the API is the only truth; roles and the careers page only decide what we can offer:
+ * roles on Circuit, else their own careers page, else just "Hiring".
+ */
+export function hiringState(t: { hiring: boolean; openRoles: number; careersUrl: string | null }): "roles" | "careers" | "hiring" | "none" {
+  if (!t.hiring) return "none";
+  return t.openRoles > 0 ? "roles" : t.careersUrl ? "careers" : "hiring";
+}
 
 export const toStartupTile = (p: Schemas["PinOut"]): StartupTile => ({
   id: p.id,
@@ -84,6 +93,7 @@ export const toStartupTile = (p: Schemas["PinOut"]): StartupTile => ({
   km: p.distance_km ?? null,
   hiring: p.hiring,
   openRoles: p.open_roles,
+  careersUrl: p.careers_url ?? null,
   fit: p.match_pct == null ? null : p.match_pct >= 75 ? "Strong match" : p.match_pct >= 55 ? "Good match" : null,
   verified: p.claimed,
 });
@@ -219,6 +229,6 @@ export function usePromotion(seg: "startups" | "jobs"): Promotion | null {
   if (me?.isMinor && !s.verified) return null;
   return {
     key: s.key, why: s.why, label: s.name, kind: "startup",
-    startup: { id: s.id, name: s.name, sector: sectorLabel(s.sector), km: 7.4, hiring: true, openRoles: 2, fit: null, verified: s.verified },
+    startup: { id: s.id, name: s.name, sector: sectorLabel(s.sector), km: 7.4, hiring: true, openRoles: 2, careersUrl: null, fit: null, verified: s.verified },
   };
 }
