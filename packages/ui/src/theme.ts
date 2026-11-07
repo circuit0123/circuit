@@ -20,9 +20,3 @@ export function initials(name: string): string {
   const last = words.length > 1 ? (words[words.length - 1][0] ?? "") : "";
   return (first + last).toUpperCase();
 }
-
-export function toneFor(name: string) {
-  let h = 0;
-  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return AVATAR_TONES[h % AVATAR_TONES.length];
-}

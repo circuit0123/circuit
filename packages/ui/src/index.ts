@@ -42,5 +42,5 @@ export * from "./TopBar";
 export * from "./UpdateView";
 export * from "./types";
 export { cx } from "./cx";
-export { initials, toneFor, spring, sheetSpring, pushSpring, fade } from "./theme";
+export { initials, spring, sheetSpring, pushSpring, fade } from "./theme";
 export { circuitPattern } from "./pattern";
