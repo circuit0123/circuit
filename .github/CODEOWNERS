@@ -1,0 +1,29 @@
+# Owner of infrastructure and authentication code. GitHub requests this owner's review on changes to these paths.
+
+# Infrastructure
+/infra/                         @drool-kitty
+/docker/                        @drool-kitty
+/deploy/                        @drool-kitty
+/docker-compose.yml             @drool-kitty
+/vercel.json                    @drool-kitty
+/.github/                       @drool-kitty
+/scripts/gcp.py                 @drool-kitty
+/scripts/gcp_monitoring.py      @drool-kitty
+/Makefile                       @drool-kitty
+
+# Authentication and access: backend
+/backend/core/auth.py           @drool-kitty
+/backend/core/permissions.py    @drool-kitty
+/backend/core/admin_site.py     @drool-kitty
+/backend/core/demo.py           @drool-kitty
+/backend/apps/beta/             @drool-kitty
+
+# Authentication and access: frontend
+/apps/app/src/data/auth.ts      @drool-kitty
+/apps/app/src/data/supabase.ts  @drool-kitty
+/apps/app/src/data/session.tsx  @drool-kitty
+/apps/app/src/data/gate.ts      @drool-kitty
+/apps/app/src/data/access.ts    @drool-kitty
+/apps/app/src/components/SignIn.tsx       @drool-kitty
+/apps/app/src/components/AuthCallback.tsx @drool-kitty
+/apps/app/src/components/Gate.tsx         @drool-kitty
