@@ -44,3 +44,4 @@ export * from "./types";
 export { cx } from "./cx";
 export { initials, spring, sheetSpring, pushSpring, fade } from "./theme";
 export { circuitPattern } from "./pattern";
+export * from "./v2";

@@ -3,6 +3,7 @@ import { firstPaintScript } from "@circuit/ui";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { Providers } from "@/components/Providers";
+import { UI_V2_MODE, uiV2Script } from "@/lib/uiV2";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en-IN" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: firstPaintScript }} />
+        {UI_V2_MODE !== "off" && <script dangerouslySetInnerHTML={{ __html: uiV2Script }} />}
       </head>
       <body>
         <Providers>{children}</Providers>

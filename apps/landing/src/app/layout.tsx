@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { LandingMotion } from "@/components/LandingMotion";
 import { LANDING_URL } from "@/lib/env";
@@ -36,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" className={GeistSans.variable}>
+    <html lang="en-IN" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10 focus:rounded-control focus:bg-surface focus:px-4 focus:py-3">Skip to content</a>
         {children}
