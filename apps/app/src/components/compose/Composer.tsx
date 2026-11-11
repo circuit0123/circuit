@@ -1,9 +1,10 @@
 "use client";
 
-import { AddChip, AddMedia, Button, CharCounter, Chip, CropFrame, GroupedList, ListRow, MediaSlot, SegmentedControl, Sheet, TextField, cx, useToast } from "@circuit/ui";
+import { AddChip, AddMedia, BigHeadline, Button, CharCounter, Chip, CropFrame, GroupedList, ListRow, MediaSlot, SegmentedControl, Sheet, TextField, cx, useToast } from "@circuit/ui";
 import { notFound, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { BODY_MAX, MAX_PHOTOS, MAX_TAGS, VISIBILITY, photoProblemText, postHref, useCapabilities, useComposer, useFeatures, type Aspect, type Visibility } from "@/data";
+import { useUiV2 } from "@/lib/uiV2";
 import { goBack } from "../jobs/JobScreen";
 import { CapabilitySheet, ConfirmSheet, ROW_INSET } from "../sheets";
 
@@ -17,6 +18,7 @@ export function Composer() {
   const toast = useToast();
   const features = useFeatures();
   const c = useComposer();
+  const v2 = useUiV2();
   const caps = useCapabilities();
   const names = new Map((caps.data ?? []).map((x) => [x.slug, x.name]));
   const file = useRef<HTMLInputElement>(null);
@@ -36,7 +38,20 @@ export function Composer() {
 
   return (
     <div className="min-h-dvh bg-bg">
-      <header className="material sticky top-0 z-20 grid min-h-11 grid-cols-[1fr_auto_1fr] items-center border-b border-separator px-4 pt-[env(safe-area-inset-top)]">
+      {v2 ? (
+        <header className="mx-auto flex w-full max-w-[600px] items-center justify-between px-5 pt-[calc(20px+env(safe-area-inset-top))]">
+          <button type="button" onClick={cancel} className="flex h-10 items-center text-[15px] text-c-muted">Cancel</button>
+          <button
+            type="button"
+            onClick={post}
+            disabled={!!c.blocker || c.publish.isPending}
+            className="h-10 rounded-[12px] bg-c-brand px-[18px] text-[15px] font-semibold text-c-text disabled:bg-c-card disabled:text-c-muted"
+          >
+            {c.publish.isPending ? "Posting…" : "Post"}
+          </button>
+        </header>
+      ) : (
+        <header className="material sticky top-0 z-20 grid min-h-11 grid-cols-[1fr_auto_1fr] items-center border-b border-separator px-4 pt-[env(safe-area-inset-top)]">
         <button type="button" onClick={cancel} className="min-h-11 justify-self-start t-body text-text-muted active:opacity-80">Cancel</button>
         <h1 className="t-headline whitespace-nowrap">New build log</h1>
         <button
@@ -47,9 +62,11 @@ export function Composer() {
         >
           {c.publish.isPending ? "Posting…" : "Post"}
         </button>
-      </header>
+        </header>
+      )}
 
-      <div className="mx-auto w-full max-w-[600px] px-4 pb-24 pt-5">
+      {v2 && <BigHeadline first="Ship" second="a log." className="mx-auto mt-4 w-full max-w-[600px] px-5 text-[52px]" />}
+      <div className={cx("mx-auto w-full max-w-[600px] pb-24 pt-5", v2 ? "px-5" : "px-4")}>
         <input
           ref={file}
           type="file"
@@ -95,15 +112,15 @@ export function Composer() {
           </section>
         )}
 
-        <label className="mt-5 block">
-          <span className="sr-only">What did you build?</span>
+        <label className={cx("mt-5 block", v2 && "rounded-[18px] bg-c-hero p-3.5 text-c-hero-text")}>
+          {v2 ? <span className="font-mono text-[12px] uppercase text-c-hero-muted">What did you build?</span> : <span className="sr-only">What did you build?</span>}
           <textarea
             value={c.body}
             onChange={(e) => c.setBody(e.target.value)}
             maxLength={BODY_MAX}
             rows={4}
             placeholder="What did you build or learn?"
-            className="t-body block w-full resize-none bg-transparent text-text outline-none placeholder:text-text-subtle"
+            className={cx("t-body block w-full resize-none bg-transparent text-text outline-none placeholder:text-text-subtle", v2 && "mt-2 text-c-hero-text placeholder:text-[#8a8d93]")}
           />
         </label>
         <CharCounter count={c.body.length} max={BODY_MAX} />
