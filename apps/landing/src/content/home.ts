@@ -33,3 +33,16 @@ export const INVITE_ONLY = {
   heading: "Circuit is invite-only right now",
   copy: "Join the waitlist and we\u2019ll send you an invite.",
 } as const;
+
+/** ui_v2: the same questions plus the one about messages, worded the way the app really works (docs/ui-v2-plan.md §5). */
+export const FAQ_V2: ReadonlyArray<FaqItem> = [
+  ...FAQ.slice(0, 3),
+  { q: "Can strangers message me?", a: "Someone you’re not connected to can send one message request. It waits in a separate Requests folder until you accept. Under-18 members never receive them." },
+  ...FAQ.slice(3),
+];
+
+export const STEPS_V2: ReadonlyArray<{ n: string; title: string; body: string }> = [
+  { n: "01", title: "Say what you need and offer", body: "Paste a bio. We suggest your skills and you confirm them in a few taps." },
+  { n: "02", title: "See matches with a reason", body: "Each match comes with a line on why you should meet, not a job title or a college name." },
+  { n: "03", title: "Meet through people you trust", body: "Where you share a connection, ask them to introduce you. The other person decides whether to say yes." },
+];
