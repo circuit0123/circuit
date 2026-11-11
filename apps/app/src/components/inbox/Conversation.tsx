@@ -4,6 +4,7 @@ import { Avatar, BarButton, Button, ErrorState, PushScreen, Sheet, Skeleton, cx,
 import { ArrowUp, ImagePlus, MoreHorizontal } from "lucide-react";
 import { notFound, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useUiV2 } from "@/lib/uiV2";
 import {
   conversationHref, imageProblem, loadFailed, useConversation, useDraftConversation, useFindConversation, type Bubble, type BubbleDay,
 } from "@/data";
@@ -141,6 +142,7 @@ function Thread({ days, other, onRetry }: { days: BubbleDay[]; other: string; on
 
 function BubbleView({ b, other, onRetry }: { b: Bubble; other: string; onRetry: (tempId: string) => void }) {
   const who = b.mine ? "You" : other;
+  const v2 = useUiV2();
   return (
     <div className={cx("flex flex-col gap-1", b.mine ? "items-end" : "items-start")} data-mine={b.mine ? "" : undefined} data-state={b.state}>
       {b.image && (
@@ -160,7 +162,7 @@ function BubbleView({ b, other, onRetry }: { b: Bubble; other: string; onRetry: 
           data-bubble
           className={cx(
             "max-w-[75%] whitespace-pre-wrap break-words rounded-[18px] px-3.5 py-2.5 t-body leading-[1.35]",
-            b.mine ? "bg-primary text-on-primary" : "bg-surface-2 text-text",
+            b.mine ? "bg-primary text-on-primary" : v2 ? "border border-c-border bg-c-card text-c-text" : "bg-surface-2 text-text",
             b.state !== "sent" && "opacity-70",
           )}
         >
@@ -179,6 +181,7 @@ function Composer({ onSend }: { onSend: (text: string, file: File | null) => voi
   const [text, setText] = useState("");
   const file = useRef<HTMLInputElement>(null);
   const toast = useToast();
+  const v2 = useUiV2();
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;
@@ -207,11 +210,11 @@ function Composer({ onSend }: { onSend: (text: string, file: File | null) => voi
           setText("");
         }}
       />
-      <label className="flex h-11 min-w-0 flex-1 items-center rounded-full bg-surface-2 px-4 focus-within:ring-2 focus-within:ring-live">
+      <label className={cx("flex h-11 min-w-0 flex-1 items-center rounded-full px-4 focus-within:ring-2 focus-within:ring-live", v2 ? "border border-c-border bg-c-card" : "bg-surface-2")}>
         <span className="sr-only">Message</span>
         <input value={text} onChange={(e) => setText(e.target.value)} maxLength={2000} placeholder="Message" className="t-body min-w-0 flex-1 bg-transparent text-text outline-none placeholder:text-text-subtle" />
       </label>
-      <button type="submit" aria-label="Send" disabled={!text.trim()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary transition-transform active:scale-[0.97] disabled:opacity-50">
+      <button type="submit" aria-label="Send" disabled={!text.trim()} className={cx("flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform active:scale-[0.97] disabled:opacity-50", v2 ? "bg-c-bright text-c-bg" : "bg-primary text-on-primary")}>
         <ArrowUp size={20} strokeWidth={2.2} aria-hidden />
       </button>
     </form>
