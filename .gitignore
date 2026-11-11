@@ -36,3 +36,6 @@ apps/app/playwright-report/
 
 # Dev-only generated media (STORAGE_PROVIDER=local); `make reset-demo` recreates it
 /backend/.media/
+.next-mock-v2/
+.next-v2build/
+.next-v2prev/

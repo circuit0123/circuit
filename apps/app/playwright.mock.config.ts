@@ -9,6 +9,7 @@ const PORT = 3200;
 export default defineConfig({
   testDir: "tests",
   testMatch: ["**/*.spec.ts"],
+  testIgnore: ["**/ui-v2.spec.ts"], // runs on its own config with the flag on: playwright.v2.config.ts
   timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,

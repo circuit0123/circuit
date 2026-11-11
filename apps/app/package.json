@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
     "test:boundary": "node --test tests/boundary.test.mjs",
-    "test:mock": "playwright test -c playwright.mock.config.ts"
+    "test:mock": "playwright test -c playwright.mock.config.ts",
+    "test:v2": "playwright test -c playwright.v2.config.ts"
   },
   "dependencies": {
     "@circuit/api-client": "workspace:*",
