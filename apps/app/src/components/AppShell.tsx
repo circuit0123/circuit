@@ -56,6 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const panes: PagerTab[] = tabs.map((t) => ({ id: t.id, node: NODES[t.id] }));
   const pushed = active === null;
+  const newLog = features.on("pulse") ? composeHref : null;
 
   return (
     <div id="app-root" className="min-h-dvh">
@@ -100,7 +101,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {!pushed && (v2
-        ? <NavV2 tabs={tabs} active={active} onSelect={select} onCompose={features.on("pulse") && composeHref ? () => router.push(composeHref) : undefined} />
+        ? <NavV2 tabs={tabs} active={active} onSelect={select} onCompose={newLog ? () => router.push(newLog) : undefined} />
         : <TabBar tabs={tabs} active={active} progress={progress} onSelect={select} />)}
     </div>
   );
