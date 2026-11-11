@@ -29,18 +29,19 @@ type Props = {
 
 /** v2 bottom bar (PMNav.dc.html): a floating card, 12px in from the edges, the active tab in a tinted pill, the + in the middle. Phones only; the desktop rail stays. */
 export function NavV2({ tabs, active, onSelect, onCompose }: Props) {
-  const cols = tabs.length + (onCompose ? 1 : 0);
   const items: (TabItem | "compose")[] = [...tabs];
   if (onCompose) items.splice(Math.min(2, tabs.length), 0, "compose");
+  // Tabs share the width; the + takes only its own, so every visible gap (3px margin each side) is the same.
+  const cols = items.map((t) => (t === "compose" ? "auto" : "minmax(0, 1fr)")).join(" ");
   return (
     <nav
       aria-label="Main"
       className="fixed inset-x-3 z-30 mx-auto grid h-16 max-w-[366px] items-center rounded-[20px] border border-c-border bg-c-card px-1.5 text-[10px] lg:hidden"
-      style={{ bottom: "calc(12px + env(safe-area-inset-bottom))", gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, boxShadow: "0 -12px 30px rgba(10,10,12,0.8)" }}
+      style={{ bottom: "calc(12px + env(safe-area-inset-bottom))", gridTemplateColumns: cols, boxShadow: "0 -12px 30px rgba(10,10,12,0.8)" }}
     >
       {items.map((t) =>
         t === "compose" ? (
-          <button key="compose" type="button" aria-label="New build log" onClick={onCompose} className="flex justify-center">
+          <button key="compose" type="button" aria-label="New build log" onClick={onCompose} className="mx-[3px] flex justify-center">
             <span className="flex h-[46px] w-[46px] items-center justify-center rounded-[14px] bg-c-bright text-c-bg">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden><path d="M12 5v14M5 12h14" /></svg>
             </span>
