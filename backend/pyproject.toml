@@ -5,7 +5,7 @@ description = "Circuit backend (Django + Ninja)"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "anthropic>=2.1.0",
-    "django>=5.2,<6",
+    "django>=5.2,<7",
     "django-cors-headers>=4.9.0",
     "django-ninja>=1.7.1",
     "django-otp>=1.7.5",
