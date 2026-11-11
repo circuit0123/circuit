@@ -10,7 +10,8 @@
     "./tokens.css": "./src/tokens.css",
     "./Button": "./src/Button.tsx",
     "./Logo": "./src/Logo.tsx",
-    "./cx": "./src/cx.ts"
+    "./cx": "./src/cx.ts",
+    "./v2": "./src/v2/index.tsx"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

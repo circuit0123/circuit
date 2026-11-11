@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tab bar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<nav aria-label="Tabs" style="width: 366px; height: 64px; box-sizing: border-box; border-radius: 20px; background: #17181B; border: 1px solid #2E3036; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; padding: 0 6px; font-family: Geist, system-ui, sans-serif; font-size: 10px; box-shadow: 0 -12px 30px rgba(10,10,12,0.8)">
+  <a href="PMHome.dc.html" aria-current="{{cur.home}}" style="height: 50px; margin: 0 3px; border-radius: 14px; background: {{bg.home}}; color: {{fg.home}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-weight: 600">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20h-5v-6H9v6H4z"/></svg>Today</a>
+  <a href="PMDiscover.dc.html" aria-current="{{cur.discover}}" style="height: 50px; margin: 0 3px; border-radius: 14px; background: {{bg.discover}}; color: {{fg.discover}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-weight: 600">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Discover</a>
+  <a href="PMComposer.dc.html" aria-label="New build log" style="display: flex; justify-content: center; text-decoration: none">
+    <span style="width: 46px; height: 46px; border-radius: 14px; background: #2FBF8A; color: #0A0A0C; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></a>
+  <a href="PMInbox.dc.html" aria-current="{{cur.inbox}}" aria-label="Inbox, 3 unread" style="position: relative; height: 50px; margin: 0 3px; border-radius: 14px; background: {{bg.inbox}}; color: {{fg.inbox}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-weight: 600">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Inbox
+    <span style="position: absolute; top: 6px; right: 16px; width: 7px; height: 7px; border-radius: 999px; background: #2FBF8A"></span></a>
+  <a href="PMProfile.dc.html" aria-current="{{cur.profile}}" style="height: 50px; margin: 0 3px; border-radius: 14px; background: {{bg.profile}}; color: {{fg.profile}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-weight: 600">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>Profile</a>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["home","discover","inbox","profile","none"],"default":"home"},"$preview":{"width":366,"height":64}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var a = this.props.active ?? 'home', bg = {}, fg = {}, cur = {};
+    ['home', 'discover', 'inbox', 'profile'].forEach(function (k) { var on = k === a; bg[k] = on ? '#0F2A21' : 'transparent'; fg[k] = on ? '#2FBF8A' : '#9A9CA3'; cur[k] = on ? 'page' : 'false'; });
+    return { bg: bg, fg: fg, cur: cur };
+  }
+}
+</script>
+</body>
+</html>

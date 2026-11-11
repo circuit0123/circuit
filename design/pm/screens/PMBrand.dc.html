@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Brand sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1200px; height: 1100px; box-sizing: border-box; padding: 48px; background: #0A0A0C; color: #ECEDEF; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; gap: 32px; position: relative; overflow: hidden">
+  <div aria-hidden="true" style="position: absolute; top: 60px; right: -60px; width: 480px; height: 90px; background: #00563F; transform: rotate(-8deg)"></div>
+
+  <div style="position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 32px">
+    <h1 style="margin: 0; font-size: 96px; line-height: 0.9; font-weight: 700; letter-spacing: -0.065em">Professional<br><span style="color: transparent; -webkit-text-stroke: 2px #9A9CA3">mayhem.</span></h1>
+    <p style="margin: 0 0 8px 0; max-width: 380px; font-size: 16px; line-height: 1.55; color: #C2C4C9">Calm system, one loud moment per screen. Black is the room, greys are the furniture, emerald is the door you walk through.</p>
+  </div>
+
+  <section aria-label="Colour" style="display: grid; grid-template-columns: 4fr 2fr 2fr 1.5fr 1.5fr; height: 168px; border-radius: 20px; overflow: hidden; border: 1px solid #2E3036">
+    <sc-for list="{{swatches}}" as="s" hint-placeholder-count="5">
+      <div style="background: {{s.hex}}; color: {{s.fg}}; padding: 16px; display: flex; flex-direction: column; justify-content: space-between">
+        <span style="font-size: 20px; font-weight: 700; letter-spacing: -0.03em">{{s.name}}</span>
+        <span style="font-family: 'Geist Mono', monospace; font-size: 11px; line-height: 1.5">{{s.hexLabel}}<br>{{s.use}}</span></div>
+    </sc-for>
+  </section>
+
+  <section aria-label="Type and components" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px">
+    <div>
+      <h2 style="margin: 0 0 14px 0; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; color: #9A9CA3">TYPE · GEIST + GEIST MONO</h2>
+      <div style="font-size: 64px; line-height: 0.92; font-weight: 700; letter-spacing: -0.06em">Three people<br><span style="color: transparent; -webkit-text-stroke: 1.5px #9A9CA3">to meet.</span></div>
+      <div style="font-size: 13px; color: #9A9CA3; margin-top: 8px">Display 52–80 px, 700, tracking −0.06em. Second line outlined. One per screen.</div>
+      <div style="font-size: 17px; font-weight: 600; margin-top: 20px">Body and names in Geist, 13–17 px.</div>
+      <div style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #9A9CA3; margin-top: 8px">GEIST MONO · LABELS, DISTANCES, TIMES · 4 KM · 8:00 AM</div>
+    </div>
+    <div>
+      <h2 style="margin: 0 0 14px 0; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; color: #9A9CA3">COMPONENTS</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+        <span style="height: 48px; padding: 0 20px; border-radius: 12px; background: #2FBF8A; color: #0A0A0C; display: inline-flex; align-items: center; font-size: 15px; font-weight: 600">Primary on black</span>
+        <span style="height: 48px; padding: 0 20px; border-radius: 12px; background: #00563F; color: #ECEDEF; display: inline-flex; align-items: center; font-size: 15px; font-weight: 600">Primary on grey</span>
+        <span style="height: 48px; padding: 0 20px; box-sizing: border-box; border-radius: 12px; border: 1px solid #2E3036; background: #17181B; display: inline-flex; align-items: center; font-size: 15px; font-weight: 500">Secondary</span>
+        <span style="height: 32px; padding: 0 12px; border-radius: 999px; background: #272727; color: #F1F1F1; display: inline-flex; align-items: center; font-size: 13px; font-weight: 600">Selected</span>
+        <span style="height: 26px; padding: 0 10px; border-radius: 999px; background: #0F2A21; color: #2FBF8A; display: inline-flex; align-items: center; font-size: 12px; font-weight: 600">Strong match</span>
+      </div>
+      <div style="margin-top: 16px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px">
+        <div style="background: #272727; color: #F1F1F1; border-radius: 16px; padding: 14px; transform: rotate(-1deg)">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #AAAAAA">HERO CARD · ONE PER SCREEN</div>
+          <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.03em; margin-top: 6px">Sakthi Vel</div>
+          <div style="font-size: 13px; color: #2FBF8A; font-weight: 600; margin-top: 2px">API design</div></div>
+        <div style="background: #17181B; border: 1px solid #2E3036; border-radius: 16px; padding: 14px">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #9A9CA3">STANDARD CARD</div>
+          <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.03em; margin-top: 6px">Frontend intern</div>
+          <div style="font-size: 13px; color: #2FBF8A; font-weight: 600; margin-top: 2px">₹15k / month</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Rules" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+    <sc-for list="{{rules}}" as="r" hint-placeholder-count="4">
+      <div style="border-top: 2px solid {{r.c}}; padding-top: 12px">
+        <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em">{{r.t}}</div>
+        <div style="font-size: 14px; line-height: 1.5; color: #C2C4C9; margin-top: 6px">{{r.b}}</div>
+      </div>
+    </sc-for>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      swatches: [
+        { name: 'Black', hex: '#0A0A0C', fg: '#ECEDEF', hexLabel: '#0A0A0C · 60%', use: 'Every background' },
+        { name: 'Grey 900', hex: '#17181B', fg: '#ECEDEF', hexLabel: '#17181B · BORDER #2E3036', use: 'Cards, nav, inputs' },
+        { name: 'Grey 700', hex: '#272727', fg: '#F1F1F1', hexLabel: '#272727 · YT PLACEHOLDER', use: 'Hero card, selected' },
+        { name: 'Emerald', hex: '#00563F', fg: '#ECEDEF', hexLabel: '#00563F', use: 'Bands, fills on grey' },
+        { name: 'Bright', hex: '#2FBF8A', fg: '#0A0A0C', hexLabel: '#2FBF8A', use: 'Action on black' }
+      ],
+      rules: [
+        { c: '#2FBF8A', t: 'One loud moment', b: 'Each screen gets one big outlined headline, one emerald band and one #272727 hero card. Everything else stays quiet.' },
+        { c: '#272727', t: 'Tilt is rare', b: 'Only the hero card stack tilts, 1–4°. Buttons, lists and the nav are always level.' },
+        { c: '#00563F', t: 'Two emeralds', b: 'Bright #2FBF8A for text and actions on black (8.4:1) and on #272727 (6.4:1). Brand #00563F only as fills with light text (7.5:1).' },
+        { c: '#9A9CA3', t: 'Real voices', b: 'Show who vouches and what they said. A one-line quote from the mutual beats any badge.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,9 +1,13 @@
 "use client";
 
-import { Settings } from "lucide-react";
+import { ChevronRight, Settings } from "lucide-react";
+import Link from "next/link";
 import { Avatar, BarButton, Button, EmptyState, ErrorState, PrivateBadge, Screen, Section, Skeleton, VerifiedBadge, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
-import { composeHref, loadFailed, memberHref, settingsHref, useMyProfile } from "@/data";
+import { composeHref, loadFailed, useFeatures, memberHref, settingsHref, useMyProfile } from "@/data";
+import { useUiV2 } from "@/lib/uiV2";
+import { HeaderV2 } from "../v2/ScreenV2";
+import { ProfileHeroV2 } from "../v2/ProfileV2";
 import { About, BuildLogGrid, CircuitsList, Highlights, OffersNeeds, ProfileTabs, StrengthMeter } from "./parts";
 
 /**
@@ -14,6 +18,8 @@ export function Profile() {
   const router = useRouter();
   const toast = useToast();
   const q = useMyProfile();
+  const v2 = useUiV2();
+  const features = useFeatures();
   const p = q.data;
   const gear = <BarButton label="Settings" onClick={() => router.push(settingsHref())}><Settings size={22} strokeWidth={1.75} /></BarButton>;
 
@@ -41,10 +47,14 @@ export function Profile() {
     );
   }
 
-  return (
-    <Screen title={p.name} right={gear}>
+  const shell = (children: React.ReactNode) => v2
+    ? <div className="bg-c-bg text-c-text"><HeaderV2 /><div className="mt-5"><ProfileHeroV2 id={p.id} name={p.name} level={p.level} line={p.line} org={p.org} />{children}</div></div>
+    : <Screen title={p.name} right={gear}>{children}</Screen>;
+
+  return shell(
+    <>
       <Section label="About you">
-        <div className="flex items-center gap-4">
+        <div className={v2 ? "hidden" : "flex items-center gap-4"}>
           <Avatar id={p.id} name={p.name} size={64} />
           <div className="min-w-0">
             <p className="t-subhead flex flex-wrap items-center gap-1.5 text-text-muted">{p.line}<VerifiedBadge level={p.level} /></p>
@@ -60,6 +70,11 @@ export function Profile() {
           {/* The gear lives in the phone's top bar; desktop has no top bar, so Settings is a button here. */}
           <div className="hidden lg:block"><Button className="w-full" onClick={() => router.push(settingsHref())}>Settings</Button></div>
         </div>
+        {v2 && features.on("circuits") && (
+          <Link href="/circuits" className="mt-3 flex min-h-12 items-center justify-between rounded-[14px] border border-c-border bg-c-card px-4 text-[15px] font-semibold lg:hidden">
+            Circuits<ChevronRight size={18} strokeWidth={2} className="text-c-muted" aria-hidden />
+          </Link>
+        )}
         {q.strength && <div className="mt-5"><StrengthMeter strength={q.strength} /></div>}
       </Section>
 
@@ -91,6 +106,6 @@ export function Profile() {
           }
         />
       </Section>
-    </Screen>
+    </>,
   );
 }

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Your role</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0A0A0C; color: #ECEDEF; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div style="padding: 20px 20px 0 20px; display: flex; justify-content: space-between; align-items: center">
+    <a href="PMInvite.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 999px; background: #17181B; border: 1px solid #2E3036; color: #ECEDEF; display: flex; align-items: center; justify-content: center">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #9A9CA3">STEP 2 OF 4</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin: 14px 20px 0 20px"><span style="height: 3px; border-radius: 9px; background: #2FBF8A"></span><span style="height: 3px; border-radius: 9px; background: #2FBF8A"></span><span style="height: 3px; border-radius: 9px; background: #2E3036"></span><span style="height: 3px; border-radius: 9px; background: #2E3036"></span></div>
+
+  <h1 style="margin: 32px 20px 0 20px; font-size: 56px; line-height: 0.95; font-weight: 700; letter-spacing: -0.06em">I'm here<br><span style="color: transparent; -webkit-text-stroke: 1.5px #ECEDEF">as a…</span></h1>
+
+  <div role="radiogroup" aria-label="Your role" style="margin: 24px 20px 0 20px; display: flex; flex-direction: column; gap: 8px">
+    <sc-for list="{{roles}}" as="r" hint-placeholder-count="5">
+      <button role="radio" aria-checked="{{r.checked}}" onClick="{{r.pick}}" style="min-height: 64px; border: 1px solid {{r.border}}; border-radius: 14px; background: {{r.bg}}; color: {{r.fg}}; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: left; cursor: pointer">
+        <span>
+          <span style="display: block; font-size: 17px; font-weight: 600">{{r.label}}</span>
+          <span style="display: block; font-size: 13px; margin-top: 2px; color: {{r.sub}}">{{r.line}}</span></span>
+        <span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 999px; border: {{r.ring}}; background: {{r.dot}}"></span>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="position: absolute; left: 20px; right: 20px; bottom: 36px">
+    <a href="PMOffer.dc.html" style="height: 52px; border-radius: 14px; background: #2FBF8A; color: #0A0A0C; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600">Continue</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { role: 'Student' }; }
+  renderVals() {
+    var self = this, role = this.state.role;
+    var R = [['Student', 'Find startups that want your skills'], ['Founder', 'Find help, hires and first users'], ['Mentor', 'Help founders who need what you know'], ['Investor', 'Three startups a day that fit your thesis'], ['Partner', 'Colleges, incubators and communities']];
+    return {
+      roles: R.map(function (r) { var on = r[0] === role; return {
+        label: r[0], line: r[1], checked: on ? 'true' : 'false',
+        bg: on ? '#272727' : '#17181B', fg: on ? '#F1F1F1' : '#ECEDEF', sub: on ? '#AAAAAA' : '#9A9CA3', border: on ? '#2FBF8A' : '#2E3036',
+        ring: on ? '6px solid #00563F' : '1.5px solid #4A4C52', dot: on ? '#272727' : 'transparent',
+        pick: function () { self.setState({ role: r[0] }); } }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -4,6 +4,8 @@ import { Button, CodeField, Logo, Step, StepTransition, TextField, Skeleton } fr
 import { useEffect, useRef, useState } from "react";
 import { problemOf, usePersonaSignIn, usePersonas, useSupabaseSignIn } from "@/data";
 import { SHOW_DEV_TOOLS } from "@/lib/env";
+import { useUiV2 } from "@/lib/uiV2";
+import { WelcomeV2 } from "./v2/SignInV2";
 import { Legal } from "./Legal";
 
 type Screen = "welcome" | "email" | "code";
@@ -54,6 +56,7 @@ function Personas() {
 /** Welcome, then (only if they pick email) the address and the 6-digit code. DESIGN.md §4 steps 1 and 2. */
 export function SignIn() {
   const sb = useSupabaseSignIn();
+  const v2 = useUiV2();
   const [screen, setScreen] = useState<Screen>("welcome");
   const [direction, setDirection] = useState<1 | -1>(1);
   const [email, setEmail] = useState("");
@@ -109,7 +112,8 @@ export function SignIn() {
 
   return (
     <StepTransition stepKey={screen} direction={direction}>
-      {screen === "welcome" && (
+      {screen === "welcome" && v2 && <WelcomeV2 pending={sb.google.isPending} googleError={googleError} onGoogle={google} onEmail={() => go("email")} personas={<Personas />} />}
+      {screen === "welcome" && !v2 && (
         <main className="mx-auto flex min-h-dvh w-full max-w-[440px] flex-col px-4">
           <div className="pointer-events-none -mx-4 mt-[env(safe-area-inset-top)] min-h-0 flex-1 basis-[28vh]"><Trace /></div>
           <div className="pt-6">

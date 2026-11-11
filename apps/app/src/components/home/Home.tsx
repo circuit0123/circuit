@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { composeHref, useHome, useUnreadCount } from "@/data";
 import { useDesktop } from "@/hooks/useDesktop";
+import { useUiV2 } from "@/lib/uiV2";
+import { ScreenV2 } from "../v2/ScreenV2";
 import { DropSection } from "./DropSection";
 import { LiveWireSection } from "./LiveWireSection";
 import { Pulse } from "./Pulse";
@@ -39,11 +41,12 @@ export function Home() {
   const home = useHome();
   const desktop = useDesktop();
   const router = useRouter();
+  const v2 = useUiV2();
   const dropHere = home.drop && (!desktop || !home.pulse);
-  return (
-    <Screen title="Today" left={home.pulse ? <NewBuildLog /> : undefined} right={<NotificationsBell />}>
+  const body = (
+    <>
       {!home.ready && <Section><Skeleton className="h-40" /></Section>}
-      {home.ready && home.pulse && <Section className="pt-2"><LiveWireSection /></Section>}
+      {home.ready && home.pulse && <Section className="pt-2"><LiveWireSection pill={v2} /></Section>}
       {home.ready && dropHere && <Section><DropSection /></Section>}
       {home.ready && home.pulse && <Pulse />}
       {home.ready && home.empty && (
@@ -51,6 +54,12 @@ export function Home() {
           <EmptyState text="Nothing on Home right now. Look for people and startups near you in Discover." action={<Button variant="secondary" onClick={() => router.push("/discover")}>Go to Discover</Button>} />
         </Section>
       )}
+    </>
+  );
+  if (v2) return <ScreenV2 first="Today" second="on Circuit.">{body}</ScreenV2>;
+  return (
+    <Screen title="Today" left={home.pulse ? <NewBuildLog /> : undefined} right={<NotificationsBell />}>
+      {body}
     </Screen>
   );
 }

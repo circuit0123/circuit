@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Circuit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0A0A0C}
+a{color:#ECEDEF;text-decoration:none}a:hover{color:#2FBF8A}
+summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
+</style>
+</helmet>
+<div style="background: #0A0A0C; color: #ECEDEF; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden">
+
+  <header style="max-width: 1200px; margin: 0 auto; padding: 22px 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; position: relative; z-index: 2">
+    <a href="PMLanding.dc.html" aria-label="Circuit home" style="display: flex; align-items: center; gap: 10px">
+      <svg width="38" height="27" viewBox="6 22 88 62" aria-hidden="true">
+        <defs><mask id="pml" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><rect x="0" y="0" width="100" height="100" fill="#fff"></rect><circle cx="20" cy="68" r="11" fill="#000"></circle><circle cx="80" cy="68" r="11" fill="#000"></circle><circle cx="50" cy="39.5" r="8" fill="#000"></circle></mask></defs>
+        <path d="M20 68 C20 30, 80 30, 80 68" fill="none" stroke="#2FBF8A" stroke-width="7" stroke-linecap="round" mask="url(#pml)"></path>
+        <circle cx="20" cy="68" r="7" fill="#2FBF8A"></circle><circle cx="80" cy="68" r="7" fill="#2FBF8A"></circle><circle cx="50" cy="39.5" r="4" fill="#ECEDEF"></circle></svg>
+      <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.035em">circuit</span></a>
+    <nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 28px; font-size: 15px; color: #9A9CA3">
+      <a href="#how" style="color: #9A9CA3">How it works</a><a href="#who" style="color: #9A9CA3">Who it's for</a><a href="#faq" style="color: #9A9CA3">FAQ</a>
+    </nav>
+    <a href="PMWelcome.dc.html" style="height: 44px; padding: 0 18px; border-radius: 12px; background: #2FBF8A; color: #0A0A0C; display: inline-flex; align-items: center; font-size: 15px; font-weight: 600">Join the beta</a>
+  </header>
+
+  <section aria-label="Introduction" style="position: relative">
+    <div aria-hidden="true" style="position: absolute; top: 180px; left: -10%; width: 120%; height: 150px; background: #00563F; transform: rotate(-5deg)"></div>
+    <div style="position: relative; max-width: 1200px; margin: 0 auto; padding: 48px 24px 112px 24px; display: flex; flex-wrap: wrap; gap: 56px; align-items: flex-end; justify-content: space-between">
+      <div style="flex: 999 1 540px; min-width: 0">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #9A9CA3">INVITE-ONLY BETA · CHENNAI</div>
+        <h1 style="margin: 18px 0 0 0; font-size: clamp(60px, 9vw, 132px); line-height: 0.92; font-weight: 700; letter-spacing: -0.06em">Build with people<br><span style="color: transparent; -webkit-text-stroke: 2px #ECEDEF">near you.</span></h1>
+        <p style="margin: 28px 0 0 0; max-width: 520px; font-size: 20px; line-height: 1.5; color: #C2C4C9">Three warm introductions a day, matched on what you need and what you can offer. Every intro comes through someone you both know. No cold messages, ever.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px">
+          <a href="PMWelcome.dc.html" style="height: 54px; padding: 0 26px; border-radius: 14px; background: #2FBF8A; color: #0A0A0C; display: inline-flex; align-items: center; font-size: 17px; font-weight: 600">Join the beta</a>
+          <a href="#how" style="height: 54px; padding: 0 24px; box-sizing: border-box; border-radius: 14px; border: 1px solid #2E3036; background: #17181B; display: inline-flex; align-items: center; font-size: 17px; font-weight: 500">See how it works</a>
+        </div>
+      </div>
+
+      <div aria-label="Example introduction card" role="img" style="flex: 1 1 320px; max-width: 360px; position: relative; height: 400px">
+        <div style="position: absolute; inset: 16px 6px 0 6px; background: #222327; border-radius: 24px; transform: rotate(4deg)"></div>
+        <div style="position: absolute; inset: 0; background: #272727; color: #F1F1F1; border-radius: 24px; padding: 10px; box-shadow: 0 30px 60px rgba(0,0,0,0.5)">
+          <div style="position: relative; height: 120px; border-radius: 16px; background: #0A0A0C; overflow: hidden">
+            <div style="position: absolute; left: 14px; bottom: -26px; font-size: 128px; font-weight: 700; letter-spacing: -0.06em; line-height: 1; color: transparent; -webkit-text-stroke: 1.2px #2FBF8A">SV</div>
+            <div style="position: absolute; top: 0; bottom: 0; right: 50px; width: 60px; background: #00563F; transform: skewX(-16deg)"></div>
+            <span style="position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 600; background: #0F2A21; color: #2FBF8A; border-radius: 999px; padding: 4px 9px">Strong match</span>
+          </div>
+          <div style="padding: 14px 10px 0 10px">
+            <div style="font-size: 28px; font-weight: 700; letter-spacing: -0.04em">Sakthi Vel</div>
+            <div style="font-size: 13px; color: #AAAAAA; margin-top: 2px">Backend mentor · 4 km</div>
+            <div style="font-size: 15px; margin-top: 12px">Can help with <strong style="color: #2FBF8A">API design and your first hire.</strong></div>
+            <div style="margin-top: 10px; padding-left: 10px; border-left: 2px solid #00563F; font-size: 13px; color: #AAAAAA">“He fixed our sync bug in one weekend.” — Meera</div>
+            <div style="margin-top: 16px; height: 46px; border-radius: 12px; background: #00563F; color: #ECEDEF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600">Ask Meera to intro</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" aria-label="How it works" style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 40px">
+      <h2 style="margin: 0; font-size: clamp(44px, 6vw, 80px); line-height: 0.95; font-weight: 700; letter-spacing: -0.055em">How it works<span style="color: #2FBF8A">.</span></h2>
+      <p style="margin: 0; max-width: 380px; font-size: 17px; line-height: 1.5; color: #9A9CA3">Two minutes a day. One tap per person. Nothing is sent until both sides agree.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="3">
+        <div style="min-height: 240px; padding: 26px; border-radius: 22px; background: {{s.bg}}; color: {{s.fg}}; border: 1px solid {{s.border}}; display: flex; flex-direction: column; justify-content: space-between">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: {{s.num}}">{{s.n}}</span>
+          <span>
+            <span style="display: block; font-size: 24px; font-weight: 700; letter-spacing: -0.035em">{{s.title}}</span>
+            <span style="display: block; margin-top: 8px; font-size: 16px; line-height: 1.5; color: {{s.sub}}">{{s.body}}</span></span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="who" aria-label="Who it's for" style="border-top: 1px solid #1F2024; border-bottom: 1px solid #1F2024">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+      <h2 style="margin: 0 0 32px 0; font-size: clamp(44px, 6vw, 80px); line-height: 0.95; font-weight: 700; letter-spacing: -0.055em">Who it's for<span style="color: #2FBF8A">.</span></h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+        <sc-for list="{{tiles}}" as="t" hint-placeholder-count="5">
+          <a href="PMWelcome.dc.html" style="display: flex; flex-direction: column; justify-content: space-between; gap: 28px; min-height: 200px; padding: 22px; border-radius: 18px; background: #17181B; border: 1px solid #2E3036">
+            <span>
+              <span style="display: block; font-size: 22px; font-weight: 700; letter-spacing: -0.03em">{{t.who}}</span>
+              <span style="display: block; margin-top: 8px; font-size: 15px; line-height: 1.5; color: #9A9CA3">{{t.line}}</span></span>
+            <span style="font-size: 15px; font-weight: 600; color: #2FBF8A">{{t.cta}} →</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" aria-label="Questions" style="max-width: 1200px; margin: 0 auto; padding: 96px 24px">
+    <div style="display: flex; flex-wrap: wrap; gap: 48px">
+      <h2 style="flex: 1 1 280px; margin: 0; font-size: clamp(44px, 6vw, 80px); line-height: 0.95; font-weight: 700; letter-spacing: -0.055em">Questions<span style="color: #2FBF8A">.</span></h2>
+      <div style="flex: 2 1 460px; min-width: 0">
+        <sc-for list="{{faq}}" as="f" hint-placeholder-count="5">
+          <details style="border-bottom: 1px solid #2E3036; padding: 20px 0">
+            <summary style="font-size: 18px; font-weight: 600; display: flex; justify-content: space-between; gap: 16px">{{f.q}}<span aria-hidden="true" style="color: #2FBF8A">+</span></summary>
+            <p style="margin: 12px 0 0 0; font-size: 16px; line-height: 1.55; color: #9A9CA3">{{f.a}}</p>
+          </details>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background: #17181B; border-top: 1px solid #2E3036">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 40px 24px">
+      <div style="font-size: clamp(56px, 10vw, 150px); line-height: 0.9; font-weight: 700; letter-spacing: -0.065em">Come<br><span style="color: transparent; -webkit-text-stroke: 2px #2FBF8A">build.</span></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid #2E3036; font-size: 14px; color: #9A9CA3">
+        <span>Circuit · [COMPANY LEGAL NAME] · Chennai</span>
+        <span style="display: flex; gap: 24px"><a href="PMLanding.dc.html" style="color: #9A9CA3">Privacy</a><a href="PMLanding.dc.html" style="color: #9A9CA3">Terms</a><a href="PMLanding.dc.html" style="color: #9A9CA3">Contact</a></span>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      steps: [
+        { n: '01', title: 'Say what you need and offer', body: 'Paste a bio. We suggest your skills and you confirm them in a few taps.', bg: '#272727', fg: '#F1F1F1', border: '#3A3A3A', sub: '#AAAAAA', num: '#2FBF8A' },
+        { n: '02', title: 'Get three people a day', body: 'Each comes with the reason you should meet and who can introduce you.', bg: '#17181B', fg: '#ECEDEF', border: '#2E3036', sub: '#9A9CA3', num: '#2FBF8A' },
+        { n: '03', title: 'Meet through people you trust', body: 'Your mutual asks first. If both say yes, you are connected. No cold DMs.', bg: '#00563F', fg: '#ECEDEF', border: '#00563F', sub: '#CFE7DC', num: '#CFE7DC' }
+      ],
+      tiles: [
+        { who: 'Students', line: 'Startups near you want your skills, not your college name.', cta: 'Find work' },
+        { who: 'Founders', line: 'Find help, hires and students who want to build with you.', cta: 'Claim your startup' },
+        { who: 'Mentors', line: 'Help founders who need exactly what you know.', cta: 'Start mentoring' },
+        { who: 'Investors', line: 'Three startups a day that fit your thesis.', cta: 'Set your focus' },
+        { who: 'Partners', line: 'See what your ecosystem is missing, and fix it.', cta: 'Bring it to campus' }
+      ],
+      faq: [
+        { q: 'Is Circuit free?', a: 'Yes for students, founders, mentors and investors. Startups can pay to promote a role, always labelled as promoted.' },
+        { q: 'Why invite-only?', a: 'We are starting with one city and one partner college so every introduction is worth your time.' },
+        { q: 'Can strangers message me?', a: 'No. Every conversation starts with an introduction from someone you both know, and both sides agree first.' },
+        { q: 'What do you do with my data?', a: 'We use it to match you. We never sell it, and you can export or delete it any time from Settings.' },
+        { q: 'Do you take a fee on deals or hires?', a: 'No. Circuit only makes introductions. No success fees.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

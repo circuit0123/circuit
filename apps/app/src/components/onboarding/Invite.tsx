@@ -3,7 +3,9 @@
 import { Button, Skeleton, Step, TextField } from "@circuit/ui";
 import { useState } from "react";
 import { inviteMessage, problemOf, useInviteLink, useJoinWaitlist, useRedeem, useRoleChoices, useSession } from "@/data";
+import { useUiV2 } from "@/lib/uiV2";
 import { Centered } from "../Centered";
+import { CodeV2 } from "../v2/InviteV2";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MIN_CODE = 6;
@@ -31,6 +33,7 @@ export function Invite() {
 
 function Code({ prefill, onWaitlist, onBack }: { prefill: { code: string; error: string } | null; onWaitlist: () => void; onBack: () => void }) {
   const redeem = useRedeem();
+  const v2 = useUiV2();
   const [code, setCode] = useState(prefill?.code ?? "");
   const [error, setError] = useState<string | null>(prefill?.error ?? null);
   const ready = code.replace(/\s/g, "").length >= MIN_CODE;
@@ -39,6 +42,7 @@ function Code({ prefill, onWaitlist, onBack }: { prefill: { code: string; error:
     setError(null);
     redeem.mutate(code, { onError: (e) => setError(inviteMessage(e)) }); // what was typed stays put
   };
+  if (v2) return <CodeV2 code={code} onCode={(v) => { setCode(v.toUpperCase()); setError(null); }} error={error} ready={ready} pending={redeem.isPending} onSubmit={submit} onWaitlist={onWaitlist} onBack={onBack} />;
   return (
     <Step
       title="Got an invite code?"

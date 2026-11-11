@@ -17,7 +17,7 @@ endef
 
 .DEFAULT_GOAL := help
 .PHONY: landing-screens simulate train ranker-report help doctor setup dev api app landing mock up down logs shell dbshell migrate migrations \
-	reset-demo load-startups admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-landing e2e lint fmt check \
+	reset-demo load-startups admin-user invite-codes flags flag job jobs daily circuit-round retention export delete-account eval test test-web test-web-v2 test-landing e2e lint fmt check \
 	smoke load-test funnel api-freeze api-client openapi contract-fixtures build build-api build-api-multiarch build-web run-prod-local deploy rollback gcp-setup secret jobs-run monitoring backup-now restore-drill usage-report job-health
 
 help: ## List every command
@@ -197,6 +197,9 @@ test-web: ## Frontend: type check, the "only src/data talks to the backend" rule
 	pnpm typecheck
 	pnpm --filter @circuit/app test:boundary
 	pnpm --filter @circuit/app test:mock
+
+test-web-v2: ## Frontend ui_v2: Playwright on mock mode with NEXT_PUBLIC_UI_V2=on at 390px and 1440px (every rebuilt screen renders, axe). No backend needed
+	pnpm --filter @circuit/app test:v2
 
 test-landing: ## Landing site: build, serve and run Playwright (CTAs, waitlist, reduced motion, axe, premium rules). No backend needed
 	pnpm --filter @circuit/landing exec playwright test

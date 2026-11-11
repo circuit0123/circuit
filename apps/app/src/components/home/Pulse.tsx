@@ -6,6 +6,8 @@ import { ActivityCard, Sheet, Button, CaughtUp, FeedItem, PartnerItem, PostCard,
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAskIntro } from "./IntroSheet";
+import { useUiV2 } from "@/lib/uiV2";
+import { PostCardV2 } from "../v2/PostCardV2";
 import { loadFailed, memberHref, roleHref, useHome, useMarkPulseSeen, usePulse, useReact, useReport, type PulseEntry } from "@/data";
 
 const REASONS = ["Spam or scam", "Harassment or hate", "Misleading or fake", "Something else"];
@@ -23,6 +25,7 @@ export function Pulse() {
   const [promo, setPromo] = useState<{ key: string; why: string } | null>(null);
   const { minor } = useHome();
   const ask = useAskIntro();
+  const v2 = useUiV2();
 
   // "Skills in demand" belongs at the top of Discover → Jobs (DESIGN.md §4), so it is left out of Pulse.
   const items = q.items.filter((it): it is Exclude<PulseEntry, { kind: "skills" }> => it.kind !== "skills");
@@ -60,6 +63,7 @@ export function Pulse() {
 
   const renderItem = (it: (typeof items)[number]) => {
     if (it.kind === "post") {
+      if (v2) return <div className="px-4 pb-4 lg:px-0"><PostCardV2 post={it.post} onReact={reactTo(it.post)} onMore={() => setMenu(it.post.id)} onOpenAuthor={memberHref(it.post.author.id) ? () => router.push(memberHref(it.post.author.id)!) : undefined} hideReactions={minor ? ["intro_me"] : undefined} /></div>;
       return <FeedItem><PostCard post={it.post} onReact={reactTo(it.post)} onMore={() => setMenu(it.post.id)} onOpenAuthor={memberHref(it.post.author.id) ? () => router.push(memberHref(it.post.author.id)!) : undefined} priority={false} hideReactions={minor ? ["intro_me"] : undefined} /></FeedItem>;
     }
     if (it.kind === "role") return <FeedItem><RoleCard role={it.role} onOpen={() => router.push(roleHref(it.role.id))} /></FeedItem>;

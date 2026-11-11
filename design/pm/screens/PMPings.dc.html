@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Notifications</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0A0A0C; color: #ECEDEF; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div style="padding: 20px 20px 0 20px; display: flex; justify-content: space-between; align-items: center">
+    <a href="PMHome.dc.html" aria-label="Back to Today" style="width: 40px; height: 40px; border-radius: 999px; background: #17181B; border: 1px solid #2E3036; color: #ECEDEF; display: flex; align-items: center; justify-content: center">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <button onClick="{{readAll}}" style="height: 36px; padding: 0 12px; border: 1px solid #2E3036; border-radius: 999px; background: #17181B; color: #ECEDEF; font-size: 13px; cursor: pointer">{{readLabel}}</button>
+  </div>
+  <h1 style="margin: 16px 20px 0 20px; font-size: 64px; line-height: 0.9; font-weight: 700; letter-spacing: -0.06em">Activity<span style="color: #2FBF8A">.</span></h1>
+
+  <section aria-label="Notifications" style="margin: 8px 20px 0 20px">
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+      <h2 style="margin: 18px 0 6px 0; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; color: #9A9CA3">{{g.label}}</h2>
+      <sc-for list="{{g.items}}" as="n" hint-placeholder-count="3">
+        <a href="{{n.href}}" style="display: flex; gap: 12px; align-items: flex-start; padding: 12px; margin-bottom: 6px; border-radius: 14px; background: {{n.bg}}; border: 1px solid {{n.border}}; color: #ECEDEF">
+          <span style="flex: 0 0 auto; margin-top: 1px; background: {{n.tagBg}}; color: {{n.tagFg}}; border-radius: 6px; padding: 3px 7px; font-family: 'Geist Mono', monospace; font-size: 10px">{{n.tag}}</span>
+          <span style="flex: 1 1 auto; min-width: 0">
+            <span style="display: block; font-size: 14px; line-height: 1.4; font-weight: {{n.weight}}">{{n.text}}</span>
+            <span style="display: block; font-family: 'Geist Mono', monospace; font-size: 11px; color: #9A9CA3; margin-top: 4px">{{n.time}}</span></span>
+          <span style="flex: 0 0 auto; width: 8px; height: 8px; margin-top: 6px; border-radius: 999px; background: {{n.dot}}"></span>
+        </a>
+      </sc-for>
+    </sc-for>
+  </section>
+
+  <div style="position: absolute; left: 12px; bottom: 14px">
+    <dc-import name="PMNav" active="none" hint-size="366px,64px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { read: false }; }
+  renderVals() {
+    var self = this, read = this.state.read;
+    var look = { INTRO: ['#0F2A21', '#2FBF8A'], ROLE: ['#222327', '#ECEDEF'], CIRCUIT: ['#272727', '#0A0A0C'], LOG: ['#222327', '#ECEDEF'] };
+    function item(tag, text, time, unread, href) { var u = unread && !read;
+      return { tag: tag, text: text, time: time, href: href, tagBg: look[tag][0], tagFg: look[tag][1], weight: u ? 600 : 400,
+        bg: u ? '#17181B' : 'transparent', border: u ? '#2E3036' : 'transparent', dot: u ? '#2FBF8A' : 'transparent' }; }
+    return {
+      readLabel: read ? 'Mark as unread' : 'Mark all read',
+      readAll: function () { self.setState({ read: !read }); },
+      groups: [
+        { label: 'TODAY', items: [
+          item('INTRO', 'Meera wants to introduce you to Sakthi Vel.', '8 MIN AGO', true, 'PMInbox.dc.html'),
+          item('CIRCUIT', 'Kavya confirmed her part of Circuit #07.', '1 H AGO', true, 'PMCircuits.dc.html'),
+          item('ROLE', 'Tatvagrid posted a role that fits you: Frontend intern.', '3 H AGO', true, 'PMJob.dc.html') ] },
+        { label: 'EARLIER', items: [
+          item('LOG', '18 people saved your offline-sync log.', 'MON', false, 'PMProfile.dc.html'),
+          item('INTRO', 'Arun introduced you to Kavya Raman.', 'SUN', false, 'PMChat.dc.html') ] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

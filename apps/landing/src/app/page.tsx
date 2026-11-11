@@ -11,9 +11,12 @@ import { Waitlist } from "@/components/Waitlist";
 import { FAQ, INVITE_ONLY, SRC } from "@/content/home";
 import { JOIN_LIVE } from "@/lib/env";
 import { flagOn, getFeatures } from "@/lib/features";
+import { HomeV2 } from "@/components/v2/HomeV2";
+import { UI_V2_ON } from "@/lib/uiV2";
 
 export default async function Page() {
   const features = await getFeatures();
+  if (UI_V2_ON) return <HomeV2 investorOpen={flagOn(features, "investor_mode")} />;
   return (
     <>
       <Header />

@@ -1,10 +1,12 @@
 "use client";
 
-import { Avatar, BarButton, EmptyState, ErrorState, Screen, Section, SegmentedControl, Sheet, Skeleton, cx } from "@circuit/ui";
+import { Avatar, BarButton, IconButton, EmptyState, ErrorState, Screen, Section, SegmentedControl, Sheet, Skeleton, cx } from "@circuit/ui";
 import { SquarePen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useUiV2 } from "@/lib/uiV2";
+import { HeaderV2 } from "../v2/ScreenV2";
 import { WaitingForYou, YourIntros } from "./Waiting";
 import { conversationHref, loadFailed, newMessageHref, useConnections, useFindConversation, useInbox, type Folder, type InboxRow } from "@/data";
 
@@ -18,23 +20,35 @@ const FOLDERS: { id: Folder; label: string }[] = [{ id: "chats", label: "Chats" 
 export function Inbox() {
   const [folder, setFolder] = useState<Folder>("chats");
   const [composing, setComposing] = useState(false);
+  const v2 = useUiV2();
   const chats = useInbox("chats");
   const requests = useInbox("requests");
   const shown = folder === "requests" && requests.allowed ? requests : chats;
   const current: Folder = shown === requests ? "requests" : "chats";
   const empty = !shown.isPending && !shown.isError && shown.rows.length === 0;
 
-  return (
-    <Screen title="Inbox" right={<BarButton label="New message" onClick={() => setComposing(true)}><SquarePen size={22} strokeWidth={1.75} /></BarButton>}>
+  const unreadCount = chats.rows.filter((r) => r.unread).length + (requests.allowed ? requests.rows.filter((r) => r.unread).length : 0);
+  const body = (
+    <>
       <WaitingForYou />
       <Section label="Conversations">
         {/* On desktop the top bar isn't drawn, so the one action sits above the list. */}
-        <div className="mb-4 hidden justify-end lg:flex">
+        <div className={cx("mb-4 hidden justify-end lg:flex", v2 && "lg:hidden")}>
           <button type="button" onClick={() => setComposing(true)} className="flex min-h-11 items-center gap-2 rounded-control px-3 t-body active:opacity-80">
             <SquarePen size={20} strokeWidth={1.75} aria-hidden />New message
           </button>
         </div>
-        {requests.allowed && (
+        {v2 && (
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <div role="tablist" aria-label="Inbox folders" className="flex gap-1.5">
+              {FOLDERS.filter((f) => f.id === "chats" || requests.allowed).map((f) => (
+                <button key={f.id} type="button" role="tab" aria-selected={current === f.id} onClick={() => setFolder(f.id)} className={cx("h-[34px] rounded-full border px-3.5 text-[14px] font-semibold", current === f.id ? "border-c-brand bg-c-bright-bg text-c-bright" : "border-c-border bg-c-card text-c-muted")}>{f.label}</button>
+              ))}
+            </div>
+            <IconButton label="New message" onClick={() => setComposing(true)}><SquarePen size={18} strokeWidth={1.8} aria-hidden /></IconButton>
+          </div>
+        )}
+        {!v2 && requests.allowed && (
           <SegmentedControl stretch label="Inbox folders" items={FOLDERS} value={current} onChange={setFolder} className="mb-6" />
         )}
         {shown.isPending && <RowsSkeleton />}
@@ -47,13 +61,48 @@ export function Inbox() {
         )}
         {shown.rows.length > 0 && (
           <ul aria-label={current === "requests" ? "Requests" : "Chats"} className="-mx-4 lg:mx-0">
-            {shown.rows.map((r) => <li key={r.id}><Row r={r} /></li>)}
+            {shown.rows.map((r) => <li key={r.id}>{v2 ? <RowV2 r={r} /> : <Row r={r} />}</li>)}
           </ul>
         )}
       </Section>
       {current === "chats" && <YourIntros />}
       <NewMessageSheet open={composing} onClose={() => setComposing(false)} />
+    </>
+  );
+  if (v2) {
+    return (
+      <div className="bg-c-bg text-c-text">
+        <HeaderV2 />
+        <div className="mx-5 mt-5 flex items-end justify-between gap-3">
+          <h1 className="m-0 text-[72px] font-bold leading-[0.9] tracking-[-0.06em]">Inbox<span className="text-c-bright">.</span></h1>
+          {unreadCount > 0 && <span className="mb-2 font-mono text-[12px] uppercase text-c-muted">{unreadCount} unread</span>}
+        </div>
+        {body}
+      </div>
+    );
+  }
+  return (
+    <Screen title="Inbox" right={<BarButton label="New message" onClick={() => setComposing(true)}><SquarePen size={22} strokeWidth={1.75} /></BarButton>}>
+      {body}
     </Screen>
+  );
+}
+
+function RowV2({ r }: { r: InboxRow }) {
+  return (
+    <Link href={conversationHref(r.id)} className="flex items-center gap-3 border-b border-[#1f2024] px-4 py-3 text-c-text lg:px-0" data-unread={r.unread ? "" : undefined}>
+      <Avatar id={r.other.id} name={r.other.name} size={44} />
+      <span className="min-w-0 flex-1">
+        <span className="flex justify-between gap-2">
+          <span className={cx("min-w-0 truncate text-[15px]", r.unread ? "font-semibold" : "font-normal")}>{r.other.name}</span>
+          <span className="shrink-0 font-mono text-[12px] text-c-muted">{r.time}</span>
+        </span>
+        <span className="mt-0.5 flex items-center justify-between gap-2">
+          <span className={cx("min-w-0 truncate text-[14px]", r.unread ? "text-c-text" : "text-c-muted")}>{r.waiting ? `${r.preview} · Waiting for them to accept` : r.preview}</span>
+          {r.unread && <><span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-c-bright" /><span className="sr-only">Unread</span></>}
+        </span>
+      </span>
+    </Link>
   );
 }
 
