@@ -38,7 +38,7 @@ Plus `apps/app/tests/ui-v2.spec.ts`, `playwright.v2.config.ts` and `make test-we
 - Nothing needed a backend change, so nothing was skipped for that reason.
 
 ## Known issues and decisions for you
-- **Circuits has no phone nav tab in v2** (so the `+` is centred). It is reachable from the desktop rail and the Profile Circuits tab; say if you'd rather have a five-tab bar with the `+` off-centre.
+- **Circuits has no phone nav tab in v2** (so the `+` is centred). On phones it is a "Circuits" row on your own Profile (only when the `circuits` flag is on); on desktop it is in the rail. Say if you'd rather have a five-tab bar with the `+` off-centre.
 - **Real match words still show.** Inherited v1 pieces (the Daily Drop card, people tiles) still show "Strong match" / "Good match" from real scores. The plan says not anywhere in v2. My new v2 cards leave match words out; the old pieces were not changed. Say if you want those hidden too.
 - **Logo**: v2 uses the PM logo (light centre node, live "circuit" text), not `docs/brand/svg`. Your call on which wins.
 - No desktop design exists for the app: at 1440px v2 keeps the left rail and 600px column in v2 colours.

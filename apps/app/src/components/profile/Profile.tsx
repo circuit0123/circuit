@@ -1,9 +1,10 @@
 "use client";
 
-import { Settings } from "lucide-react";
+import { ChevronRight, Settings } from "lucide-react";
+import Link from "next/link";
 import { Avatar, BarButton, Button, EmptyState, ErrorState, PrivateBadge, Screen, Section, Skeleton, VerifiedBadge, useToast } from "@circuit/ui";
 import { useRouter } from "next/navigation";
-import { composeHref, loadFailed, memberHref, settingsHref, useMyProfile } from "@/data";
+import { composeHref, loadFailed, useFeatures, memberHref, settingsHref, useMyProfile } from "@/data";
 import { useUiV2 } from "@/lib/uiV2";
 import { HeaderV2 } from "../v2/ScreenV2";
 import { ProfileHeroV2 } from "../v2/ProfileV2";
@@ -18,6 +19,7 @@ export function Profile() {
   const toast = useToast();
   const q = useMyProfile();
   const v2 = useUiV2();
+  const features = useFeatures();
   const p = q.data;
   const gear = <BarButton label="Settings" onClick={() => router.push(settingsHref())}><Settings size={22} strokeWidth={1.75} /></BarButton>;
 
@@ -68,6 +70,11 @@ export function Profile() {
           {/* The gear lives in the phone's top bar; desktop has no top bar, so Settings is a button here. */}
           <div className="hidden lg:block"><Button className="w-full" onClick={() => router.push(settingsHref())}>Settings</Button></div>
         </div>
+        {v2 && features.on("circuits") && (
+          <Link href="/circuits" className="mt-3 flex min-h-12 items-center justify-between rounded-[14px] border border-c-border bg-c-card px-4 text-[15px] font-semibold lg:hidden">
+            Circuits<ChevronRight size={18} strokeWidth={2} className="text-c-muted" aria-hidden />
+          </Link>
+        )}
         {q.strength && <div className="mt-5"><StrengthMeter strength={q.strength} /></div>}
       </Section>
 

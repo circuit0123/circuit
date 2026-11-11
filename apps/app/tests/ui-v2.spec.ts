@@ -43,9 +43,16 @@ test.describe("ui_v2", () => {
     await checkPage(page, "composer");
   });
 
-  test("Profile: own and someone else's", async ({ page }) => {
+  test("Profile: own and someone else's", async ({ page }, info) => {
     await open(page, "/profile");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    if (phoneOnly(info)) {
+      // Circuits has no tab in the v2 phone bar, so Profile links to it.
+      await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: /Circuits/ })).toHaveCount(0);
+      await page.getByRole("link", { name: "Circuits" }).click();
+      await expect(page).toHaveURL(/\/circuits/);
+      await open(page, "/profile");
+    }
     await checkPage(page, "profile");
     await open(page, "/members/2");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
