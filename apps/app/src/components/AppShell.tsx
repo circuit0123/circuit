@@ -8,6 +8,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { composeHref, useFeatures, useInboxDot, useMe, useNotificationNudges, useUnreadCount } from "@/data";
 import { useDesktop } from "@/hooks/useDesktop";
+import { useUiV2 } from "@/lib/uiV2";
+import { NavV2 } from "./v2/NavV2";
 import { Circuits } from "./circuits/Circuits";
 import { Discover } from "./discover/Discover";
 import { Home } from "./home/Home";
@@ -32,6 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const inboxDot = useInboxDot();
   useNotificationNudges();
   const desktop = useDesktop();
+  const v2 = useUiV2();
   const path = usePathname();
   const router = useRouter();
 
@@ -96,7 +99,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {!pushed && <TabBar tabs={tabs} active={active} progress={progress} onSelect={select} />}
+      {!pushed && (v2
+        ? <NavV2 tabs={tabs} active={active} onSelect={select} onCompose={features.on("pulse") && composeHref ? () => router.push(composeHref) : undefined} />
+        : <TabBar tabs={tabs} active={active} progress={progress} onSelect={select} />)}
     </div>
   );
 }
