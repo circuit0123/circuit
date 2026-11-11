@@ -27,7 +27,7 @@ type Props = {
   onCompose?: () => void;
 };
 
-/** v2 bottom bar (PMNav.dc.html): a floating card, 12px in from the edges, the active tab in a tinted pill, the + in the middle. Phones only; the desktop rail stays. */
+/** v2 bottom bar (PMNav.dc.html): a floating card, 12px in from the edges, the active tab in a tinted pill, the + in the middle. AppShell gives it four tabs (Circuits stays in the desktop rail), so the + is exactly centred. Phones only. */
 export function NavV2({ tabs, active, onSelect, onCompose }: Props) {
   const items: (TabItem | "compose")[] = [...tabs];
   if (onCompose) items.splice(Math.min(2, tabs.length), 0, "compose");

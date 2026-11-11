@@ -101,7 +101,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {!pushed && (v2
-        ? <NavV2 tabs={tabs} active={active} onSelect={select} onCompose={newLog ? () => router.push(newLog) : undefined} />
+        ? <NavV2 tabs={tabs.filter((t) => t.id !== "circuits")} active={active} onSelect={select} onCompose={newLog ? () => router.push(newLog) : undefined} />
         : <TabBar tabs={tabs} active={active} progress={progress} onSelect={select} />)}
     </div>
   );

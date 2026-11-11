@@ -15,7 +15,7 @@ Rollback = set `off` and redeploy. The preview switch is per browser, not per ac
 
 ## What shipped (one commit per step)
 1. **Tokens, flag, shared pieces**: `--c-*` tokens scoped to `data-ui="v2"` (also remapping the old tokens so un-rebuilt screens match; dark only), the `NEXT_PUBLIC_UI_V2` switch, `packages/ui/src/v2/` (LogoV2, BigHeadline, EmeraldBand, HeroCard, IconButton, MonoLabel, ChipV2), Geist Mono on landing.
-2. **Nav**: floating bar, active pill, `+` for a build log (only when `pulse` is on). Circuits stays in the bar when its flag is on. Desktop rail unchanged.
+2. **Nav**: floating bar, active pill, `+` for a build log (only when `pulse` is on), exactly centred. The phone bar has four tabs; Circuits is left out of it in v2 (it stays in the desktop rail and as a tab on Profile) so the `+` can sit dead centre. Desktop rail unchanged.
 3. **Sign-in welcome and invite code**. Auth, redeem and waitlist logic untouched; the email/code steps and waitlist screens inherit the v2 colours.
 4. **Feed and composer**: header, big headline, LIVE strip, post cards, composer header/headline/text panel. Alt-text blocking, 500 limit and uploads untouched.
 5. **Profiles**: own and other-person banner.
@@ -38,6 +38,7 @@ Plus `apps/app/tests/ui-v2.spec.ts`, `playwright.v2.config.ts` and `make test-we
 - Nothing needed a backend change, so nothing was skipped for that reason.
 
 ## Known issues and decisions for you
+- **Circuits has no phone nav tab in v2** (so the `+` is centred). It is reachable from the desktop rail and the Profile Circuits tab; say if you'd rather have a five-tab bar with the `+` off-centre.
 - **Real match words still show.** Inherited v1 pieces (the Daily Drop card, people tiles) still show "Strong match" / "Good match" from real scores. The plan says not anywhere in v2. My new v2 cards leave match words out; the old pieces were not changed. Say if you want those hidden too.
 - **Logo**: v2 uses the PM logo (light centre node, live "circuit" text), not `docs/brand/svg`. Your call on which wins.
 - No desktop design exists for the app: at 1440px v2 keeps the left rail and 600px column in v2 colours.
