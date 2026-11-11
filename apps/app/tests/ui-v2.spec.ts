@@ -50,6 +50,7 @@ test.describe("ui_v2", () => {
     await open(page, "/members/2");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.getByRole("button", { name: /Connect|Request sent|Connected|Answer request/ })).toBeVisible();
+    await page.waitForTimeout(600); // the pushed screen fades in; axe must not read mid-fade colours
     await checkPage(page, "person");
   });
 
