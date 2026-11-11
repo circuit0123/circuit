@@ -2,7 +2,7 @@
 
 import { Avatar, EmeraldBand, VerifiedBadge } from "@circuit/ui";
 
-/** "Sakthi Vel" → ["Sakthi", "Vel."]. A single word stays on one line. */
+/** "Asha Raman" → ["Asha", "Raman."]. A single word stays on one line. */
 function splitName(name: string): [string, string | null] {
   const words = name.trim().split(/\s+/);
   if (words.length < 2) return [name, null];

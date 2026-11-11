@@ -10,8 +10,8 @@ export function HeaderV2() {
   const unread = useUnreadCount().data ?? 0;
   return (
     <header className="flex items-center justify-between px-5 pt-[calc(20px+env(safe-area-inset-top))] lg:pt-6">
-      <LogoV2 height={23} />
-      <div className="flex gap-2">
+      <LogoV2 height={23} className="lg:hidden" />
+      <div className="flex gap-2 lg:ml-auto">
         <Link href="/settings" aria-label="Settings" className="flex h-10 w-10 items-center justify-center rounded-full border border-c-border bg-c-card text-c-text">
           <SlidersHorizontal size={18} strokeWidth={1.9} aria-hidden />
         </Link>
