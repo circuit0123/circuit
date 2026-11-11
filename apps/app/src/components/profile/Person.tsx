@@ -8,6 +8,8 @@ import { loadFailed, memberHref, newMessageHref, useIntroPath, useMe, useMemberP
 import { useAskIntro } from "../home/IntroSheet";
 import { goBack } from "../jobs/JobScreen";
 import { ConfirmSheet, ReportSheet } from "../sheets";
+import { useUiV2 } from "@/lib/uiV2";
+import { ProfileHeroV2 } from "../v2/ProfileV2";
 import { About, BuildLogGrid, CircuitsList, Highlights, OffersNeeds, ProfileTabs } from "./parts";
 
 /**
@@ -45,7 +47,9 @@ export function Person({ id }: { id: number }) {
 }
 
 function Head({ p }: { p: PersonView }) {
+  const v2 = useUiV2();
   const mutuals = p.mutuals ? `${p.mutuals} mutual connection${p.mutuals === 1 ? "" : "s"}` : null;
+  if (v2) return <ProfileHeroV2 id={p.id} name={p.name} level={p.level} line={[p.line, mutuals].filter(Boolean).join(" · ")} org={p.org} />;
   return (
     <header>
       <Avatar id={p.id} name={p.name} size={96} />
@@ -76,6 +80,7 @@ function Page({ p, connect }: { p: PersonView; connect: (note: string) => void }
   const path = useIntroPath(p.connection === "connected" || me?.isMinor ? null : p.id);
   const via = path.data?.via ?? null;
   const first = firstName(p.name);
+  const v2 = useUiV2();
 
   const connectButton =
     p.connection === "connected" ? <Button disabled aria-disabled>Connected</Button>
@@ -85,13 +90,14 @@ function Page({ p, connect }: { p: PersonView; connect: (note: string) => void }
 
   return (
     <>
+      {v2 && <Head p={p} />}
       <div className="px-4 lg:px-0">
-        <Head p={p} />
-        <div className="mt-5 grid grid-cols-2 gap-3">
+        {!v2 && <Head p={p} />}
+        <div className={v2 ? "mt-4 grid grid-cols-[2fr_1fr] gap-2" : "mt-5 grid grid-cols-2 gap-3"}>
           {connectButton}
           <Button disabled={!p.canMessage} onClick={() => router.push(newMessageHref(p.id))}>Message</Button>
         </div>
-        {!p.canMessage && <p className="t-footnote mt-2 text-text-muted">{first} only takes messages from connections.</p>}
+        {!p.canMessage && <p className="t-footnote mt-2 text-text-muted">{v2 ? `You can't message ${first} right now.` : `${first} only takes messages from connections.`}</p>}
         {via && (
           <button type="button" onClick={() => ask({ id: p.id, name: p.name })} className="mt-3 flex min-h-11 w-full items-center justify-between t-subhead text-text-muted active:opacity-80">
             Intro via {via.name}, {via.role.toLowerCase()}
