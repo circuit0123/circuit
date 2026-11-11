@@ -11,6 +11,7 @@ import {
   type Bounds, type DiscoverFilters, type StartupTile,
 } from "@/data";
 import { MAP_TILES_URL } from "@/lib/env";
+import { useUiV2 } from "@/lib/uiV2";
 
 type Pin = StartupTile & { lat: number; lng: number };
 type View = { lng: number; lat: number; zoom: number; selected: number | null };
@@ -24,7 +25,7 @@ const saveView = (v: View) => { try { sessionStorage.setItem(VIEW_KEY, JSON.stri
 const around = (c: { lat: number; lng: number }): Bounds => ({ west: c.lng - 0.16, east: c.lng + 0.16, south: c.lat - 0.14, north: c.lat + 0.14 });
 
 /** Raster tiles look like a lit window on a black screen, so the dark theme dims and greys them (the pins and photos stay the loud things). */
-const isDark = () => getComputedStyle(document.body).backgroundColor === "rgb(0, 0, 0)";
+const isDark = () => document.documentElement.dataset.ui === "v2" || getComputedStyle(document.body).backgroundColor === "rgb(0, 0, 0)";
 const paint = (dark: boolean) => ({
   bg: dark ? "#050b08" : "#c2bcc8",
   raster: dark ? { "raster-saturation": -0.85, "raster-brightness-max": 0.32, "raster-contrast": 0.1 } : { "raster-saturation": -0.5, "raster-brightness-max": 1, "raster-contrast": 0 },
@@ -45,6 +46,7 @@ type Props = {
  */
 export function MapView({ visible, filters, onFilters, onOpenFilters, segment }: Props) {
   const here = useHere();
+  const v2 = useUiV2();
   const box = useRef<HTMLDivElement>(null);
   const map = useRef<import("maplibre-gl").Map | null>(null);
   const markers = useRef(new Map<number, { marker: import("maplibre-gl").Marker; el: HTMLButtonElement }>());
@@ -105,7 +107,7 @@ export function MapView({ visible, filters, onFilters, onOpenFilters, segment }:
           for (const [k, v] of Object.entries(l.raster)) m.setPaintProperty("osm", k as "raster-saturation", v);
         };
         const watch = new MutationObserver(() => requestAnimationFrame(retheme));
-        watch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class"] });
+        watch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class", "data-ui"] });
         const media = window.matchMedia("(prefers-color-scheme: dark)");
         media.addEventListener("change", retheme);
         m.once("remove", () => { watch.disconnect(); media.removeEventListener("change", retheme); });
@@ -202,6 +204,12 @@ export function MapView({ visible, filters, onFilters, onOpenFilters, segment }:
 
       <div className="absolute inset-x-4 top-[calc(12px+env(safe-area-inset-top))] flex flex-col gap-3 lg:left-6 lg:right-auto lg:w-[420px]">
         {segment}
+        {v2 && (
+          <div className="pointer-events-none flex items-end justify-between gap-3">
+            <h1 className="m-0 text-[64px] font-bold leading-[0.9] tracking-[-0.06em]">Nearby<span className="text-c-bright">.</span></h1>
+            {bounds && !pins.isPending && !pins.isError && !pins.tooWide && <span className="mb-1 rounded-full border border-c-border bg-c-card px-2.5 py-1 font-mono text-[12px] uppercase text-c-muted">{pins.pins.length} startups</span>}
+          </div>
+        )}
         <div className="flex gap-2" role="group" aria-label="Map filters">
           <Chip label="Hiring" selected={filters.hiringOnly} onToggle={() => onFilters({ ...filters, hiringOnly: !filters.hiringOnly })} className={filters.hiringOnly ? undefined : "material"} />
           <Chip label="Within 10 km" selected={filters.distanceKm === 10} onToggle={() => onFilters({ ...filters, distanceKm: filters.distanceKm === 10 ? null : 10 })} className={filters.distanceKm === 10 ? undefined : "material"} />
@@ -223,6 +231,7 @@ export function MapView({ visible, filters, onFilters, onOpenFilters, segment }:
 /** The selected startup (Map.dc.html): name, sector and distance, what it is hiring for and how well you fit, and one primary action. */
 function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
   const router = useRouter();
+  const v2 = useUiV2();
   const me = useMe().data;
   const jobs = useStartupJobs(pin.hiring && pin.openRoles > 0 ? pin.id : null);
   const follows = useFollows();
@@ -249,9 +258,9 @@ function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
   return (
     <section
       aria-label="Selected startup"
-      className="absolute inset-x-0 bottom-0 rounded-t-sheet bg-surface px-4 pb-[calc(104px+env(safe-area-inset-bottom))] pt-2 shadow-lift lg:bottom-6 lg:left-6 lg:right-auto lg:w-[420px] lg:rounded-sheet lg:pb-5"
+      className={cx("absolute shadow-lift lg:bottom-6 lg:left-6 lg:right-auto lg:w-[420px] lg:pb-5", v2 ? "inset-x-5 bottom-[calc(92px+env(safe-area-inset-bottom))] rounded-[20px] bg-c-hero p-4 text-c-hero-text lg:rounded-[20px]" : "inset-x-0 bottom-0 rounded-t-sheet bg-surface px-4 pb-[calc(104px+env(safe-area-inset-bottom))] pt-2 lg:rounded-sheet")}
     >
-      <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-text-subtle/50 lg:hidden" aria-hidden />
+      {!v2 && <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-text-subtle/50 lg:hidden" aria-hidden />}
       <div className="flex items-center gap-4">
         <Avatar id={`s${pin.id}`} name={pin.name} size={44} shape="square" />
         <div className="min-w-0 flex-1">
