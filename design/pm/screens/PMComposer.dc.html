@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>New build log</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{text-decoration:none}
+button,input,textarea{font-family:inherit}
+textarea::placeholder{color:#5A5C62}
+input::placeholder{color:#7A7D84}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0A0A0C; color: #ECEDEF; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div style="padding: 20px 20px 0 20px; display: flex; justify-content: space-between; align-items: center">
+    <a href="PMHome.dc.html" style="height: 40px; display: flex; align-items: center; font-size: 15px; color: #9A9CA3">Cancel</a>
+    <button onClick="{{post}}" aria-disabled="{{disabled}}" style="height: 40px; padding: 0 18px; border: 0; border-radius: 12px; background: {{postBg}}; color: {{postFg}}; font-size: 15px; font-weight: 600; cursor: pointer">{{postLabel}}</button>
+  </div>
+
+  <h1 style="margin: 18px 20px 0 20px; font-size: 52px; line-height: 0.95; font-weight: 700; letter-spacing: -0.055em">Ship<br><span style="color: transparent; -webkit-text-stroke: 1.5px #9A9CA3">a log.</span></h1>
+
+  <div style="margin: 18px 20px 0 20px; background: #272727; color: #F1F1F1; border-radius: 18px; padding: 14px">
+    <label for="log-text" style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #AAAAAA">WHAT DID YOU BUILD?</label>
+    <textarea id="log-text" rows="4" value="{{text}}" onChange="{{typeText}}" placeholder="Shipped offline sync for the farm map. 40% fewer failed uploads." style="display: block; width: 100%; box-sizing: border-box; margin-top: 8px; border: 0; background: transparent; color: #F1F1F1; font-size: 17px; line-height: 1.4; resize: none; outline: none"></textarea>
+    <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; font-size: 11px; color: #AAAAAA"><span>{{chars}}/280</span><span>VISIBLE TO YOUR NETWORK</span></div>
+  </div>
+
+  <div style="margin: 12px 20px 0 20px; display: flex; gap: 10px; align-items: stretch">
+    <button onClick="{{togglePhoto}}" aria-pressed="{{photoP}}" style="flex: 0 0 92px; height: 92px; border-radius: 14px; border: {{photoBorder}}; background: {{photoBg}}; color: {{photoFg}}; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M21 17l-5-5-8 7"/></svg>{{photoLabel}}</button>
+    <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; justify-content: center">
+      <sc-if value="{{hasPhoto}}" hint-placeholder-val="{{ true }}">
+        <label for="alt-text" style="font-size: 13px; color: #9A9CA3">Describe the photo (alt text)</label>
+        <input id="alt-text" value="{{alt}}" onChange="{{typeAlt}}" placeholder="Farm map on a phone in sunlight" style="height: 44px; border: 1px solid {{altBorder}}; border-radius: 12px; background: #17181B; color: #ECEDEF; padding: 0 12px; font-size: 14px; outline: none">
+      </sc-if>
+      <sc-if value="{{noPhoto}}" hint-placeholder-val="{{ false }}">
+        <span style="font-size: 14px; line-height: 1.4; color: #9A9CA3">Add a screenshot of what you shipped. Optional.</span>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="margin: 14px 20px 0 20px; display: flex; gap: 6px; flex-wrap: wrap">
+    <sc-for list="{{tags}}" as="t" hint-placeholder-count="4">
+      <button aria-pressed="{{t.pressed}}" onClick="{{t.toggle}}" style="height: 32px; padding: 0 12px; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.bg}}; color: {{t.fg}}; font-size: 13px; cursor: pointer">#{{t.label}}</button>
+    </sc-for>
+  </div>
+
+  <div role="status" aria-live="polite" style="position: absolute; left: 20px; right: 20px; bottom: 28px; min-height: 48px; border-radius: 12px; background: {{blockBg}}; border: 1px solid {{blockBorder}}; color: {{blockFg}}; display: flex; align-items: center; gap: 10px; padding: 0 14px; font-size: 14px">
+    <span style="width: 8px; height: 8px; border-radius: 999px; background: {{blockDot}}"></span>{{blocker}}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { text: '', photo: true, alt: '', tags: { 'agritech': true }, posted: false }; }
+  renderVals() {
+    var self = this, s = this.state, blocker = '';
+    if (!s.text.trim()) blocker = 'Write what you built to post.';
+    else if (s.photo && !s.alt.trim()) blocker = 'Add alt text to your photo to post.';
+    var ok = !blocker;
+    return {
+      text: s.text, alt: s.alt, chars: s.text.length,
+      typeText: function (e) { self.setState({ text: e.target.value.slice(0, 280), posted: false }); },
+      typeAlt: function (e) { self.setState({ alt: e.target.value, posted: false }); },
+      hasPhoto: s.photo, noPhoto: !s.photo, photoP: s.photo ? 'true' : 'false', photoLabel: s.photo ? 'Remove' : 'Add photo',
+      photoBg: s.photo ? '#222327' : 'transparent', photoFg: s.photo ? '#ECEDEF' : '#9A9CA3', photoBorder: s.photo ? '1px solid #2E3036' : '1px dashed #4A4C52',
+      altBorder: s.photo && !s.alt.trim() && s.text.trim() ? '#2FBF8A' : '#2E3036',
+      togglePhoto: function () { self.setState({ photo: !s.photo, alt: '' }); },
+      tags: ['agritech', 'shipped', 'maps', 'hiring'].map(function (t) { var on = !!s.tags[t];
+        return { label: t, pressed: on ? 'true' : 'false', bg: on ? '#0F2A21' : 'transparent', fg: on ? '#2FBF8A' : '#9A9CA3', border: on ? '#00563F' : '#2E3036',
+          toggle: function () { var n = Object.assign({}, s.tags); n[t] = !on; self.setState({ tags: n }); } }; }),
+      disabled: ok ? 'false' : 'true',
+      postBg: s.posted ? '#0F2A21' : (ok ? '#2FBF8A' : '#17181B'), postFg: s.posted ? '#2FBF8A' : (ok ? '#0A0A0C' : '#5A5C62'),
+      postLabel: s.posted ? 'Posted' : 'Post',
+      post: function () { if (ok) self.setState({ posted: true }); },
+      blocker: s.posted ? 'Posted to your network.' : (ok ? 'Ready to post.' : blocker),
+      blockBg: '#17181B', blockBorder: '#2E3036', blockFg: '#ECEDEF', blockDot: s.posted || ok ? '#2FBF8A' : '#9A9CA3'
+    };
+  }
+}
+</script>
+</body>
+</html>

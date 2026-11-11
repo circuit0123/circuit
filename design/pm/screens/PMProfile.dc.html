@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0A0A0C; color: #ECEDEF; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <section aria-label="Sakthi Vel" style="position: relative; height: 300px; background: #17181B; border-bottom: 1px solid #2E3036; overflow: hidden">
+    <div aria-hidden="true" style="position: absolute; top: -40px; right: 40px; width: 90px; height: 420px; background: #00563F; transform: rotate(20deg)"></div>
+    <div style="position: relative; padding: 20px 20px 0 20px; display: flex; justify-content: space-between; align-items: center">
+      <a href="PMHome.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 999px; background: #222327; color: #ECEDEF; display: flex; align-items: center; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+      <span style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 999px; background: #0A0A0C; font-family: 'Geist Mono', monospace; font-size: 11px; color: #9A9CA3"><span style="width: 6px; height: 6px; border-radius: 999px; background: #2FBF8A"></span>ACTIVE TODAY · 4 KM</span>
+    </div>
+    <div style="position: relative; display: flex; justify-content: space-between; align-items: flex-end; margin: 34px 20px 0 20px">
+      <h1 style="margin: 0; font-size: 56px; line-height: 0.92; font-weight: 700; letter-spacing: -0.06em">Sakthi<br><span style="color: transparent; -webkit-text-stroke: 1.5px #9A9CA3">Vel.</span></h1>
+      <span style="width: 92px; height: 92px; border-radius: 999px; background: #272727; color: #F1F1F1; border: 3px solid #0A0A0C; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 700; letter-spacing: -0.04em">SV</span>
+    </div>
+    <div style="position: relative; margin: 14px 20px 0 20px; font-size: 14px; color: #9A9CA3">Backend mentor · ex-Zoho · Chennai</div>
+  </section>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 16px 20px 0 20px; border: 1px solid #2E3036; border-radius: 14px; overflow: hidden">
+    <div style="padding: 12px; border-right: 1px solid #2E3036"><div style="font-size: 22px; font-weight: 700; letter-spacing: -0.03em">12</div><div style="font-size: 12px; color: #9A9CA3">Mutuals</div></div>
+    <div style="padding: 12px; border-right: 1px solid #2E3036"><div style="font-size: 22px; font-weight: 700; letter-spacing: -0.03em">31</div><div style="font-size: 12px; color: #9A9CA3">Build logs</div></div>
+    <div style="padding: 12px"><div style="font-size: 22px; font-weight: 700; letter-spacing: -0.03em; color: #2FBF8A">7</div><div style="font-size: 12px; color: #9A9CA3">Circuits</div></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; margin: 14px 20px 0 20px">
+    <button onClick="{{connect}}" style="height: 48px; border: 0; border-radius: 12px; background: {{cBg}}; color: {{cFg}}; font-size: 15px; font-weight: 600; cursor: pointer">{{cLabel}}</button>
+    <a href="PMChat.dc.html" style="height: 48px; box-sizing: border-box; border: 1px solid #2E3036; border-radius: 12px; background: #17181B; color: #ECEDEF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600">Message</a>
+  </div>
+  <div style="margin: 8px 20px 0 20px; font-size: 13px; color: #9A9CA3">Meera can introduce you. You both know her from Kaveri incubator.</div>
+
+  <section aria-label="Offers and needs" style="margin: 16px 20px 0 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px">
+    <div style="background: #272727; color: #F1F1F1; border-radius: 16px; padding: 14px; transform: rotate(-1deg)">
+      <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #AAAAAA">OFFERS</div>
+      <div style="font-size: 15px; font-weight: 600; margin-top: 8px; line-height: 1.5">API design<br>Offline sync<br>Your first hire</div>
+    </div>
+    <div style="background: #17181B; border: 1px solid #2E3036; border-radius: 16px; padding: 14px">
+      <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #2FBF8A">NEEDS</div>
+      <div style="font-size: 15px; font-weight: 600; margin-top: 8px; line-height: 1.5">UI design<br>Pitch feedback</div>
+    </div>
+  </section>
+
+  <div style="position: absolute; left: 12px; bottom: 14px">
+    <dc-import name="PMNav" active="profile" hint-size="366px,64px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sent: false }; }
+  renderVals() {
+    var self = this, sent = this.state.sent;
+    return {
+      cLabel: sent ? 'Request sent · Undo' : 'Ask Meera to intro',
+      cBg: sent ? '#0F2A21' : '#2FBF8A', cFg: sent ? '#2FBF8A' : '#0A0A0C',
+      connect: function () { self.setState({ sent: !sent }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

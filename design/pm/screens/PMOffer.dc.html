@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Offers and needs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0A0A0C; color: #ECEDEF; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div style="padding: 20px 20px 0 20px; display: flex; justify-content: space-between; align-items: center">
+    <a href="PMRole.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 999px; background: #17181B; border: 1px solid #2E3036; color: #ECEDEF; display: flex; align-items: center; justify-content: center">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #9A9CA3">STEP 3 OF 4</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin: 14px 20px 0 20px"><span style="height: 3px; border-radius: 9px; background: #2FBF8A"></span><span style="height: 3px; border-radius: 9px; background: #2FBF8A"></span><span style="height: 3px; border-radius: 9px; background: #2FBF8A"></span><span style="height: 3px; border-radius: 9px; background: #2E3036"></span></div>
+
+  <section aria-label="What you offer" style="margin: 28px 20px 0 20px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end">
+      <h1 style="margin: 0; font-size: 44px; line-height: 0.95; font-weight: 700; letter-spacing: -0.055em">I can<br>help with</h1>
+      <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #2FBF8A">{{offerN}}</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px">
+      <sc-for list="{{offers}}" as="o" hint-placeholder-count="9">
+        <button aria-pressed="{{o.pressed}}" onClick="{{o.toggle}}" style="height: 36px; padding: 0 12px; border: 1px solid {{o.border}}; border-radius: 10px; background: {{o.bg}}; color: {{o.fg}}; font-size: 14px; font-weight: 500; cursor: pointer">{{o.label}}</button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="What you need" style="margin: 22px 20px 0 20px; background: #272727; color: #F1F1F1; border-radius: 18px; padding: 16px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end">
+      <h2 style="margin: 0; font-size: 30px; line-height: 1; font-weight: 700; letter-spacing: -0.05em">I need</h2>
+      <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #2FBF8A">{{needN}}</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px">
+      <sc-for list="{{needs}}" as="o" hint-placeholder-count="6">
+        <button aria-pressed="{{o.pressed}}" onClick="{{o.toggle}}" style="height: 36px; padding: 0 12px; border: 1px solid {{o.border}}; border-radius: 10px; background: {{o.bg}}; color: {{o.fg}}; font-size: 14px; font-weight: 500; cursor: pointer">{{o.label}}</button>
+      </sc-for>
+    </div>
+  </section>
+
+  <div style="position: absolute; left: 20px; right: 20px; bottom: 36px">
+    <a href="PMReady.dc.html" style="height: 52px; border-radius: 14px; background: #2FBF8A; color: #0A0A0C; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600">Continue</a>
+    <div style="text-align: center; margin-top: 10px; font-size: 13px; color: #9A9CA3">Pick at least 3 you offer and 1 you need. You can change these later.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { o: { 'React': true, 'Maps': true, 'UI design': true }, n: { 'Mentoring': true } }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var O = ['React', 'Flutter', 'Maps', 'UI design', 'Python', 'Pitch decks', 'Tamil content', 'Embedded C', 'Sales'];
+    var N = ['Mentoring', 'First job', 'Co-founder', 'Pricing help', 'Funding', 'Test users'];
+    function count(m) { return Object.keys(m).filter(function (k) { return m[k]; }).length; }
+    return {
+      offerN: count(s.o) + ' SELECTED', needN: count(s.n) + ' SELECTED',
+      offers: O.map(function (l) { var on = !!s.o[l]; return { label: l, pressed: on ? 'true' : 'false',
+        bg: on ? '#0F2A21' : '#17181B', fg: on ? '#2FBF8A' : '#ECEDEF', border: on ? '#00563F' : '#2E3036',
+        toggle: function () { var m = Object.assign({}, s.o); m[l] = !on; self.setState({ o: m }); } }; }),
+      needs: N.map(function (l) { var on = !!s.n[l]; return { label: l, pressed: on ? 'true' : 'false',
+        bg: on ? '#00563F' : 'transparent', fg: on ? '#ECEDEF' : '#0A0A0C', border: on ? '#00563F' : '#8A8D93',
+        toggle: function () { var m = Object.assign({}, s.n); m[l] = !on; self.setState({ n: m }); } }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

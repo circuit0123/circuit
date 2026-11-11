@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Circuits</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0A0A0C; color: #ECEDEF; font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <div style="padding: 28px 20px 0 20px">
+    <h1 style="margin: 0; font-size: 64px; line-height: 0.9; font-weight: 700; letter-spacing: -0.06em">Circuits<span style="color: #2FBF8A">.</span></h1>
+    <p style="margin: 10px 0 0 0; font-size: 15px; color: #9A9CA3">Three people. Each one helps the next.</p>
+  </div>
+
+  <section aria-label="Live circuit" style="margin: 18px 20px 0 20px; background: #272727; color: #F1F1F1; border-radius: 22px; padding: 16px">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #AAAAAA">CIRCUIT #07 · LIVE</span>
+      <span style="font-size: 13px; font-weight: 600; color: #2FBF8A">{{progress}}</span>
+    </div>
+    <svg width="318" height="236" viewBox="0 0 318 236" role="img" aria-label="You help Farhan with React and maps. Farhan introduces Kavya to agritech customers. Kavya helps you with pricing." style="display: block; margin: 6px auto 0 auto">
+      <defs><marker id="pmah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#AAAAAA"></path></marker></defs>
+      <path d="M134 50 C 60 64, 40 130, 66 168" fill="none" stroke="#AAAAAA" stroke-width="1.8" marker-end="url(#pmah)"></path>
+      <path d="M100 198 C 140 222, 178 222, 218 198" fill="none" stroke="#AAAAAA" stroke-width="1.8" marker-end="url(#pmah)"></path>
+      <path d="M252 168 C 280 130, 262 64, 186 50" fill="none" stroke="#AAAAAA" stroke-width="1.8" marker-end="url(#pmah)"></path>
+      <text x="30" y="100" font-family="Geist Mono, monospace" font-size="10" fill="#AAAAAA">REACT + MAPS</text>
+      <text x="112" y="232" font-family="Geist Mono, monospace" font-size="10" fill="#AAAAAA">AGRI CUSTOMERS</text>
+      <text x="236" y="100" font-family="Geist Mono, monospace" font-size="10" fill="#AAAAAA">PRICING</text>
+      <circle cx="159" cy="40" r="30" fill="{{youFill}}"></circle>
+      <text x="159" y="45" text-anchor="middle" font-family="Geist, sans-serif" font-size="14" font-weight="700" fill="{{youText}}">You</text>
+      <circle cx="78" cy="190" r="28" fill="#0A0A0C"></circle>
+      <text x="78" y="195" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="700" fill="#ECEDEF">Farhan</text>
+      <circle cx="240" cy="190" r="28" fill="#00563F"></circle>
+      <text x="240" y="195" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="700" fill="#ECEDEF">Kavya</text>
+    </svg>
+    <button onClick="{{confirm}}" style="width: 100%; height: 48px; margin-top: 10px; border: 0; border-radius: 12px; background: {{btnBg}}; color: {{btnFg}}; font-size: 15px; font-weight: 600; cursor: pointer">{{btnLabel}}</button>
+  </section>
+
+  <section aria-label="Closed circuits" style="margin: 18px 20px 0 20px">
+    <h2 style="margin: 0 0 10px 0; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; color: #9A9CA3">CLOSED</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <div style="background: #17181B; border: 1px solid #2E3036; border-radius: 14px; padding: 12px">
+        <div style="font-size: 17px; font-weight: 700">#06 <span style="color: #2FBF8A">✓</span></div>
+        <div style="font-size: 13px; color: #9A9CA3; margin-top: 4px">You, Divya, Ishaan · 9 days</div></div>
+      <div style="background: #17181B; border: 1px solid #2E3036; border-radius: 14px; padding: 12px">
+        <div style="font-size: 17px; font-weight: 700">#05 <span style="color: #2FBF8A">✓</span></div>
+        <div style="font-size: 13px; color: #9A9CA3; margin-top: 4px">You, Meera, Sakthi · 4 days</div></div>
+    </div>
+  </section>
+
+  <div style="position: absolute; left: 12px; bottom: 14px">
+    <dc-import name="PMNav" active="none" hint-size="366px,64px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { done: false }; }
+  renderVals() {
+    var self = this, d = this.state.done;
+    return {
+      progress: d ? '3 of 3 confirmed' : '2 of 3 confirmed',
+      youFill: d ? '#00563F' : '#ECEDEF', youText: d ? '#ECEDEF' : '#0A0A0C',
+      btnBg: d ? '#0A0A0C' : '#00563F', btnFg: '#ECEDEF',
+      btnLabel: d ? 'Circuit closed · Undo' : 'Confirm my part',
+      confirm: function () { self.setState({ done: !d }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
