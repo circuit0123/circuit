@@ -4,10 +4,14 @@ import { MoreHorizontal } from "lucide-react";
 import { Avatar, Button, PatternArt, Sheet, Skeleton, VerifiedBadge, cx } from "@circuit/ui";
 import Link from "next/link";
 import { useState } from "react";
+import { useUiV2 } from "@/lib/uiV2";
+import { JobRowV2, StartupCardV2 } from "../v2/DiscoverV2";
 import { hiringState, kmOrNull, metaLine, roleHref, startupHref, type JobRow, type PersonTile, type Promotion, type StartupTile } from "@/data";
 
 /** A role as a row (Discover.dc.html): startup mark, title, "Startup · Sector · 3.2 km", then the stipend in mono and the fit in words. No box. */
 export function JobRowItem({ job, showStartup = true, className }: { job: JobRow; showStartup?: boolean; className?: string }) {
+  const v2 = useUiV2();
+  if (v2) return <JobRowV2 job={job} showStartup={showStartup} />;
   return (
     <Link href={roleHref(job.id)} data-feed-item className={cx("flex items-start gap-4 border-b border-separator px-4 py-4 active:opacity-80 lg:px-0", className)}>
       {showStartup && <Avatar id={`s${job.startupId}`} name={job.startup} size={44} shape="square" />}
@@ -44,6 +48,8 @@ export function PersonTileCard({ person, onOpen }: { person: PersonTile; onOpen?
 
 /** A startup, picture first: its mark (circuit pattern until logos exist), name, sector and distance, and whether it is hiring. */
 export function StartupTileCard({ startup }: { startup: StartupTile }) {
+  const v2 = useUiV2();
+  if (v2) return <StartupCardV2 startup={startup} />;
   const state = hiringState(startup);
   const status = state === "roles" ? `Hiring · ${startup.openRoles} ${startup.openRoles === 1 ? "role" : "roles"}` : state === "none" ? startup.fit ?? "Not hiring right now" : "Hiring";
   return (

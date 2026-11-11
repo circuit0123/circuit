@@ -10,6 +10,9 @@ import {
   useDiscoverStartups, useMe, useMyApplications, usePromotion, useSkillsInDemand, type DiscoverFilters, type Segment,
 } from "@/data";
 import { useAskIntro } from "../home/IntroSheet";
+import { useUiV2 } from "@/lib/uiV2";
+import { HeaderV2 } from "../v2/ScreenV2";
+import { SegmentTabsV2 } from "../v2/DiscoverV2";
 import { FilterSheet } from "./FilterSheet";
 import { GridSkeleton, JobRowItem, PersonTileCard, PromotedSlot, RowsSkeleton, StartupTileCard, TileGrid } from "./parts";
 
@@ -31,6 +34,7 @@ export function Discover() {
   const [filters, setFilters] = useState<DiscoverFilters>(NO_FILTERS);
   const [query, setQuery] = useState("");
   const [sheet, setSheet] = useState(false);
+  const v2 = useUiV2();
 
   // On first load and whenever Discover comes back into view (`/discover?s=jobs` from another screen picks Jobs).
   useEffect(() => {
@@ -57,30 +61,38 @@ export function Discover() {
     </button>
   );
 
+  const content = query.trim() ? (
+    <SearchResults query={query} />
+  ) : seg === "people" ? (
+    <People filters={filters} filterButton={filterButton} />
+  ) : seg === "startups" ? (
+    <Startups filters={filters} filterButton={filterButton} onClear={() => setFilters(NO_FILTERS)} />
+  ) : (
+    <Jobs filters={filters} filterButton={filterButton} onClear={() => setFilters(NO_FILTERS)} />
+  );
+
   return (
     <>
       {map ? (
         <h1 className="sr-only">Discover</h1>
+      ) : v2 ? (
+        <div className="bg-c-bg text-c-text">
+          <HeaderV2 />
+          <SegmentTabsV2 items={SEGMENTS} value={seg} onChange={pick} label="Discover sections" className="mt-5 px-5" />
+          <h1 className="m-0 mt-4 px-5 text-[72px] font-bold leading-[0.9] tracking-[-0.06em]">{SEGMENTS.find((x) => x.id === seg)?.label}<span className="text-c-bright">.</span></h1>
+          <div className="mt-4 px-4 lg:px-0"><SearchField placeholder="People, startups, roles" aria-label="Search people, startups and roles" value={query} onChange={(e) => setQuery(e.target.value)} /></div>
+          <div className="mt-6">{content}</div>
+        </div>
       ) : (
         <Screen title="Discover">
           <div className="flex flex-col gap-4 px-4 lg:px-0">
             <SearchField placeholder="People, startups, roles" aria-label="Search people, startups and roles" value={query} onChange={(e) => setQuery(e.target.value)} />
             <SegmentedControl stretch label="Discover sections" items={SEGMENTS} value={seg} onChange={pick} />
           </div>
-          <div className="mt-section">
-            {query.trim() ? (
-              <SearchResults query={query} />
-            ) : seg === "people" ? (
-              <People filters={filters} filterButton={filterButton} />
-            ) : seg === "startups" ? (
-              <Startups filters={filters} filterButton={filterButton} onClear={() => setFilters(NO_FILTERS)} />
-            ) : (
-              <Jobs filters={filters} filterButton={filterButton} onClear={() => setFilters(NO_FILTERS)} />
-            )}
-          </div>
+          <div className="mt-section">{content}</div>
         </Screen>
       )}
-      {map && <MapView visible={here} filters={filters} onFilters={setFilters} onOpenFilters={() => setSheet(true)} segment={<SegmentedControl stretch label="Discover sections" items={SEGMENTS} value={seg} onChange={pick} className="material" />} />}
+      {map && <MapView visible={here} filters={filters} onFilters={setFilters} onOpenFilters={() => setSheet(true)} segment={v2 ? <SegmentTabsV2 items={SEGMENTS} value={seg} onChange={pick} label="Discover sections" /> : <SegmentedControl stretch label="Discover sections" items={SEGMENTS} value={seg} onChange={pick} className="material" />} />}
       <FilterSheet open={sheet} onClose={() => setSheet(false)} segment={seg} value={filters} onApply={setFilters} />
     </>
   );
