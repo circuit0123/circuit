@@ -22,6 +22,8 @@ function km(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
 export type StartupPage = {
   id: number;
   name: string;
+  /** Signed link to the logo, or null (the circuit-pattern square). */
+  logo: string | null;
   sector: string;
   stage: string;
   place: string;
@@ -68,6 +70,7 @@ export function useStartup(id: number) {
   const data: StartupPage | undefined = s && {
     id: s.id,
     name: s.name,
+    logo: s.logo ?? null,
     sector: sectorLabel(s.sector),
     stage: stageLabel(s.stage),
     place: s.address,

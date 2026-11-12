@@ -48,14 +48,14 @@ export function Profile() {
   }
 
   const shell = (children: React.ReactNode) => v2
-    ? <div className="bg-c-bg text-c-text"><HeaderV2 /><div className="mt-5"><ProfileHeroV2 id={p.id} name={p.name} level={p.level} line={p.line} org={p.org} />{children}</div></div>
+    ? <div className="bg-c-bg text-c-text"><HeaderV2 /><div className="mt-5"><ProfileHeroV2 id={p.id} name={p.name} level={p.level} line={p.line} org={p.org} photo={p.photo} />{children}</div></div>
     : <Screen title={p.name} right={gear}>{children}</Screen>;
 
   return shell(
     <>
       <Section label="About you">
         <div className={v2 ? "hidden" : "flex items-center gap-4"}>
-          <Avatar id={p.id} name={p.name} size={64} />
+          <Avatar id={p.id} name={p.name} src={p.photo} size={64} />
           <div className="min-w-0">
             <p className="t-subhead flex flex-wrap items-center gap-1.5 text-text-muted">{p.line}<VerifiedBadge level={p.level} /></p>
             {p.org && <p className="t-subhead text-text-muted">{p.org}</p>}

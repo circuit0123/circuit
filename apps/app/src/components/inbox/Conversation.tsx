@@ -61,7 +61,7 @@ export function ConversationScreen({ id }: { id: number }) {
       {c.head && (
         // A short thread sits at the bottom, just above the composer (Chat.dc.html), with the person right above the first message.
         <div className="flex min-h-[calc(100dvh-220px)] flex-col justify-end">
-          <PersonLine name={c.head.other.name} id={c.head.other.id} line={c.head.other.line} />
+          <PersonLine name={c.head.other.name} id={c.head.other.id} photo={c.head.other.photo} line={c.head.other.line} />
           {c.hasOlder && (
             <div className="mt-4 px-4 lg:px-0">
               <Button variant="text" className="w-full text-text-muted" disabled={c.isLoadingOlder} onClick={c.loadOlder}>Show earlier messages</Button>
@@ -106,7 +106,7 @@ export function DraftConversationScreen({ memberId }: { memberId: number }) {
       {draft.isPending && <ThreadSkeleton />}
       {p && (
         <>
-          <PersonLine name={p.name} id={p.id} line={p.line} />
+          <PersonLine name={p.name} id={p.id} photo={p.photo} line={p.line} />
           {!last && <p className="t-subhead mt-6 px-4 text-text-muted lg:px-0">Your first message starts the conversation. If you&apos;re not connected, it arrives as a request.</p>}
           {bubble && <Thread days={[{ day: "Today", items: [bubble] }]} other={firstName(p.name)} onRetry={() => last && draft.start.mutate({ text: last.text, file: last.file })} />}
         </>
@@ -115,10 +115,10 @@ export function DraftConversationScreen({ memberId }: { memberId: number }) {
   );
 }
 
-function PersonLine({ id, name, line }: { id: number; name: string; line: string }) {
+function PersonLine({ id, name, photo, line }: { id: number; name: string; photo: string | null; line: string }) {
   return (
     <div className="flex items-center gap-4 px-4 pt-2 lg:px-0">
-      <Avatar id={id} name={name} size={64} />
+      <Avatar id={id} name={name} src={photo} size={64} />
       <div className="min-w-0">
         <h1 className="t-headline">{name}</h1>
         {line && <p className="t-subhead text-text-muted">{line}</p>}

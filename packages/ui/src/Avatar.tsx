@@ -8,7 +8,8 @@ type Props = {
   /** Seeds the pattern, so the same member always looks the same. */
   id: string | number;
   name: string;
-  src?: string | null;
+  /** The picture link, or null for the circuit pattern (no photo, or the member chose none). Required so a screen cannot forget it. */
+  src: string | null;
   size?: AvatarSize;
   shape?: "round" | "square";
   className?: string;
@@ -22,6 +23,11 @@ export function Avatar({ id, name, src, size = 40, shape = "round", className }:
       {src ? <img src={src} alt="" className="h-full w-full object-cover" /> : <PatternArt id={id} initial={size > 20 ? initials(name)[0] : null} size={size} />}
     </span>
   );
+}
+
+/** A wide photo-first tile: the picture when there is one, otherwise the pattern. */
+export function BannerArt({ id, initial, src }: { id: string | number; initial?: string | null; src: string | null }) {
+  return src ? <img src={src} alt="" className="h-full w-full object-cover" /> : <PatternArt id={id} initial={initial} banner />;
 }
 
 /** The pattern alone. `banner` fills a wide area (a Daily Drop card without a photo) with more traces. */

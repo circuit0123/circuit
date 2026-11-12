@@ -15,7 +15,7 @@ import { PEOPLE } from "./fixtures";
 
 const API = "*/api";
 const envelope = (status: number, code: string, message: string) => HttpResponse.json({ error: { code, message, details: null } }, { status });
-const person = (p: { id: number; display_name: string; role: string; verification_level: number }): Schemas["PersonOut"] => ({ id: p.id, display_name: p.display_name, role: p.role, verification_level: p.verification_level, photo: null });
+const person = (p: { id: number; display_name: string; role: string; verification_level: number; photo?: string | null }): Schemas["PersonOut"] => ({ id: p.id, display_name: p.display_name, role: p.role, verification_level: p.verification_level, photo: "photo" in p ? (p.photo as string | null) : null });
 const ago = (h: number) => new Date(Date.now() - h * 3600_000).toISOString();
 const soon = (h: number) => new Date(Date.now() + h * 3600_000).toISOString();
 

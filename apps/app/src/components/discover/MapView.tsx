@@ -262,7 +262,7 @@ function PinSheet({ pin, onClose }: { pin: Pin; onClose: () => void }) {
     >
       {!v2 && <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-text-subtle/50 lg:hidden" aria-hidden />}
       <div className="flex items-center gap-4">
-        <Avatar id={`s${pin.id}`} name={pin.name} size={44} shape="square" />
+        <Avatar id={`s${pin.id}`} name={pin.name} src={pin.logo} size={44} shape="square" />
         <div className="min-w-0 flex-1">
           <h2 className="t-headline">{pin.name}</h2>
           <p className="t-subhead text-text-muted">{metaLine(pin.sector, kmOrNull(pin.km))}</p>

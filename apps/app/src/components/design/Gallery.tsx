@@ -13,10 +13,10 @@ import { createContext, useContext, useState } from "react";
 
 const PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect width="128" height="128" fill="#6b8f7f"/><circle cx="64" cy="50" r="22" fill="#d9c7b0"/><path d="M20 128c4-30 24-44 44-44s40 14 44 44z" fill="#2c4a3d"/></svg>')}`;
 
-const SAKTHI = { id: 41, name: "Sakthi Vel", role: "Mentor", headline: "Backend mentor", place: "Chennai", level: 3 };
+const SAKTHI = { id: 41, name: "Sakthi Vel", role: "Mentor", headline: "Backend mentor", place: "Chennai", level: 3, photo: null };
 const SAMPLE_DROP: DropCard = {
   id: 41, person: SAKTHI, reason: "Sakthi can help you with backend.", detail: "You both build for small teams. 3 km away.", helpWith: "backend",
-  via: { id: 7, name: "Meera Krishnan", role: "mentor" }, offers: ["Backend", "APIs", "Mentoring"], strength: "strong", bridge: false, answered: null,
+  via: { id: 7, name: "Meera Krishnan", photo: null, role: "mentor" }, offers: ["Backend", "APIs", "Mentoring"], strength: "strong", bridge: false, answered: null,
 };
 
 const Theme = createContext<"dark" | "light">("dark");
@@ -25,7 +25,7 @@ const Theme = createContext<"dark" | "light">("dark");
 function F6Blocks() {
   const [on, setOn] = useState(true);
   const [focus, setFocus] = useState({ x: 0.5, y: 0.5 });
-  const reply = (id: number, name: string, body: string, replies: ReplyView[] = []): ReplyView => ({ id, author: { id, name, role: "Mentor", headline: "", place: "Chennai", level: 3 }, body, when: "2h", mine: false, replies });
+  const reply = (id: number, name: string, body: string, replies: ReplyView[] = []): ReplyView => ({ id, author: { id, name, role: "Mentor", headline: "", place: "Chennai", level: 3, photo: null }, body, when: "2h", mine: false, replies });
   return (
     <>
       <Block title="Toggle">
@@ -152,7 +152,7 @@ function Panel({ theme, accent }: { theme: "dark" | "light"; accent: Accent }) {
           <ListRow title="With chevron" onClick={() => {}} />
           <ListRow title="With subtitle" subtitle="Two full lines are never cut" onClick={() => {}} />
           <ListRow title="Appearance" value="Dark" onClick={() => {}} />
-          <ListRow title="Ravi Kumar" subtitle="Student · Chennai" leading={<Avatar id={1} name="Ravi Kumar" size={40} />} onClick={() => {}} />
+          <ListRow title="Ravi Kumar" subtitle="Student · Chennai" leading={<Avatar id={1} name="Ravi Kumar" src={null} size={40} />} onClick={() => {}} />
           <ListRow title="Delete account" danger onClick={() => {}} />
         </div>
       </Block>
@@ -218,11 +218,11 @@ function Panel({ theme, accent }: { theme: "dark" | "light"; accent: Accent }) {
 
       <Block title="Avatar">
         <Row label="circuit pattern, every size">
-          {([20, 32, 40, 44, 64, 96, 128] as const).map((s) => <Avatar key={s} id={s * 7} name="Priya Nair" size={s} />)}
+          {([20, 32, 40, 44, 64, 96, 128] as const).map((s) => <Avatar key={s} id={s * 7} name="Priya Nair" src={null} size={s} />)}
         </Row>
         <Row label="photo · square">
           <Avatar id={3} name="Priya Nair" src={PHOTO} size={64} />
-          <Avatar id={4} name="Arjun Mehta" size={64} shape="square" />
+          <Avatar id={4} name="Arjun Mehta" src={null} size={64} shape="square" />
         </Row>
       </Block>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { MoreHorizontal } from "lucide-react";
-import { Avatar, Button, PatternArt, Sheet, Skeleton, VerifiedBadge, cx } from "@circuit/ui";
+import { Avatar, BannerArt, Button, Sheet, Skeleton, VerifiedBadge, cx } from "@circuit/ui";
 import Link from "next/link";
 import { useState } from "react";
 import { useUiV2 } from "@/lib/uiV2";
@@ -14,7 +14,7 @@ export function JobRowItem({ job, showStartup = true, className }: { job: JobRow
   if (v2) return <JobRowV2 job={job} showStartup={showStartup} />;
   return (
     <Link href={roleHref(job.id)} data-feed-item className={cx("flex items-start gap-4 border-b border-separator px-4 py-4 active:opacity-80 lg:px-0", className)}>
-      {showStartup && <Avatar id={`s${job.startupId}`} name={job.startup} size={44} shape="square" />}
+      {showStartup && <Avatar id={`s${job.startupId}`} name={job.startup} src={job.logo} size={44} shape="square" />}
       <span className="min-w-0 flex-1">
         <span className="t-headline block">{job.title}</span>
         <span className="t-subhead mt-1 block text-text-muted">{showStartup ? metaLine(job.startup, job.sector, kmOrNull(job.km)) : job.kind}</span>
@@ -31,7 +31,7 @@ export function JobRowItem({ job, showStartup = true, className }: { job: JobRow
 export function PersonTileCard({ person, onOpen }: { person: PersonTile; onOpen?: () => void }) {
   const body = (
     <>
-      <span className="block aspect-[4/5] overflow-hidden rounded-card"><PatternArt id={person.id} initial={person.name.replace(/^Dr\.?\s+/, "")[0]} banner /></span>
+      <span className="block aspect-[4/5] overflow-hidden rounded-card"><BannerArt id={person.id} initial={person.name.replace(/^Dr\.?\s+/, "")[0]} src={person.photo} /></span>
       <span className="mt-2 flex items-center gap-1 t-headline">{person.name}<VerifiedBadge level={person.level} /></span>
       <span className="t-subhead mt-0.5 block text-text-muted">{person.line}</span>
       {person.fit && <span className={cx("t-subhead mt-0.5 block", person.bridge ? "text-bridge" : "text-text-muted")}>{person.fit}</span>}
@@ -54,7 +54,7 @@ export function StartupTileCard({ startup }: { startup: StartupTile }) {
   const status = state === "roles" ? `Hiring · ${startup.openRoles} ${startup.openRoles === 1 ? "role" : "roles"}` : state === "none" ? startup.fit ?? "Not hiring right now" : "Hiring";
   return (
     <Link href={startupHref(startup.id)} className="block min-w-0 active:opacity-80">
-      <span className="block aspect-square overflow-hidden rounded-card"><PatternArt id={`s${startup.id}`} initial={startup.name[0]} banner /></span>
+      <span className="block aspect-square overflow-hidden rounded-card"><BannerArt id={`s${startup.id}`} initial={startup.name[0]} src={startup.logo} /></span>
       <span className="t-headline mt-2 block">{startup.name}</span>
       <span className="t-subhead mt-0.5 block text-text-muted">{metaLine(startup.sector, kmOrNull(startup.km))}</span>
       <span className="t-subhead mt-0.5 block text-text-muted">{status}</span>
@@ -102,7 +102,7 @@ export function PromotedSlot({ promotion, onHide }: { promotion: Promotion; onHi
         <JobRowItem job={promotion.job} className="pt-1" />
       ) : (
         <Link href={startupHref(promotion.startup.id)} className="flex items-center gap-4 border-b border-separator px-4 pb-4 pt-1 active:opacity-80 lg:px-0">
-          <Avatar id={`s${promotion.startup.id}`} name={promotion.startup.name} size={44} shape="square" />
+          <Avatar id={`s${promotion.startup.id}`} name={promotion.startup.name} src={promotion.startup.logo} size={44} shape="square" />
           <span className="min-w-0 flex-1">
             <span className="t-headline block">{promotion.startup.name}</span>
             <span className="t-subhead block text-text-muted">{metaLine(promotion.startup.sector, kmOrNull(promotion.startup.km), promotion.startup.hiring ? "Hiring" : null)}</span>

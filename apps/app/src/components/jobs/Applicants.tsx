@@ -51,7 +51,7 @@ function Applicant({ a, rank, jobId, name }: { a: ApplicantRow; rank: number; jo
   return (
     <article aria-label={`${rank}. ${a.name}`} className="border-b border-separator px-4 lg:px-0 py-5">
       <div className="flex items-start gap-4">
-        <Avatar id={a.studentId} name={a.name} size={44} />
+        <Avatar id={a.studentId} name={a.name} src={a.photo} size={44} />
         <div className="min-w-0 flex-1">
           <h2 className="t-headline"><span className="num text-text-muted">{rank}.</span> {a.name}</h2>
           <p className="t-subhead text-text-muted">{a.fit} · applied {a.when === "now" ? "just now" : `${a.when} ago`}</p>

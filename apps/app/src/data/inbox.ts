@@ -13,7 +13,7 @@ export type Folder = "chats" | "requests";
 
 export type InboxRow = {
   id: number;
-  other: { id: number; name: string };
+  other: { id: number; name: string; photo: string | null };
   /** The last message in one line: "You: Sent the repo link." or "Photo". */
   preview: string;
   /** "9:41 am", "Yesterday", "Tue", "12 Oct" (IST). */
@@ -45,7 +45,7 @@ export function previewOf(m: Conv["last_message"]): string {
 
 export const toInboxRow = (c: Conv): InboxRow => ({
   id: c.id,
-  other: { id: c.other.id, name: c.other.display_name },
+  other: { id: c.other.id, name: c.other.display_name, photo: c.other.photo ?? null },
   preview: previewOf(c.last_message),
   time: inboxTime(c.last_message_at),
   unread: c.unread > 0,
@@ -89,7 +89,7 @@ export function useInboxDot(): boolean {
   return (q.data?.chats ?? 0) + (q.data?.requests ?? 0) > 0;
 }
 
-export type Connection = { id: number; name: string; line: string };
+export type Connection = { id: number; name: string; photo: string | null; line: string };
 
 /** People the viewer is connected to: who "New message" can write to. */
 export function useConnections(enabledNow = true) {
@@ -98,7 +98,7 @@ export function useConnections(enabledNow = true) {
     queryKey: key,
     enabled: enabled && enabledNow,
     queryFn: async (): Promise<Connection[]> =>
-      (await unwrap(api.GET("/api/connections"))).map((a) => ({ id: a.id, name: a.display_name, line: [roleLabel(a.role), a.city].filter(Boolean).join(" · ") })),
+      (await unwrap(api.GET("/api/connections"))).map((a) => ({ id: a.id, name: a.display_name, photo: a.photo ?? null, line: [roleLabel(a.role), a.city].filter(Boolean).join(" · ") })),
   });
 }
 
@@ -123,7 +123,7 @@ export function useStartConversation() {
   });
 }
 
-export type ConnectionRequestRow = { id: number; from: { id: number; name: string; line: string }; note: string };
+export type ConnectionRequestRow = { id: number; from: { id: number; name: string; photo: string | null; line: string }; note: string };
 
 /** People who asked to connect with the viewer and are waiting for an answer (newest first). */
 export function useConnectionRequests() {
@@ -135,7 +135,7 @@ export function useConnectionRequests() {
     queryFn: async (): Promise<ConnectionRequestRow[]> =>
       (await unwrap(api.GET("/api/connections/requests", { params: { query: { box: "incoming" } } }))).map((r) => ({
         id: r.id,
-        from: { id: r.sender.id, name: r.sender.display_name, line: [r.sender.headline || roleLabel(r.sender.role), r.sender.city].filter(Boolean).join(" · ") },
+        from: { id: r.sender.id, name: r.sender.display_name, photo: r.sender.photo ?? null, line: [r.sender.headline || roleLabel(r.sender.role), r.sender.city].filter(Boolean).join(" · ") },
         note: r.note,
       })),
   });

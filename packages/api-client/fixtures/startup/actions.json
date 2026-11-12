@@ -49,6 +49,7 @@
         "job_title": "Associate – Backend development",
         "skill_match": 0.1,
         "startup_id": 10,
+        "startup_logo": null,
         "startup_name": "Kaviloop",
         "status": "applied"
       },
@@ -67,6 +68,7 @@
         "job_title": "Associate – Backend development",
         "skill_match": 0.1,
         "startup_id": 10,
+        "startup_logo": null,
         "startup_name": "Kaviloop",
         "status": "withdrawn"
       },

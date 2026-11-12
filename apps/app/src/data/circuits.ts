@@ -72,7 +72,7 @@ export function toCircuitView(c: Out): CircuitView {
   }
   const ordered = legs.length === 3 ? legs : c.legs;
   const label = (p: Schemas["PersonOut"]) => (p.id === meId ? "You" : firstName(p.display_name));
-  const members = ordered.map((l) => ({ id: l.giver.id, name: l.giver.display_name, label: label(l.giver), lit: consent.get(l.giver.id) === "accepted" })) as CircuitView["ring"]["members"];
+  const members = ordered.map((l) => ({ id: l.giver.id, name: l.giver.display_name, photo: l.giver.photo ?? null, label: label(l.giver), lit: consent.get(l.giver.id) === "accepted" })) as CircuitView["ring"]["members"];
   const accepted = members.filter((m) => m.lit).length;
   const closed = accepted === 3;
   const others = members.slice(1);

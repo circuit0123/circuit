@@ -13,8 +13,8 @@ const VERB: Record<Item["kind"], WireUpdate["verb"]> = {
 /** A Live wire item from the API as the UI package draws it. */
 export function toUpdate(it: Item): LiveWireItem {
   const who = it.actor
-    ? { id: it.actor.id, name: it.actor.display_name, level: it.actor.verification_level }
-    : { id: it.startup?.id ?? 0, name: it.startup?.name ?? "", level: 0 };
+    ? { id: it.actor.id, name: it.actor.display_name, level: it.actor.verification_level, photo: it.actor.photo ?? null }
+    : { id: it.startup?.id ?? 0, name: it.startup?.name ?? "", level: 0, photo: it.startup?.logo ?? null };
   const visual: WireUpdate["visual"] = it.image
     ? { kind: "image", src: it.image.w1440, alt: it.image.alt }
     : it.kind === "circuit_closed"

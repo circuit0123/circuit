@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, PatternArt, cx } from "@circuit/ui";
+import { Avatar, BannerArt, cx } from "@circuit/ui";
 import Link from "next/link";
 import { hiringState, kmOrNull, metaLine, roleHref, startupHref, type JobRow, type StartupTile } from "@/data";
 
@@ -33,7 +33,7 @@ export function StartupCardV2({ startup }: { startup: StartupTile }) {
   const status = state === "roles" ? `Hiring · ${startup.openRoles} ${startup.openRoles === 1 ? "role" : "roles"}` : hiring ? "Hiring" : "Not hiring right now";
   return (
     <Link href={startupHref(startup.id)} className="block min-w-0 overflow-hidden rounded-[20px] border border-c-border bg-c-card">
-      <span className="block aspect-[4/3] overflow-hidden"><PatternArt id={`s${startup.id}`} initial={startup.name[0]} banner /></span>
+      <span className="block aspect-[4/3] overflow-hidden"><BannerArt id={`s${startup.id}`} initial={startup.name[0]} src={startup.logo} /></span>
       <span className="block p-3">
         <span className="block truncate text-[17px] font-semibold tracking-[-0.02em]">{startup.name}</span>
         <span className="mt-0.5 block truncate text-[13px] text-c-muted">{metaLine(startup.sector, kmOrNull(startup.km))}</span>
@@ -47,7 +47,7 @@ export function StartupCardV2({ startup }: { startup: StartupTile }) {
 export function JobRowV2({ job, showStartup = true }: { job: JobRow; showStartup?: boolean }) {
   return (
     <Link href={roleHref(job.id)} data-feed-item className="mx-4 mb-2.5 flex items-end justify-between gap-3 rounded-2xl border border-c-border bg-c-card px-4 py-3.5 lg:mx-0">
-      {showStartup && <Avatar id={`s${job.startupId}`} name={job.startup} size={44} shape="square" className="self-start" />}
+      {showStartup && <Avatar id={`s${job.startupId}`} name={job.startup} src={job.logo} size={44} shape="square" className="self-start" />}
       <span className="min-w-0 flex-1">
         <span className="block text-[17px] font-semibold tracking-[-0.02em]">{job.title}</span>
         <span className="mt-0.5 block text-[13px] text-c-muted">{showStartup ? metaLine(job.startup, job.sector, kmOrNull(job.km)) : job.kind}</span>

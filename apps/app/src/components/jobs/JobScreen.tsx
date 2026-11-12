@@ -55,7 +55,7 @@ export function JobScreen({ id }: { id: number }) {
       {j && (
         <>
           <Link href={startupHref(j.startupId)} className="mx-4 lg:mx-0 flex items-center gap-3 active:opacity-80">
-            <Avatar id={`s${j.startupId}`} name={j.startup} size={40} shape="square" />
+            <Avatar id={`s${j.startupId}`} name={j.startup} src={j.logo} size={40} shape="square" />
             <span className="t-subhead text-text-muted">{metaLine(j.startup, j.sector, kmOrNull(j.km))}</span>
           </Link>
           <h1 className="t-large mx-4 lg:mx-0 mt-3">{j.title}</h1>

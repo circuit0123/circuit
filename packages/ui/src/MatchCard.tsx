@@ -24,7 +24,7 @@ export function MatchCard({ match, onOpen, onIntro, asked, className }: Props) {
     <article className={cx("flex flex-col gap-3", className)}>
       <p className="t-body max-w-[540px]">{match.reason}</p>
       <div className="flex min-h-row-sub items-center gap-4">
-        <Avatar id={p.id} name={p.name} size={44} />
+        <Avatar id={p.id} name={p.name} src={p.photo} size={44} />
         <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left">
           <span className="t-headline block">{p.name} <VerifiedBadge level={p.level} /></span>
           <span className="t-footnote block text-text-muted">{[p.role, p.place].filter(Boolean).join(" · ")}</span>

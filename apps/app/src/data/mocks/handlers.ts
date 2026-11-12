@@ -51,7 +51,7 @@ function config(s: Scenario): Schemas["ConfigOut"] {
 
 const person = (id: number): Schemas["PersonOut"] => {
   const p = Object.values(PEOPLE).find((x) => x.id === id) ?? PEOPLE.asha;
-  return { id: p.id, display_name: p.display_name, role: p.role, verification_level: p.verification_level };
+  return { id: p.id, display_name: p.display_name, role: p.role, verification_level: p.verification_level, photo: p.photo };
 };
 /** Mock people for the intro flow: Kavya (5) shares no connection with Ravi, Arjun (4) is already connected and has no slots left this week, everyone else is reached via Dr. Lakshmi. */
 const NO_PATH = 5;

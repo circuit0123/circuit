@@ -91,18 +91,21 @@
         {
           "hiring": true,
           "id": 8,
+          "logo": null,
           "name": "Aeroforge",
           "sector": "biotech"
         },
         {
           "hiring": true,
           "id": 10,
+          "logo": null,
           "name": "Kaviloop",
           "sector": "fintech"
         },
         {
           "hiring": true,
           "id": 3,
+          "logo": null,
           "name": "Pixelwave Labs",
           "sector": "saas"
         }

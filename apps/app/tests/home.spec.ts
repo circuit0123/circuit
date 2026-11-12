@@ -248,7 +248,8 @@ test("on a phone the picture comes first, edge to edge (DESIGN.md §4 Build log)
   await open(page);
   const post = page.getByRole("region", { name: "Pulse" }).locator("[data-feed-item]").first();
   const text = (await post.locator("p.t-body").first().boundingBox())!;
-  const picture = (await post.locator("img").first().boundingBox())!;
+  // The build log picture, not the author's avatar (avatars sit in an aria-hidden span and may now be real photos).
+  const picture = (await post.locator("img:not([aria-hidden] img)").first().boundingBox())!;
   expect(picture.y).toBeLessThan(text.y);
   expect(picture.width).toBe(375);
 });
@@ -288,7 +289,7 @@ test.describe("Desktop Home (Desktop.dc.html)", () => {
     await open(page);
     const post = page.getByRole("region", { name: "Pulse" }).locator("[data-feed-item]").first();
     const text = (await post.locator("p.t-body").first().boundingBox())!;
-    const picture = (await post.locator("img").first().boundingBox())!;
+    const picture = (await post.locator("img:not([aria-hidden] img)").first().boundingBox())!;
     expect(text.y).toBeLessThan(picture.y);
     const reactions = (await post.getByRole("group", { name: "React" }).boundingBox())!;
     expect(reactions.y).toBeGreaterThan(picture.y + picture.height - 1);

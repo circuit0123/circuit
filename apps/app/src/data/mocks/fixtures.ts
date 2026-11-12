@@ -8,8 +8,12 @@ import type { Schemas } from "@circuit/api-client";
 
 const minutes = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
 
+/** A flat-colour square standing in for an uploaded photo, so mock mode shows both states: a few people with a picture, the rest with the pattern. */
+const swatch = (fill: string) => `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="${fill}"/></svg>`)}`;
+const MOCK_PHOTOS: Record<number, string> = { 2: swatch("#c2410c"), 3: swatch("#0f766e"), 4: swatch("#4338ca"), 7: swatch("#a16207") };
+
 export const author = (id: number, display_name: string, role: string, headline: string, city = "Chennai", verification_level = 1) =>
-  ({ id, display_name, role, headline, city, verification_level }) satisfies Schemas["AuthorOut"];
+  ({ id, display_name, role, headline, city, verification_level, photo: MOCK_PHOTOS[id] ?? null }) satisfies Schemas["AuthorOut"];
 
 export const PEOPLE = {
   me: author(1, "Ravi Kumar", "student", "Frontend developer, third year", "Chennai", 1),

@@ -102,6 +102,16 @@ def test_blocked_people_vanish_from_my_connection_list(make_member, connect, blo
 
 
 # -- follows ------------------------------------------------------------------------------------------
+def test_followed_startups_carry_their_logo(make_member, make_startup, client_for):
+    me = make_member("student")
+    s = make_startup("Acme", "acme.io", logo_path="avatar/1/logo")
+    plain = make_startup("Plain", "plain.io")
+    for st in (s, plain):
+        client_for(me).post(f"/api/startups/{st.pk}/follow")
+    rows = {r["id"]: r for r in client_for(me).get("/api/me/follows").json()}
+    assert rows[s.pk]["logo"].startswith("http") and rows[plain.pk]["logo"] is None
+
+
 def test_follow_unfollow_are_safe_to_repeat_and_private(make_member, make_startup, client_for):
     me, other = make_member("student"), make_member("student")
     s = make_startup("Acme", "acme.io", hiring=True, sector="fintech")
@@ -109,7 +119,7 @@ def test_follow_unfollow_are_safe_to_repeat_and_private(make_member, make_startu
     assert c.post(f"/api/startups/{s.pk}/follow").status_code == 204
     assert c.post(f"/api/startups/{s.pk}/follow").status_code == 204
     assert Follow.objects.count() == 1 and Event.objects.filter(type="follow.added").count() == 1
-    assert c.get("/api/me/follows").json() == [{"id": s.pk, "name": "Acme", "sector": "fintech", "hiring": True}]
+    assert c.get("/api/me/follows").json() == [{"id": s.pk, "name": "Acme", "sector": "fintech", "hiring": True, "logo": None}]
     assert client_for(other).get("/api/me/follows").json() == []
     assert c.delete(f"/api/startups/{s.pk}/follow").status_code == 204
     assert c.delete(f"/api/startups/{s.pk}/follow").status_code == 204

@@ -28,7 +28,7 @@ export function Applications() {
             {apps.data.map((a) => (
               <li key={a.id}>
                 <Link href={roleHref(a.jobId)} className="flex items-center gap-4 border-b border-separator px-4 lg:px-0 py-3 active:opacity-80">
-                  <Avatar id={`s${a.startupId}`} name={a.startup} size={44} shape="square" />
+                  <Avatar id={`s${a.startupId}`} name={a.startup} src={a.logo} size={44} shape="square" />
                   <span className="min-w-0 flex-1">
                     <span className="t-headline block">{a.title}</span>
                     <span className="t-subhead block text-text-muted">{a.startup} · applied {a.when === "now" ? "just now" : `${a.when} ago`}</span>

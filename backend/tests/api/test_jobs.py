@@ -214,6 +214,31 @@ def test_applicants_ranked_by_skill_match_not_college(team, make_member, client_
     assert "college" not in rows[0] and {s["capability"] for s in rows[0]["skills"]} == {"frontend-dev", "seo"}
 
 
+def test_applicants_carry_a_photo_but_never_a_minors(team, make_member, client_for):
+    founder, startup = team
+    job = add_job(startup, ["seo"])
+    adult = make_member("student", photo_path="avatar/1/adult")
+    minor = make_member("student", photo_path="avatar/2/minor", is_minor=True)
+    bare = make_member("student")
+    for s in (adult, minor, bare):
+        client_for(s).post(f"/api/jobs/{job.pk}/apply")
+    rows = {r["student_id"]: r for r in client_for(founder).get(f"/api/jobs/{job.pk}/applicants").json()["items"]}
+    assert rows[adult.pk]["photo"].startswith("http")
+    assert rows[minor.pk]["photo"] is None and rows[bare.pk]["photo"] is None
+
+
+def test_removing_a_photo_shows_no_photo_everywhere(team, make_member, client_for):
+    founder, startup = team
+    job = add_job(startup, ["seo"])
+    student = make_member("student", photo_path="avatar/1/mine")
+    c = client_for(student)
+    c.post(f"/api/jobs/{job.pk}/apply")
+    assert c.get("/api/me").json()["photo"].startswith("http")
+    assert c.delete("/api/me/photo").status_code in (200, 204)
+    assert c.get("/api/me").json()["photo"] is None
+    assert client_for(founder).get(f"/api/jobs/{job.pk}/applicants").json()["items"][0]["photo"] is None
+
+
 def test_applicants_hide_withdrawn_and_are_team_only(team, make_member, make_startup, client_for):
     founder, startup = team
     job = add_job(startup, ["seo"])
@@ -251,3 +276,14 @@ def test_status_change_on_another_startups_application_is_404(team, make_member,
     StartupMember.objects.create(startup=Startup.objects.get(website_domain="theirs.io"), member=stranger, role="founder")
     assert client_for(stranger).patch(f"/api/applications/{app_id}", {"status": "shortlisted"}).status_code == 404
     assert Application.objects.get(pk=app_id).status == "applied"
+
+
+def test_my_applications_carry_the_startups_logo(team, make_member, client_for):
+    founder, startup = team
+    startup.logo_path = "avatar/1/logo"
+    startup.save()
+    job = add_job(startup, ["seo"])
+    student = make_member("student")
+    c = client_for(student)
+    c.post(f"/api/jobs/{job.pk}/apply")
+    assert c.get("/api/me/applications").json()["items"][0]["startup_logo"].startswith("http")

@@ -5,6 +5,7 @@ from ninja import Field, Router, Schema, Status
 from apps.accounts.models import Member
 from apps.organisations import services
 from apps.organisations.models import Organisation
+from apps.social import media
 from core.auth import current_context, current_member
 from core.errors import NotFound
 from core.pagination import Page, PageParams, Query, paginate
@@ -32,6 +33,7 @@ class OrgMemberOut(Schema):
     role: str
     college: str
     verification_level: int
+    photo: str | None = None  # signed link to their profile photo, or null (also null for under-18s)
 
 
 def _org_out(org: Organisation, member: Member) -> dict:
@@ -116,7 +118,16 @@ def leave(request):
 def members(request, params: PageParams = Query(...)):
     org_id = require_org_admin(current_member(request))
     qs = Member.objects.filter(organisation_id=org_id, visible_to_org=True, suspended_at__isnull=True).order_by("id")
-    return paginate(qs, params)
+    page = paginate(qs, params)
+    media.prime_photos(page["items"])  # one storage call for the whole page
+    page["items"] = [
+        {
+            "id": m.pk, "display_name": m.display_name, "role": m.role, "college": m.college,
+            "verification_level": m.verification_level, "photo": media.photo_of(m),
+        }
+        for m in page["items"]
+    ]  # fmt: skip
+    return page
 
 
 @router.delete(

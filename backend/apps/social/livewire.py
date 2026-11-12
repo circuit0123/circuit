@@ -118,6 +118,15 @@ def _shipped(member: Member, since, circle: set[int]) -> list[Candidate]:
     return out
 
 
+def _logos(startup_ids) -> dict[int, str | None]:
+    """{startup id: signed logo link or None} for the startups shown on the wire, in one storage call."""
+    from apps.startups.models import Startup
+
+    startups = list(Startup.objects.filter(pk__in=set(startup_ids)))
+    media.prime_logos(startups)
+    return {s.pk: media.logo_of(s) for s in startups}
+
+
 def _hiring(member: Member, since) -> list[Candidate]:
     startups = pulse.followed_startups(member)
     out = []
@@ -230,10 +239,11 @@ def live_wire(member: Member) -> list[dict]:
             per_kind[c["kind"]] = per_kind.get(c["kind"], 0) + 1
             picked.append(c)
     media.prime_photos(c["member"] for c in picked[:MAX_ITEMS] if c["member"])
+    logos = _logos(c["startup"]["id"] for c in picked[:MAX_ITEMS] if c.get("startup"))
     return [
         {
             "key": c["key"], "kind": c["kind"], "actor": author(c["member"]) if c["member"] else None,
-            "startup": c.get("startup"), "image": c["image"], "headline": c["headline"], "reason": c["reason"],
+            "startup": {**c["startup"], "logo": logos.get(c["startup"]["id"])} if c.get("startup") else None, "image": c["image"], "headline": c["headline"], "reason": c["reason"],
             "action": c["action"], "created_at": c["at"], "seen": c["key"] in viewed,
         }
         for c in picked[:MAX_ITEMS]
