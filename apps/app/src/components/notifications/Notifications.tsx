@@ -52,7 +52,7 @@ export function Notifications() {
 function Row({ n, onOpen }: { n: NotificationRow; onOpen: () => void }) {
   return (
     <Link href={n.href} onClick={onOpen} className="flex min-h-14 items-start gap-4 px-4 py-3.5 active:opacity-80">
-      <Avatar id={n.actor?.id ?? `n${n.id}`} name={n.actor?.name ?? "Circuit"} size={40} />
+      <Avatar id={n.actor?.id ?? `n${n.id}`} name={n.actor?.name ?? "Circuit"} src={n.actor?.photo ?? null} size={40} />
       <span className="min-w-0 flex-1">
         <span className="t-body block leading-[1.35]">{n.text}</span>
         <span className="t-subhead mt-0.5 block text-text-subtle">{n.time}</span>

@@ -22,7 +22,7 @@ export type DropCard = {
   /** The capability they offer that you need, e.g. "mentoring". */
   helpWith?: string | null;
   /** Best mutual connection, e.g. Meera, mentor. */
-  via?: { id: number; name: string; photo?: string | null; role: string } | null;
+  via?: { id: number; name: string; photo: string | null; role: string } | null;
   /** Their best build log image, used when they have no photo. */
   image?: { src: string; alt: string } | null;
   /** Up to 3 things they offer that you need. */

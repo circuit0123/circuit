@@ -8,6 +8,7 @@ from apps.accounts.models import Role
 from apps.jobs import services
 from apps.jobs.models import Application
 from apps.matching.models import MemberSkill
+from apps.social import media
 from core.auth import current_member
 from core.pagination import Page, PageParams, paginate
 from core.permissions import require_role
@@ -169,6 +170,7 @@ class ApplicationOut(Schema):
     job_title: str
     startup_id: int
     startup_name: str
+    startup_logo: str | None = None  # signed link, or null (draw the circuit-pattern square)
     status: str
     skill_match: float
     created_at: datetime
@@ -189,6 +191,7 @@ class ApplicantOut(Schema):
     skill_match: float
     skills: list[ApplicantSkill]
     applied_at: datetime
+    photo: str | None = None  # signed link to their profile photo, or null (also null for under-18s)
 
 
 class StatusIn(Schema):
@@ -198,7 +201,7 @@ class StatusIn(Schema):
 def _application(a: Application) -> dict:
     return {
         "id": a.pk, "job_id": a.job_id, "job_title": a.job.title, "startup_id": a.job.startup_id, "startup_name": a.job.startup.name,
-        "status": a.status, "skill_match": a.skill_match, "created_at": a.created_at,
+        "startup_logo": media.logo_of(a.job.startup), "status": a.status, "skill_match": a.skill_match, "created_at": a.created_at,
     }  # fmt: skip
 
 
@@ -226,7 +229,10 @@ def apply(request, job_id: int):
 def my_applications(request, params: PageParams = Query(...)):
     member = current_member(request)
     require_role(member, Role.STUDENT)
-    return paginate(services.my_applications(member), params, _application)
+    page = paginate(services.my_applications(member), params)
+    media.prime_logos(a.job.startup for a in page["items"])  # one storage call for the whole page
+    page["items"] = [_application(a) for a in page["items"]]
+    return page
 
 
 @router.post(
@@ -257,10 +263,11 @@ def applicants(request, job_id: int, params: PageParams = Query(...)):
     ids = [a.student_id for a in page["items"]]
     for s in MemberSkill.objects.filter(member_id__in=ids).select_related("capability").order_by("-level", "id"):
         by_student.setdefault(s.member_id, []).append(s)  # one query for the whole page, not one per applicant
+    media.prime_photos(a.student for a in page["items"])  # one storage call for the whole page
     page["items"] = [
         {
             "application_id": a.pk, "student_id": a.student_id, "display_name": a.student.display_name, "status": a.status,
-            "skill_match": a.skill_match, "applied_at": a.created_at,
+            "skill_match": a.skill_match, "applied_at": a.created_at, "photo": media.photo_of(a.student),
             "skills": [
                 {"capability": s.capability.slug, "name": s.capability.name, "level": s.level, "proof_url": s.proof_url}
                 for s in by_student.get(a.student_id, [])

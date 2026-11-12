@@ -329,6 +329,7 @@ class WireImageOut(Schema):
 class WireStartupOut(Schema):
     id: int
     name: str
+    logo: str | None = None  # signed link, or null (draw the circuit-pattern square)
 
 
 class WireActionOut(Schema):
@@ -431,6 +432,7 @@ class FollowedStartupOut(Schema):
     name: str
     sector: str
     hiring: bool
+    logo: str | None = None  # signed link, or null (draw the circuit-pattern square)
 
 
 @router.post("/startups/{startup_id}/follow", response={204: None}, summary="Follow a startup", description="Safe to repeat.")
@@ -452,9 +454,9 @@ def unfollow(request, startup_id: int):
     description="Newest first. Only I can see this list.",
 )
 def my_follows(request):
-    return [
-        {"id": s.pk, "name": s.name, "sector": s.sector, "hiring": s.hiring} for s in services.my_follows(current_member(request))
-    ]
+    startups = services.my_follows(current_member(request))
+    media.prime_logos(startups)  # one storage call for the whole list
+    return [{"id": s.pk, "name": s.name, "sector": s.sector, "hiring": s.hiring, "logo": media.logo_of(s)} for s in startups]
 
 
 # -- connections ---------------------------------------------------------------------------------------

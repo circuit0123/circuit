@@ -2349,6 +2349,8 @@ export interface components {
             applied_at: string;
             /** Display Name */
             display_name: string;
+            /** Photo */
+            photo?: string | null;
             /** Skill Match */
             skill_match: number;
             /** Skills */
@@ -2386,6 +2388,8 @@ export interface components {
             skill_match: number;
             /** Startup Id */
             startup_id: number;
+            /** Startup Logo */
+            startup_logo?: string | null;
             /** Startup Name */
             startup_name: string;
             /** Status */
@@ -2785,6 +2789,8 @@ export interface components {
             hiring: boolean;
             /** Id */
             id: number;
+            /** Logo */
+            logo?: string | null;
             /** Name */
             name: string;
             /** Sector */
@@ -3533,6 +3539,8 @@ export interface components {
             display_name: string;
             /** Id */
             id: number;
+            /** Photo */
+            photo?: string | null;
             /** Role */
             role: string;
             /** Verification Level */
@@ -4431,6 +4439,8 @@ export interface components {
         WireStartupOut: {
             /** Id */
             id: number;
+            /** Logo */
+            logo?: string | null;
             /** Name */
             name: string;
         };

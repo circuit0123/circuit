@@ -1,6 +1,6 @@
 # Circuit — Frontend handoff
 
-**API version:** 1.3.0 (frozen). Any change to `packages/api-client/openapi.json` needs a higher version here and in `backend/circuit/api.py`, and an entry in section 3; `make api-freeze` (and CI) fails otherwise.
+**API version:** 1.3.1 (frozen). Any change to `packages/api-client/openapi.json` needs a higher version here and in `backend/circuit/api.py`, and an entry in section 3; `make api-freeze` (and CI) fails otherwise.
 
 What the app's data layer (`apps/app/src/data`) can rely on from the backend. One section per screen: the hook that serves it, the
 endpoints it calls, what comes back, which errors to draw, the Realtime channels and the rate limits.
@@ -222,7 +222,7 @@ Founders post roles with `POST /api/jobs` and edit or close them with `PATCH /ap
 **Hooks:** `useApplicants`, `useSetApplicantStatus`.
 | Call | Returns |
 |---|---|
-| `GET /api/jobs/{id}/applicants` | `Page<ApplicantOut>` `{application_id, student_id, display_name, status, skill_match, skills[{capability (slug), name, level, proof_url}], applied_at}`, best match first. Nothing about colleges. One query for all the skills |
+| `GET /api/jobs/{id}/applicants` | `Page<ApplicantOut>` `{application_id, student_id, display_name, photo?, status, skill_match, skills[{capability (slug), name, level, proof_url}], applied_at}`, best match first. Nothing about colleges. One query for all the skills |
 | `PATCH /api/applications/{id}` `{status: shortlisted|rejected|hired}` | `ApplicationOut`; `409 invalid_transition`; someone else's is `404` |
 
 **Fixtures:** `applicants/default.json`.
@@ -335,6 +335,11 @@ Fixtures `errors/{signed_out,default,rate_limited,beta_required}.json` show 401,
 | Profile highlights, GitHub summary | not scheduled | |
 
 ## 3. What changed in the API in B7 (for switching hooks from mocks)
+
+API 1.3.1 (photos and logos): four responses gain a picture, so the app can draw it instead of the circuit pattern. `ApplicantOut` and
+`OrgMemberOut` gain `photo` (signed link or null; always null for under-18s). `WireStartupOut` and `FollowedStartupOut` gain `logo`, and
+`ApplicationOut` gains `startup_logo` (signed link or null). Nothing else changed. Every screen now passes `photo` / `logo` to `Avatar` (its `src` is required; `null` means the circuit
+pattern, which is also what a member gets after choosing "Remove photo").
 
 B7 part 4 (API 1.3.0): `PinOut` (map, nearby, search) and `StartupOut` gain `careers_url` (string or null). Nothing else changed.
 

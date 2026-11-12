@@ -145,6 +145,7 @@
           "seen": false,
           "startup": {
             "id": 100,
+            "logo": null,
             "name": "Sutragrid"
           }
         },
@@ -163,6 +164,7 @@
           "seen": false,
           "startup": {
             "id": 41,
+            "logo": null,
             "name": "Tatvagrid"
           }
         },
@@ -181,6 +183,7 @@
           "seen": false,
           "startup": {
             "id": 31,
+            "logo": null,
             "name": "Zetapulse"
           }
         },

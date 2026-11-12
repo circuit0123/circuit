@@ -49,10 +49,10 @@ export function Person({ id }: { id: number }) {
 function Head({ p }: { p: PersonView }) {
   const v2 = useUiV2();
   const mutuals = p.mutuals ? `${p.mutuals} mutual connection${p.mutuals === 1 ? "" : "s"}` : null;
-  if (v2) return <ProfileHeroV2 id={p.id} name={p.name} level={p.level} line={[p.line, mutuals].filter(Boolean).join(" · ")} org={p.org} />;
+  if (v2) return <ProfileHeroV2 id={p.id} name={p.name} level={p.level} line={[p.line, mutuals].filter(Boolean).join(" · ")} org={p.org} photo={p.photo} />;
   return (
     <header>
-      <Avatar id={p.id} name={p.name} size={96} />
+      <Avatar id={p.id} name={p.name} src={p.photo} size={96} />
       <h1 className="t-large mt-4 flex flex-wrap items-center gap-2">{p.name}<VerifiedBadge level={p.level} className="[&>svg]:h-5 [&>svg]:w-5" /></h1>
       <p className="t-subhead mt-1 text-text-muted">{[p.line, mutuals].filter(Boolean).join(" · ")}</p>
       {p.org && <p className="t-subhead text-text-muted">{p.org}</p>}

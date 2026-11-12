@@ -91,7 +91,7 @@ export function Inbox() {
 function RowV2({ r }: { r: InboxRow }) {
   return (
     <Link href={conversationHref(r.id)} className="flex items-center gap-3 border-b border-[#1f2024] px-4 py-3 text-c-text lg:px-0" data-unread={r.unread ? "" : undefined}>
-      <Avatar id={r.other.id} name={r.other.name} size={44} />
+      <Avatar id={r.other.id} name={r.other.name} src={r.other.photo} size={44} />
       <span className="min-w-0 flex-1">
         <span className="flex justify-between gap-2">
           <span className={cx("min-w-0 truncate text-[15px]", r.unread ? "font-semibold" : "font-normal")}>{r.other.name}</span>
@@ -109,7 +109,7 @@ function RowV2({ r }: { r: InboxRow }) {
 function Row({ r }: { r: InboxRow }) {
   return (
     <Link href={conversationHref(r.id)} className="flex min-h-[72px] items-center gap-4 px-4 active:opacity-80 lg:px-0" data-unread={r.unread ? "" : undefined}>
-      <Avatar id={r.other.id} name={r.other.name} size={44} />
+      <Avatar id={r.other.id} name={r.other.name} src={r.other.photo} size={44} />
       <span className="flex min-w-0 flex-1 flex-col justify-center self-stretch border-b border-separator py-3.5">
         <span className="flex items-baseline justify-between gap-2">
           <span className={cx("t-body min-w-0", r.unread ? "font-semibold" : "font-normal")}>{r.other.name}</span>
@@ -143,7 +143,7 @@ function NewMessageSheet({ open, onClose }: { open: boolean; onClose: () => void
           {people.data.map((p) => (
             <li key={p.id}>
               <button type="button" onClick={() => go(p.id)} className="flex min-h-16 w-full items-center gap-4 text-left active:opacity-80">
-                <Avatar id={p.id} name={p.name} size={40} />
+                <Avatar id={p.id} name={p.name} src={p.photo} size={40} />
                 <span className="min-w-0 flex-1 border-b border-separator py-3">
                   <span className="t-body block">{p.name}</span>
                   <span className="t-subhead block text-text-muted">{p.line}</span>

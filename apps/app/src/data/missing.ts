@@ -40,7 +40,7 @@ export const PROMOTED_STARTUP_STAND_IN = {
   why: "Promoted to people in Chennai interested in mobile apps.",
 } as const;
 
-export type StartupFounder = { id: number; name: string; role: string; level: number };
+export type StartupFounder = { id: number; name: string; photo: string | null; role: string; level: number };
 export type StartupLog = { id: number; src: string; alt: string };
 
 /** A believable screenshot for a build log tile (DESIGN.md §5 Imagery): a title and three rows of real-looking data. */
@@ -56,7 +56,7 @@ function screen(title: string, rows: Array<[string, string]>) {
 export const STARTUP_EXTRAS: Record<number, { teamSize: number; founders: StartupFounder[]; logs: StartupLog[] }> = {
   41: {
     teamSize: 6,
-    founders: [{ id: 4, name: "Arjun Mehta", role: "Founder", level: 3 }, { id: 3, name: "Priya Nair", role: "Co-founder", level: 2 }],
+    founders: [{ id: 4, name: "Arjun Mehta", photo: null, role: "Founder", level: 3 }, { id: 3, name: "Priya Nair", photo: null, role: "Co-founder", level: 2 }],
     logs: [
       { id: 101, src: screen("Stock today · Adyar", [["Paracetamol 500 mg", "1,240"], ["ORS sachets", "860"], ["Gloves (M)", "412"]]), alt: "Stock screen listing three medicines and units in stock" },
       { id: 111, src: screen("Reorder by Friday", [["Thermometers", "₹28,500"], ["Gloves (M)", "₹24,720"], ["ORS sachets", "₹10,320"]]), alt: "Reorder list with three items and their value in rupees" },
@@ -65,7 +65,7 @@ export const STARTUP_EXTRAS: Record<number, { teamSize: number; founders: Startu
   },
   42: {
     teamSize: 4,
-    founders: [{ id: 8, name: "Divya Menon", role: "Founder", level: 2 }],
+    founders: [{ id: 8, name: "Divya Menon", photo: null, role: "Founder", level: 2 }],
     logs: [{ id: 121, src: screen("Today's soil reading", [["Moisture", "31%"], ["Nitrogen", "Low"], ["Next watering", "Thu"]]), alt: "One farm's soil reading with moisture, nitrogen and the next watering day" }],
   },
 };

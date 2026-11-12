@@ -18,7 +18,7 @@ export type WireUpdate = {
   key: string;
   verb: WireVerb;
   visual: WireVisualData;
-  person: { id: number; name: string; photo?: string | null; level: number };
+  person: { id: number; name: string; photo: string | null; level: number };
   seen: boolean;
   /** Short relative time such as "4h". */
   when: string;

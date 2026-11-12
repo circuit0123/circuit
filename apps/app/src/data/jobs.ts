@@ -54,7 +54,7 @@ const FOUNDER_STATUS: Record<string, string> = { submitted: "New" };
 const STATUS: Record<string, string> = { submitted: "Sent", shortlisted: "Shortlisted", rejected: "Not selected", hired: "Hired", withdrawn: "Withdrawn" };
 export const applicationStatus = (s: string) => STATUS[s] ?? s;
 
-export type ApplicationRow = { id: number; jobId: number; title: string; startup: string; startupId: number; status: string; statusKey: string; when: string };
+export type ApplicationRow = { id: number; jobId: number; title: string; startup: string; startupId: number; logo: string | null; status: string; statusKey: string; when: string };
 
 /** "My applications": newest first, with a status in plain words. */
 export function useMyApplications() {
@@ -64,7 +64,7 @@ export function useMyApplications() {
     enabled,
     queryFn: async (): Promise<ApplicationRow[]> =>
       (await unwrap(api.GET("/api/me/applications", { params: { query: { limit: 50 } } }))).items.map((a) => ({
-        id: a.id, jobId: a.job_id, title: a.job_title, startup: a.startup_name, startupId: a.startup_id, status: applicationStatus(a.status), statusKey: a.status, when: ago(a.created_at),
+        id: a.id, jobId: a.job_id, title: a.job_title, startup: a.startup_name, startupId: a.startup_id, logo: a.startup_logo ?? null, status: applicationStatus(a.status), statusKey: a.status, when: ago(a.created_at),
       })),
   });
 }
@@ -73,6 +73,7 @@ export type ApplicantRow = {
   applicationId: number;
   studentId: number;
   name: string;
+  photo: string | null;
   fit: string;
   skills: Array<{ name: string; level: number; proof: string }>;
   status: string;
@@ -96,6 +97,7 @@ export function useApplicants(jobId: number) {
         applicationId: a.application_id,
         studentId: a.student_id,
         name: a.display_name,
+        photo: a.photo ?? null,
         fit: skillFit(a.skill_match) ?? "Some of the skills",
         skills: a.skills.map((s) => ({ name: s.capability, level: s.level, proof: s.proof_url })),
         status: FOUNDER_STATUS[a.status] ?? applicationStatus(a.status),

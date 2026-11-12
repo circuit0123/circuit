@@ -64,7 +64,7 @@ export function useDailyDrop() {
           helpWith: c.help_with,
           offers: c.offers_you_need,
           strength: c.strength,
-          via: c.via ? { id: c.via.id, name: c.via.display_name, role: roleLabel(c.via.role) } : null,
+          via: c.via ? { id: c.via.id, name: c.via.display_name, role: roleLabel(c.via.role), photo: c.via.photo ?? null } : null,
           image: c.image ? { src: c.image.w1440, alt: c.image.alt } : null,
           bridge: c.is_bridge,
           answered: (c.outcome as "intro" | "skip" | null) ?? null,
@@ -186,7 +186,7 @@ export function useMatches(opts: { limit?: number; offset?: number } = {}) {
       const page = await unwrap(api.GET("/api/matches", { params: { query: { limit, offset } } }));
       const items: MatchView[] = page.items.map((m) => ({
         id: m.candidate_id,
-        person: { id: m.candidate_id, name: m.display_name, role: roleLabel(m.role), headline: "", place: m.city, level: m.verification_level },
+        person: { id: m.candidate_id, name: m.display_name, role: roleLabel(m.role), headline: "", place: m.city, level: m.verification_level, photo: m.photo ?? null },
         strength: m.strength,
         reason: m.reason,
         bridge: m.is_bridge,

@@ -67,7 +67,7 @@ function Page({ s }: { s: StartupPage }) {
   return (
     <>
       <header className="px-4 lg:px-0">
-        <Avatar id={`s${s.id}`} name={s.name} size={64} shape="square" />
+        <Avatar id={`s${s.id}`} name={s.name} src={s.logo} size={64} shape="square" />
         <h1 className="t-large mt-4">{s.name}</h1>
         <p className="t-subhead mt-1 text-text-muted">{metaLine(s.sector, s.stage, s.teamSize ? `${s.teamSize} people` : null)}</p>
         <p className="t-subhead text-text-muted">{metaLine(s.place, kmOrNull(s.km))}</p>
@@ -157,7 +157,7 @@ function Founder({ f, minor, self }: { f: StartupFounder; minor: boolean; self: 
   const via = path.data?.via;
   return (
     <div className="flex min-h-row-sub items-center gap-4 px-4 lg:px-0 py-2">
-      <Avatar id={f.id} name={f.name} size={44} />
+      <Avatar id={f.id} name={f.name} src={f.photo} size={44} />
       <div className="min-w-0 flex-1">
         <p className="t-headline flex items-center gap-1">{f.name}<VerifiedBadge level={f.level} /></p>
         <p className="t-subhead text-text-muted">{f.role}</p>

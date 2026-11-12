@@ -21,7 +21,7 @@ export function Blocked() {
               key={p.id}
               title={p.name}
               subtitle={p.role}
-              leading={<Avatar id={p.id} name={p.name} size={40} />}
+              leading={<Avatar id={p.id} name={p.name} src={p.photo} size={40} />}
               trailing={
                 <button
                   type="button"

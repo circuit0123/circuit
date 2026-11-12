@@ -31,7 +31,7 @@ export type BubbleDay = { day: string; items: Bubble[] };
 
 export type ConversationHead = {
   id: number;
-  other: { id: number; name: string; line: string };
+  other: { id: number; name: string; photo: string | null; line: string };
   /** `received`: a request to the viewer, waiting for Accept. `sent`: the viewer's own request, waiting for the other person. */
   request: "received" | "sent" | null;
 };
@@ -201,7 +201,7 @@ export function useConversation(id: number) {
 
   const head: ConversationHead | undefined = c && {
     id: c.id,
-    other: { id: c.other.id, name: c.other.display_name, line: [roleLabel(c.other.role), c.other.city].filter(Boolean).join(" · ") },
+    other: { id: c.other.id, name: c.other.display_name, photo: c.other.photo ?? null, line: [roleLabel(c.other.role), c.other.city].filter(Boolean).join(" · ") },
     request: c.status === "request" ? (c.started_by_me ? "sent" : "received") : null,
   };
   const all = (msgs.data?.pages ?? []).flatMap((pg) => pg.items).slice().reverse();
@@ -232,7 +232,7 @@ export function useConversation(id: number) {
   };
 }
 
-export type DraftPerson = { id: number; name: string; line: string };
+export type DraftPerson = { id: number; name: string; photo: string | null; line: string };
 
 /**
  * A conversation that doesn't exist yet ("New message" to a connection, or "Reply" on a Live wire update). The first send starts it (`POST /api/conversations`);
@@ -246,7 +246,7 @@ export function useDraftConversation(memberId: number, onStarted: (conversationI
     enabled: enabled && Number.isFinite(memberId),
     queryFn: async (): Promise<DraftPerson> => {
       const a = await unwrap(api.GET("/api/members/{member_id}", { params: { path: { member_id: memberId } } }));
-      return { id: a.id, name: a.display_name, line: [roleLabel(a.role), a.city].filter(Boolean).join(" · ") };
+      return { id: a.id, name: a.display_name, photo: a.photo ?? null, line: [roleLabel(a.role), a.city].filter(Boolean).join(" · ") };
     },
   });
   const start = useMutation({

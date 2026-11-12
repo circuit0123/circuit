@@ -7,7 +7,8 @@ export type Person = {
   headline: string;
   place: string;
   level: number;
-  photo?: string | null;
+  /** Signed picture link, or null (no photo, or the member chose none). */
+  photo: string | null;
 };
 
 export type MediaItem = { src: string; srcSmall: string; alt: string; width: number | null; height: number | null };

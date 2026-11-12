@@ -9,7 +9,7 @@ function splitName(name: string): [string, string | null] {
   return [words[0], `${words.slice(1).join(" ")}.`];
 }
 
-type Props = { id: number; name: string; level: number; line: string; org?: string | null; photo?: string | null; children?: React.ReactNode };
+type Props = { id: number; name: string; level: number; line: string; org?: string | null; photo: string | null; children?: React.ReactNode };
 
 /** The profile banner (PMProfile.dc.html): a grey panel with one emerald slash, the name in two lines (second outlined) and the avatar. */
 export function ProfileHeroV2({ id, name, level, line, org, photo, children }: Props) {

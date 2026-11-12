@@ -29,7 +29,7 @@ export function WaitingForYou() {
   );
 }
 
-function ConnectionCard({ id, from, note }: { id: number; from: { id: number; name: string; line: string }; note: string }) {
+function ConnectionCard({ id, from, note }: { id: number; from: { id: number; name: string; photo: string | null; line: string }; note: string }) {
   const respond = useRespondConnection();
   const toast = useToast();
   // mutateAsync, not mutate's callbacks: the row is removed at once, so this card unmounts and those callbacks would be skipped.
@@ -42,7 +42,7 @@ function ConnectionCard({ id, from, note }: { id: number; from: { id: number; na
   return (
     <div className="rounded-card bg-surface p-surface" data-testid="connection-request">
       <Link href={memberHref(from.id) ?? "/"} className="flex items-center gap-3 active:opacity-80">
-        <Avatar id={from.id} name={from.name} size={40} />
+        <Avatar id={from.id} name={from.name} src={from.photo} size={40} />
         <span className="min-w-0">
           <span className="t-body block font-semibold">{from.name}</span>
           <span className="t-subhead block text-text-muted">{from.line}</span>

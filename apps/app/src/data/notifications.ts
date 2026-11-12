@@ -16,7 +16,7 @@ export type NotificationRow = {
   id: number;
   text: string;
   /** Who did it, when a person did; system notices have none. */
-  actor: { id: number; name: string } | null;
+  actor: { id: number; name: string; photo: string | null } | null;
   /** "9:41 am", IST. */
   time: string;
   unread: boolean;
@@ -49,7 +49,7 @@ export function groupByDay(items: Schemas["NotificationOut"][], now = new Date()
     const row: NotificationRow = {
       id: n.id,
       text: n.text,
-      actor: n.actor ? { id: n.actor.id, name: n.actor.display_name } : null,
+      actor: n.actor ? { id: n.actor.id, name: n.actor.display_name, photo: n.actor.photo ?? null } : null,
       time: timeOf(at),
       unread: !n.read,
       href: notificationHref(n.target),

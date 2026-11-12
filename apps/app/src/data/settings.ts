@@ -108,7 +108,7 @@ export function useBlocks() {
     onError: () => qc.invalidateQueries({ queryKey: key }),
     onSettled: () => qc.invalidateQueries({ queryKey: ["settings"] }),
   });
-  return { people: (q.data ?? []).map((p) => ({ id: p.id, name: p.display_name, role: roleLabel(p.role), level: p.verification_level })), isPending: q.isPending, isError: q.isError, refetch: q.refetch, unblock };
+  return { people: (q.data ?? []).map((p) => ({ id: p.id, name: p.display_name, photo: p.photo ?? null, role: roleLabel(p.role), level: p.verification_level })), isPending: q.isPending, isError: q.isError, refetch: q.refetch, unblock };
 }
 
 export type ExportState =

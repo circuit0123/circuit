@@ -131,7 +131,25 @@ def test_members_list_is_scoped_and_opt_in_only(make_member, make_org, client_fo
     make_member(org=None, visible_to_org=True)
     body = client_for(admin).get("/api/organisations/mine/members").json()
     assert [i["id"] for i in body["items"]] == [visible.pk] and body["count"] == 1 and body["next_offset"] is None
-    assert set(body["items"][0]) == {"id", "display_name", "role", "college", "verification_level"}  # no bio/location/etc.
+    assert set(body["items"][0]) == {
+        "id",
+        "display_name",
+        "role",
+        "college",
+        "verification_level",
+        "photo",
+    }  # no bio/location/etc.
+
+
+def test_members_list_shows_photos_but_never_a_minors(make_member, make_org, client_for):
+    org = make_org()
+    admin = make_member("partner_admin", org=org)
+    adult = make_member(org=org, visible_to_org=True, photo_path="avatar/1/adult")
+    minor = make_member(org=org, visible_to_org=True, photo_path="avatar/2/minor", is_minor=True)
+    bare = make_member(org=org, visible_to_org=True)
+    rows = {i["id"]: i for i in client_for(admin).get("/api/organisations/mine/members").json()["items"]}
+    assert rows[adult.pk]["photo"].startswith("http")
+    assert rows[minor.pk]["photo"] is None and rows[bare.pk]["photo"] is None
 
 
 def test_members_list_paginates(make_member, make_org, client_for):

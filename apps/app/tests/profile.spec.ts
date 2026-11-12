@@ -215,3 +215,22 @@ test.describe("Profile: accessibility", () => {
     });
   }
 });
+
+test.describe("Profile: photos", () => {
+  // The picture sits in the header next to the name (v1 layout). Mock people 2 (Asha) has a photo and 5 (Dr. Kavya) has none.
+  const headerPicture = (page: Page) => page.locator("header").filter({ has: page.getByRole("heading", { level: 1 }) }).locator("img");
+
+  test("a member's photo shows on their profile; someone with none keeps the pattern", async ({ page }) => {
+    await person(page, 2);
+    await expect(headerPicture(page)).toHaveCount(1);
+    await person(page, 5);
+    await expect(headerPicture(page)).toHaveCount(0);
+  });
+
+  test("with no photo your own profile shows the pattern and Settings offers to add one", async ({ page }) => {
+    await page.goto("/settings/profile");
+    await expect(page.getByRole("button", { name: "Add a photo" })).toBeVisible();
+    await own(page);
+    await expect(headerPicture(page)).toHaveCount(0);
+  });
+});

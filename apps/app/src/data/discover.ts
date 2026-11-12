@@ -52,7 +52,7 @@ export function useHere(): { lat: number; lng: number } {
   return loc ?? (pilot ? { lat: pilot.lat, lng: pilot.lng } : PILOT_CENTRE);
 }
 
-export type PersonTile = { id: number; name: string; line: string; fit: string | null; bridge: boolean; level: number };
+export type PersonTile = { id: number; name: string; photo: string | null; line: string; fit: string | null; bridge: boolean; level: number };
 
 /** Discover → People: the member's matches as photo-first tiles, matched on skills. Role and "verified only" filter what came back. */
 export function useDiscoverPeople(filters: DiscoverFilters, on = true) {
@@ -67,6 +67,7 @@ export function useDiscoverPeople(filters: DiscoverFilters, on = true) {
     .map((m) => ({
       id: m.candidate_id,
       name: m.display_name,
+      photo: m.photo ?? null,
       line: m.sector ? `${roleLabel(m.role)}, ${sectorLabel(m.sector).toLowerCase()}` : roleLabel(m.role),
       fit: m.is_bridge ? "Bridge match" : m.strength === "strong" ? "Strong match" : m.strength === "good" ? "Good match" : null,
       bridge: m.is_bridge,
@@ -75,7 +76,7 @@ export function useDiscoverPeople(filters: DiscoverFilters, on = true) {
   return { items, isPending: q.isPending && on, isError: q.isError, refetch: q.refetch };
 }
 
-export type StartupTile = { id: number; name: string; sector: string; km: number | null; hiring: boolean; openRoles: number; careersUrl: string | null; fit: string | null; verified: boolean };
+export type StartupTile = { id: number; name: string; logo: string | null; sector: string; km: number | null; hiring: boolean; openRoles: number; careersUrl: string | null; fit: string | null; verified: boolean };
 
 /**
  * What a startup says about hiring. `hiring` from the API is the only truth; roles and the careers page only decide what we can offer:
@@ -89,6 +90,7 @@ export function hiringState(t: { hiring: boolean; openRoles: number; careersUrl:
 export const toStartupTile = (p: Schemas["PinOut"]): StartupTile => ({
   id: p.id,
   name: p.name,
+  logo: p.logo ?? null,
   sector: sectorLabel(p.sector),
   km: p.distance_km ?? null,
   hiring: p.hiring,
@@ -114,7 +116,7 @@ export function useDiscoverStartups(filters: DiscoverFilters, on = true) {
 }
 
 export type JobRow = {
-  id: number; title: string; startup: string; startupId: number; sector: string; km: number | null; stipend: string | null; kind: string;
+  id: number; title: string; startup: string; startupId: number; logo: string | null; sector: string; km: number | null; stipend: string | null; kind: string;
   fit: string | null; applied: boolean; verified: boolean;
 };
 
@@ -124,6 +126,7 @@ export const toJobRow = (j: JobIn): JobRow => ({
   title: j.title,
   startup: j.startup_name,
   startupId: j.startup_id,
+  logo: j.startup_logo ?? null,
   sector: sectorLabel(j.sector),
   km: j.distance_km ?? null,
   stipend: rupees(j.stipend_min, j.stipend_max),
@@ -197,7 +200,7 @@ export function useDiscoverSearch(query: string) {
     on,
     isPending: on && !found.isError && !ready,
     isError: on && found.isError,
-    people: ready ? found.data!.people.map((p): PersonTile => ({ id: p.id, name: p.display_name, line: p.headline || roleLabel(p.role), fit: null, bridge: false, level: p.verification_level })) : [],
+    people: ready ? found.data!.people.map((p): PersonTile => ({ id: p.id, name: p.display_name, photo: p.photo ?? null, line: p.headline || roleLabel(p.role), fit: null, bridge: false, level: p.verification_level })) : [],
     startups: ready ? found.data!.startups.map(toStartupTile) : [],
     jobs: ready ? (found.data!.jobs as JobIn[]).map(toJobRow).filter(visibleTo(me)) : [],
   };
@@ -222,13 +225,13 @@ export function usePromotion(seg: "startups" | "jobs"): Promotion | null {
     const r = PROMOTED_STAND_IN.role;
     return {
       key: PROMOTED_STAND_IN.key, why: PROMOTED_STAND_IN.why, label: PROMOTED_STAND_IN.startup, kind: "role",
-      job: { id: r.id, title: r.title, startup: r.startup, startupId: 43, sector: "Logistics", km: r.km, stipend: r.stipend, kind: "Internship", fit: null, applied: false, verified: PROMOTED_STAND_IN.verified },
+      job: { id: r.id, title: r.title, startup: r.startup, startupId: 43, logo: null, sector: "Logistics", km: r.km, stipend: r.stipend, kind: "Internship", fit: null, applied: false, verified: PROMOTED_STAND_IN.verified },
     };
   }
   const s = PROMOTED_STARTUP_STAND_IN;
   if (me?.isMinor && !s.verified) return null;
   return {
     key: s.key, why: s.why, label: s.name, kind: "startup",
-    startup: { id: s.id, name: s.name, sector: sectorLabel(s.sector), km: 7.4, hiring: true, openRoles: 2, careersUrl: null, fit: null, verified: s.verified },
+    startup: { id: s.id, name: s.name, logo: null, sector: sectorLabel(s.sector), km: 7.4, hiring: true, openRoles: 2, careersUrl: null, fit: null, verified: s.verified },
   };
 }

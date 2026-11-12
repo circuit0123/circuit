@@ -25,6 +25,8 @@ export type SkillItem = { slug: string; name: string; level: number; proof: stri
 export type ProfileView = {
   id: number;
   name: string;
+  /** Signed link to the profile photo, or null (none chosen, removed, or under 18 and not me). */
+  photo: string | null;
   role: string;
   /** "Frontend developer · Chennai": headline (or role) and place. */
   line: string;
@@ -105,6 +107,7 @@ export function useProfile(id: number) {
   const data: PersonView | undefined = p && {
     id: p.id,
     name: p.display_name,
+    photo: p.photo ?? null,
     role: roleLabel(p.role),
     line: lineOf(x.headline, p.role, p.city),
     org: x.org ?? null,
@@ -187,6 +190,7 @@ export function useMyProfile() {
   const data: (ProfileView & { minor: boolean; hiddenFromPublic: boolean }) | undefined = m && mine.needs.data && mine.offers.data && mine.skills.data ? {
     id: m.id,
     name: m.name,
+    photo: m.photo,
     role: roleLabel(m.role),
     line: lineOf(x.headline, m.role, m.city),
     org: x.org ?? (m.college || null),

@@ -11,6 +11,7 @@ export type RingMember = {
   /** What the ring shows beside the avatar: "You" or a first name. */
   label: string;
   name: string;
+  photo: string | null;
   /** This person said yes: their segment of the ring (from them to the person they help) is lit. */
   lit: boolean;
 };
@@ -120,7 +121,7 @@ export function CircuitRing({ members, centre, label, closing = false, onDone, c
             animate={closing && !reduce ? { scale: [1, 1.12, 1] } : { scale: 1 }}
             transition={{ duration: 0.3, delay: closing && !reduce ? 3 * SEGMENT + SWEEP - 0.2 : 0 }}
           >
-            <Avatar id={m.id} name={m.name} size={40} />
+            <Avatar id={m.id} name={m.name} src={m.photo} size={40} />
           </motion.span>
         );
       })}

@@ -3,7 +3,7 @@ import type { MediaItem, Person, PostView, RoleView } from "@circuit/ui";
 import { ago, rupees, roleLabel } from "@/lib/format";
 
 export function toPerson(a: Schemas["AuthorOut"]): Person {
-  return { id: a.id, name: a.display_name, role: roleLabel(a.role), headline: a.headline, place: a.city, level: a.verification_level };
+  return { id: a.id, name: a.display_name, role: roleLabel(a.role), headline: a.headline, place: a.city, level: a.verification_level, photo: a.photo ?? null };
 }
 
 export function toPost(p: Schemas["PostOut"], meId: number | undefined): PostView {

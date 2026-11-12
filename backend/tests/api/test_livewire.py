@@ -80,6 +80,7 @@ def test_hiring_needs_joined_and_circuit_nodes(me_and_friend, make_member, make_
     by_kind = {i["kind"]: i for i in wire(client_for, me)}
     assert set(by_kind) == {"hiring", "needs", "joined"}
     assert by_kind["hiring"]["startup"]["id"] == startup.pk and by_kind["hiring"]["actor"] is None
+    assert by_kind["hiring"]["startup"]["logo"] is None  # no logo uploaded: the app draws the circuit pattern
     assert by_kind["hiring"]["action"] == {"kind": "view_role", "target_id": job.pk}
     assert by_kind["needs"]["headline"].startswith("Needs help with") and "which they need" in by_kind["needs"]["reason"]
     assert by_kind["joined"]["headline"] == f"Joined {org.name}"

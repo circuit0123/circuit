@@ -13,6 +13,7 @@
             "application_id": 4,
             "applied_at": "2026-03-02T04:00:00Z",
             "display_name": "Aditi Venkatesh",
+            "photo": null,
             "skill_match": 0.45,
             "skills": [
               {
@@ -29,6 +30,7 @@
             "application_id": 3,
             "applied_at": "2026-03-02T04:00:00Z",
             "display_name": "Hemalatha Pillai",
+            "photo": null,
             "skill_match": 0.4,
             "skills": [
               {
@@ -45,6 +47,7 @@
             "application_id": 2,
             "applied_at": "2026-03-02T04:00:00Z",
             "display_name": "Aditi Annamalai",
+            "photo": null,
             "skill_match": 0.35,
             "skills": [
               {
@@ -61,6 +64,7 @@
             "application_id": 1,
             "applied_at": "2026-03-02T04:00:00Z",
             "display_name": "Kavin Venkatesh",
+            "photo": null,
             "skill_match": 0.3,
             "skills": [
               {
@@ -94,6 +98,7 @@
         "job_title": "Frontend Intern",
         "skill_match": 0.3,
         "startup_id": 3,
+        "startup_logo": null,
         "startup_name": "Pixelwave Labs",
         "status": "shortlisted"
       },
