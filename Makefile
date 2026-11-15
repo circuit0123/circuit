@@ -212,7 +212,7 @@ else
 endif
 
 lint: ## ruff, mypy, ESLint
-	$(BACKEND) ruff check . && $(BACKEND) ruff format --check . && $(BACKEND) mypy .
+	$(BACKEND) ruff check . && $(BACKEND) ruff format --check . && $(BACKEND) mypy --show-traceback .
 	pnpm lint
 
 fmt: ## Auto-format Python (prettier is not installed yet)

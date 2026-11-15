@@ -40,12 +40,14 @@ jobs:
           cache-dependency-glob: backend/uv.lock
       - name: Install backend dependencies
         run: uv sync --directory backend --frozen
+      - name: Environment file (mypy's Django plugin loads the settings, which refuse to start without these variables)
+        run: cp .env.example .env
       - name: ruff (rules)
         run: uv run --directory backend ruff check .
       - name: ruff (format)
         run: uv run --directory backend ruff format --check .
       - name: mypy
-        run: uv run --directory backend mypy .
+        run: uv run --directory backend mypy --show-traceback .
       - name: API freeze (openapi.json needs a version bump and a FRONTEND_HANDOFF.md change)
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
