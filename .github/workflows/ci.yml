@@ -49,7 +49,7 @@ jobs:
       - name: ruff (format)
         run: uv run --directory backend ruff format --check .
       - name: mypy
-        run: uv run --directory backend mypy --show-traceback .
+        run: uv run --directory backend mypy .
       - name: API freeze (openapi.json needs a version bump and a FRONTEND_HANDOFF.md change)
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
