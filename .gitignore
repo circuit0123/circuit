@@ -39,3 +39,6 @@ apps/app/playwright-report/
 .next-mock-v2/
 .next-v2build/
 .next-v2prev/
+
+# google-github-actions/auth writes this into the workspace; an untracked file would make scripts/gcp.py think the tree is dirty
+gha-creds-*.json
