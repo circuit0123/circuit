@@ -206,7 +206,11 @@ def test_plan_monitoring_writes_every_file_and_names_them(prod):
     assert any(api_host in text for text in apply_step.files.values())  # API_URL=auto resolved with the project number
 
 
-def test_monitoring_with_no_channels_stops_with_a_message_not_a_traceback():
+def test_monitoring_with_no_channels_stops_with_a_message_not_a_traceback(monkeypatch):
+    # no gcloud here: on a laptop it is logged in, on the CI runner it is not, and tests make no live calls
+    monkeypatch.setattr(
+        gcp, "read_state", lambda cfg, run=None, out=print: gcp.DeployState(project_number="123", serving_revision=None)
+    )
     out: list[str] = []
     assert gcp.main(["monitoring", "--env", "production"], out=out.append) == 1
     assert "No notification channels" in "\n".join(out)

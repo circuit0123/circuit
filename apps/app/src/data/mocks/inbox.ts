@@ -36,8 +36,13 @@ export const INBOX_PEOPLE = {
 };
 
 let nextId = 9000;
-/** Minutes since noon yesterday (local), so "Yesterday" is true whatever the time of day. */
-const sinceYesterdayNoon = () => { const d = new Date(); d.setDate(d.getDate() - 1); d.setHours(12, 0, 0, 0); return Math.round((Date.now() - d.getTime()) / 60_000); };
+/** Minutes since noon yesterday in IST (the zone inboxTime reads days in), so "Yesterday" is true whatever the time of day or the machine's timezone. */
+const IST_OFFSET_MS = 330 * 60_000;
+const sinceYesterdayNoon = () => {
+  const ist = new Date(Date.now() + IST_OFFSET_MS); // its UTC fields are the IST wall clock
+  const noon = Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate() - 1, 12) - IST_OFFSET_MS;
+  return Math.round((Date.now() - noon) / 60_000);
+};
 const m = (mine: boolean, body: string, minutes: number, read = true): Msg => ({ id: ++nextId, mine, body, image: null, removed: false, created_at: minutesAgo(minutes), read: mine || read });
 
 const fresh = (): Conv[] => [

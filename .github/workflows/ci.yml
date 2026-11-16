@@ -38,8 +38,12 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           enable-cache: true
           cache-dependency-glob: backend/uv.lock
+      - name: System libraries for GeoDjango (the Dockerfile installs the same ones)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libgdal-dev libgeos-dev libgomp1
       - name: Install backend dependencies
         run: uv sync --directory backend --frozen
+      - name: Environment file (mypy's Django plugin loads the settings, which refuse to start without these variables)
+        run: cp .env.example .env
       - name: ruff (rules)
         run: uv run --directory backend ruff check .
       - name: ruff (format)
@@ -69,6 +73,8 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: System libraries for GeoDjango (the Dockerfile installs the same ones)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libgdal-dev libgeos-dev libgomp1
       - name: Install backend dependencies
         run: uv sync --directory backend --frozen
       - name: Install frontend dependencies
