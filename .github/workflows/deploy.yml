@@ -45,7 +45,7 @@ jobs:
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.sha }}
           fetch-depth: 0
@@ -81,7 +81,7 @@ jobs:
       group: deploy-${{ inputs.environment }}
       cancel-in-progress: false # two deploys of one environment never overlap, and a running one is never cut off
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.verify.outputs.sha }}
 
