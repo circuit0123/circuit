@@ -3,7 +3,7 @@
 # Works on ARM64 and x86_64: only Debian packages and Python wheels. Cloud Run itself runs x86_64.
 
 # ---- builder: has uv and the Python packages; none of this reaches the final image -----------------------------------------
-FROM python:3.12-slim-trixie AS builder
+FROM python:3.15-slim-trixie AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.12.19 /uv /usr/local/bin/uv
 # collectstatic imports GeoDjango, which loads the GDAL and GEOS libraries (same packages as the runtime stage below).
 RUN apt-get update \
@@ -32,7 +32,7 @@ RUN ENV=demo SECRET_KEY=build-only-0123456789-abcdefghijklmnopqrstuvwxyz DATABAS
     .venv/bin/python manage.py collectstatic --noinput
 
 # ---- runtime: only what is needed to run --------------------------------------------------------------------------------
-FROM python:3.12-slim-trixie
+FROM python:3.15-slim-trixie
 # libgdal36 + libgeos-c1t64: GeoDjango (PostGIS). libgomp1: LightGBM's OpenMP runtime (train_ranker, compute_matches).
 # postgresql-client-17 (pg_dump; version 17 can dump Supabase's Postgres 15-17) + age: the nightly encrypted backup (core/backup.py).
 RUN apt-get update \
